@@ -46,7 +46,8 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 - 연동 테스트 (DB 접근, Auth 흐름)
 
 ### 사전 준비 (유저 액션)
-- Supabase 프로젝트 생성
+- Supabase 프로젝트 생성 (Pro 플랜, Branching 활성화)
+- Vercel + Supabase 통합 연결 (Preview Branch 자동 환경변수 주입)
 - Google Cloud Console OAuth 2.0 클라이언트 발급
 - Supabase Auth에 Google Provider 등록
 
@@ -141,21 +142,23 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 | 환경 | 브랜치 | Vercel | Supabase | 도메인 |
 |------|--------|--------|----------|--------|
-| **Production** | `main` | Production 배포 | prod 프로젝트 | 커스텀 도메인 |
-| **Development** | `develop` / PR | Preview 배포 | dev 프로젝트 | `*.vercel.app` (자동) |
+| **Production** | `main` | Production 배포 | 메인 DB | 커스텀 도메인 |
+| **Development** | `develop` / PR | Preview 배포 | Preview Branch (자동) | `*.vercel.app` (자동) |
 
 ### Git 브랜칭
 - `main` — 프로덕션. 직접 push 금지, PR merge만 허용
 - `develop` — 개발 통합 브랜치. feature 브랜치에서 PR → develop 머지
 - `feature/*` — 기능 개발 브랜치
 
-### Supabase 프로젝트
-- **dev**: 개발/테스트용. 자유롭게 스키마 변경, 데이터 초기화 가능
-- **prod**: 운영용. 스키마 변경은 dev에서 검증 후 반영
+### Supabase (Pro 플랜 + Branching)
+- 하나의 Supabase 프로젝트로 dev/prod 통합 관리
+- PR 생성 시 Preview Branch가 자동 생성 (임시 DB 인스턴스)
+- PR 머지/닫기 시 Preview Branch 자동 삭제
+- 스키마 변경은 마이그레이션 파일로 관리, PR 브랜치에서 자동 적용
 
-### Vercel 환경변수 스코핑
-- **Production**: prod Supabase URL/Key, 실제 API 키
-- **Preview / Development**: dev Supabase URL/Key, 테스트 API 키
+### Vercel 환경변수
+- **Production**: Supabase 메인 프로젝트 URL/Key, 실제 API 키
+- **Preview**: Supabase Preview Branch URL/Key (Vercel + Supabase 통합 시 자동 주입)
 
 ### 커스텀 도메인
 - Vercel Production 배포에 커스텀 도메인 연결
@@ -164,9 +167,9 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ### 배포 흐름
 ```
-feature/* → PR → develop (Preview 배포 + dev Supabase)
+feature/* → PR → develop (Vercel Preview + Supabase Preview Branch)
                      ↓ 검증 완료
-               PR → main (Production 배포 + prod Supabase + 커스텀 도메인)
+               PR → main (Vercel Production + Supabase 메인 DB + 커스텀 도메인)
 ```
 
 ---
