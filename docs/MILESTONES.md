@@ -36,7 +36,35 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 3: Google OAuth 인증
+## Step 3: Supabase 프로젝트 연동
+
+- `.env.local`에 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` 설정
+- Supabase SQL Editor에서 스키마 실행 (`001_schema.sql` ~ `004_storage.sql`)
+- Google OAuth Provider 활성화 (Google Cloud Console OAuth 클라이언트 ID/Secret 등록)
+- `supabase gen types typescript`로 DB 타입 자동 생성 → `src/types/database.ts`
+- 수동 타입(`src/types/index.ts`)을 자동 생성 타입 기반으로 전환
+- 연동 테스트 (DB 접근, Auth 흐름)
+
+### 사전 준비 (유저 액션)
+- Supabase 프로젝트 생성
+- Google Cloud Console OAuth 2.0 클라이언트 발급
+- Supabase Auth에 Google Provider 등록
+
+---
+
+## Step 4: 네이버 API 연동
+
+- `.env.local`에 `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`, `NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID` 설정
+- 검색 API: Route Handler 프록시 구현 (`src/app/api/naver-search/route.ts`) + 응답 테스트
+- 지도 API: 스크립트 로딩 유틸 + 기본 맵 컴포넌트 (`src/components/naver-map.tsx`)
+- 회사 위치(크몽, 06625) 중심 기본 지도 렌더링 확인
+
+### 사전 준비 (유저 액션)
+- 네이버 개발자센터에서 검색 API + Maps API 키 발급
+
+---
+
+## Step 5: Google OAuth 인증
 
 - Google OAuth 로그인/로그아웃 구현
 - OAuth 콜백 처리 (`src/app/auth/callback/route.ts`)
@@ -48,7 +76,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 4: 레이아웃 + 홈 페이지
+## Step 6: 레이아웃 + 홈 페이지
 
 - 공통 레이아웃: 헤더 (로고, 네비게이션, 로그인/아바타)
 - 모바일 하단 네비게이션
@@ -59,9 +87,8 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 5: 맛집 CRUD + 네이버 검색
+## Step 7: 맛집 CRUD
 
-- 네이버 검색 프록시 API (`src/app/api/naver-search/route.ts`)
 - 맛집 등록 페이지 — 네이버 검색 자동완성 → 선택 시 정보 자동 채움
 - 맛집 목록 페이지 (카테고리/코나카드 필터)
 - 맛집 상세 페이지
@@ -75,7 +102,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 6: 상호작용 (리뷰, 좋아요, 코나카드 투표)
+## Step 8: 상호작용 (리뷰, 좋아요, 코나카드 투표)
 
 - 리뷰 작성: 별점(1-5, 필수) + 내용(선택) + 사진 다수(선택, 0번째=썸네일)
 - 리뷰 수정/삭제 (작성자만)
@@ -85,16 +112,14 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 7: 네이버 지도 연동
+## Step 9: 지도 뷰
 
-- Naver Maps JavaScript API v3 클라이언트 로딩
-- 회사 위치(크몽, 06625) 중심 기본 표시
 - 맛집 마커 표시, 클릭 시 InfoWindow (이름, 카테고리, 코나카드 상태)
 - 맛집 목록 페이지에 리스트/지도 뷰 전환
 
 ---
 
-## Step 8: 랜덤 룰렛
+## Step 10: 랜덤 룰렛
 
 - 카테고리 필터 + 코나카드 필터
 - CSS 애니메이션 기반 룰렛 회전
@@ -102,7 +127,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 9: 마이페이지
+## Step 11: 마이페이지
 
 - 내가 등록한 맛집 목록
 - 내가 작성한 리뷰 목록
@@ -115,21 +140,13 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 ```
 Step 1 (초기 세팅) ✅
   └→ Step 2 (DB 스키마) ✅
-       └→ Step 3 (인증)
-            ├→ Step 4 (레이아웃 + 홈)
-            └→ Step 5 (맛집 CRUD)
-                 ├→ Step 6 (상호작용)
-                 ├→ Step 7 (지도)
-                 └→ Step 8 (룰렛)
-                      └→ Step 9 (마이페이지)
+       └→ Step 3 (Supabase 연동)
+            ├→ Step 4 (네이버 API 연동)
+            └→ Step 5 (Google OAuth)
+                 └→ Step 6 (레이아웃 + 홈)
+                      └→ Step 7 (맛집 CRUD) ← Step 4 필요
+                           ├→ Step 8 (상호작용)
+                           ├→ Step 9 (지도 뷰) ← Step 4 필요
+                           └→ Step 10 (룰렛)
+                                └→ Step 11 (마이페이지)
 ```
-
----
-
-## 사전 준비 (유저 액션)
-
-- [ ] Supabase 프로젝트 생성 → URL + Anon Key
-- [ ] Supabase Google OAuth Provider 활성화
-- [ ] Google Cloud Console → OAuth 2.0 클라이언트 ID/Secret
-- [ ] 네이버 개발자센터 → 검색 API + Maps API 키
-- [ ] 코나카드 사용가능 우편번호 데이터 (`kona_postal_codes` 시드)
