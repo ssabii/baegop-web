@@ -13,7 +13,7 @@ export interface Profile {
 }
 
 export interface Restaurant {
-  id: string;
+  id: number;
   name: string;
   category: string;
   address: string;
@@ -23,7 +23,6 @@ export interface Restaurant {
   naver_place_id: string | null;
   description: string | null;
   kona_card_status: KonaCardStatus;
-  kona_card_zone: boolean;
   like_count: number;
   dislike_count: number;
   created_by: string;
@@ -33,28 +32,36 @@ export interface Restaurant {
 }
 
 export interface Review {
-  id: string;
-  restaurant_id: string;
+  id: number;
+  restaurant_id: number;
   user_id: string;
   profile?: Profile;
   rating: number;
   content: string | null;
-  image_urls: string[];
+  images?: ReviewImage[];
   created_at: string;
   updated_at: string;
 }
 
+export interface ReviewImage {
+  id: number;
+  review_id: number;
+  url: string;
+  display_order: number;
+  created_at: string;
+}
+
 export interface Reaction {
-  id: string;
-  restaurant_id: string;
+  id: number;
+  restaurant_id: number;
   user_id: string;
   type: ReactionType;
   created_at: string;
 }
 
 export interface KonaCardVote {
-  id: string;
-  restaurant_id: string;
+  id: number;
+  restaurant_id: number;
   user_id: string;
   vote: KonaVote;
   created_at: string;
