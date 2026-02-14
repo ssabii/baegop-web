@@ -157,11 +157,16 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 - **Production**: prod Supabase URL/Key, 실제 API 키
 - **Preview / Development**: dev Supabase URL/Key, 테스트 API 키
 
+### 커스텀 도메인
+- Vercel Production 배포에 커스텀 도메인 연결
+- DNS 설정 (A/CNAME 레코드 → Vercel)
+- Supabase Auth redirect URL에 커스텀 도메인 추가
+
 ### 배포 흐름
 ```
 feature/* → PR → develop (Preview 배포 + dev Supabase)
                      ↓ 검증 완료
-               PR → main (Production 배포 + prod Supabase)
+               PR → main (Production 배포 + prod Supabase + 커스텀 도메인)
 ```
 
 ---
