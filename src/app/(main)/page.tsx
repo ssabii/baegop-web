@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Search, Shuffle, UtensilsCrossed } from "lucide-react";
+import { Search, Shuffle, ThumbsUp, Clock, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/server";
+import { RestaurantCard } from "@/components/restaurant-card";
 
 const CATEGORY_SUGGESTIONS = [
   { label: "한식 어때요?", query: "한식", emoji: "🍚" },
@@ -12,7 +14,21 @@ const CATEGORY_SUGGESTIONS = [
   { label: "분식 어때요?", query: "분식", emoji: "🍢" },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient();
+
+  const { data: popularRestaurants } = await supabase
+    .from("restaurants")
+    .select("id, name, address, category, kona_card_status, like_count")
+    .order("like_count", { ascending: false, nullsFirst: false })
+    .limit(5);
+
+  const { data: recentRestaurants } = await supabase
+    .from("restaurants")
+    .select("id, name, address, category, kona_card_status, like_count")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-12">
       {/* Hero */}
@@ -26,7 +42,7 @@ export default function HomePage() {
 
         {/* CTA 버튼 */}
         <Button size="lg" className="mt-8 gap-2" asChild>
-          <Link href="/search">
+          <Link href="/random">
             <Shuffle className="size-4" />
             오늘 뭐 먹지?
           </Link>
@@ -62,37 +78,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 최근/인기 맛집 플레이스홀더 */}
+      {/* 인기 맛집 */}
       <section className="mt-16">
-        <h2 className="text-lg font-semibold">인기 맛집</h2>
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle className="text-base text-muted-foreground">
-              준비 중입니다
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              리뷰가 쌓이면 인기 맛집이 여기에 표시됩니다.
-            </p>
-          </CardContent>
-        </Card>
+        <h2 className="flex items-center gap-2 text-lg font-semibold">
+          <ThumbsUp className="size-5" />
+          인기 맛집
+        </h2>
+        {popularRestaurants && popularRestaurants.length > 0 ? (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {popularRestaurants.map((r) => (
+              <RestaurantCard key={r.id} restaurant={r} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-4 text-sm text-muted-foreground">
+            아직 등록된 맛집이 없습니다. 첫 번째 맛집을 등록해보세요!
+          </p>
+        )}
       </section>
 
+      {/* 최근 등록된 맛집 */}
       <section className="mt-8">
-        <h2 className="text-lg font-semibold">최근 등록된 맛집</h2>
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle className="text-base text-muted-foreground">
-              준비 중입니다
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              새로 등록된 맛집이 여기에 표시됩니다.
-            </p>
-          </CardContent>
-        </Card>
+        <h2 className="flex items-center gap-2 text-lg font-semibold">
+          <Clock className="size-5" />
+          최근 등록된 맛집
+        </h2>
+        {recentRestaurants && recentRestaurants.length > 0 ? (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {recentRestaurants.map((r) => (
+              <RestaurantCard key={r.id} restaurant={r} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-4 text-sm text-muted-foreground">
+            아직 등록된 맛집이 없습니다.
+          </p>
+        )}
       </section>
     </main>
   );
