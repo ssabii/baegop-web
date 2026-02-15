@@ -24,7 +24,7 @@ export async function fetchNaverImages(query: string): Promise<string[]> {
   try {
     const url = new URL("https://openapi.naver.com/v1/search/image");
     url.searchParams.set("query", query);
-    url.searchParams.set("display", "3");
+    url.searchParams.set("display", "10");
     url.searchParams.set("sort", "sim");
 
     const res = await fetch(url.toString(), {

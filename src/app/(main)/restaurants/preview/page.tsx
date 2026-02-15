@@ -1,6 +1,7 @@
-import { ExternalLink, MapPin, Phone, Tag, UtensilsCrossed } from "lucide-react";
+import { ExternalLink, MapPin, Phone, Tag } from "lucide-react";
 import { buildNaverMapLink } from "@/lib/naver";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageGallery } from "@/components/image-gallery";
 import { ReviewForm } from "./review-form";
 
 export default async function RestaurantPreviewPage({
@@ -29,19 +30,7 @@ export default async function RestaurantPreviewPage({
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
       <Card>
-        {imageUrls[0] ? (
-          <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
-            <img
-              src={imageUrls[0]}
-              alt={title}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        ) : (
-          <div className="flex h-48 w-full items-center justify-center rounded-t-lg bg-muted">
-            <UtensilsCrossed className="size-12 text-muted-foreground" />
-          </div>
-        )}
+        <ImageGallery images={imageUrls} alt={title} />
         <CardHeader>
           <div className="flex items-center gap-2">
             <CardTitle className="text-2xl">{title}</CardTitle>
