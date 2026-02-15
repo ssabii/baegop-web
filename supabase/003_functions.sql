@@ -6,7 +6,7 @@
 create or replace function handle_new_user()
 returns trigger as $$
 begin
-  insert into profiles (id, email, nickname, avatar_url)
+  insert into public.profiles (id, email, nickname, avatar_url)
   values (
     new.id,
     new.email,
