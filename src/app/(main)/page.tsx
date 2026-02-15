@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { RestaurantSearch } from "@/components/restaurant-search";
 
 export default function HomePage() {
   return (
@@ -11,13 +10,8 @@ export default function HomePage() {
         함께 만들어가는 회사 주변 맛집 추천 서비스
       </p>
 
-      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-        <Button size="lg" asChild>
-          <Link href="/restaurants">맛집 둘러보기</Link>
-        </Button>
-        <Button size="lg" variant="outline" asChild>
-          <Link href="/restaurants/new">맛집 등록하기</Link>
-        </Button>
+      <div className="mt-10 w-full max-w-md">
+        <RestaurantSearch />
       </div>
     </main>
   );
