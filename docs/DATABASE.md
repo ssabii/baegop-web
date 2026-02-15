@@ -14,7 +14,7 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | created_at | timestamptz | 생성일 |
 
 ### restaurants
-등록된 맛집 정보. 네이버 검색 API로 자동 채움.
+맛집 정보. 리뷰 작성 시 DB에 없으면 네이버 검색 정보로 자동 생성.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -25,15 +25,16 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | postal_code | text | 우편번호 |
 | lat / lng | double precision | 위도/경도 |
 | naver_place_id | text (UNIQUE) | 네이버 장소 ID (중복 등록 방지) |
-| description | text | 한줄 메모 |
+| naver_link | text | 네이버 플레이스 URL (메뉴/소식/리뷰/사진 연결용) |
+| telephone | text | 전화번호 |
 | kona_card_status | text | `available` / `unavailable` / `unknown` |
 | like_count | int | 좋아요 수 (반정규화, 트리거 동기화) |
 | dislike_count | int | 싫어요 수 (반정규화, 트리거 동기화) |
-| created_by | uuid (FK → profiles) | 등록자 |
+| created_by | uuid (FK → profiles) | 최초 리뷰 작성자 (자동 등록자) |
 | created_at / updated_at | timestamptz | 생성/수정일 |
 
 ### reviews
-맛집 리뷰. 별점 필수, 내용과 이미지는 선택.
+맛집 리뷰. 별점 필수, 설명/이미지는 선택. 리뷰 작성 시 맛집이 DB에 없으면 자동 생성.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -41,7 +42,7 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | restaurant_id | int (FK → restaurants) | 맛집 |
 | user_id | uuid (FK → profiles) | 작성자 |
 | rating | int (1~5, NOT NULL) | 별점 |
-| content | text | 리뷰 내용 (선택) |
+| content | text | 리뷰 설명 (선택) |
 | created_at / updated_at | timestamptz | 생성/수정일 |
 
 ### review_images

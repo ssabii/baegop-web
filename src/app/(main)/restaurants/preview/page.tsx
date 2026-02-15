@@ -1,4 +1,5 @@
 import { ExternalLink, MapPin, Phone, Tag } from "lucide-react";
+import { buildNaverMapLink } from "@/lib/naver";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewForm } from "./review-form";
 
@@ -54,9 +55,9 @@ export default async function RestaurantPreviewPage({
               </a>
             </p>
           )}
-          {link && (
+          {title && address && (
             <a
-              href={link}
+              href={buildNaverMapLink(title)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
