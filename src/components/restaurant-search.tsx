@@ -1,13 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Loader2, MapPin, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { stripHtml } from "@/lib/naver";
-import { findOrCreateRestaurant } from "@/app/(main)/actions";
+import { stripHtml, extractNaverPlaceId } from "@/lib/naver";
+import { findRestaurantByNaverPlaceId } from "@/app/(main)/actions";
 import type { NaverSearchResult } from "@/types";
 
 export function RestaurantSearch() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<NaverSearchResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -51,12 +53,32 @@ export function RestaurantSearch() {
     setOpen(false);
     setQuery(stripHtml(item.title));
     startTransition(async () => {
-      await findOrCreateRestaurant(item);
+      const naverPlaceId = extractNaverPlaceId(item.link);
+
+      if (naverPlaceId) {
+        const existing = await findRestaurantByNaverPlaceId(naverPlaceId);
+        if (existing) {
+          router.push(`/restaurants/${existing.id}`);
+          return;
+        }
+      }
+
+      // DB에 없으면 프리뷰 페이지로 이동
+      const params = new URLSearchParams({
+        title: stripHtml(item.title),
+        link: item.link,
+        category: item.category,
+        telephone: item.telephone,
+        address: item.roadAddress || item.address,
+        mapx: item.mapx,
+        mapy: item.mapy,
+      });
+      router.push(`/restaurants/preview?${params.toString()}`);
     });
   }
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-md">
+    <div ref={containerRef} className="relative w-full">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
