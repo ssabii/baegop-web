@@ -162,7 +162,15 @@ update app_config set value = '5' where key = 'kona_vote_threshold';
 
 | 버킷 | 공개 | 설명 |
 |------|------|------|
-| `review-images` | O | 리뷰 이미지. 누구나 조회, 인증 유저 업로드, 본인 이미지만 삭제 |
+| `review-images` | O | 리뷰 이미지. 누구나 조회, 인증 유저 업로드, 본인만 삭제 |
+| `profile-images` | O | 프로필 이미지. 누구나 조회, 본인만 업로드/수정/삭제 |
+
+### 폴더 구조 (Storage)
+```
+review-images/{user_id}/{restaurant_id}/{파일명}
+profile-images/{user_id}/{파일명}
+```
+`(storage.foldername(name))[1]`로 본인 폴더만 접근 가능하도록 RLS 제어.
 
 ---
 
