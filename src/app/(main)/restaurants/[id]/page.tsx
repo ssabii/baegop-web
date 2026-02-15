@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
-import { MapPin, Tag, MessageSquare } from "lucide-react";
+import { ExternalLink, MapPin, Phone, Tag, MessageSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
 export default async function RestaurantDetailPage({
   params,
 }: {
@@ -36,6 +35,25 @@ export default async function RestaurantDetailPage({
               <Tag className="size-4 shrink-0" />
               {restaurant.category}
             </p>
+          )}
+          {restaurant.telephone && (
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Phone className="size-4 shrink-0" />
+              <a href={`tel:${restaurant.telephone}`} className="hover:underline">
+                {restaurant.telephone}
+              </a>
+            </p>
+          )}
+          {restaurant.naver_link && (
+            <a
+              href={restaurant.naver_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+            >
+              <ExternalLink className="size-4" />
+              네이버에서 보기
+            </a>
           )}
         </CardContent>
       </Card>
