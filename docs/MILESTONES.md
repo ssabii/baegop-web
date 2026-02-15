@@ -6,7 +6,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 1: 프로젝트 초기 세팅 ✅
+## Step 1: 프로젝트 초기 세팅 ✅ (PR #1)
 
 - Next.js 16 (App Router, React 19) + TypeScript 프로젝트 생성
 - shadcn/ui 초기화 및 기본 컴포넌트 설치
@@ -19,7 +19,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 2: Supabase DB 스키마 + RLS ✅
+## Step 2: Supabase DB 스키마 + RLS ✅ (PR #2)
 
 - 테이블: profiles, restaurants, kona_postal_codes, kona_card_votes, reviews, reactions
 - RLS 정책: 공개 조회, 인증 사용자 생성, 소유자만 수정/삭제
@@ -36,7 +36,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 3: Supabase 프로젝트 연동
+## Step 3: Supabase 프로젝트 연동 ✅
 
 - `.env.local`에 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` 설정
 - Supabase SQL Editor에서 스키마 실행 (`001_schema.sql` ~ `004_storage.sql`)
@@ -53,7 +53,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 4: 네이버 API 연동
+## Step 4: 네이버 API 연동 ✅
 
 - `.env.local`에 `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`, `NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID` 설정
 - 검색 API: Route Handler 프록시 구현 (`src/app/api/naver-search/route.ts`) + 응답 테스트
@@ -65,7 +65,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 5: Google OAuth 인증
+## Step 5: Google OAuth 인증 ✅ (PR #1)
 
 - Google OAuth 로그인/로그아웃 구현
 - OAuth 콜백 처리 (`src/app/auth/callback/route.ts`)
@@ -77,62 +77,71 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ---
 
-## Step 6: 레이아웃 + 홈 페이지
+## Step 6: 레이아웃 + 홈 페이지 ✅ (PR #2, #3, #7)
 
 - 공통 레이아웃: 헤더 (로고, 네비게이션, 로그인/아바타)
-- 모바일 하단 네비게이션
-- 홈 페이지 (`src/app/page.tsx`):
-  - 랜덤 맛집 추천 CTA ("오늘 뭐 먹지?" 버튼)
-  - 최근 등록된 맛집
-  - 인기 맛집 TOP (좋아요 기준)
+- ~~모바일 하단 네비게이션~~ → 헤더 네비게이션으로 통합
+- 홈 페이지 (`src/app/(main)/page.tsx`):
+  - 랜덤 맛집 추천 CTA ("오늘 뭐 먹지?" 버튼 → `/random`)
+  - 최근 등록된 맛집 (실데이터)
+  - 인기 맛집 TOP (좋아요 기준, 실데이터)
   - 카테고리별 추천 ("xx 어때요?" 큐레이션)
+- 공통 `RestaurantCard` 컴포넌트 추출
 
 ---
 
-## Step 7: 검색 + 맛집 상세
+## Step 7: 검색 + 맛집 상세 ✅ (PR #3, #4, #5, #7)
 
-- 검색 페이지 (`/search`) — DB 맛집 우선 + 네이버 API 결과 혼합 표시
-- 맛집 상세 페이지 — 네이버 기본 정보(이름, 주소, 카테고리, 전화번호) + "네이버에서 보기" 링크
-- 맛집 목록 페이지 (카테고리/코나카드 필터)
+- 검색 페이지 (`/search`) — 네이버 API 검색 + 자동완성
+- 맛집 상세 페이지 (`/restaurants/[id]`) — 기본 정보 + "네이버에서 보기" 링크
+- 맛집 프리뷰 페이지 (`/restaurants/preview`) — 미등록 맛집 프리뷰 + 리뷰 작성 시 자동 등록
+- 맛집 목록 페이지 (`/restaurants`) — 전체 맛집 카드 리스트
 
 ### 검색 흐름
-1. 검색 입력 → debounce → DB 검색 + `/api/naver-search` 병렬 호출
-2. DB 맛집 결과 우선 표시, 네이버 API 결과 아래에 함께 표시
-3. 결과 선택 → 맛집 상세 페이지로 이동
+1. 검색 입력 → debounce → `/api/naver-search` 호출
+2. 결과 선택 → DB에 있으면 상세 페이지, 없으면 프리뷰 페이지
+3. 프리뷰에서 리뷰 작성 시 맛집 자동 등록 + 상세 페이지 리다이렉트
 
 ---
 
-## Step 8: 상호작용 (리뷰, 좋아요, 코나카드 투표)
+## Step 8: 상호작용 (리뷰, 좋아요, 코나카드 투표) ✅ (PR #4, #6)
 
-- 리뷰 작성: 별점(1-5, 필수) + 설명(선택) + 코나카드 사용 여부(선택) + 사진 다수(선택, 0번째=썸네일)
+- 리뷰 작성: 별점(1-5, 필수) + 설명(선택)
 - **리뷰 작성 시 맛집 자동 등록**: DB에 없는 맛집이면 네이버 정보로 자동 생성 후 리뷰 연결
-- 리뷰 수정/삭제 (작성자만)
-- 리뷰 이미지 업로드 (Supabase Storage)
+- 리뷰 삭제 (작성자만)
+- ~~리뷰 수정~~ → 추후 구현
+- ~~리뷰 이미지 업로드 (Supabase Storage)~~ → 추후 구현
 - 좋아요/싫어요 토글 (이미 누른 것 취소, 반대로 변경 가능)
 - 코나카드 투표 (가능/불가, DB 트리거로 3표 이상 시 자동 상태 변경)
 
 ---
 
-## Step 9: 지도 뷰
+## Step 9: 지도 뷰 ✅ (PR #8)
 
-- 맛집 마커 표시, 클릭 시 InfoWindow (이름, 카테고리, 코나카드 상태)
-- 맛집 목록 페이지에 리스트/지도 뷰 전환
-
----
-
-## Step 10: 랜덤 룰렛
-
-- 카테고리 필터 + 코나카드 필터
-- CSS 애니메이션 기반 룰렛 회전
-- 결과 → 맛집 상세 페이지 이동 링크
+- 지도 페이지 (`/map`): 등록된 맛집을 네이버 지도에 마커 표시
+- NaverMap 컴포넌트 dynamic import (SSR 비활성화)
+- 헤더에 지도, 랜덤 네비게이션 링크 추가
+- ~~클릭 시 InfoWindow~~ → 추후 구현
+- ~~맛집 목록 페이지에 리스트/지도 뷰 전환~~ → 추후 구현
 
 ---
 
-## Step 11: 마이페이지
+## Step 10: 랜덤 룰렛 ✅ (PR #9)
 
+- 랜덤 페이지 (`/random`): 등록된 맛집 중 랜덤 추천
+- 슬롯머신 스타일 애니메이션으로 맛집 선택 + 다시 뽑기
+- 결과 → `RestaurantCard`로 표시 (클릭 시 상세 페이지 이동)
+- ~~카테고리 필터 + 코나카드 필터~~ → 추후 구현
+
+---
+
+## Step 11: 마이페이지 ✅ (PR #10)
+
+- 마이페이지 (`/mypage`): 보호 라우트 (미인증 시 `/login` 리다이렉트)
+- 내 프로필 정보 (아바타 + 닉네임)
+- 내가 작성한 리뷰 목록 (맛집 이름 join)
 - 내가 등록한 맛집 목록
-- 내가 작성한 리뷰 목록
-- 프로필 편집 (닉네임)
+- ~~프로필 편집 (닉네임)~~ → 추후 구현
 
 ---
 
@@ -179,13 +188,13 @@ feature/* → PR → develop (Vercel Preview + Supabase Preview Branch)
 ```
 Step 1 (초기 세팅) ✅
   └→ Step 2 (DB 스키마) ✅
-       └→ Step 3 (Supabase 연동)
-            ├→ Step 4 (네이버 API 연동)
-            └→ Step 5 (Google OAuth)
-                 └→ Step 6 (레이아웃 + 홈)
-                      └→ Step 7 (검색 + 맛집 상세) ← Step 4 필요
-                           ├→ Step 8 (상호작용: 리뷰 + 맛집 자동 등록)
-                           ├→ Step 9 (지도 뷰) ← Step 4 필요
-                           └→ Step 10 (룰렛)
-                                └→ Step 11 (마이페이지)
+       └→ Step 3 (Supabase 연동) ✅
+            ├→ Step 4 (네이버 API 연동) ✅
+            └→ Step 5 (Google OAuth) ✅
+                 └→ Step 6 (레이아웃 + 홈) ✅
+                      └→ Step 7 (검색 + 맛집 상세) ✅
+                           ├→ Step 8 (상호작용: 리뷰 + 맛집 자동 등록) ✅
+                           ├→ Step 9 (지도 뷰) ✅
+                           └→ Step 10 (룰렛) ✅
+                                └→ Step 11 (마이페이지) ✅
 ```
