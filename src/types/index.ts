@@ -35,4 +35,5 @@ export interface NaverSearchResult {
   roadAddress: string;
   mapx: string;
   mapy: string;
+  imageUrls?: string[];
 }

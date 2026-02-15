@@ -30,7 +30,7 @@ export default async function MyPage() {
   // 내가 등록한 맛집
   const { data: myRestaurants } = await supabase
     .from("restaurants")
-    .select("id, name, address, category, kona_card_status, like_count")
+    .select("id, name, address, category, kona_card_status, like_count, image_urls")
     .eq("created_by", user.id)
     .order("created_at", { ascending: false });
 

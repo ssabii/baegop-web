@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { stripHtml, fetchNaverImages } from "@/lib/naver";
 import type { NaverSearchResult } from "@/types";
 
 export async function GET(request: NextRequest) {
@@ -41,5 +42,13 @@ export async function GET(request: NextRequest) {
 
   const data = (await res.json()) as { items: NaverSearchResult[] };
 
-  return NextResponse.json(data.items);
+  // 병렬로 각 결과에 대해 이미지 검색
+  const resultsWithImages = await Promise.all(
+    data.items.map(async (item) => {
+      const imageUrls = await fetchNaverImages(stripHtml(item.title));
+      return { ...item, imageUrls };
+    })
+  );
+
+  return NextResponse.json(resultsWithImages);
 }

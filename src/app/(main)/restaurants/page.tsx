@@ -7,7 +7,7 @@ export default async function RestaurantsPage() {
 
   const { data: restaurants } = await supabase
     .from("restaurants")
-    .select("id, name, address, category, kona_card_status, like_count")
+    .select("id, name, address, category, kona_card_status, like_count, image_urls")
     .order("created_at", { ascending: false });
 
   return (

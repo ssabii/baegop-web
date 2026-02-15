@@ -12,6 +12,7 @@ interface RestaurantData {
   category: string | null;
   kona_card_status: string | null;
   like_count: number | null;
+  image_urls: string[] | null;
 }
 
 interface RouletteProps {

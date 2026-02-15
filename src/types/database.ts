@@ -158,6 +158,7 @@ export type Database = {
           description: string | null
           dislike_count: number | null
           id: number
+          image_urls: string[] | null
           kona_card_status: string | null
           lat: number | null
           like_count: number | null
@@ -177,6 +178,7 @@ export type Database = {
           description?: string | null
           dislike_count?: number | null
           id?: number
+          image_urls?: string[] | null
           kona_card_status?: string | null
           lat?: number | null
           like_count?: number | null
@@ -196,6 +198,7 @@ export type Database = {
           description?: string | null
           dislike_count?: number | null
           id?: number
+          image_urls?: string[] | null
           kona_card_status?: string | null
           lat?: number | null
           like_count?: number | null
