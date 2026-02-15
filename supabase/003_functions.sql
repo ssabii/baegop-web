@@ -25,7 +25,7 @@ create trigger on_auth_user_created
 create or replace function update_reaction_counts()
 returns trigger as $$
 declare
-  target_restaurant_id int;
+  target_restaurant_id bigint;
 begin
   target_restaurant_id := coalesce(new.restaurant_id, old.restaurant_id);
 
@@ -47,7 +47,7 @@ create trigger on_reaction_change
 create or replace function check_kona_votes()
 returns trigger as $$
 declare
-  target_restaurant_id int;
+  target_restaurant_id bigint;
   available_count int;
   unavailable_count int;
   threshold int;

@@ -14,7 +14,7 @@ create table profiles (
 
 -- 2. restaurants
 create table restaurants (
-  id serial primary key,
+  id bigserial primary key,
   name text not null,
   category text,
   address text not null,
@@ -33,15 +33,15 @@ create table restaurants (
 
 -- 3. kona_postal_codes (코나카드 사용가능 우편번호)
 create table kona_postal_codes (
-  id serial primary key,
+  id bigserial primary key,
   postal_code text not null unique,
   dong_name text
 );
 
 -- 4. kona_card_votes (코나카드 크라우드소싱 투표)
 create table kona_card_votes (
-  id serial primary key,
-  restaurant_id int references restaurants(id) on delete cascade not null,
+  id bigserial primary key,
+  restaurant_id bigint references restaurants(id) on delete cascade not null,
   user_id uuid references profiles(id) not null,
   vote text not null check (vote in ('available', 'unavailable')),
   created_at timestamptz default now(),
@@ -50,8 +50,8 @@ create table kona_card_votes (
 
 -- 5. reviews (리뷰)
 create table reviews (
-  id serial primary key,
-  restaurant_id int references restaurants(id) on delete cascade not null,
+  id bigserial primary key,
+  restaurant_id bigint references restaurants(id) on delete cascade not null,
   user_id uuid references profiles(id) not null,
   rating int not null check (rating >= 1 and rating <= 5),
   content text,
@@ -61,8 +61,8 @@ create table reviews (
 
 -- 6. review_images (리뷰 이미지)
 create table review_images (
-  id serial primary key,
-  review_id int references reviews(id) on delete cascade not null,
+  id bigserial primary key,
+  review_id bigint references reviews(id) on delete cascade not null,
   url text not null,
   display_order int not null default 0,
   created_at timestamptz default now()
@@ -70,8 +70,8 @@ create table review_images (
 
 -- 7. reactions (좋아요/싫어요)
 create table reactions (
-  id serial primary key,
-  restaurant_id int references restaurants(id) on delete cascade not null,
+  id bigserial primary key,
+  restaurant_id bigint references restaurants(id) on delete cascade not null,
   user_id uuid references profiles(id) not null,
   type text not null check (type in ('like', 'dislike')),
   created_at timestamptz default now(),
