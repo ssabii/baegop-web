@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { List, Search } from "lucide-react";
+import { List, MapPin, Search, Shuffle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AuthButton } from "@/components/auth-button";
 
@@ -41,6 +41,20 @@ export async function Header() {
             >
               <Search className="size-4 sm:hidden" />
               <span className="hidden sm:inline">검색</span>
+            </Link>
+            <Link
+              href="/map"
+              className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <MapPin className="size-4 sm:hidden" />
+              <span className="hidden sm:inline">지도</span>
+            </Link>
+            <Link
+              href="/random"
+              className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Shuffle className="size-4 sm:hidden" />
+              <span className="hidden sm:inline">랜덤</span>
             </Link>
           </nav>
         </div>
