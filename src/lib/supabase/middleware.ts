@@ -35,10 +35,9 @@ export async function updateSession(request: NextRequest) {
 
   // 보호 라우트: 미인증 시 로그인 페이지로 리다이렉트
   const protectedPaths = ["/mypage"];
-  const isProtected =
-    protectedPaths.some((path) =>
-      request.nextUrl.pathname.startsWith(path)
-    ) || request.nextUrl.pathname.match(/\/restaurants\/.*\/edit/);
+  const isProtected = protectedPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  );
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();

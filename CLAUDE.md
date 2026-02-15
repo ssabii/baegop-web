@@ -32,7 +32,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - `src/lib/supabase/middleware.ts` — Auth 세션 갱신 + 보호 라우트 리다이렉트
 
 ### Auth & Protected Routes
-미들웨어(`src/middleware.ts`)가 모든 요청에서 Supabase 세션을 갱신. 보호 라우트(`/mypage`, `/restaurants/*/edit`)는 미인증 시 `/login`으로 리다이렉트.
+미들웨어(`src/middleware.ts`)가 모든 요청에서 Supabase 세션을 갱신. 보호 라우트(`/mypage`)는 미인증 시 `/login`으로 리다이렉트.
 
 ### Naver Search API Proxy
 네이버 검색 API는 서버사이드 Route Handler(`src/app/api/naver-search/route.ts`)를 통해 프록시. CORS 회피 + API 키 보호 목적.

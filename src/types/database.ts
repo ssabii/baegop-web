@@ -163,8 +163,10 @@ export type Database = {
           like_count: number | null
           lng: number | null
           name: string
+          naver_link: string | null
           naver_place_id: string | null
           postal_code: string | null
+          telephone: string | null
           updated_at: string | null
         }
         Insert: {
@@ -180,8 +182,10 @@ export type Database = {
           like_count?: number | null
           lng?: number | null
           name: string
+          naver_link?: string | null
           naver_place_id?: string | null
           postal_code?: string | null
+          telephone?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -197,8 +201,10 @@ export type Database = {
           like_count?: number | null
           lng?: number | null
           name?: string
+          naver_link?: string | null
           naver_place_id?: string | null
           postal_code?: string | null
+          telephone?: string | null
           updated_at?: string | null
         }
         Relationships: [
