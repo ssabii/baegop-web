@@ -87,6 +87,19 @@ create table app_config (
 insert into app_config (key, value) values
   ('kona_vote_threshold', '3');
 
+-- 9. restaurant_menus (맛집 메뉴)
+create table restaurant_menus (
+  id bigserial primary key,
+  restaurant_id bigint references restaurants(id) on delete cascade not null,
+  name text not null,
+  price text,
+  description text,
+  images text[],
+  recommend boolean default false,
+  priority int default 0,
+  created_at timestamptz default now()
+);
+
 -- 인덱스
 create index idx_restaurants_category on restaurants(category);
 create index idx_restaurants_kona_card_status on restaurants(kona_card_status);
@@ -96,3 +109,4 @@ create index idx_reviews_user_id on reviews(user_id);
 create index idx_review_images_review_id on review_images(review_id);
 create index idx_reactions_restaurant_id on reactions(restaurant_id);
 create index idx_kona_card_votes_restaurant_id on kona_card_votes(restaurant_id);
+create index idx_restaurant_menus_restaurant_id on restaurant_menus(restaurant_id);
