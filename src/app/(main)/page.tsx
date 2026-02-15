@@ -19,13 +19,13 @@ export default async function HomePage() {
 
   const { data: popularRestaurants } = await supabase
     .from("restaurants")
-    .select("id, name, address, category, kona_card_status, like_count")
+    .select("id, name, address, category, kona_card_status, like_count, image_urls")
     .order("like_count", { ascending: false, nullsFirst: false })
     .limit(5);
 
   const { data: recentRestaurants } = await supabase
     .from("restaurants")
-    .select("id, name, address, category, kona_card_status, like_count")
+    .select("id, name, address, category, kona_card_status, like_count, image_urls")
     .order("created_at", { ascending: false })
     .limit(5);
 

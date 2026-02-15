@@ -67,6 +67,7 @@ export async function createRestaurantWithReview(
           telephone: item.telephone || null,
           lat: item.mapy ? convertNaverCoord(item.mapy) : null,
           lng: item.mapx ? convertNaverCoord(item.mapx) : null,
+          image_urls: item.imageUrls?.length ? item.imageUrls : null,
           created_by: user.id,
         })
         .select("id")
@@ -88,6 +89,7 @@ export async function createRestaurantWithReview(
         telephone: item.telephone || null,
         lat: item.mapy ? convertNaverCoord(item.mapy) : null,
         lng: item.mapx ? convertNaverCoord(item.mapx) : null,
+        image_urls: item.imageUrls?.length ? item.imageUrls : null,
         created_by: user.id,
       })
       .select("id")

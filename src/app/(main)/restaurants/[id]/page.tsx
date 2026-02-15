@@ -5,6 +5,7 @@ import {
   Phone,
   Tag,
   MessageSquare,
+  UtensilsCrossed,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,6 +82,19 @@ export default async function RestaurantDetailPage({
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
       <Card>
+        {restaurant.image_urls?.[0] ? (
+          <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
+            <img
+              src={restaurant.image_urls[0]}
+              alt={restaurant.name}
+              className="h-full w-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="flex h-48 w-full items-center justify-center rounded-t-lg bg-muted">
+            <UtensilsCrossed className="size-12 text-muted-foreground" />
+          </div>
+        )}
         <CardHeader>
           <CardTitle className="text-2xl">{restaurant.name}</CardTitle>
         </CardHeader>

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, MapPin, Search } from "lucide-react";
+import { Loader2, MapPin, Search, UtensilsCrossed } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { stripHtml, extractNaverPlaceId } from "@/lib/naver";
 import { findRestaurantByNaverPlaceId } from "@/app/(main)/actions";
@@ -73,6 +73,9 @@ export function RestaurantSearch() {
         mapx: item.mapx,
         mapy: item.mapy,
       });
+      if (item.imageUrls && item.imageUrls.length > 0) {
+        params.set("imageUrls", item.imageUrls.join(","));
+      }
       router.push(`/restaurants/preview?${params.toString()}`);
     });
   }
@@ -97,16 +100,29 @@ export function RestaurantSearch() {
               <button
                 type="button"
                 onClick={() => handleSelect(item)}
-                className="flex w-full flex-col gap-0.5 px-3 py-2.5 text-left transition-colors hover:bg-accent"
+                className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent"
               >
-                <span className="text-sm font-medium">{stripHtml(item.title)}</span>
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="size-3 shrink-0" />
-                  {item.roadAddress || item.address}
-                </span>
-                {item.category && (
-                  <span className="text-xs text-muted-foreground">{item.category}</span>
+                {item.imageUrls?.[0] ? (
+                  <img
+                    src={item.imageUrls[0]}
+                    alt=""
+                    className="size-12 shrink-0 rounded-md object-cover"
+                  />
+                ) : (
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted">
+                    <UtensilsCrossed className="size-5 text-muted-foreground" />
+                  </div>
                 )}
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <span className="text-sm font-medium">{stripHtml(item.title)}</span>
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="size-3 shrink-0" />
+                    {item.roadAddress || item.address}
+                  </span>
+                  {item.category && (
+                    <span className="text-xs text-muted-foreground">{item.category}</span>
+                  )}
+                </div>
               </button>
             </li>
           ))}
