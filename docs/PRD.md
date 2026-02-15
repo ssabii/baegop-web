@@ -138,6 +138,7 @@
 - naver_place_id (네이버 검색 결과 연동용)
 - naver_link (text, 네이버 플레이스 URL — 메뉴/소식/리뷰/사진 연결용)
 - telephone (text, 전화번호)
+- image_urls (text[], 네이버 이미지 검색 API에서 가져온 외부 이미지 URL 배열. 최대 10장)
 - kona_card_status (enum: 'available' | 'unavailable' | 'unknown')
 - kona_card_zone (boolean, 우편번호 기반 자동 판별 결과)
 - like_count, dislike_count
@@ -175,6 +176,12 @@
 - 검색 페이지에서 맛집 검색 + 리뷰 작성 시 맛집 자동 등록에 사용
 - 응답: 가게명, 주소, 카테고리, 도로명주소, 좌표, 전화번호, 링크 등
 - API URL: https://openapi.naver.com/v1/search/local.json
+
+### Naver Search API (Image Search)
+- 맛집별 이미지를 서버사이드에서 가져옴 (로컬 검색 결과 5개에 대해 병렬 호출)
+- 각 맛집당 최대 10장, 유사도순 정렬
+- API URL: https://openapi.naver.com/v1/search/image
+- 가져온 이미지 URL은 `restaurants.image_urls`에 저장하여 검색 드롭다운, 카드, 프리뷰/상세 페이지에서 갤러리로 표시
 
 ### Naver Maps API
 - 지도 표시, 마커, 거리 계산
