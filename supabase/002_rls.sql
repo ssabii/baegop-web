@@ -11,6 +11,7 @@ alter table app_config enable row level security;
 alter table reviews enable row level security;
 alter table review_images enable row level security;
 alter table reactions enable row level security;
+alter table restaurant_menus enable row level security;
 
 -- ============================================
 -- app_config
@@ -112,6 +113,13 @@ create policy "review_images: 리뷰 작성자만 삭제"
   using (
     auth.uid() = (select user_id from reviews where id = review_id)
   );
+
+-- ============================================
+-- restaurant_menus
+-- ============================================
+create policy "restaurant_menus: 누구나 조회 가능"
+  on restaurant_menus for select
+  using (true);
 
 -- ============================================
 -- reactions

@@ -6,6 +6,7 @@ export type Restaurant = Tables<"restaurants">;
 export type Review = Tables<"reviews">;
 export type ReviewImage = Tables<"review_images">;
 export type Reaction = Tables<"reactions">;
+export type RestaurantMenu = Tables<"restaurant_menus">;
 export type KonaCardVote = Tables<"kona_card_votes">;
 export type KonaPostalCode = Tables<"kona_postal_codes">;
 
