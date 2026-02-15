@@ -2,7 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { stripHtml, extractNaverPlaceId, convertNaverCoord } from "@/lib/naver";
+import {
+  stripHtml,
+  extractNaverPlaceId,
+  convertNaverCoord,
+  buildNaverMapLink,
+} from "@/lib/naver";
 import type { NaverSearchResult } from "@/types";
 
 export async function findRestaurantByNaverPlaceId(
@@ -58,7 +63,7 @@ export async function createRestaurantWithReview(
           address: item.roadAddress || item.address,
           category: item.category || null,
           naver_place_id: naverPlaceId,
-          naver_link: item.link || null,
+          naver_link: buildNaverMapLink(stripHtml(item.title)),
           telephone: item.telephone || null,
           lat: item.mapy ? convertNaverCoord(item.mapy) : null,
           lng: item.mapx ? convertNaverCoord(item.mapx) : null,
@@ -79,7 +84,7 @@ export async function createRestaurantWithReview(
         name: stripHtml(item.title),
         address: item.roadAddress || item.address,
         category: item.category || null,
-        naver_link: item.link || null,
+        naver_link: buildNaverMapLink(stripHtml(item.title)),
         telephone: item.telephone || null,
         lat: item.mapy ? convertNaverCoord(item.mapy) : null,
         lng: item.mapx ? convertNaverCoord(item.mapx) : null,

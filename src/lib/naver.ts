@@ -10,3 +10,7 @@ export function extractNaverPlaceId(link: string): string | undefined {
 export function convertNaverCoord(value: string): number {
   return parseInt(value, 10) / 10_000_000;
 }
+
+export function buildNaverMapLink(name: string): string {
+  return `https://map.naver.com/p/search/${encodeURIComponent(name)}`;
+}
