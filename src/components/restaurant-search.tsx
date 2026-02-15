@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, MapPin, Search, UtensilsCrossed } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { stripHtml, extractNaverPlaceId } from "@/lib/naver";
 import { findRestaurantByNaverPlaceId } from "@/app/(main)/actions";
 import type { NaverSearchResult } from "@/types";
 
@@ -51,32 +50,18 @@ export function RestaurantSearch() {
 
   function handleSelect(item: NaverSearchResult) {
     setOpen(false);
-    setQuery(stripHtml(item.title));
+    setQuery(item.name);
     startTransition(async () => {
-      const naverPlaceId = extractNaverPlaceId(item.link);
-
-      if (naverPlaceId) {
-        const existing = await findRestaurantByNaverPlaceId(naverPlaceId);
+      if (item.id) {
+        const existing = await findRestaurantByNaverPlaceId(item.id);
         if (existing) {
           router.push(`/restaurants/${existing.id}`);
           return;
         }
       }
 
-      // DB에 없으면 프리뷰 페이지로 이동
-      const params = new URLSearchParams({
-        title: stripHtml(item.title),
-        link: item.link,
-        category: item.category,
-        telephone: item.telephone,
-        address: item.roadAddress || item.address,
-        mapx: item.mapx,
-        mapy: item.mapy,
-      });
-      if (item.imageUrls && item.imageUrls.length > 0) {
-        params.set("imageUrls", item.imageUrls.join(","));
-      }
-      router.push(`/restaurants/preview?${params.toString()}`);
+      // DB에 없으면 프리뷰 페이지로 이동 (상세 정보는 서버에서 placeDetail로 조회)
+      router.push(`/restaurants/preview/${item.id}`);
     });
   }
 
@@ -95,16 +80,16 @@ export function RestaurantSearch() {
 
       {open && (
         <ul className="absolute z-50 mt-1 w-full overflow-hidden rounded-md border bg-popover shadow-md">
-          {results.map((item, i) => (
-            <li key={i}>
+          {results.map((item) => (
+            <li key={item.id}>
               <button
                 type="button"
                 onClick={() => handleSelect(item)}
                 className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent"
               >
-                {item.imageUrls?.[0] ? (
+                {item.imageUrl ? (
                   <img
-                    src={item.imageUrls[0]}
+                    src={item.imageUrl}
                     alt=""
                     className="size-12 shrink-0 rounded-md object-cover"
                   />
@@ -114,7 +99,7 @@ export function RestaurantSearch() {
                   </div>
                 )}
                 <div className="flex min-w-0 flex-col gap-0.5">
-                  <span className="text-sm font-medium">{stripHtml(item.title)}</span>
+                  <span className="text-sm font-medium">{item.name}</span>
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <MapPin className="size-3 shrink-0" />
                     {item.roadAddress || item.address}
