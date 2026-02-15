@@ -5,6 +5,8 @@ import {
   Phone,
   Tag,
   MessageSquare,
+  UtensilsCrossed,
+  Flame,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +38,13 @@ export default async function RestaurantDetailPage({
     .select("*, profiles(nickname, avatar_url)")
     .eq("restaurant_id", restaurant.id)
     .order("created_at", { ascending: false });
+
+  // 메뉴 목록
+  const { data: menus } = await supabase
+    .from("restaurant_menus")
+    .select("*")
+    .eq("restaurant_id", restaurant.id)
+    .order("priority", { ascending: true });
 
   // 현재 유저
   const {
@@ -142,6 +151,39 @@ export default async function RestaurantDetailPage({
           </div>
         </CardContent>
       </Card>
+
+      {/* 메뉴 섹션 */}
+      {menus && menus.length > 0 && (
+        <section className="mt-8">
+          <h2 className="flex items-center gap-2 text-lg font-semibold">
+            <UtensilsCrossed className="size-5" />
+            메뉴 ({menus.length})
+          </h2>
+          <ul className="mt-4 divide-y rounded-lg border">
+            {menus.map((menu) => (
+              <li
+                key={menu.id}
+                className="flex items-center justify-between px-4 py-3"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{menu.name}</span>
+                  {menu.recommend && (
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                      <Flame className="size-3" />
+                      인기
+                    </span>
+                  )}
+                </div>
+                {menu.price && (
+                  <span className="text-sm text-muted-foreground">
+                    {menu.price}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* 리뷰 섹션 */}
       <section className="mt-8">

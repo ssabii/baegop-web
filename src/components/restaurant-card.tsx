@@ -15,7 +15,11 @@ interface RestaurantCardProps {
   image_urls?: string[] | null;
 }
 
-export function RestaurantCard({ restaurant }: { restaurant: RestaurantCardProps }) {
+export function RestaurantCard({
+  restaurant,
+}: {
+  restaurant: RestaurantCardProps;
+}) {
   const status = (restaurant.kona_card_status ?? "unknown") as KonaCardStatus;
 
   return (
@@ -25,8 +29,8 @@ export function RestaurantCard({ restaurant }: { restaurant: RestaurantCardProps
           {restaurant.image_urls?.[0] ? (
             <img
               src={restaurant.image_urls[0]}
-              alt=""
-              className="size-16 shrink-0 rounded-md object-cover"
+              alt={restaurant.name}
+              className="size-36 shrink-0 rounded-md object-cover"
             />
           ) : (
             <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-muted">
