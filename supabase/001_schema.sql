@@ -78,6 +78,15 @@ create table reactions (
   unique(restaurant_id, user_id)
 );
 
+-- 8. app_config (앱 설정)
+create table app_config (
+  key text primary key,
+  value text not null
+);
+
+insert into app_config (key, value) values
+  ('kona_vote_threshold', '3');
+
 -- 인덱스
 create index idx_restaurants_category on restaurants(category);
 create index idx_restaurants_kona_card_status on restaurants(kona_card_status);

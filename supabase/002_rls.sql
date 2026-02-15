@@ -7,9 +7,17 @@ alter table profiles enable row level security;
 alter table restaurants enable row level security;
 alter table kona_postal_codes enable row level security;
 alter table kona_card_votes enable row level security;
+alter table app_config enable row level security;
 alter table reviews enable row level security;
 alter table review_images enable row level security;
 alter table reactions enable row level security;
+
+-- ============================================
+-- app_config
+-- ============================================
+create policy "app_config: 누구나 조회 가능"
+  on app_config for select
+  using (true);
 
 -- ============================================
 -- profiles

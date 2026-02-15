@@ -50,9 +50,14 @@ declare
   target_restaurant_id int;
   available_count int;
   unavailable_count int;
-  threshold int := 3;
+  threshold int;
 begin
   target_restaurant_id := coalesce(new.restaurant_id, old.restaurant_id);
+
+  select (value::int) into threshold
+  from app_config where key = 'kona_vote_threshold';
+
+  threshold := coalesce(threshold, 3);
 
   select
     count(*) filter (where vote = 'available'),

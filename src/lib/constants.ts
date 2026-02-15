@@ -6,7 +6,7 @@ export const KONA_CARD_LABELS: Record<KonaCardStatus, string> = {
   unknown: "미확인",
 };
 
-export const KONA_VOTE_THRESHOLD = 3;
+// 코나카드 투표 임계값은 DB app_config 테이블에서 관리 (key: 'kona_vote_threshold')
 
 // 크몽 사무실 좌표 (서울 강남구 테헤란로)
 export const COMPANY_LOCATION = {
