@@ -10,7 +10,7 @@ export const KONA_CARD_LABELS: Record<KonaCardStatus, string> = {
 
 // 크몽 사무실 좌표 (서울 강남구 테헤란로)
 export const COMPANY_LOCATION = {
-  lat: 37.5058,
-  lng: 127.0396,
+  lat: 37.4924644,
+  lng: 127.0268075,
   postalCode: "06625",
 } as const;

@@ -46,7 +46,7 @@ function loadNaverMapsScript(): Promise<void> {
     }
 
     const script = document.createElement("script");
-    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}`;
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () => reject(new Error("네이버 지도 스크립트 로딩 실패"));
@@ -65,6 +65,7 @@ export default function NaverMap({
   const mapInstanceRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markerInstancesRef = useRef<any[]>([]);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Initialize map
@@ -82,6 +83,7 @@ export default function NaverMap({
         });
 
         mapInstanceRef.current = map;
+        setReady(true);
       })
       .catch((err) => {
         if (mounted) setError(err.message);
@@ -106,7 +108,7 @@ export default function NaverMap({
   // Update markers
   useEffect(() => {
     const map = mapInstanceRef.current;
-    if (!map) return;
+    if (!ready || !map) return;
 
     // Clear existing markers
     markerInstancesRef.current.forEach((m: { setMap: (v: null) => void }) =>
@@ -124,7 +126,7 @@ export default function NaverMap({
       });
       markerInstancesRef.current.push(marker);
     });
-  }, [markers]);
+  }, [ready, markers]);
 
   if (error) {
     return (
