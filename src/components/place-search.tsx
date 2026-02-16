@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, MapPin, Search, UtensilsCrossed } from "lucide-react";
+import {
+  ArrowLeft,
+  Loader2,
+  MapPin,
+  Search,
+  UtensilsCrossed,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { findPlaceByNaverPlaceId } from "@/app/(main)/actions";
 import type { NaverSearchResult } from "@/types";
@@ -44,7 +50,10 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -82,7 +91,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="장소 이름으로 검색..."
+            placeholder="장소 이름으로 검색"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => results.length > 0 && setOpen(true)}
@@ -119,7 +128,9 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
                     {item.roadAddress || item.address}
                   </span>
                   {item.category && (
-                    <span className="text-xs text-muted-foreground">{item.category}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {item.category}
+                    </span>
                   )}
                 </div>
               </button>

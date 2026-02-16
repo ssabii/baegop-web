@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "배곱 — 회사 주변 맛집 추천",
-  description: "함께 만들어가는 회사 주변 맛집 추천 서비스",
+  title: "배곱",
+  description: "배고플땐 배곱",
 };
 
 export default function RootLayout({
