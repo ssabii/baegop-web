@@ -160,7 +160,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   }
 
   const searchBar = (
-    <div className="sticky top-0 z-40 pt-4 pb-3">
+    <div className="sticky top-0 z-40 pt-4 pb-3 bg-transparent">
       <form
         ref={formRef}
         role="search"
@@ -181,7 +181,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           autoFocus={autoFocus}
-          className={`backdrop-blur rounded-full pl-10 ${input ? "pr-10" : ""}`}
+          className={`backdrop-blur-lg rounded-full pl-10 ${input ? "pr-10" : ""}`}
         />
         {input && (
           <button

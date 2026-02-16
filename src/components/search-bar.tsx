@@ -23,7 +23,7 @@ export async function SearchBar() {
 
   return (
     <div className="sticky top-0 z-40 px-4 py-3 bg-transparent">
-      <div className="flex h-11 items-center rounded-full bg-muted/80 backdrop-blur">
+      <div className="flex h-11 items-center rounded-full bg-muted/80 backdrop-blur-lg">
         <Link
           href="/search"
           className="flex min-w-0 flex-1 items-center gap-3 px-4 py-2"
