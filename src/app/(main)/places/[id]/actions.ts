@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { ReactionType, KonaVote } from "@/types";
 
 export async function createReview(
-  restaurantId: number,
+  placeId: number,
   data: { rating: number; content: string }
 ) {
   const supabase = await createClient();
@@ -16,7 +16,7 @@ export async function createReview(
   if (!user) throw new Error("로그인이 필요합니다");
 
   const { error } = await supabase.from("reviews").insert({
-    restaurant_id: restaurantId,
+    place_id: placeId,
     user_id: user.id,
     rating: data.rating,
     content: data.content || null,
@@ -24,10 +24,10 @@ export async function createReview(
 
   if (error) throw new Error("리뷰 작성에 실패했습니다");
 
-  revalidatePath(`/restaurants/${restaurantId}`);
+  revalidatePath(`/places/${placeId}`);
 }
 
-export async function deleteReview(reviewId: number, restaurantId: number) {
+export async function deleteReview(reviewId: number, placeId: number) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -43,11 +43,11 @@ export async function deleteReview(reviewId: number, restaurantId: number) {
 
   if (error) throw new Error("리뷰 삭제에 실패했습니다");
 
-  revalidatePath(`/restaurants/${restaurantId}`);
+  revalidatePath(`/places/${placeId}`);
 }
 
 export async function toggleReaction(
-  restaurantId: number,
+  placeId: number,
   type: ReactionType
 ) {
   const supabase = await createClient();
@@ -61,7 +61,7 @@ export async function toggleReaction(
   const { data: existing } = await supabase
     .from("reactions")
     .select("id, type")
-    .eq("restaurant_id", restaurantId)
+    .eq("place_id", placeId)
     .eq("user_id", user.id)
     .single();
 
@@ -79,17 +79,17 @@ export async function toggleReaction(
   } else {
     // 없으면 → 새로 생성
     await supabase.from("reactions").insert({
-      restaurant_id: restaurantId,
+      place_id: placeId,
       user_id: user.id,
       type,
     });
   }
 
-  revalidatePath(`/restaurants/${restaurantId}`);
+  revalidatePath(`/places/${placeId}`);
 }
 
 export async function voteKonaCard(
-  restaurantId: number,
+  placeId: number,
   vote: KonaVote
 ) {
   const supabase = await createClient();
@@ -103,7 +103,7 @@ export async function voteKonaCard(
   const { data: existing } = await supabase
     .from("kona_card_votes")
     .select("id, vote")
-    .eq("restaurant_id", restaurantId)
+    .eq("place_id", placeId)
     .eq("user_id", user.id)
     .single();
 
@@ -121,11 +121,11 @@ export async function voteKonaCard(
   } else {
     // 없으면 → 새로 생성
     await supabase.from("kona_card_votes").insert({
-      restaurant_id: restaurantId,
+      place_id: placeId,
       user_id: user.id,
       vote,
     });
   }
 
-  revalidatePath(`/restaurants/${restaurantId}`);
+  revalidatePath(`/places/${placeId}`);
 }

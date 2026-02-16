@@ -16,7 +16,7 @@ import { ReactionButtons } from "./reaction-buttons";
 import { KonaVoteSection } from "./kona-vote";
 import type { KonaCardStatus, ReactionType, KonaVote } from "@/types";
 
-export default async function RestaurantDetailPage({
+export default async function PlaceDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -24,26 +24,26 @@ export default async function RestaurantDetailPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data: restaurant } = await supabase
-    .from("restaurants")
+  const { data: place } = await supabase
+    .from("places")
     .select("*")
     .eq("id", Number(id))
     .single();
 
-  if (!restaurant) notFound();
+  if (!place) notFound();
 
   // 리뷰 목록
   const { data: reviews } = await supabase
     .from("reviews")
     .select("*, profiles(nickname, avatar_url)")
-    .eq("restaurant_id", restaurant.id)
+    .eq("place_id", place.id)
     .order("created_at", { ascending: false });
 
   // 메뉴 목록
   const { data: menus } = await supabase
-    .from("restaurant_menus")
+    .from("place_menus")
     .select("*")
-    .eq("restaurant_id", restaurant.id)
+    .eq("place_id", place.id)
     .order("priority", { ascending: true });
 
   // 현재 유저
@@ -55,13 +55,13 @@ export default async function RestaurantDetailPage({
   const { count: likeCount } = await supabase
     .from("reactions")
     .select("*", { count: "exact", head: true })
-    .eq("restaurant_id", restaurant.id)
+    .eq("place_id", place.id)
     .eq("type", "like");
 
   const { count: dislikeCount } = await supabase
     .from("reactions")
     .select("*", { count: "exact", head: true })
-    .eq("restaurant_id", restaurant.id)
+    .eq("place_id", place.id)
     .eq("type", "dislike");
 
   // 현재 유저의 reaction
@@ -70,7 +70,7 @@ export default async function RestaurantDetailPage({
     const { data: reaction } = await supabase
       .from("reactions")
       .select("type")
-      .eq("restaurant_id", restaurant.id)
+      .eq("place_id", place.id)
       .eq("user_id", user.id)
       .single();
     userReaction = (reaction?.type as ReactionType) ?? null;
@@ -82,7 +82,7 @@ export default async function RestaurantDetailPage({
     const { data: vote } = await supabase
       .from("kona_card_votes")
       .select("vote")
-      .eq("restaurant_id", restaurant.id)
+      .eq("place_id", place.id)
       .eq("user_id", user.id)
       .single();
     userKonaVote = (vote?.vote as KonaVote) ?? null;
@@ -91,35 +91,35 @@ export default async function RestaurantDetailPage({
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
       <Card>
-        <ImageGallery images={restaurant.image_urls ?? []} alt={restaurant.name} />
+        <ImageGallery images={place.image_urls ?? []} alt={place.name} />
         <CardHeader>
-          <CardTitle className="text-2xl">{restaurant.name}</CardTitle>
+          <CardTitle className="text-2xl">{place.name}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="size-4 shrink-0" />
-            {restaurant.address}
+            {place.address}
           </p>
-          {restaurant.category && (
+          {place.category && (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <Tag className="size-4 shrink-0" />
-              {restaurant.category}
+              {place.category}
             </p>
           )}
-          {restaurant.telephone && (
+          {place.telephone && (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <Phone className="size-4 shrink-0" />
               <a
-                href={`tel:${restaurant.telephone}`}
+                href={`tel:${place.telephone}`}
                 className="hover:underline"
               >
-                {restaurant.telephone}
+                {place.telephone}
               </a>
             </p>
           )}
-          {restaurant.naver_link && (
+          {place.naver_link && (
             <a
-              href={restaurant.naver_link}
+              href={place.naver_link}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
@@ -132,7 +132,7 @@ export default async function RestaurantDetailPage({
           {/* 좋아요/싫어요 */}
           <div className="pt-2">
             <ReactionButtons
-              restaurantId={restaurant.id}
+              placeId={place.id}
               likeCount={likeCount ?? 0}
               dislikeCount={dislikeCount ?? 0}
               userReaction={userReaction}
@@ -143,8 +143,8 @@ export default async function RestaurantDetailPage({
           {/* 코나카드 투표 */}
           <div className="pt-1">
             <KonaVoteSection
-              restaurantId={restaurant.id}
-              status={(restaurant.kona_card_status as KonaCardStatus) ?? "unknown"}
+              placeId={place.id}
+              status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
               userVote={userKonaVote}
               isLoggedIn={!!user}
             />
@@ -193,7 +193,7 @@ export default async function RestaurantDetailPage({
         </h2>
         <div className="mt-4">
           <ReviewSection
-            restaurantId={restaurant.id}
+            placeId={place.id}
             reviews={(reviews as never[]) ?? []}
             currentUserId={user?.id ?? null}
           />

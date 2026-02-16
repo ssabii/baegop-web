@@ -5,13 +5,13 @@ import { createClient } from "@/lib/supabase/server";
 import { buildNaverMapLink } from "@/lib/naver";
 import type { NaverPlaceDetail } from "@/types";
 
-export async function findRestaurantByNaverPlaceId(
+export async function findPlaceByNaverPlaceId(
   naverPlaceId: string
 ): Promise<{ id: number } | null> {
   const supabase = await createClient();
 
   const { data } = await supabase
-    .from("restaurants")
+    .from("places")
     .select("id")
     .eq("naver_place_id", naverPlaceId)
     .single();
@@ -19,7 +19,7 @@ export async function findRestaurantByNaverPlaceId(
   return data;
 }
 
-export async function createRestaurantWithReview(
+export async function createPlaceWithReview(
   place: NaverPlaceDetail,
   review: {
     rating: number;
@@ -36,20 +36,20 @@ export async function createRestaurantWithReview(
     throw new Error("로그인이 필요합니다");
   }
 
-  // 이미 등록된 맛집인지 확인
-  let restaurantId: number;
+  // 이미 등록된 장소인지 확인
+  let placeId: number;
 
   const { data: existing } = await supabase
-    .from("restaurants")
+    .from("places")
     .select("id")
     .eq("naver_place_id", place.id)
     .single();
 
   if (existing) {
-    restaurantId = existing.id;
+    placeId = existing.id;
   } else {
     const { data: created, error } = await supabase
-      .from("restaurants")
+      .from("places")
       .insert({
         name: place.name,
         address: place.roadAddress || place.address,
@@ -66,14 +66,14 @@ export async function createRestaurantWithReview(
       .single();
 
     if (error || !created) {
-      throw new Error("맛집 등록에 실패했습니다");
+      throw new Error("장소 등록에 실패했습니다");
     }
-    restaurantId = created.id;
+    placeId = created.id;
   }
 
   // 리뷰 저장
   const { error: reviewError } = await supabase.from("reviews").insert({
-    restaurant_id: restaurantId,
+    place_id: placeId,
     user_id: user.id,
     rating: review.rating,
     content: review.content || null,
@@ -83,5 +83,5 @@ export async function createRestaurantWithReview(
     throw new Error("리뷰 작성에 실패했습니다");
   }
 
-  redirect(`/restaurants/${restaurantId}`);
+  redirect(`/places/${placeId}`);
 }

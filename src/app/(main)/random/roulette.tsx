@@ -3,9 +3,9 @@
 import { useState, useCallback } from "react";
 import { Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { RestaurantCard } from "@/components/restaurant-card";
+import { PlaceCard } from "@/components/place-card";
 
-interface RestaurantData {
+interface PlaceData {
   id: number;
   name: string;
   address: string;
@@ -16,15 +16,15 @@ interface RestaurantData {
 }
 
 interface RouletteProps {
-  restaurants: RestaurantData[];
+  places: PlaceData[];
 }
 
-export function Roulette({ restaurants }: RouletteProps) {
-  const [result, setResult] = useState<RestaurantData | null>(null);
+export function Roulette({ places }: RouletteProps) {
+  const [result, setResult] = useState<PlaceData | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
 
   const spin = useCallback(() => {
-    if (restaurants.length === 0) return;
+    if (places.length === 0) return;
 
     setIsSpinning(true);
     setResult(null);
@@ -33,23 +33,23 @@ export function Roulette({ restaurants }: RouletteProps) {
     let count = 0;
     const totalTicks = 15;
     const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * restaurants.length);
-      setResult(restaurants[randomIndex]);
+      const randomIndex = Math.floor(Math.random() * places.length);
+      setResult(places[randomIndex]);
       count++;
 
       if (count >= totalTicks) {
         clearInterval(interval);
-        const finalIndex = Math.floor(Math.random() * restaurants.length);
-        setResult(restaurants[finalIndex]);
+        const finalIndex = Math.floor(Math.random() * places.length);
+        setResult(places[finalIndex]);
         setIsSpinning(false);
       }
     }, 100);
-  }, [restaurants]);
+  }, [places]);
 
-  if (restaurants.length === 0) {
+  if (places.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        등록된 맛집이 없습니다. 먼저 맛집을 등록해주세요!
+        등록된 장소가 없습니다. 먼저 장소를 등록해주세요!
       </p>
     );
   }
@@ -63,7 +63,7 @@ export function Roulette({ restaurants }: RouletteProps) {
         disabled={isSpinning}
       >
         <Shuffle className={`size-4 ${isSpinning ? "animate-spin" : ""}`} />
-        {isSpinning ? "고르는 중..." : result ? "다시 뽑기" : "맛집 뽑기!"}
+        {isSpinning ? "고르는 중..." : result ? "다시 뽑기" : "장소 뽑기!"}
       </Button>
 
       {result && (
@@ -72,7 +72,7 @@ export function Roulette({ restaurants }: RouletteProps) {
             isSpinning ? "scale-95 opacity-50" : "scale-100 opacity-100"
           }`}
         >
-          <RestaurantCard restaurant={result} />
+          <PlaceCard place={result} />
         </div>
       )}
     </div>

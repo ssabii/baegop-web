@@ -9,7 +9,7 @@ import { KONA_CARD_LABELS } from "@/lib/constants";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface KonaVoteProps {
-  restaurantId: number;
+  placeId: number;
   status: KonaCardStatus;
   userVote: KonaVote | null;
   isLoggedIn: boolean;
@@ -22,7 +22,7 @@ const STATUS_VARIANT: Record<KonaCardStatus, "default" | "destructive" | "second
 };
 
 export function KonaVoteSection({
-  restaurantId,
+  placeId,
   status,
   userVote,
   isLoggedIn,
@@ -31,7 +31,7 @@ export function KonaVoteSection({
 
   function handleVote(vote: KonaVote) {
     startTransition(async () => {
-      await voteKonaCard(restaurantId, vote);
+      await voteKonaCard(placeId, vote);
     });
   }
 

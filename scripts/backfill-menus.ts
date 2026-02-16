@@ -213,8 +213,8 @@ async function main() {
   console.log("🔍 맛집 조회 중...");
 
   // naver_place_id가 있는 맛집 조회
-  const { data: restaurants, error } = await supabase
-    .from("restaurants")
+  const { data: places, error } = await supabase
+    .from("places")
     .select("id, name, naver_place_id")
     .not("naver_place_id", "is", null);
 
@@ -223,21 +223,21 @@ async function main() {
     process.exit(1);
   }
 
-  let targets: typeof restaurants;
+  let targets: typeof places;
 
   if (forceAll) {
-    targets = restaurants ?? [];
+    targets = places ?? [];
   } else {
     // 이미 메뉴가 있는 맛집 제외
-    const { data: existingMenuRestaurants } = await supabase
-      .from("restaurant_menus")
-      .select("restaurant_id");
+    const { data: existingMenuPlaces } = await supabase
+      .from("place_menus")
+      .select("place_id");
 
     const existingIds = new Set(
-      (existingMenuRestaurants ?? []).map((r) => r.restaurant_id)
+      (existingMenuPlaces ?? []).map((r) => r.place_id)
     );
 
-    targets = (restaurants ?? []).filter((r) => !existingIds.has(r.id));
+    targets = (places ?? []).filter((r) => !existingIds.has(r.id));
   }
 
   if (targets.length === 0) {
@@ -258,13 +258,13 @@ async function main() {
 
   try {
     for (let i = 0; i < targets.length; i++) {
-      const restaurant = targets[i];
+      const place = targets[i];
       const progress = `[${i + 1}/${targets.length}]`;
 
       try {
-        console.log(`${progress} ${restaurant.name} (${restaurant.naver_place_id}) 크롤링 중...`);
+        console.log(`${progress} ${place.name} (${place.naver_place_id}) 크롤링 중...`);
 
-        const menus = await crawlMenus(browser, restaurant.naver_place_id!);
+        const menus = await crawlMenus(browser, place.naver_place_id!);
 
         if (menus.length === 0) {
           console.log(`  ⏭️  메뉴 없음 (스킵)`);
@@ -272,12 +272,12 @@ async function main() {
         } else {
           // 기존 메뉴 삭제 후 재삽입
           await supabase
-            .from("restaurant_menus")
+            .from("place_menus")
             .delete()
-            .eq("restaurant_id", restaurant.id);
+            .eq("place_id", place.id);
 
           const rows = menus.map((m) => ({
-            restaurant_id: restaurant.id,
+            place_id: place.id,
             name: m.name,
             price: m.price,
             description: m.description,
@@ -287,7 +287,7 @@ async function main() {
           }));
 
           const { error: insertError } = await supabase
-            .from("restaurant_menus")
+            .from("place_menus")
             .insert(rows);
 
           if (insertError) {

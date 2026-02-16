@@ -120,8 +120,8 @@
 /                    → 홈 (랜덤 추천 CTA + 최근/인기 맛집 + 카테고리별 추천 "xx 어때요?")
 /login               → 로그인
 /search              → 맛집 검색 (DB 맛집 우선 + 네이버 API 결과 혼합)
-/restaurants          → 맛집 목록 (리스트 + 지도 뷰 전환)
-/restaurants/[id]     → 맛집 상세 (네이버 정보 + 배곱 리뷰 + 좋아요/싫어요 + 코나카드 투표)
+/places               → 맛집 목록 (리스트 + 지도 뷰 전환)
+/places/[id]          → 맛집 상세 (네이버 정보 + 배곱 리뷰 + 좋아요/싫어요 + 코나카드 투표)
 /random              → 랜덤 추천 (룰렛)
 /mypage              → 내 리뷰, 내가 등록한 맛집
 ```
@@ -133,7 +133,7 @@
 ### profiles (Supabase Auth 확장)
 - id, email, nickname, avatar_url, created_at
 
-### restaurants
+### places
 - id, name, category (text, 네이버 API 원본 카테고리. 예: "음식점>한식"), address, postal_code, lat, lng
 - naver_place_id (네이버 검색 결과 연동용)
 - naver_link (text, 네이버 플레이스 URL — 메뉴/소식/리뷰/사진 연결용)
@@ -148,13 +148,13 @@
 - id, postal_code, dong_name (동명)
 
 ### kona_card_votes (코나카드 크라우드소싱 투표)
-- id, restaurant_id (FK), user_id (FK)
+- id, place_id (FK), user_id (FK)
 - vote (enum: 'available' | 'unavailable')
 - created_at
-- UNIQUE(restaurant_id, user_id) — 1인 1투표
+- UNIQUE(place_id, user_id) — 1인 1투표
 
 ### reviews (리뷰)
-- id, restaurant_id (FK), user_id (FK)
+- id, place_id (FK), user_id (FK)
 - rating (1~5, 필수)
 - content (nullable, 설명)
 - kona_card_used (enum: 'yes' | 'no' | 'unknown', nullable — 코나카드 사용 여부)
@@ -162,11 +162,11 @@
 - created_at, updated_at
 
 ### reactions (좋아요/싫어요)
-- id, restaurant_id (FK), user_id (FK)
+- id, place_id (FK), user_id (FK)
 - type (enum: 'like' | 'dislike')
-- UNIQUE(restaurant_id, user_id) — 1인 1반응
+- UNIQUE(place_id, user_id) — 1인 1반응
 
-*(categories 테이블 없음 — 네이버 API 카테고리 문자열을 restaurants.category에 직접 저장)*
+*(categories 테이블 없음 — 네이버 API 카테고리 문자열을 places.category에 직접 저장)*
 
 ---
 
@@ -181,7 +181,7 @@
 - 맛집별 이미지를 서버사이드에서 가져옴 (로컬 검색 결과 5개에 대해 병렬 호출)
 - 각 맛집당 최대 10장, 유사도순 정렬
 - API URL: https://openapi.naver.com/v1/search/image
-- 가져온 이미지 URL은 `restaurants.image_urls`에 저장하여 검색 드롭다운, 카드, 프리뷰/상세 페이지에서 갤러리로 표시
+- 가져온 이미지 URL은 `places.image_urls`에 저장하여 검색 드롭다운, 카드, 프리뷰/상세 페이지에서 갤러리로 표시
 
 ### Naver Maps API
 - 지도 표시, 마커, 거리 계산

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**배곱 (Baegop)** — 사용자가 함께 만들어가는 회사 주변 맛집 추천 웹 서비스. PRD는 `PRD.md` 참조.
+**배곱 (Baegop)** — 사용자가 함께 만들어가는 회사 주변 장소 추천 웹 서비스. PRD는 `PRD.md` 참조.
 
 ## Commands
 
@@ -38,7 +38,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 네이버 검색 API는 서버사이드 Route Handler(`src/app/api/naver-search/route.ts`)를 통해 프록시. CORS 회피 + API 키 보호 목적.
 
 ### Category Handling
-카테고리 테이블 없음. 네이버 API가 반환하는 카테고리 문자열(예: `"음식점>한식"`)을 `restaurants.category`에 직접 저장.
+카테고리 테이블 없음. 네이버 API가 반환하는 카테고리 문자열(예: `"음식점>한식"`)을 `places.category`에 직접 저장.
 
 ### Kona Card Crowdsourcing
 코나카드 결제 가능 여부는 등록자 입력 + 사용자 투표로 관리. 투표 임계값(`KONA_VOTE_THRESHOLD = 3`) 초과 시 상태 자동 변경.

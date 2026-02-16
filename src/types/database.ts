@@ -33,30 +33,30 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
-          restaurant_id: number
+          place_id: number
           user_id: string
           vote: string
         }
         Insert: {
           created_at?: string | null
           id?: number
-          restaurant_id: number
+          place_id: number
           user_id: string
           vote: string
         }
         Update: {
           created_at?: string | null
           id?: number
-          restaurant_id?: number
+          place_id?: number
           user_id?: string
           vote?: string
         }
         Relationships: [
           {
-            foreignKeyName: "kona_card_votes_restaurant_id_fkey"
-            columns: ["restaurant_id"]
+            foreignKeyName: "kona_card_votes_place_id_fkey"
+            columns: ["place_id"]
             isOneToOne: false
-            referencedRelation: "restaurants"
+            referencedRelation: "places"
             referencedColumns: ["id"]
           },
           {
@@ -114,30 +114,30 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
-          restaurant_id: number
+          place_id: number
           type: string
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: number
-          restaurant_id: number
+          place_id: number
           type: string
           user_id: string
         }
         Update: {
           created_at?: string | null
           id?: number
-          restaurant_id?: number
+          place_id?: number
           type?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "reactions_restaurant_id_fkey"
-            columns: ["restaurant_id"]
+            foreignKeyName: "reactions_place_id_fkey"
+            columns: ["place_id"]
             isOneToOne: false
-            referencedRelation: "restaurants"
+            referencedRelation: "places"
             referencedColumns: ["id"]
           },
           {
@@ -149,7 +149,51 @@ export type Database = {
           },
         ]
       }
-      restaurants: {
+      place_menus: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          images: string[] | null
+          name: string
+          place_id: number
+          price: string | null
+          priority: number
+          recommend: boolean
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          images?: string[] | null
+          name: string
+          place_id: number
+          price?: string | null
+          priority?: number
+          recommend?: boolean
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          images?: string[] | null
+          name?: string
+          place_id?: number
+          price?: string | null
+          priority?: number
+          recommend?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_menus_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      places: {
         Row: {
           address: string
           category: string | null
@@ -212,7 +256,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "restaurants_created_by_fkey"
+            foreignKeyName: "places_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -258,7 +302,7 @@ export type Database = {
           created_at: string | null
           id: number
           rating: number
-          restaurant_id: number
+          place_id: number
           updated_at: string | null
           user_id: string
         }
@@ -267,7 +311,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           rating: number
-          restaurant_id: number
+          place_id: number
           updated_at?: string | null
           user_id: string
         }
@@ -276,16 +320,16 @@ export type Database = {
           created_at?: string | null
           id?: number
           rating?: number
-          restaurant_id?: number
+          place_id?: number
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "reviews_restaurant_id_fkey"
-            columns: ["restaurant_id"]
+            foreignKeyName: "reviews_place_id_fkey"
+            columns: ["place_id"]
             isOneToOne: false
-            referencedRelation: "restaurants"
+            referencedRelation: "places"
             referencedColumns: ["id"]
           },
           {

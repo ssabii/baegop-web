@@ -7,7 +7,7 @@ import { toggleReaction } from "./actions";
 import type { ReactionType } from "@/types";
 
 interface ReactionButtonsProps {
-  restaurantId: number;
+  placeId: number;
   likeCount: number;
   dislikeCount: number;
   userReaction: ReactionType | null;
@@ -15,7 +15,7 @@ interface ReactionButtonsProps {
 }
 
 export function ReactionButtons({
-  restaurantId,
+  placeId,
   likeCount,
   dislikeCount,
   userReaction,
@@ -25,7 +25,7 @@ export function ReactionButtons({
 
   function handleClick(type: ReactionType) {
     startTransition(async () => {
-      await toggleReaction(restaurantId, type);
+      await toggleReaction(placeId, type);
     });
   }
 

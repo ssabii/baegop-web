@@ -13,8 +13,8 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | avatar_url | text | 프로필 이미지 URL |
 | created_at | timestamptz | 생성일 |
 
-### restaurants
-맛집 정보. 리뷰 작성 시 DB에 없으면 네이버 검색 정보로 자동 생성.
+### places
+장소 정보. 리뷰 작성 시 DB에 없으면 네이버 검색 정보로 자동 생성.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -39,7 +39,7 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | serial (PK) | |
-| restaurant_id | int (FK → restaurants) | 맛집 |
+| place_id | int (FK → places) | 장소 |
 | user_id | uuid (FK → profiles) | 작성자 |
 | rating | int (1~5, NOT NULL) | 별점 |
 | content | text | 리뷰 설명 (선택) |
@@ -57,23 +57,23 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | created_at | timestamptz | 생성일 |
 
 ### reactions
-맛집 좋아요/싫어요. 유저당 맛집 1개만 (UNIQUE 제약).
+장소 좋아요/싫어요. 유저당 장소 1개만 (UNIQUE 제약).
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | serial (PK) | |
-| restaurant_id | int (FK → restaurants) | 맛집 |
+| place_id | int (FK → places) | 장소 |
 | user_id | uuid (FK → profiles) | 유저 |
 | type | text | `like` / `dislike` |
 | created_at | timestamptz | 생성일 |
 
 ### kona_card_votes
-코나카드 사용 가능 여부 크라우드소싱 투표. 유저당 맛집 1표.
+코나카드 사용 가능 여부 크라우드소싱 투표. 유저당 장소 1표.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | serial (PK) | |
-| restaurant_id | int (FK → restaurants) | 맛집 |
+| place_id | int (FK → places) | 장소 |
 | user_id | uuid (FK → profiles) | 유저 |
 | vote | text | `available` / `unavailable` |
 | created_at | timestamptz | 생성일 |
@@ -117,15 +117,15 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | 항목 | 내용 |
 |------|------|
 | 트리거 | `on_reaction_change` (AFTER INSERT/UPDATE/DELETE on `reactions`) |
-| 동작 | `restaurants.like_count`, `dislike_count`를 실시간 갱신 |
-| 이유 | 맛집 목록에서 매번 `COUNT(*)` 집계하면 느림. 반정규화된 카운트를 트리거로 동기화하여 조회 성능 확보 |
+| 동작 | `places.like_count`, `dislike_count`를 실시간 갱신 |
+| 이유 | 장소 목록에서 매번 `COUNT(*)` 집계하면 느림. 반정규화된 카운트를 트리거로 동기화하여 조회 성능 확보 |
 
 ### 3. `check_kona_votes()` — 코나카드 상태 자동 변경
 
 | 항목 | 내용 |
 |------|------|
 | 트리거 | `on_kona_vote_change` (AFTER INSERT/UPDATE/DELETE on `kona_card_votes`) |
-| 동작 | 투표 수가 임계값 이상이고 한쪽이 더 많으면 `restaurants.kona_card_status` 자동 변경 |
+| 동작 | 투표 수가 임계값 이상이고 한쪽이 더 많으면 `places.kona_card_status` 자동 변경 |
 | 임계값 | `app_config` 테이블의 `kona_vote_threshold` 값 (기본 3) |
 | 이유 | 프론트에서 처리하면 동시성 문제 발생 가능. DB 레벨에서 데이터 정합성 보장 |
 
@@ -138,7 +138,7 @@ update app_config set value = '5' where key = 'kona_vote_threshold';
 
 | 항목 | 내용 |
 |------|------|
-| 트리거 | `set_restaurants_updated_at`, `set_reviews_updated_at` (BEFORE UPDATE) |
+| 트리거 | `set_places_updated_at`, `set_reviews_updated_at` (BEFORE UPDATE) |
 | 동작 | `updated_at`을 현재 시간으로 자동 설정 |
 | 이유 | 프론트에서 누락할 수 없도록 DB 레벨에서 보장 |
 
@@ -149,7 +149,7 @@ update app_config set value = '5' where key = 'kona_vote_threshold';
 | 테이블 | SELECT | INSERT | UPDATE | DELETE |
 |--------|--------|--------|--------|--------|
 | profiles | 모두 | (트리거) | 본인만 | - |
-| restaurants | 모두 | 인증 유저 (created_by = 본인) | 등록자만 | 등록자만 |
+| places | 모두 | 인증 유저 (created_by = 본인) | 등록자만 | 등록자만 |
 | reviews | 모두 | 인증 유저 (user_id = 본인) | 작성자만 | 작성자만 |
 | review_images | 모두 | 리뷰 작성자만 | - | 리뷰 작성자만 |
 | reactions | 모두 | 인증 유저 (user_id = 본인) | 본인만 | 본인만 |
@@ -168,7 +168,7 @@ update app_config set value = '5' where key = 'kona_vote_threshold';
 
 ### 폴더 구조 (Storage)
 ```
-review-images/{user_id}/{restaurant_id}/{파일명}
+review-images/{user_id}/{place_id}/{파일명}
 profile-images/{user_id}/{파일명}
 ```
 `(storage.foldername(name))[1]`로 본인 폴더만 접근 가능하도록 RLS 제어.

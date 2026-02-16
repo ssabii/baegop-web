@@ -5,8 +5,8 @@ import { Roulette } from "./roulette";
 export default async function RandomPage() {
   const supabase = await createClient();
 
-  const { data: restaurants } = await supabase
-    .from("restaurants")
+  const { data: places } = await supabase
+    .from("places")
     .select("id, name, address, category, kona_card_status, like_count, image_urls");
 
   return (
@@ -16,11 +16,11 @@ export default async function RandomPage() {
         오늘 뭐 먹지?
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        버튼을 눌러 랜덤으로 맛집을 추천받아보세요!
+        버튼을 눌러 랜덤으로 장소를 추천받아보세요!
       </p>
 
       <div className="mt-8">
-        <Roulette restaurants={restaurants ?? []} />
+        <Roulette places={places ?? []} />
       </div>
     </main>
   );

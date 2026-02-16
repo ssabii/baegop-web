@@ -13,8 +13,8 @@ values
   ('00000000-0000-0000-0000-000000000000', 'd4444444-4444-4444-4444-444444444444', 'authenticated', 'authenticated', 'dave@test.com', crypt('test1234', gen_salt('bf')), now(), now(), now(), '{"full_name": "최우진", "avatar_url": ""}'),
   ('00000000-0000-0000-0000-000000000000', 'e5555555-5555-5555-5555-555555555555', 'authenticated', 'authenticated', 'eve@test.com', crypt('test1234', gen_salt('bf')), now(), now(), now(), '{"full_name": "정하늘", "avatar_url": ""}');
 
--- 2. 맛집 (크몽 사무실 주변 역삼/삼성동 일대)
-insert into restaurants (name, category, address, postal_code, lat, lng, naver_place_id, description, kona_card_status, created_by)
+-- 2. 장소 (크몽 사무실 주변 역삼/삼성동 일대)
+insert into places (name, category, address, postal_code, lat, lng, naver_place_id, description, kona_card_status, created_by)
 values
   ('순남시래기', '음식점>한식', '서울특별시 강남구 테헤란로 330', '06212', 37.5065, 127.0535, 'naver_001', '시래기 된장찌개 맛집, 점심 한정 백반', 'available', 'a1111111-1111-1111-1111-111111111111'),
   ('리장마라탕', '음식점>중식', '서울특별시 강남구 역삼로 180', '06248', 37.5010, 127.0380, 'naver_002', '마라탕 1인 세트가 좋음', 'available', 'b2222222-2222-2222-2222-222222222222'),
@@ -33,7 +33,7 @@ values
   ('미소야 역삼점', '음식점>일식', '서울특별시 강남구 역삼로 175', '06248', 37.5006, 127.0372, 'naver_015', '라멘 맛집, 돈코츠 추천', 'available', 'd4444444-4444-4444-4444-444444444444');
 
 -- 3. 리뷰 (다양한 별점, 일부는 내용 없이 별점만)
-insert into reviews (restaurant_id, user_id, rating, content)
+insert into reviews (place_id, user_id, rating, content)
 values
   -- 순남시래기
   (1, 'b2222222-2222-2222-2222-222222222222', 5, '시래기 된장찌개 진짜 맛있어요! 밥도 맛있고 반찬도 깔끔합니다.'),
@@ -77,7 +77,7 @@ values
   (15, 'c3333333-3333-3333-3333-333333333333', 3, '웨이팅이 너무 길어요');
 
 -- 4. 좋아요/싫어요 (트리거가 like_count, dislike_count 자동 갱신)
-insert into reactions (restaurant_id, user_id, type)
+insert into reactions (place_id, user_id, type)
 values
   -- 순남시래기: 좋아요 4
   (1, 'a1111111-1111-1111-1111-111111111111', 'like'),
@@ -119,7 +119,7 @@ values
   (15, 'e5555555-5555-5555-5555-555555555555', 'dislike');
 
 -- 5. 코나카드 투표 (트리거가 임계값 초과 시 상태 자동 변경)
-insert into kona_card_votes (restaurant_id, user_id, vote)
+insert into kona_card_votes (place_id, user_id, vote)
 values
   -- 순남시래기: available 4표 → 자동으로 available 확정
   (1, 'b2222222-2222-2222-2222-222222222222', 'available'),
