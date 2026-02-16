@@ -1,14 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import {
-  ImagePlus,
-  Loader2,
-  Plus,
-  MessageSquarePlus,
-  Star,
-  X,
-} from "lucide-react";
+import { ImagePlus, Loader2, Plus, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -32,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { createPlaceWithReview } from "@/app/(main)/actions";
 import type { NaverPlaceDetail } from "@/types";
+import { toast } from "sonner";
 
 export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
   const [open, setOpen] = useState(false);
@@ -78,7 +72,9 @@ export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
     const valid = files.filter((f) => f.size <= maxSize);
 
     if (valid.length < files.length) {
-      alert("10MB를 초과하는 이미지는 제외되었습니다.");
+      toast.warning("10MB를 초과하는 이미지는 제외되었습니다.", {
+        position: "top-center",
+      });
     }
 
     if (valid.length > 0) {

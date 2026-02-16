@@ -89,6 +89,95 @@ export async function deleteReview(
   revalidatePath(`/places/${naverPlaceId}`);
 }
 
+export async function updateReview(
+  reviewId: number,
+  naverPlaceId: string,
+  data: { rating: number; content: string },
+  newImages?: FormData,
+  deletedImageUrls?: string[]
+) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("로그인이 필요합니다");
+
+  const { error } = await supabase
+    .from("reviews")
+    .update({
+      rating: data.rating,
+      content: data.content || null,
+    })
+    .eq("id", reviewId)
+    .eq("user_id", user.id);
+
+  if (error) throw new Error("리뷰 수정에 실패했습니다");
+
+  // 삭제할 이미지 처리
+  if (deletedImageUrls && deletedImageUrls.length > 0) {
+    // Storage에서 파일 삭제
+    const storagePaths = deletedImageUrls.map((url) => {
+      const parts = url.split("/review-images/");
+      return parts[1];
+    });
+    await supabase.storage.from("review-images").remove(storagePaths);
+
+    // DB에서 레코드 삭제
+    await supabase
+      .from("review_images")
+      .delete()
+      .eq("review_id", reviewId)
+      .in("url", deletedImageUrls);
+  }
+
+  // 새 이미지 업로드
+  if (newImages) {
+    const files = newImages.getAll("images") as File[];
+    const imageUrls: string[] = [];
+
+    // 현재 이미지 최대 display_order 조회
+    const { data: existingImages } = await supabase
+      .from("review_images")
+      .select("display_order")
+      .eq("review_id", reviewId)
+      .order("display_order", { ascending: false })
+      .limit(1);
+
+    let nextOrder = (existingImages?.[0]?.display_order ?? -1) + 1;
+
+    for (const file of files) {
+      if (!(file instanceof File) || file.size === 0) continue;
+
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `${naverPlaceId}/${user.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("review-images")
+        .upload(path, file);
+
+      if (!uploadError) {
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("review-images").getPublicUrl(path);
+        imageUrls.push(publicUrl);
+      }
+    }
+
+    if (imageUrls.length > 0) {
+      await supabase.from("review_images").insert(
+        imageUrls.map((url, i) => ({
+          review_id: reviewId,
+          url,
+          display_order: nextOrder + i,
+        }))
+      );
+    }
+  }
+
+  revalidatePath(`/places/${naverPlaceId}`);
+}
+
 export async function voteKonaCard(
   placeId: string,
   naverPlaceId: string,
