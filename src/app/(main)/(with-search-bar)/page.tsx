@@ -5,17 +5,31 @@ import { PlaceCard, EmptyPlace } from "@/components/places";
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const { data: popularPlaces } = await supabase
+  const { data: rawPopular } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, image_urls")
+    .select("id, name, address, category, kona_card_status, image_urls, reviews(rating)")
     .order("like_count", { ascending: false, nullsFirst: false })
     .limit(5);
 
-  const { data: recentPlaces } = await supabase
+  const { data: rawRecent } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, image_urls")
+    .select("id, name, address, category, kona_card_status, image_urls, reviews(rating)")
     .order("created_at", { ascending: false })
     .limit(5);
+
+  function withRating(places: typeof rawPopular) {
+    return places?.map(({ reviews, ...rest }) => ({
+      ...rest,
+      avg_rating:
+        reviews.length > 0
+          ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+          : null,
+      review_count: reviews.length,
+    }));
+  }
+
+  const popularPlaces = withRating(rawPopular);
+  const recentPlaces = withRating(rawRecent);
 
   const hasPlaces =
     (popularPlaces && popularPlaces.length > 0) ||
@@ -30,14 +44,14 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-4">
+    <main className="mx-auto max-w-4xl p-4">
       {/* 인기 장소 */}
       <section>
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           <Star className="size-5" />
           인기 장소
         </h2>
-        <div className="mt-3">
+        <div className="mt-1">
           {popularPlaces!.map((r) => (
             <PlaceCard key={r.id} place={r} />
           ))}
@@ -50,7 +64,7 @@ export default async function HomePage() {
           <Clock className="size-5" />
           최근 등록된 장소
         </h2>
-        <div className="mt-3">
+        <div className="mt-1">
           {recentPlaces!.map((r) => (
             <PlaceCard key={r.id} place={r} />
           ))}
