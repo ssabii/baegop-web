@@ -1,27 +1,11 @@
 -- ============================================
--- 함수 & 트리거
+-- 트리거 함수 place_id 타입 수정 (bigint → text)
 -- ============================================
+-- 008_places_id_to_naver_id.sql에서 places.id를 text로 변경했으나
+-- 트리거 함수의 target_place_id 변수가 bigint로 남아있어
+-- 코나카드 투표/반응 시 타입 불일치로 상태 업데이트가 실패하는 버그 수정
 
--- 1. 신규 사용자 가입 시 profiles 자동 생성
-create or replace function handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profiles (id, email, nickname, avatar_url)
-  values (
-    new.id,
-    new.email,
-    coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name', split_part(new.email, '@', 1)),
-    coalesce(new.raw_user_meta_data ->> 'avatar_url', new.raw_user_meta_data ->> 'picture')
-  );
-  return new;
-end;
-$$ language plpgsql security definer;
-
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function handle_new_user();
-
--- 2. reactions 변경 시 places.like_count / dislike_count 자동 업데이트
+-- 1. reactions 변경 시 places.like_count / dislike_count 자동 업데이트
 create or replace function update_reaction_counts()
 returns trigger as $$
 declare
@@ -39,11 +23,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
-create trigger on_reaction_change
-  after insert or update or delete on reactions
-  for each row execute function update_reaction_counts();
-
--- 3. 코나카드 투표 임계값 초과 시 상태 자동 변경
+-- 2. 코나카드 투표 임계값 초과 시 상태 자동 변경
 create or replace function check_kona_votes()
 returns trigger as $$
 declare
@@ -77,24 +57,3 @@ begin
   return coalesce(new, old);
 end;
 $$ language plpgsql security definer;
-
-create trigger on_kona_vote_change
-  after insert or update or delete on kona_card_votes
-  for each row execute function check_kona_votes();
-
--- 4. updated_at 자동 갱신
-create or replace function update_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
-create trigger set_places_updated_at
-  before update on places
-  for each row execute function update_updated_at();
-
-create trigger set_reviews_updated_at
-  before update on reviews
-  for each row execute function update_updated_at();
