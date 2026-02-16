@@ -40,7 +40,6 @@ export interface NaverSearchResult {
 export interface NaverPlaceDetail {
   id: string;
   name: string;
-  description: string | null;
   category: string;
   address: string;
   roadAddress: string;

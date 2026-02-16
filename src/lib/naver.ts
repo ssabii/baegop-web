@@ -1,4 +1,4 @@
-import type { NaverPlaceDetail } from "@/types";
+import type { NaverPlaceDetail, NaverSearchResult } from "@/types";
 
 const GRAPHQL_URL = "https://pcmap-api.place.naver.com/place/graphql";
 
@@ -16,7 +16,7 @@ export function buildNaverMapLink(name: string): string {
 
 /** 네이버 플레이스 상세 정보 조회 (이미지 복수, 메뉴 이미지/추천 포함) */
 export async function fetchPlaceDetail(
-  placeId: string
+  placeId: string,
 ): Promise<NaverPlaceDetail | null> {
   try {
     const res = await fetch(GRAPHQL_URL, {
@@ -28,7 +28,7 @@ export async function fetchPlaceDetail(
           variables: { input: { id: placeId } },
           query: `query getPlaceDetail($input: PlaceDetailInput!) {
             placeDetail(input: $input) {
-              base { id name description address roadAddress phone category coordinate { x y } }
+              base { id name address roadAddress phone category coordinate { x y } }
               images { images { origin } }
               menus { name price images description recommend }
             }
@@ -48,7 +48,6 @@ export async function fetchPlaceDetail(
     return {
       id: base.id,
       name: base.name,
-      description: base.description ?? null,
       category: base.category ?? "",
       address: base.address ?? "",
       roadAddress: base.roadAddress ?? "",
@@ -72,10 +71,82 @@ export async function fetchPlaceDetail(
           images: m.images ?? [],
           description: m.description || null,
           recommend: m.recommend ?? false,
-        })
+        }),
       ),
     };
   } catch {
     return null;
   }
+}
+
+/** 검색 API(getPlaces)로 장소명 검색 → ID 매칭하여 상세 정보 구성 (Tier 2 폴백) */
+async function fetchPlaceBySearch(
+  placeId: string,
+  placeName: string,
+): Promise<NaverPlaceDetail | null> {
+  try {
+    const res = await fetch(GRAPHQL_URL, {
+      method: "POST",
+      headers: GRAPHQL_HEADERS,
+      body: JSON.stringify([
+        {
+          operationName: "getPlaces",
+          variables: { input: { query: placeName, display: 10, start: 1 } },
+          query: `query getPlaces($input: PlacesInput!) {
+            places(input: $input) {
+              items {
+                id name category address roadAddress
+                phone x y imageUrl menus
+              }
+            }
+          }`,
+        },
+      ]),
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!res.ok) return null;
+
+    const json = await res.json();
+    const items: NaverSearchResult[] = json[0]?.data?.places?.items ?? [];
+    const match = items.find((item) => item.id === placeId);
+    if (!match) return null;
+
+    return {
+      id: match.id,
+      name: match.name,
+      category: match.category ?? "",
+      address: match.address ?? "",
+      roadAddress: match.roadAddress ?? "",
+      phone: match.phone ?? null,
+      x: match.x ?? "",
+      y: match.y ?? "",
+      imageUrls: match.imageUrl ? [match.imageUrl] : [],
+      menus: (match.menus ?? []).map((menuStr) => ({
+        name: menuStr,
+        price: null,
+        images: [],
+        description: null,
+        recommend: false,
+      })),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** 네이버 플레이스 상세 조회 (Tier 1 → Tier 2 폴백) */
+export async function fetchPlaceDetailWithFallback(
+  placeId: string,
+  placeName?: string,
+): Promise<NaverPlaceDetail | null> {
+  const detail = await fetchPlaceDetail(placeId);
+  if (detail) return detail;
+
+  if (placeName) {
+    const searchResult = await fetchPlaceBySearch(placeId, placeName);
+    if (searchResult) return searchResult;
+  }
+
+  return null;
 }

@@ -8,14 +8,18 @@ import {
   Tag,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { buildNaverMapLink, fetchPlaceDetail } from "@/lib/naver";
+import { buildNaverMapLink, fetchPlaceDetailWithFallback } from "@/lib/naver";
 import { COMPANY_LOCATION } from "@/lib/constants";
-import { calculateDistance, estimateWalkingMinutes, formatDistance } from "@/lib/geo";
+import {
+  calculateDistance,
+  estimateWalkingMinutes,
+  formatDistance,
+} from "@/lib/geo";
 import { ImageGallery } from "@/components/image-gallery";
 import { PlaceDetailTabs } from "./place-detail-tabs";
 import { KonaVoteSection } from "./kona-vote";
 import { RegisterPlaceButton } from "./register-place-button";
-import type { KonaCardStatus, KonaVote } from "@/types";
+import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
 
 export default async function PlaceDetailPage({
   params,
@@ -24,11 +28,7 @@ export default async function PlaceDetailPage({
 }) {
   const { id: naverPlaceId } = await params;
 
-  // 네이버 API에서 상세 정보 조회
-  const detail = await fetchPlaceDetail(naverPlaceId);
-  if (!detail) notFound();
-
-  // DB에서 장소 조회 (등록 여부 확인)
+  // DB에서 장소 조회 (등록 여부 확인 + Tier 3 폴백용)
   const supabase = await createClient();
 
   const { data: place } = await supabase
@@ -38,6 +38,30 @@ export default async function PlaceDetailPage({
     .single();
 
   const isRegistered = !!place;
+
+  // 3단계 폴백으로 상세 정보 조회
+  // Tier 1: getPlaceDetail (GraphQL) → Tier 2: getPlaces 검색 → Tier 3: DB 데이터
+  let detail: NaverPlaceDetail | null = await fetchPlaceDetailWithFallback(
+    naverPlaceId,
+    place?.name,
+  );
+
+  if (!detail && place) {
+    detail = {
+      id: naverPlaceId,
+      name: place.name,
+      category: place.category ?? "",
+      address: place.address ?? "",
+      roadAddress: place.address ?? "",
+      phone: null,
+      x: place.lng?.toString() ?? "",
+      y: place.lat?.toString() ?? "",
+      imageUrls: place.image_urls ?? [],
+      menus: [],
+    };
+  }
+
+  if (!detail) notFound();
 
   // 거리 계산 (네이버 API 좌표 기준)
   const lat = detail.y ? parseFloat(detail.y) : null;
@@ -91,9 +115,9 @@ export default async function PlaceDetailPage({
       {/* 이미지 갤러리 */}
       <ImageGallery images={detail.imageUrls} alt={detail.name} />
 
-      <div className="space-y-6 px-4 py-6">
+      <div className="space-y-6 p-4">
         {/* 기본 정보 */}
-        <section className="space-y-3">
+        <section className="space-y-2">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">{detail.name}</h1>
             {!isRegistered && (
@@ -103,24 +127,18 @@ export default async function PlaceDetailPage({
             )}
           </div>
 
-          {detail.description && (
-            <p className="text-sm text-muted-foreground">
-              {detail.description}
-            </p>
-          )}
-
           {detail.category && (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Tag className="size-4 shrink-0" />
               {detail.category}
             </p>
           )}
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <p className="flex items-start gap-2 text-sm font-medium text-muted-foreground">
             <MapPin className="size-4 shrink-0" />
             {address}
           </p>
           {detail.phone && (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Phone className="size-4 shrink-0" />
               <a href={`tel:${detail.phone}`} className="hover:underline">
                 {detail.phone}
@@ -128,7 +146,7 @@ export default async function PlaceDetailPage({
             </p>
           )}
           {distanceText && (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Footprints className="size-4 shrink-0" />
               {distanceText}
             </p>
