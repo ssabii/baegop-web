@@ -62,7 +62,6 @@ export async function voteKonaCard(
 
   if (!user) throw new Error("로그인이 필요합니다");
 
-  // 기존 투표 확인
   const { data: existing } = await supabase
     .from("kona_card_votes")
     .select("id, vote")
@@ -72,17 +71,14 @@ export async function voteKonaCard(
 
   if (existing) {
     if (existing.vote === vote) {
-      // 같은 투표 → 취소
       await supabase.from("kona_card_votes").delete().eq("id", existing.id);
     } else {
-      // 다른 투표 → 변경
       await supabase
         .from("kona_card_votes")
         .update({ vote })
         .eq("id", existing.id);
     }
   } else {
-    // 없으면 → 새로 생성
     await supabase.from("kona_card_votes").insert({
       place_id: placeId,
       user_id: user.id,

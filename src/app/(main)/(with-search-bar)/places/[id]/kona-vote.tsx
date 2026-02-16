@@ -3,9 +3,7 @@
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { voteKonaCard } from "./actions";
-import { KONA_CARD_LABELS } from "@/lib/constants";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface KonaVoteProps {
@@ -15,12 +13,6 @@ interface KonaVoteProps {
   userVote: KonaVote | null;
   isLoggedIn: boolean;
 }
-
-const STATUS_VARIANT: Record<KonaCardStatus, "default" | "destructive" | "secondary"> = {
-  available: "default",
-  unavailable: "destructive",
-  unknown: "secondary",
-};
 
 export function KonaVoteSection({
   placeId,
@@ -39,20 +31,26 @@ export function KonaVoteSection({
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="flex items-center gap-2">
-        <img
-          src="/icons/kona.png"
-          alt="코나카드"
-          className="size-5 rounded-sm"
-        />
-        <Badge variant={STATUS_VARIANT[status]}>
-          {KONA_CARD_LABELS[status]}
-        </Badge>
-      </div>
+      {status !== "unknown" && (
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+            status === "available"
+              ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
+              : "bg-muted text-muted-foreground"
+          }`}
+        >
+          <img
+            src="/icons/kona.png"
+            alt="코나카드"
+            className="size-3.5 rounded-sm"
+          />
+          {status === "available" ? "결제가능" : "결제불가"}
+        </span>
+      )}
 
       {isLoggedIn && (
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">투표:</span>
+          <span className="text-xs text-muted-foreground">코나카드 사용이 가능한가요?</span>
           <Button
             variant={userVote === "available" ? "default" : "outline"}
             size="sm"

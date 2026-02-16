@@ -1,22 +1,20 @@
 import { notFound } from "next/navigation";
 import {
   ExternalLink,
-  Flame,
   Footprints,
   MapPin,
-  MessageSquare,
   Phone,
+  Star,
   Tag,
-  UtensilsCrossed,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buildNaverMapLink, fetchPlaceDetail } from "@/lib/naver";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { calculateDistance, estimateWalkingMinutes, formatDistance } from "@/lib/geo";
 import { ImageGallery } from "@/components/image-gallery";
-import { ReviewSection } from "./review-section";
+import { PlaceDetailTabs } from "./place-detail-tabs";
 import { KonaVoteSection } from "./kona-vote";
-import { ReviewForm } from "./review-form";
+import { RegisterPlaceButton } from "./register-place-button";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 export default async function PlaceDetailPage({
@@ -82,7 +80,11 @@ export default async function PlaceDetailPage({
   }
 
   const address = detail.roadAddress || detail.address;
-  const naverLink = place?.naver_link ?? buildNaverMapLink(detail.name);
+  const naverLink = buildNaverMapLink(detail.name);
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : null;
 
   return (
     <main className="mx-auto max-w-4xl">
@@ -100,6 +102,12 @@ export default async function PlaceDetailPage({
               </span>
             )}
           </div>
+
+          {detail.description && (
+            <p className="text-sm text-muted-foreground">
+              {detail.description}
+            </p>
+          )}
 
           {detail.category && (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -135,9 +143,20 @@ export default async function PlaceDetailPage({
             네이버에서 보기
           </a>
 
-          {/* 코나카드 투표 (등록된 장소만) */}
+          {/* 장소 등록 버튼 (미등록 + 로그인 상태) */}
+          {!isRegistered && user && (
+            <RegisterPlaceButton placeDetail={detail} />
+          )}
+
+          {/* 별점 + 코나카드 배지 */}
           {isRegistered && (
-            <div className="pt-1">
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {avgRating !== null && (
+                <span className="flex items-center gap-1 text-sm font-medium text-yellow-500">
+                  <Star className="size-4 fill-current" />
+                  {avgRating.toFixed(1)}
+                </span>
+              )}
               <KonaVoteSection
                 placeId={place.id}
                 naverPlaceId={naverPlaceId}
@@ -149,85 +168,16 @@ export default async function PlaceDetailPage({
           )}
         </section>
 
-        {/* 메뉴 섹션 (네이버 API) */}
-        {detail.menus.length > 0 && (
-          <section>
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <UtensilsCrossed className="size-5" />
-              메뉴 ({detail.menus.length})
-            </h2>
-            <ul className="mt-4 divide-y rounded-lg border">
-              {detail.menus.map((menu) => (
-                <li key={menu.name} className="flex items-center gap-3 px-4 py-3">
-                  {menu.images.length > 0 ? (
-                    <img
-                      src={menu.images[0]}
-                      alt={menu.name}
-                      className="size-14 shrink-0 rounded-md object-cover"
-                    />
-                  ) : (
-                    <div className="flex size-14 shrink-0 items-center justify-center rounded-md bg-muted">
-                      <UtensilsCrossed className="size-5 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div className="flex min-w-0 flex-1 items-center justify-between">
-                    <div className="flex flex-col gap-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{menu.name}</span>
-                        {menu.recommend && (
-                          <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                            <Flame className="size-3" />
-                            추천
-                          </span>
-                        )}
-                      </div>
-                      {menu.description && (
-                        <span className="text-xs text-muted-foreground">
-                          {menu.description}
-                        </span>
-                      )}
-                    </div>
-                    {menu.price && (
-                      <span className="shrink-0 text-sm text-muted-foreground">
-                        {Number(menu.price).toLocaleString()}원
-                      </span>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {/* 리뷰 섹션 */}
-        <section>
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <MessageSquare className="size-5" />
-            리뷰 ({reviews.length})
-          </h2>
-          <div className="mt-4">
-            {isRegistered ? (
-              <ReviewSection
-                placeId={place.id}
-                naverPlaceId={naverPlaceId}
-                reviews={reviews}
-                currentUserId={user?.id ?? null}
-              />
-            ) : (
-              <div className="space-y-4">
-                <div className="rounded-lg border border-dashed p-4">
-                  <p className="text-sm font-medium">
-                    리뷰를 작성하면 장소가 등록됩니다
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    첫 리뷰를 남겨주세요!
-                  </p>
-                </div>
-                {user && <ReviewForm placeDetail={detail} />}
-              </div>
-            )}
-          </div>
-        </section>
+        {/* 메뉴 / 리뷰 탭 */}
+        <PlaceDetailTabs
+          menus={detail.menus}
+          reviews={reviews}
+          isRegistered={isRegistered}
+          placeId={place?.id ?? null}
+          naverPlaceId={naverPlaceId}
+          currentUserId={user?.id ?? null}
+          placeDetail={detail}
+        />
       </div>
     </main>
   );

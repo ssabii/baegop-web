@@ -6,8 +6,6 @@ export type Place = Tables<"places">;
 export type Review = Tables<"reviews">;
 export type ReviewImage = Tables<"review_images">;
 export type Reaction = Tables<"reactions">;
-export type PlaceMenu = Tables<"place_menus">;
-export type KonaCardVote = Tables<"kona_card_votes">;
 export type KonaPostalCode = Tables<"kona_postal_codes">;
 
 // 릴레이션 포함 타입 (JOIN 조회용)
@@ -42,6 +40,7 @@ export interface NaverSearchResult {
 export interface NaverPlaceDetail {
   id: string;
   name: string;
+  description: string | null;
   category: string;
   address: string;
   roadAddress: string;
