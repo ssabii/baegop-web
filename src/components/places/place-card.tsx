@@ -9,6 +9,8 @@ interface PlaceCardProps {
   category: string | null;
   kona_card_status: string | null;
   image_urls?: string[] | null;
+  avg_rating: number | null;
+  review_count: number;
 }
 
 export function PlaceCard({ place }: { place: PlaceCardProps }) {
@@ -47,10 +49,13 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1 text-xs font-medium text-yellow-500">
-            <Star className="size-3 fill-current" />
-            4.2
-          </span>
+          {place.review_count > 0 && (
+            <span className="flex items-center gap-1 text-xs font-medium text-yellow-500">
+              <Star className="size-3 fill-current" />
+              {place.avg_rating!.toFixed(1)}
+              <span className="text-muted-foreground">({place.review_count})</span>
+            </span>
+          )}
           {status !== "unknown" && (
             <span
               className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${

@@ -28,11 +28,20 @@ export default async function MyPage() {
     .order("created_at", { ascending: false });
 
   // 내가 등록한 장소
-  const { data: myPlaces } = await supabase
+  const { data: rawMyPlaces } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, image_urls")
+    .select("id, name, address, category, kona_card_status, image_urls, reviews(rating)")
     .eq("created_by", user.id)
     .order("created_at", { ascending: false });
+
+  const myPlaces = rawMyPlaces?.map(({ reviews, ...rest }) => ({
+    ...rest,
+    avg_rating:
+      reviews.length > 0
+        ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+        : null,
+    review_count: reviews.length,
+  }));
 
   const nickname = profile?.nickname ?? user.email ?? "사용자";
 
