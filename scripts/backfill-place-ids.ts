@@ -205,24 +205,24 @@ async function main() {
 
   console.log("🔍 맛집 조회 중...");
 
-  let query = supabase.from("restaurants").select("id, name, address");
+  let query = supabase.from("places").select("id, name, address");
   if (!forceAll) {
     query = query.is("naver_place_id", null);
   }
 
-  const { data: restaurants, error } = await query;
+  const { data: places, error } = await query;
 
   if (error) {
     console.error("맛집 조회 실패:", error.message);
     process.exit(1);
   }
 
-  if (!restaurants || restaurants.length === 0) {
+  if (!places || places.length === 0) {
     console.log("✅ 모든 맛집에 place ID가 이미 등록되어 있습니다.");
     return;
   }
 
-  console.log(`📋 대상: ${restaurants.length}개 맛집\n`);
+  console.log(`📋 대상: ${places.length}개 맛집\n`);
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -233,17 +233,17 @@ async function main() {
   let failCount = 0;
 
   try {
-    for (let i = 0; i < restaurants.length; i++) {
-      const restaurant = restaurants[i];
-      const progress = `[${i + 1}/${restaurants.length}]`;
+    for (let i = 0; i < places.length; i++) {
+      const place = places[i];
+      const progress = `[${i + 1}/${places.length}]`;
 
       try {
-        console.log(`${progress} ${restaurant.name} 검색 중...`);
+        console.log(`${progress} ${place.name} 검색 중...`);
 
         const match = await searchPlaceId(
           browser,
-          restaurant.name,
-          restaurant.address
+          place.name,
+          place.address
         );
 
         if (!match) {
@@ -256,9 +256,9 @@ async function main() {
           successCount++;
         } else {
           const { error: updateError } = await supabase
-            .from("restaurants")
+            .from("places")
             .update({ naver_place_id: match.id })
-            .eq("id", restaurant.id);
+            .eq("id", place.id);
 
           if (updateError) {
             console.error(`  ❌ 업데이트 실패: ${updateError.message}`);
@@ -275,7 +275,7 @@ async function main() {
       }
 
       // rate limit 방지: 2~3초 랜덤 딜레이
-      if (i < restaurants.length - 1) {
+      if (i < places.length - 1) {
         const waitMs = 2000 + Math.random() * 1000;
         await delay(waitMs);
       }
@@ -287,7 +287,7 @@ async function main() {
   console.log("\n========== 결과 ==========");
   console.log(`✅ 성공: ${successCount}`);
   console.log(`❌ 실패: ${failCount}`);
-  console.log(`📊 전체: ${restaurants.length}`);
+  console.log(`📊 전체: ${places.length}`);
 }
 
 main().catch((err) => {

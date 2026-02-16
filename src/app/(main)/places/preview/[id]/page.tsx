@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageGallery } from "@/components/image-gallery";
 import { ReviewForm } from "./review-form";
 
-export default async function RestaurantPreviewPage({
+export default async function PlacePreviewPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -117,7 +117,7 @@ export default async function RestaurantPreviewPage({
 
       <section className="mt-8">
         <h2 className="text-lg font-semibold">
-          리뷰를 작성하면 맛집이 등록됩니다
+          리뷰를 작성하면 장소가 등록됩니다
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           첫 리뷰를 남겨주세요!

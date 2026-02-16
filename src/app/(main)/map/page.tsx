@@ -5,14 +5,14 @@ import { MapView } from "./map-view";
 export default async function MapPage() {
   const supabase = await createClient();
 
-  const { data: restaurants } = await supabase
-    .from("restaurants")
+  const { data: places } = await supabase
+    .from("places")
     .select("id, name, lat, lng")
     .not("lat", "is", null)
     .not("lng", "is", null);
 
   const markers =
-    restaurants?.map((r) => ({
+    places?.map((r) => ({
       lat: r.lat!,
       lng: r.lng!,
       title: r.name,
@@ -25,7 +25,7 @@ export default async function MapPage() {
         지도
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        등록된 맛집을 지도에서 확인해보세요.
+        등록된 장소를 지도에서 확인해보세요.
       </p>
 
       <div className="mt-6">

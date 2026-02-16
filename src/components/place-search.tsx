@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, MapPin, Search, UtensilsCrossed } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { findRestaurantByNaverPlaceId } from "@/app/(main)/actions";
+import { findPlaceByNaverPlaceId } from "@/app/(main)/actions";
 import type { NaverSearchResult } from "@/types";
 
-export function RestaurantSearch() {
+export function PlaceSearch() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<NaverSearchResult[]>([]);
@@ -53,15 +53,15 @@ export function RestaurantSearch() {
     setQuery(item.name);
     startTransition(async () => {
       if (item.id) {
-        const existing = await findRestaurantByNaverPlaceId(item.id);
+        const existing = await findPlaceByNaverPlaceId(item.id);
         if (existing) {
-          router.push(`/restaurants/${existing.id}`);
+          router.push(`/places/${existing.id}`);
           return;
         }
       }
 
       // DB에 없으면 프리뷰 페이지로 이동 (상세 정보는 서버에서 placeDetail로 조회)
-      router.push(`/restaurants/preview/${item.id}`);
+      router.push(`/places/preview/${item.id}`);
     });
   }
 
@@ -70,7 +70,7 @@ export function RestaurantSearch() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="맛집 이름으로 검색..."
+          placeholder="장소 이름으로 검색..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}

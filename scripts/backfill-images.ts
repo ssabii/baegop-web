@@ -147,28 +147,28 @@ async function main() {
 
   console.log("🔍 맛집을 조회합니다...\n");
 
-  let query = supabase.from("restaurants").select("id, name, naver_place_id");
+  let query = supabase.from("places").select("id, name, naver_place_id");
   if (!forceAll) {
     query = query.is("image_urls", null);
   }
 
-  const { data: restaurants, error } = await query;
+  const { data: places, error } = await query;
 
   if (error) {
     console.error("❌ 맛집 조회 실패:", error.message);
     process.exit(1);
   }
 
-  if (!restaurants || restaurants.length === 0) {
+  if (!places || places.length === 0) {
     console.log("✅ 모든 맛집에 이미지가 이미 등록되어 있습니다.");
     return;
   }
 
-  const withPlaceId = restaurants.filter((r) => r.naver_place_id);
-  const withoutPlaceId = restaurants.filter((r) => !r.naver_place_id);
+  const withPlaceId = places.filter((r) => r.naver_place_id);
+  const withoutPlaceId = places.filter((r) => !r.naver_place_id);
 
   console.log(
-    `📋 총 ${restaurants.length}개 맛집 (Place 크롤링: ${withPlaceId.length}, API 폴백: ${withoutPlaceId.length})\n`
+    `📋 총 ${places.length}개 맛집 (Place 크롤링: ${withPlaceId.length}, API 폴백: ${withoutPlaceId.length})\n`
   );
 
   let successCount = 0;
@@ -185,17 +185,17 @@ async function main() {
 
     try {
       for (let i = 0; i < withPlaceId.length; i++) {
-        const restaurant = withPlaceId[i];
+        const place = withPlaceId[i];
         const progress = `[${i + 1}/${withPlaceId.length}]`;
 
         try {
           console.log(
-            `${progress} ${restaurant.name} (${restaurant.naver_place_id}) 크롤링 중...`
+            `${progress} ${place.name} (${place.naver_place_id}) 크롤링 중...`
           );
 
           const images = await crawlPlaceImages(
             browser,
-            restaurant.naver_place_id!
+            place.naver_place_id!
           );
 
           if (images.length === 0) {
@@ -203,9 +203,9 @@ async function main() {
             failCount++;
           } else {
             const { error: updateError } = await supabase
-              .from("restaurants")
+              .from("places")
               .update({ image_urls: images })
-              .eq("id", restaurant.id);
+              .eq("id", place.id);
 
             if (updateError) {
               console.log(`  ❌ 업데이트 실패: ${updateError.message}`);
@@ -244,12 +244,12 @@ async function main() {
       console.log("\n--- 네이버 이미지 검색 API 폴백 ---\n");
 
       for (let i = 0; i < withoutPlaceId.length; i++) {
-        const restaurant = withoutPlaceId[i];
+        const place = withoutPlaceId[i];
         const progress = `[${i + 1}/${withoutPlaceId.length}]`;
-        const query = `${restaurant.name} 맛집`;
+        const query = `${place.name} 맛집`;
 
         try {
-          console.log(`${progress} ${restaurant.name} 이미지 검색 중...`);
+          console.log(`${progress} ${place.name} 이미지 검색 중...`);
 
           const images = await fetchNaverImages(query);
 
@@ -258,9 +258,9 @@ async function main() {
             failCount++;
           } else {
             const { error: updateError } = await supabase
-              .from("restaurants")
+              .from("places")
               .update({ image_urls: images })
-              .eq("id", restaurant.id);
+              .eq("id", place.id);
 
             if (updateError) {
               console.log(`  ❌ 업데이트 실패: ${updateError.message}`);

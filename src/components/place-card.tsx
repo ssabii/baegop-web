@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { KONA_CARD_LABELS } from "@/lib/constants";
 import type { KonaCardStatus } from "@/types";
 
-interface RestaurantCardProps {
+interface PlaceCardProps {
   id: number;
   name: string;
   address: string;
@@ -15,21 +15,21 @@ interface RestaurantCardProps {
   image_urls?: string[] | null;
 }
 
-export function RestaurantCard({
-  restaurant,
+export function PlaceCard({
+  place,
 }: {
-  restaurant: RestaurantCardProps;
+  place: PlaceCardProps;
 }) {
-  const status = (restaurant.kona_card_status ?? "unknown") as KonaCardStatus;
+  const status = (place.kona_card_status ?? "unknown") as KonaCardStatus;
 
   return (
-    <Link href={`/restaurants/${restaurant.id}`}>
+    <Link href={`/places/${place.id}`}>
       <Card className="transition-colors hover:border-primary/50">
         <CardContent className="flex gap-3 p-4">
-          {restaurant.image_urls?.[0] ? (
+          {place.image_urls?.[0] ? (
             <img
-              src={restaurant.image_urls[0]}
-              alt={restaurant.name}
+              src={place.image_urls[0]}
+              alt={place.name}
               className="size-36 shrink-0 rounded-md object-cover"
             />
           ) : (
@@ -40,7 +40,7 @@ export function RestaurantCard({
 
           <div className="min-w-0 space-y-2">
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-medium leading-snug">{restaurant.name}</h3>
+              <h3 className="font-medium leading-snug">{place.name}</h3>
               {status !== "unknown" && (
                 <Badge
                   variant={status === "available" ? "default" : "destructive"}
@@ -53,21 +53,21 @@ export function RestaurantCard({
 
             <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="size-3 shrink-0" />
-              {restaurant.address}
+              {place.address}
             </p>
 
-            {restaurant.category && (
+            {place.category && (
               <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Tag className="size-3 shrink-0" />
-                {restaurant.category}
+                {place.category}
               </p>
             )}
 
-            {(restaurant.like_count ?? 0) > 0 && (
+            {(place.like_count ?? 0) > 0 && (
               <div className="flex items-center gap-3 pt-1 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <ThumbsUp className="size-3" />
-                  {restaurant.like_count}
+                  {place.like_count}
                 </span>
               </div>
             )}

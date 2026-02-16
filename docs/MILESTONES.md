@@ -21,7 +21,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ## Step 2: Supabase DB 스키마 + RLS ✅ (PR #2)
 
-- 테이블: profiles, restaurants, kona_postal_codes, kona_card_votes, reviews, reactions
+- 테이블: profiles, places, kona_postal_codes, kona_card_votes, reviews, reactions
 - RLS 정책: 공개 조회, 인증 사용자 생성, 소유자만 수정/삭제
 - 트리거/함수:
   - `handle_new_user()` — OAuth 가입 시 profiles 자동 생성
@@ -31,7 +31,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 - Storage: review-images 버킷 (공개 조회, 인증 업로드, 본인 삭제)
 
 ### 참고
-- 카테고리 테이블 없음 — 네이버 API 카테고리 문자열을 restaurants.category에 직접 저장
+- 카테고리 테이블 없음 — 네이버 API 카테고리 문자열을 places.category에 직접 저장
 - SQL 파일: `supabase/001_schema.sql` ~ `004_storage.sql`
 
 ---
@@ -73,7 +73,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 - 세션 상태 관리 (로그인 후 리다이렉트)
 
 ### 보호 라우트
-- `/restaurants/new`, `/restaurants/[id]/edit`, `/mypage` → 미인증 시 `/login`
+- `/places/new`, `/places/[id]/edit`, `/mypage` → 미인증 시 `/login`
 
 ---
 
@@ -86,16 +86,16 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
   - 최근 등록된 맛집 (실데이터)
   - 인기 맛집 TOP (좋아요 기준, 실데이터)
   - 카테고리별 추천 ("xx 어때요?" 큐레이션)
-- 공통 `RestaurantCard` 컴포넌트 추출
+- 공통 `PlaceCard` 컴포넌트 추출
 
 ---
 
 ## Step 7: 검색 + 맛집 상세 ✅ (PR #3, #4, #5, #7)
 
 - 검색 페이지 (`/search`) — 네이버 API 검색 + 자동완성
-- 맛집 상세 페이지 (`/restaurants/[id]`) — 기본 정보 + "네이버에서 보기" 링크
-- 맛집 프리뷰 페이지 (`/restaurants/preview`) — 미등록 맛집 프리뷰 + 리뷰 작성 시 자동 등록
-- 맛집 목록 페이지 (`/restaurants`) — 전체 맛집 카드 리스트
+- 맛집 상세 페이지 (`/places/[id]`) — 기본 정보 + "네이버에서 보기" 링크
+- 맛집 프리뷰 페이지 (`/places/preview`) — 미등록 맛집 프리뷰 + 리뷰 작성 시 자동 등록
+- 맛집 목록 페이지 (`/places`) — 전체 맛집 카드 리스트
 
 ### 검색 흐름
 1. 검색 입력 → debounce → `/api/naver-search` 호출
@@ -130,7 +130,7 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 - 랜덤 페이지 (`/random`): 등록된 맛집 중 랜덤 추천
 - 슬롯머신 스타일 애니메이션으로 맛집 선택 + 다시 뽑기
-- 결과 → `RestaurantCard`로 표시 (클릭 시 상세 페이지 이동)
+- 결과 → `PlaceCard`로 표시 (클릭 시 상세 페이지 이동)
 - ~~카테고리 필터 + 코나카드 필터~~ → 추후 구현
 
 ---

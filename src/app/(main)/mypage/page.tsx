@@ -3,7 +3,7 @@ import { Star, UtensilsCrossed } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RestaurantCard } from "@/components/restaurant-card";
+import { PlaceCard } from "@/components/place-card";
 
 export default async function MyPage() {
   const supabase = await createClient();
@@ -23,13 +23,13 @@ export default async function MyPage() {
   // 내가 작성한 리뷰 (맛집 이름 join)
   const { data: myReviews } = await supabase
     .from("reviews")
-    .select("id, rating, content, created_at, restaurants(id, name)")
+    .select("id, rating, content, created_at, places(id, name)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  // 내가 등록한 맛집
-  const { data: myRestaurants } = await supabase
-    .from("restaurants")
+  // 내가 등록한 장소
+  const { data: myPlaces } = await supabase
+    .from("places")
     .select("id, name, address, category, kona_card_status, like_count, image_urls")
     .eq("created_by", user.id)
     .order("created_at", { ascending: false });
@@ -63,12 +63,12 @@ export default async function MyPage() {
         {myReviews && myReviews.length > 0 ? (
           <div className="mt-4 space-y-3">
             {myReviews.map((review) => {
-              const restaurant = review.restaurants as unknown as { id: number; name: string } | null;
+              const place = review.places as unknown as { id: number; name: string } | null;
               return (
                 <Card key={review.id}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm">
-                      {restaurant?.name ?? "알 수 없는 맛집"}
+                      {place?.name ?? "알 수 없는 장소"}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-1">
@@ -104,21 +104,21 @@ export default async function MyPage() {
         )}
       </section>
 
-      {/* 내가 등록한 맛집 */}
+      {/* 내가 등록한 장소 */}
       <section className="mt-8">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           <UtensilsCrossed className="size-5" />
-          내가 등록한 맛집 ({myRestaurants?.length ?? 0})
+          내가 등록한 장소 ({myPlaces?.length ?? 0})
         </h2>
-        {myRestaurants && myRestaurants.length > 0 ? (
+        {myPlaces && myPlaces.length > 0 ? (
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {myRestaurants.map((r) => (
-              <RestaurantCard key={r.id} restaurant={r} />
+            {myPlaces.map((r) => (
+              <PlaceCard key={r.id} place={r} />
             ))}
           </div>
         ) : (
           <p className="mt-4 text-sm text-muted-foreground">
-            아직 등록한 맛집이 없습니다.
+            아직 등록한 장소가 없습니다.
           </p>
         )}
       </section>

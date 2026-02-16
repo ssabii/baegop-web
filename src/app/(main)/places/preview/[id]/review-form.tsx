@@ -5,7 +5,7 @@ import { Loader2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { createRestaurantWithReview } from "@/app/(main)/actions";
+import { createPlaceWithReview } from "@/app/(main)/actions";
 import type { NaverPlaceDetail } from "@/types";
 
 export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
@@ -18,7 +18,7 @@ export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
     if (rating === 0) return;
 
     startTransition(async () => {
-      await createRestaurantWithReview(placeDetail, {
+      await createPlaceWithReview(placeDetail, {
         rating,
         content,
       });
@@ -73,7 +73,7 @@ export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
         className="gap-2"
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
-        리뷰 작성 및 맛집 등록
+        리뷰 작성 및 장소 등록
       </Button>
     </div>
   );

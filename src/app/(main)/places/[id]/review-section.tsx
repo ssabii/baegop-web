@@ -21,7 +21,7 @@ interface ReviewData {
 }
 
 interface ReviewSectionProps {
-  restaurantId: number;
+  placeId: number;
   reviews: ReviewData[];
   currentUserId: string | null;
 }
@@ -46,17 +46,17 @@ function StarRating({ rating }: { rating: number }) {
 function ReviewCard({
   review,
   isOwner,
-  restaurantId,
+  placeId,
 }: {
   review: ReviewData;
   isOwner: boolean;
-  restaurantId: number;
+  placeId: number;
 }) {
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
     startTransition(async () => {
-      await deleteReview(review.id, restaurantId);
+      await deleteReview(review.id, placeId);
     });
   }
 
@@ -101,7 +101,7 @@ function ReviewCard({
   );
 }
 
-function ReviewForm({ restaurantId }: { restaurantId: number }) {
+function ReviewForm({ placeId }: { placeId: number }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [content, setContent] = useState("");
@@ -111,7 +111,7 @@ function ReviewForm({ restaurantId }: { restaurantId: number }) {
     if (rating === 0) return;
 
     startTransition(async () => {
-      await createReview(restaurantId, { rating, content });
+      await createReview(placeId, { rating, content });
       setRating(0);
       setContent("");
     });
@@ -171,13 +171,13 @@ function ReviewForm({ restaurantId }: { restaurantId: number }) {
 }
 
 export function ReviewSection({
-  restaurantId,
+  placeId,
   reviews,
   currentUserId,
 }: ReviewSectionProps) {
   return (
     <div className="space-y-4">
-      {currentUserId && <ReviewForm restaurantId={restaurantId} />}
+      {currentUserId && <ReviewForm placeId={placeId} />}
 
       {reviews.length === 0 ? (
         <p className="text-sm text-muted-foreground">아직 리뷰가 없습니다.</p>
@@ -188,7 +188,7 @@ export function ReviewSection({
               key={review.id}
               review={review}
               isOwner={currentUserId === review.user_id}
-              restaurantId={restaurantId}
+              placeId={placeId}
             />
           ))}
         </div>
