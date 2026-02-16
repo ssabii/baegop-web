@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { CreditCard, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { voteKonaCard } from "./actions";
@@ -10,6 +10,7 @@ import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface KonaVoteProps {
   placeId: number;
+  naverPlaceId: string;
   status: KonaCardStatus;
   userVote: KonaVote | null;
   isLoggedIn: boolean;
@@ -23,6 +24,7 @@ const STATUS_VARIANT: Record<KonaCardStatus, "default" | "destructive" | "second
 
 export function KonaVoteSection({
   placeId,
+  naverPlaceId,
   status,
   userVote,
   isLoggedIn,
@@ -31,14 +33,18 @@ export function KonaVoteSection({
 
   function handleVote(vote: KonaVote) {
     startTransition(async () => {
-      await voteKonaCard(placeId, vote);
+      await voteKonaCard(placeId, naverPlaceId, vote);
     });
   }
 
   return (
     <div className="flex flex-wrap items-center gap-3">
       <div className="flex items-center gap-2">
-        <CreditCard className="size-4 text-muted-foreground" />
+        <img
+          src="/icons/kona.png"
+          alt="코나카드"
+          className="size-5 rounded-sm"
+        />
         <Badge variant={STATUS_VARIANT[status]}>
           {KONA_CARD_LABELS[status]}
         </Badge>

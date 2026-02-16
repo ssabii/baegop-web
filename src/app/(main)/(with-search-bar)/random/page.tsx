@@ -7,7 +7,7 @@ export default async function RandomPage() {
 
   const { data: places } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, like_count, image_urls");
+    .select("id, naver_place_id, name, address, category, kona_card_status, image_urls");
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">

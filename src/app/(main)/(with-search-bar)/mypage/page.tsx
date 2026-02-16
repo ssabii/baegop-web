@@ -30,7 +30,7 @@ export default async function MyPage() {
   // 내가 등록한 장소
   const { data: myPlaces } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, like_count, image_urls")
+    .select("id, naver_place_id, name, address, category, kona_card_status, image_urls")
     .eq("created_by", user.id)
     .order("created_at", { ascending: false });
 
@@ -111,7 +111,7 @@ export default async function MyPage() {
           내가 등록한 장소 ({myPlaces?.length ?? 0})
         </h2>
         {myPlaces && myPlaces.length > 0 ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="mt-4">
             {myPlaces.map((r) => (
               <PlaceCard key={r.id} place={r} />
             ))}

@@ -1,16 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  Loader2,
   MapPin,
   Search,
   UtensilsCrossed,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { findPlaceByNaverPlaceId } from "@/app/(main)/actions";
 import type { NaverSearchResult } from "@/types";
 
 interface PlaceSearchProps {
@@ -22,7 +20,6 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<NaverSearchResult[]>([]);
   const [open, setOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -64,18 +61,9 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   function handleSelect(item: NaverSearchResult) {
     setOpen(false);
     setQuery(item.name);
-    startTransition(async () => {
-      if (item.id) {
-        const existing = await findPlaceByNaverPlaceId(item.id);
-        if (existing) {
-          router.push(`/places/${existing.id}`);
-          return;
-        }
-      }
-
-      // DB에 없으면 프리뷰 페이지로 이동 (상세 정보는 서버에서 placeDetail로 조회)
-      router.push(`/places/preview/${item.id}`);
-    });
+    // 네이버 Place ID 기반으로 항상 같은 상세 페이지로 이동
+    // (등록/미등록 여부는 상세 페이지에서 판단)
+    router.push(`/places/${item.id}`);
   }
 
   return (
@@ -139,11 +127,6 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
         </ul>
       )}
 
-      {isPending && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background/80">
-          <Loader2 className="size-5 animate-spin text-primary" />
-        </div>
-      )}
     </div>
   );
 }

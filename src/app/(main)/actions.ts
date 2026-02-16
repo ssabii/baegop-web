@@ -5,20 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { buildNaverMapLink } from "@/lib/naver";
 import type { NaverPlaceDetail } from "@/types";
 
-export async function findPlaceByNaverPlaceId(
-  naverPlaceId: string
-): Promise<{ id: number } | null> {
-  const supabase = await createClient();
-
-  const { data } = await supabase
-    .from("places")
-    .select("id")
-    .eq("naver_place_id", naverPlaceId)
-    .single();
-
-  return data;
-}
-
 export async function createPlaceWithReview(
   place: NaverPlaceDetail,
   review: {
@@ -83,5 +69,5 @@ export async function createPlaceWithReview(
     throw new Error("리뷰 작성에 실패했습니다");
   }
 
-  redirect(`/places/${placeId}`);
+  redirect(`/places/${place.id}`);
 }

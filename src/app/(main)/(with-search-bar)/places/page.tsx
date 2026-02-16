@@ -7,7 +7,7 @@ export default async function PlacesPage() {
 
   const { data: places } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, like_count, image_urls")
+    .select("id, naver_place_id, name, address, category, kona_card_status, image_urls")
     .order("created_at", { ascending: false });
 
   return (
@@ -18,7 +18,7 @@ export default async function PlacesPage() {
       </h1>
 
       {places && places.length > 0 ? (
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="mt-6">
           {places.map((r) => (
             <PlaceCard key={r.id} place={r} />
           ))}

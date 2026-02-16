@@ -26,8 +26,7 @@ export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* 별점 */}
+    <div className="space-y-4 rounded-lg border p-4">
       <div>
         <Label className="text-sm font-medium">별점</Label>
         <div className="mt-2 flex gap-1">
@@ -52,7 +51,6 @@ export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
         </div>
       </div>
 
-      {/* 리뷰 내용 */}
       <div>
         <Label htmlFor="content" className="text-sm font-medium">
           리뷰 내용
@@ -63,13 +61,14 @@ export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           className="mt-2"
-          rows={4}
+          rows={3}
         />
       </div>
 
       <Button
         onClick={handleSubmit}
         disabled={rating === 0 || isPending}
+        size="sm"
         className="gap-2"
       >
         {isPending && <Loader2 className="size-4 animate-spin" />}
