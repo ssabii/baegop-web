@@ -3,7 +3,6 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { buildNaverMapLink } from "@/lib/naver";
 import type { NaverPlaceDetail } from "@/types";
 
 export async function createPlaceWithReview(
@@ -41,9 +40,8 @@ export async function createPlaceWithReview(
         name: place.name,
         address: place.roadAddress || place.address,
         category: place.category || null,
+        description: place.description || null,
         naver_place_id: place.id,
-        naver_link: buildNaverMapLink(place.name),
-        telephone: place.phone || null,
         lat: place.y ? parseFloat(place.y) : null,
         lng: place.x ? parseFloat(place.x) : null,
         image_urls: place.imageUrls.length > 0 ? place.imageUrls : null,
@@ -100,9 +98,8 @@ export async function registerPlace(place: NaverPlaceDetail) {
     name: place.name,
     address: place.roadAddress || place.address,
     category: place.category || null,
+    description: place.description || null,
     naver_place_id: place.id,
-    naver_link: buildNaverMapLink(place.name),
-    telephone: place.phone || null,
     lat: place.y ? parseFloat(place.y) : null,
     lng: place.x ? parseFloat(place.x) : null,
     image_urls: place.imageUrls.length > 0 ? place.imageUrls : null,

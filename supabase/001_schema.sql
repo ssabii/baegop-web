@@ -12,17 +12,18 @@ create table profiles (
   created_at timestamptz default now()
 );
 
--- 2. places
+-- 2. places (telephone, naver_link는 네이버 API에서 실시간 조회)
 create table places (
   id bigserial primary key,
   name text not null,
   category text,
   address text not null,
+  description text,
   postal_code text,
   lat double precision,
   lng double precision,
   naver_place_id text unique,
-  description text,
+  image_urls text[],
   kona_card_status text default 'unknown' check (kona_card_status in ('available', 'unavailable', 'unknown')),
   like_count int default 0,
   dislike_count int default 0,

@@ -80,7 +80,7 @@ export default async function PlaceDetailPage({
   }
 
   const address = detail.roadAddress || detail.address;
-  const naverLink = place?.naver_link ?? buildNaverMapLink(detail.name);
+  const naverLink = buildNaverMapLink(detail.name);
   const avgRating =
     reviews.length > 0
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length

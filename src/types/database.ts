@@ -86,6 +86,71 @@ export type Database = {
         }
         Relationships: []
       }
+      places: {
+        Row: {
+          address: string
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          dislike_count: number | null
+          id: number
+          image_urls: string[] | null
+          kona_card_status: string | null
+          lat: number | null
+          like_count: number | null
+          lng: number | null
+          name: string
+          naver_place_id: string | null
+          postal_code: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address: string
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          dislike_count?: number | null
+          id?: number
+          image_urls?: string[] | null
+          kona_card_status?: string | null
+          lat?: number | null
+          like_count?: number | null
+          lng?: number | null
+          name: string
+          naver_place_id?: string | null
+          postal_code?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          dislike_count?: number | null
+          id?: number
+          image_urls?: string[] | null
+          kona_card_status?: string | null
+          lat?: number | null
+          like_count?: number | null
+          lng?: number | null
+          name?: string
+          naver_place_id?: string | null
+          postal_code?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "places_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -149,121 +214,6 @@ export type Database = {
           },
         ]
       }
-      place_menus: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: number
-          images: string[] | null
-          name: string
-          place_id: number
-          price: string | null
-          priority: number
-          recommend: boolean
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: number
-          images?: string[] | null
-          name: string
-          place_id: number
-          price?: string | null
-          priority?: number
-          recommend?: boolean
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: number
-          images?: string[] | null
-          name?: string
-          place_id?: number
-          price?: string | null
-          priority?: number
-          recommend?: boolean
-        }
-        Relationships: [
-          {
-            foreignKeyName: "place_menus_place_id_fkey"
-            columns: ["place_id"]
-            isOneToOne: false
-            referencedRelation: "places"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      places: {
-        Row: {
-          address: string
-          category: string | null
-          created_at: string | null
-          created_by: string | null
-          description: string | null
-          dislike_count: number | null
-          id: number
-          image_urls: string[] | null
-          kona_card_status: string | null
-          lat: number | null
-          like_count: number | null
-          lng: number | null
-          name: string
-          naver_link: string | null
-          naver_place_id: string | null
-          postal_code: string | null
-          telephone: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          address: string
-          category?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          dislike_count?: number | null
-          id?: number
-          image_urls?: string[] | null
-          kona_card_status?: string | null
-          lat?: number | null
-          like_count?: number | null
-          lng?: number | null
-          name: string
-          naver_link?: string | null
-          naver_place_id?: string | null
-          postal_code?: string | null
-          telephone?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          address?: string
-          category?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          dislike_count?: number | null
-          id?: number
-          image_urls?: string[] | null
-          kona_card_status?: string | null
-          lat?: number | null
-          like_count?: number | null
-          lng?: number | null
-          name?: string
-          naver_link?: string | null
-          naver_place_id?: string | null
-          postal_code?: string | null
-          telephone?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "places_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       review_images: {
         Row: {
           created_at: string | null
@@ -301,8 +251,8 @@ export type Database = {
           content: string | null
           created_at: string | null
           id: number
-          rating: number
           place_id: number
+          rating: number
           updated_at: string | null
           user_id: string
         }
@@ -310,8 +260,8 @@ export type Database = {
           content?: string | null
           created_at?: string | null
           id?: number
-          rating: number
           place_id: number
+          rating: number
           updated_at?: string | null
           user_id: string
         }
@@ -319,8 +269,8 @@ export type Database = {
           content?: string | null
           created_at?: string | null
           id?: number
-          rating?: number
           place_id?: number
+          rating?: number
           updated_at?: string | null
           user_id?: string
         }
