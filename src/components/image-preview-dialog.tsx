@@ -68,6 +68,8 @@ export function ImageCarouselDialog({
       role="dialog"
       aria-modal="true"
       aria-label={alt || "이미지 미리보기"}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
       style={{
         position: "fixed",
         top: 0,
@@ -79,6 +81,7 @@ export function ImageCarouselDialog({
         flexDirection: "column",
         background: "#000",
         height: "100svh",
+        pointerEvents: "auto",
       }}
     >
       {/* Top bar — counter centered, close right */}
