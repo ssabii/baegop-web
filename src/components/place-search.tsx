@@ -211,7 +211,9 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
                   <span className="text-sm font-bold">{item.name}</span>
                   <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
                     <MapPin className="size-3 shrink-0" />
-                    <span className="truncate">{item.roadAddress || item.address}</span>
+                    <span className="truncate">
+                      {item.roadAddress || item.address}
+                    </span>
                   </span>
                   {item.category && (
                     <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
@@ -303,16 +305,18 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
             <button
               type="button"
               onClick={() => handleSelect(item)}
-              className="flex w-full items-center gap-3 px-1 py-3 text-left transition-colors hover:bg-accent"
+              className="flex w-full gap-3 px-1 py-3 text-left transition-colors hover:bg-accent"
             >
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-sm font-bold">{item.name}</span>
-                <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <span className="text-base font-bold">{item.name}</span>
+                <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
                   <MapPin className="size-3 shrink-0" />
-                  <span className="truncate">{item.roadAddress || item.address}</span>
+                  <span className="truncate">
+                    {item.roadAddress || item.address}
+                  </span>
                 </span>
                 {item.category && (
-                  <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                  <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
                     <Tag className="size-3 shrink-0" />
                     <span className="truncate">{item.category}</span>
                   </span>
