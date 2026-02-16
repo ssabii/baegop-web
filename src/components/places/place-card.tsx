@@ -21,18 +21,6 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
       href={`/places/${place.id}`}
       className="flex h-[7.5rem] gap-3 border-b border-border py-3 last:border-b-0"
     >
-      {place.image_urls?.[0] ? (
-        <img
-          src={place.image_urls[0]}
-          alt={place.name}
-          className="h-full w-24 shrink-0 rounded-lg object-cover"
-        />
-      ) : (
-        <div className="flex h-full w-24 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <UtensilsCrossed className="size-6 text-muted-foreground" />
-        </div>
-      )}
-
       <div className="flex min-w-0 flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
           <h3 className="line-clamp-2 font-bold leading-snug">{place.name}</h3>
@@ -74,6 +62,18 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
           )}
         </div>
       </div>
+
+      {place.image_urls?.[0] ? (
+        <img
+          src={place.image_urls[0]}
+          alt={place.name}
+          className="h-full w-24 shrink-0 rounded-lg object-cover"
+        />
+      ) : (
+        <div className="flex h-full w-24 shrink-0 items-center justify-center rounded-lg bg-muted">
+          <UtensilsCrossed className="size-6 text-muted-foreground" />
+        </div>
+      )}
     </Link>
   );
 }

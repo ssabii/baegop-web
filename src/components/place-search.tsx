@@ -7,22 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { NaverSearchResult } from "@/types";
 
-const DEFAULT_DISPLAY = 10;
 const AUTOCOMPLETE_LIMIT = 5;
 
 interface PlaceSearchProps {
   autoFocus?: boolean;
+  initialQuery?: string;
+  initialResults?: NaverSearchResult[] | null;
 }
 
-export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
+export function PlaceSearch({
+  autoFocus,
+  initialQuery = "",
+  initialResults = null,
+}: PlaceSearchProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") ?? "";
-  const displayParam = Number(searchParams.get("display")) || DEFAULT_DISPLAY;
 
   const [input, setInput] = useState(queryParam);
-  const [results, setResults] = useState<NaverSearchResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -31,6 +33,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   const [showPopover, setShowPopover] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const suggestControllerRef = useRef<AbortController>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
   const isTyping = input !== queryParam;
@@ -41,13 +44,21 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
       setShowPopover(false);
       return;
     }
-    const res = await fetch(
-      `/api/naver-search?query=${encodeURIComponent(q)}&display=${AUTOCOMPLETE_LIMIT}`,
-    );
-    if (res.ok) {
-      const data: NaverSearchResult[] = await res.json();
-      setSuggestions(data);
-      setShowPopover(data.length > 0);
+    suggestControllerRef.current?.abort();
+    const controller = new AbortController();
+    suggestControllerRef.current = controller;
+    try {
+      const res = await fetch(
+        `/api/naver-search?query=${encodeURIComponent(q)}&display=${AUTOCOMPLETE_LIMIT}`,
+        { signal: controller.signal },
+      );
+      if (res.ok) {
+        const data: NaverSearchResult[] = await res.json();
+        setSuggestions(data);
+        setShowPopover(data.length > 0);
+      }
+    } catch {
+      // aborted
     }
   }, []);
 
@@ -78,24 +89,6 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    if (!queryParam) return;
-
-    const controller = new AbortController();
-    setIsLoading(true);
-
-    fetch(
-      `/api/naver-search?query=${encodeURIComponent(queryParam)}&display=${displayParam}`,
-      { signal: controller.signal },
-    )
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data: NaverSearchResult[]) => setResults(data))
-      .catch(() => {})
-      .finally(() => setIsLoading(false));
-
-    return () => controller.abort();
-  }, [queryParam, displayParam]);
 
   // 팝오버 결과 바뀌면 하이라이트 리셋
   useEffect(() => {
@@ -146,16 +139,24 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
     inputRef.current?.focus();
   }
 
+  function dismissSuggestions() {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    suggestControllerRef.current?.abort();
+    setSuggestions([]);
+    setShowPopover(false);
+    inputRef.current?.blur();
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
     if (trimmed.length < 2) return;
-    setShowPopover(false);
+    dismissSuggestions();
     router.push(`/search?query=${encodeURIComponent(trimmed)}`);
   }
 
   function handleSelect(item: NaverSearchResult) {
-    setShowPopover(false);
+    dismissSuggestions();
     router.push(`/places/${item.id}`);
   }
 
@@ -197,7 +198,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
         {showPopover && (
           <ul
             ref={listRef}
-            className="absolute right-0 left-0 z-50 mt-2 overflow-hidden rounded-xl border bg-popover shadow-lg"
+            className="absolute right-0 left-0 z-50 mt-2 max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-xl border bg-popover shadow-lg"
           >
             {suggestions.map((item, index) => (
               <li key={item.id}>
@@ -262,8 +263,8 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
     );
   }
 
-  // 로딩 중
-  if (isLoading) {
+  // 최초 검색 대기 (서버 응답 전)
+  if (initialResults === null) {
     return (
       <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-4xl flex-col px-4">
         {searchBar}
@@ -279,7 +280,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   }
 
   // 검색 결과 없음
-  if (results.length === 0) {
+  if (initialResults.length === 0) {
     return (
       <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-4xl flex-col px-4">
         {searchBar}
@@ -302,7 +303,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
     <div className="mx-auto max-w-4xl px-4">
       {searchBar}
       <ul className="mt-4 divide-y">
-        {results.map((item) => (
+        {initialResults.map((item) => (
           <li key={item.id}>
             <button
               type="button"
@@ -331,7 +332,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
                   className="size-20 shrink-0 rounded-lg object-cover"
                 />
               ) : (
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted">
+                <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
                   <MapPin className="size-5 text-muted-foreground" />
                 </div>
               )}
