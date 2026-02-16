@@ -116,6 +116,10 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@utility shadow-top {
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+}
+
 @utility scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
