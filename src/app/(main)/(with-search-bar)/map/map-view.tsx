@@ -12,14 +12,16 @@ const NaverMap = dynamic(() => import("@/components/naver-map"), {
 });
 
 interface MapViewProps {
-  markers: { lat: number; lng: number; title?: string }[];
+  markers: {
+    id: string;
+    lat: number;
+    lng: number;
+    title?: string;
+    category?: string | null;
+  }[];
+  className?: string;
 }
 
-export function MapView({ markers }: MapViewProps) {
-  return (
-    <NaverMap
-      markers={markers}
-      className="h-[500px] w-full rounded-lg border"
-    />
-  );
+export function MapView({ markers, className }: MapViewProps) {
+  return <NaverMap markers={markers} className={className} />;
 }
