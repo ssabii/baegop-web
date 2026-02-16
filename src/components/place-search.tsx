@@ -2,12 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, MapPin, Search, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, Loader2, MapPin, Search, UtensilsCrossed } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { findPlaceByNaverPlaceId } from "@/app/(main)/actions";
 import type { NaverSearchResult } from "@/types";
 
-export function PlaceSearch() {
+interface PlaceSearchProps {
+  autoFocus?: boolean;
+}
+
+export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<NaverSearchResult[]>([]);
@@ -67,15 +71,25 @@ export function PlaceSearch() {
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="장소 이름으로 검색..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => results.length > 0 && setOpen(true)}
-          className="pl-9"
-        />
+      <div className="relative flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-5" />
+        </button>
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="장소 이름으로 검색..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => results.length > 0 && setOpen(true)}
+            autoFocus={autoFocus}
+            className="rounded-full pl-9"
+          />
+        </div>
       </div>
 
       {open && (

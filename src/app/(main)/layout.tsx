@@ -1,4 +1,4 @@
-import { Header } from "@/components/header";
+import { BottomNav } from "@/components/bottom-nav";
 
 export default function MainLayout({
   children,
@@ -7,8 +7,8 @@ export default function MainLayout({
 }) {
   return (
     <>
-      <Header />
-      {children}
+      <main className="pb-20">{children}</main>
+      <BottomNav />
     </>
   );
 }
