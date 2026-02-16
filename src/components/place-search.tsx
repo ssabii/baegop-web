@@ -160,86 +160,86 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   }
 
   const searchBar = (
-    <div className="sticky top-0 z-40 pt-4 pb-2 backdrop-blur">
+    <div className="sticky top-0 z-40 pt-4 pb-3 backdrop-blur">
       <form
         ref={formRef}
         role="search"
         onSubmit={handleSubmit}
         className="relative"
       >
-      <button
-        type="button"
-        onClick={() => router.back()}
-        className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ChevronLeft className="size-5" />
-      </button>
-      <Input
-        ref={inputRef}
-        placeholder="장소 이름으로 검색"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        autoFocus={autoFocus}
-        className={`rounded-full pl-10 ${input ? "pr-10" : ""}`}
-      />
-      {input && (
         <button
           type="button"
-          onClick={handleClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+          onClick={() => router.back()}
+          className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <X className="size-4" />
+          <ChevronLeft className="size-5" />
         </button>
-      )}
+        <Input
+          ref={inputRef}
+          placeholder="장소 이름으로 검색"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          autoFocus={autoFocus}
+          className={`rounded-full pl-10 ${input ? "pr-10" : ""}`}
+        />
+        {input && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        )}
 
-      {/* 자동완성 팝오버 */}
-      {showPopover && (
-        <ul
-          ref={listRef}
-          className="absolute right-0 left-0 z-50 mt-2 overflow-hidden rounded-xl border bg-popover shadow-lg"
-        >
-          {suggestions.map((item, index) => (
-            <li key={item.id}>
-              <button
-                type="button"
-                onClick={() => handleSelect(item)}
-                className={`flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors ${
-                  index === highlightedIndex ? "bg-accent" : "hover:bg-accent"
-                }`}
-              >
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="text-sm font-bold">{item.name}</span>
-                  <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                    <MapPin className="size-3 shrink-0" />
-                    <span className="truncate">
-                      {item.roadAddress || item.address}
-                    </span>
-                  </span>
-                  {item.category && (
+        {/* 자동완성 팝오버 */}
+        {showPopover && (
+          <ul
+            ref={listRef}
+            className="absolute right-0 left-0 z-50 mt-2 overflow-hidden rounded-xl border bg-popover shadow-lg"
+          >
+            {suggestions.map((item, index) => (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  onClick={() => handleSelect(item)}
+                  className={`flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors ${
+                    index === highlightedIndex ? "bg-accent" : "hover:bg-accent"
+                  }`}
+                >
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="text-sm font-bold">{item.name}</span>
                     <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                      <Tag className="size-3 shrink-0" />
-                      <span className="truncate">{item.category}</span>
+                      <MapPin className="size-3 shrink-0" />
+                      <span className="truncate">
+                        {item.roadAddress || item.address}
+                      </span>
                     </span>
-                  )}
-                </div>
-                {item.imageUrl ? (
-                  <img
-                    src={item.imageUrl}
-                    alt=""
-                    className="size-12 shrink-0 rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted">
-                    <MapPin className="size-5 text-muted-foreground" />
+                    {item.category && (
+                      <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                        <Tag className="size-3 shrink-0" />
+                        <span className="truncate">{item.category}</span>
+                      </span>
+                    )}
                   </div>
-                )}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </form>
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt=""
+                      className="size-12 shrink-0 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted">
+                      <MapPin className="size-5 text-muted-foreground" />
+                    </div>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </form>
     </div>
   );
 
