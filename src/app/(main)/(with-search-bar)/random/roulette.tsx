@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlaceCard } from "@/components/place-card";
+import { PlaceCard } from "@/components/places";
 
 interface PlaceData {
   id: number;

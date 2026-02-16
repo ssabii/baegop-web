@@ -1,5 +1,6 @@
 import { Shuffle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { EmptyPlace } from "@/components/places";
 import { Roulette } from "./roulette";
 
 export default async function RandomPage() {
@@ -8,6 +9,14 @@ export default async function RandomPage() {
   const { data: places } = await supabase
     .from("places")
     .select("id, naver_place_id, name, address, category, kona_card_status, image_urls");
+
+  if (!places || places.length === 0) {
+    return (
+      <main className="mx-auto flex h-[calc(100dvh-9rem)] w-full max-w-4xl items-center justify-center px-4">
+        <EmptyPlace />
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
@@ -20,7 +29,7 @@ export default async function RandomPage() {
       </p>
 
       <div className="mt-8">
-        <Roulette places={places ?? []} />
+        <Roulette places={places} />
       </div>
     </main>
   );
