@@ -4,6 +4,7 @@ import {
   Footprints,
   MapPin,
   Phone,
+  Star,
   Tag,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -12,7 +13,8 @@ import { COMPANY_LOCATION } from "@/lib/constants";
 import { calculateDistance, estimateWalkingMinutes, formatDistance } from "@/lib/geo";
 import { ImageGallery } from "@/components/image-gallery";
 import { PlaceDetailTabs } from "./place-detail-tabs";
-import type { KonaCardStatus } from "@/types";
+import { KonaVoteSection } from "./kona-vote";
+import type { KonaCardStatus, KonaVote } from "@/types";
 
 export default async function PlaceDetailPage({
   params,
@@ -48,6 +50,7 @@ export default async function PlaceDetailPage({
 
   // 등록된 장소인 경우 DB 데이터 조회
   let reviews: ReviewData[] = [];
+  let userKonaVote: KonaVote | null = null;
   let user: { id: string } | null = null;
 
   const {
@@ -63,10 +66,24 @@ export default async function PlaceDetailPage({
       .order("created_at", { ascending: false });
 
     reviews = (reviewData as ReviewData[]) ?? [];
+
+    if (user) {
+      const { data: vote } = await supabase
+        .from("kona_card_votes")
+        .select("vote")
+        .eq("place_id", place.id)
+        .eq("user_id", user.id)
+        .single();
+      userKonaVote = (vote?.vote as KonaVote) ?? null;
+    }
   }
 
   const address = detail.roadAddress || detail.address;
   const naverLink = place?.naver_link ?? buildNaverMapLink(detail.name);
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : null;
 
   return (
     <main className="mx-auto max-w-4xl">
@@ -119,27 +136,24 @@ export default async function PlaceDetailPage({
             네이버에서 보기
           </a>
 
-          {/* 코나카드 상태 배지 (등록된 장소만) */}
-          {isRegistered &&
-            ((place.kona_card_status as KonaCardStatus) ?? "unknown") !==
-              "unknown" && (
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-                  (place.kona_card_status as KonaCardStatus) === "available"
-                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                <img
-                  src="/icons/kona.png"
-                  alt="코나카드"
-                  className="size-3.5 rounded-sm"
-                />
-                {(place.kona_card_status as KonaCardStatus) === "available"
-                  ? "결제가능"
-                  : "결제불가"}
-              </span>
-            )}
+          {/* 별점 + 코나카드 배지 */}
+          {isRegistered && (
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {avgRating !== null && (
+                <span className="flex items-center gap-1 text-sm font-medium text-yellow-500">
+                  <Star className="size-4 fill-current" />
+                  {avgRating.toFixed(1)}
+                </span>
+              )}
+              <KonaVoteSection
+                placeId={place.id}
+                naverPlaceId={naverPlaceId}
+                status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
+                userVote={userKonaVote}
+                isLoggedIn={!!user}
+              />
+            </div>
+          )}
         </section>
 
         {/* 메뉴 / 리뷰 탭 */}

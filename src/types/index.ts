@@ -20,6 +20,7 @@ export type ReviewWithProfile = Review & {
 
 // 리터럴 타입 (DB에서 text로 저장되지만 앱에서는 좁은 타입으로 사용)
 export type KonaCardStatus = "available" | "unavailable" | "unknown";
+export type KonaVote = "available" | "unavailable";
 
 // 비DB 타입 — 네이버 플레이스 GraphQL 검색 결과 (places 쿼리)
 export interface NaverSearchResult {
