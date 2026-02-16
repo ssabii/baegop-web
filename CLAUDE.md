@@ -55,6 +55,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - **Import alias**: `@/*` → `src/*`
 - **컴포넌트**: shadcn/ui 기반, `src/components/ui/`에 위치
 - **브랜딩**: 프라이머리 컬러 오렌지/코랄 계열. 라임 계열 사용 금지 (크몽 컬러와 구분)
+- **빈 상태 페이지**: 콘텐츠가 없는 화면(검색 전, 데이터 없음 등)은 `h-dvh` + `flex flex-col` + `flex-1`로 뷰포트 높이에 딱 맞춰 스크롤이 생기지 않게 한다.
 
 ## Environment Variables
 

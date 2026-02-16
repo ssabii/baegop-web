@@ -5,6 +5,8 @@ const GRAPHQL_URL = "https://pcmap-api.place.naver.com/place/graphql";
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("query");
+  const displayParam = Number(request.nextUrl.searchParams.get("display")) || 10;
+  const display = Math.min(Math.max(displayParam, 1), 100);
 
   if (!query) {
     return NextResponse.json(
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
       body: JSON.stringify([
         {
           operationName: "getPlaces",
-          variables: { input: { query, display: 5, start: 1 } },
+          variables: { input: { query, display, start: 1 } },
           query: `query getPlaces($input: PlacesInput!) {
             places(input: $input) {
               items {
