@@ -1,23 +1,18 @@
 import { notFound } from "next/navigation";
 import {
   ExternalLink,
-  Flame,
   Footprints,
   MapPin,
-  MessageSquare,
   Phone,
   Tag,
-  UtensilsCrossed,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buildNaverMapLink, fetchPlaceDetail } from "@/lib/naver";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { calculateDistance, estimateWalkingMinutes, formatDistance } from "@/lib/geo";
 import { ImageGallery } from "@/components/image-gallery";
-import { ReviewSection } from "./review-section";
-import { KonaVoteSection } from "./kona-vote";
-import { ReviewForm } from "./review-form";
-import type { KonaCardStatus, KonaVote } from "@/types";
+import { PlaceDetailTabs } from "./place-detail-tabs";
+import type { KonaCardStatus } from "@/types";
 
 export default async function PlaceDetailPage({
   params,
@@ -53,7 +48,6 @@ export default async function PlaceDetailPage({
 
   // 등록된 장소인 경우 DB 데이터 조회
   let reviews: ReviewData[] = [];
-  let userKonaVote: KonaVote | null = null;
   let user: { id: string } | null = null;
 
   const {
@@ -69,16 +63,6 @@ export default async function PlaceDetailPage({
       .order("created_at", { ascending: false });
 
     reviews = (reviewData as ReviewData[]) ?? [];
-
-    if (user) {
-      const { data: vote } = await supabase
-        .from("kona_card_votes")
-        .select("vote")
-        .eq("place_id", place.id)
-        .eq("user_id", user.id)
-        .single();
-      userKonaVote = (vote?.vote as KonaVote) ?? null;
-    }
   }
 
   const address = detail.roadAddress || detail.address;
@@ -135,99 +119,39 @@ export default async function PlaceDetailPage({
             네이버에서 보기
           </a>
 
-          {/* 코나카드 투표 (등록된 장소만) */}
-          {isRegistered && (
-            <div className="pt-1">
-              <KonaVoteSection
-                placeId={place.id}
-                naverPlaceId={naverPlaceId}
-                status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
-                userVote={userKonaVote}
-                isLoggedIn={!!user}
-              />
-            </div>
-          )}
-        </section>
-
-        {/* 메뉴 섹션 (네이버 API) */}
-        {detail.menus.length > 0 && (
-          <section>
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <UtensilsCrossed className="size-5" />
-              메뉴 ({detail.menus.length})
-            </h2>
-            <ul className="mt-4 divide-y rounded-lg border">
-              {detail.menus.map((menu) => (
-                <li key={menu.name} className="flex items-center gap-3 px-4 py-3">
-                  {menu.images.length > 0 ? (
-                    <img
-                      src={menu.images[0]}
-                      alt={menu.name}
-                      className="size-14 shrink-0 rounded-md object-cover"
-                    />
-                  ) : (
-                    <div className="flex size-14 shrink-0 items-center justify-center rounded-md bg-muted">
-                      <UtensilsCrossed className="size-5 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div className="flex min-w-0 flex-1 items-center justify-between">
-                    <div className="flex flex-col gap-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{menu.name}</span>
-                        {menu.recommend && (
-                          <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                            <Flame className="size-3" />
-                            추천
-                          </span>
-                        )}
-                      </div>
-                      {menu.description && (
-                        <span className="text-xs text-muted-foreground">
-                          {menu.description}
-                        </span>
-                      )}
-                    </div>
-                    {menu.price && (
-                      <span className="shrink-0 text-sm text-muted-foreground">
-                        {Number(menu.price).toLocaleString()}원
-                      </span>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {/* 리뷰 섹션 */}
-        <section>
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <MessageSquare className="size-5" />
-            리뷰 ({reviews.length})
-          </h2>
-          <div className="mt-4">
-            {isRegistered ? (
-              <ReviewSection
-                placeId={place.id}
-                naverPlaceId={naverPlaceId}
-                reviews={reviews}
-                currentUserId={user?.id ?? null}
-              />
-            ) : (
-              <div className="space-y-4">
-                <div className="rounded-lg border border-dashed p-4">
-                  <p className="text-sm font-medium">
-                    리뷰를 작성하면 장소가 등록됩니다
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    첫 리뷰를 남겨주세요!
-                  </p>
-                </div>
-                {user && <ReviewForm placeDetail={detail} />}
-              </div>
+          {/* 코나카드 상태 배지 (등록된 장소만) */}
+          {isRegistered &&
+            ((place.kona_card_status as KonaCardStatus) ?? "unknown") !==
+              "unknown" && (
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                  (place.kona_card_status as KonaCardStatus) === "available"
+                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                <img
+                  src="/icons/kona.png"
+                  alt="코나카드"
+                  className="size-3.5 rounded-sm"
+                />
+                {(place.kona_card_status as KonaCardStatus) === "available"
+                  ? "결제가능"
+                  : "결제불가"}
+              </span>
             )}
-          </div>
         </section>
+
+        {/* 메뉴 / 리뷰 탭 */}
+        <PlaceDetailTabs
+          menus={detail.menus}
+          reviews={reviews}
+          isRegistered={isRegistered}
+          placeId={place?.id ?? null}
+          naverPlaceId={naverPlaceId}
+          currentUserId={user?.id ?? null}
+          placeDetail={detail}
+        />
       </div>
     </main>
   );

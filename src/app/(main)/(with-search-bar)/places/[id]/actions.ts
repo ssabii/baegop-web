@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import type { KonaVote } from "@/types";
 
 export async function createReview(
   placeId: number,
@@ -46,49 +45,6 @@ export async function deleteReview(
     .eq("user_id", user.id);
 
   if (error) throw new Error("리뷰 삭제에 실패했습니다");
-
-  revalidatePath(`/places/${naverPlaceId}`);
-}
-
-export async function voteKonaCard(
-  placeId: number,
-  naverPlaceId: string,
-  vote: KonaVote
-) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("로그인이 필요합니다");
-
-  // 기존 투표 확인
-  const { data: existing } = await supabase
-    .from("kona_card_votes")
-    .select("id, vote")
-    .eq("place_id", placeId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (existing) {
-    if (existing.vote === vote) {
-      // 같은 투표 → 취소
-      await supabase.from("kona_card_votes").delete().eq("id", existing.id);
-    } else {
-      // 다른 투표 → 변경
-      await supabase
-        .from("kona_card_votes")
-        .update({ vote })
-        .eq("id", existing.id);
-    }
-  } else {
-    // 없으면 → 새로 생성
-    await supabase.from("kona_card_votes").insert({
-      place_id: placeId,
-      user_id: user.id,
-      vote,
-    });
-  }
 
   revalidatePath(`/places/${naverPlaceId}`);
 }
