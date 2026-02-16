@@ -160,12 +160,13 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   }
 
   const searchBar = (
-    <form
-      ref={formRef}
-      role="search"
-      onSubmit={handleSubmit}
-      className="relative"
-    >
+    <div className="sticky top-0 z-40 pt-4 pb-2 backdrop-blur">
+      <form
+        ref={formRef}
+        role="search"
+        onSubmit={handleSubmit}
+        className="relative"
+      >
       <button
         type="button"
         onClick={() => router.back()}
@@ -239,12 +240,13 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
         </ul>
       )}
     </form>
+    </div>
   );
 
   // 검색 전: 뷰포트 높이에 맞춘 안내 화면
   if (!queryParam) {
     return (
-      <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-4xl flex-col px-4 pt-4">
+      <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-4xl flex-col px-4">
         {searchBar}
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           <Search className="size-16 text-muted-foreground/30" />
@@ -263,7 +265,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   // 로딩 중
   if (isLoading) {
     return (
-      <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-4xl flex-col px-4 pt-4">
+      <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-4xl flex-col px-4">
         {searchBar}
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           <Loader2 className="size-16 animate-spin text-muted-foreground/30" />
@@ -279,7 +281,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
   // 검색 결과 없음
   if (results.length === 0) {
     return (
-      <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-4xl flex-col px-4 pt-4">
+      <div className="mx-auto flex h-[calc(100dvh-5rem)] max-w-4xl flex-col px-4">
         {searchBar}
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           <Search className="size-16 text-muted-foreground/30" />
@@ -297,7 +299,7 @@ export function PlaceSearch({ autoFocus }: PlaceSearchProps) {
 
   // 검색 결과 리스트
   return (
-    <div className="mx-auto max-w-4xl px-4 pt-4">
+    <div className="mx-auto max-w-4xl px-4">
       {searchBar}
       <ul className="mt-4 divide-y">
         {results.map((item) => (
