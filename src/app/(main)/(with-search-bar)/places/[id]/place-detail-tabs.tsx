@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Flame, MessageSquarePlus, UtensilsCrossed } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 import { ReviewSection } from "./review-section";
 import { ReviewForm } from "./review-form";
 import type { NaverPlaceDetail, NaverPlaceMenu } from "@/types";
@@ -20,6 +21,10 @@ interface ReviewData {
     nickname: string | null;
     avatar_url: string | null;
   } | null;
+  review_images: {
+    url: string;
+    display_order: number;
+  }[];
 }
 
 interface PlaceDetailTabsProps {
@@ -67,35 +72,37 @@ export function PlaceDetailTabs({
             <ul className="divide-y">
               {visibleMenus.map((menu) => (
                 <li key={menu.name} className="flex gap-2 py-3">
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="truncate text-sm font-bold">
-                        {menu.name}
-                      </div>
+                  <div className="flex min-w-0 flex-1 flex-col justify-between">
+                    <div className="space-y-0.5">
                       {menu.recommend && (
-                        <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
                           <Flame className="size-3" />
                           추천
                         </span>
                       )}
-                    </div>
-                    {menu.description && (
-                      <div className="line-clamp-2 text-sm text-muted-foreground">
-                        {menu.description}
+                      <div className="truncate text-sm font-bold">
+                        {menu.name}
                       </div>
-                    )}
+                      {menu.description && (
+                        <div className="line-clamp-2 text-sm text-muted-foreground">
+                          {menu.description}
+                        </div>
+                      )}
+                    </div>
                     {menu.price && (
-                      <div className="text-sm font-medium text-muted-foreground">
+                      <div className="text-sm font-bold">
                         {Number(menu.price).toLocaleString()}원
                       </div>
                     )}
                   </div>
                   {menu.images.length > 0 ? (
-                    <img
-                      src={menu.images[0]}
-                      alt={menu.name}
-                      className="size-20 shrink-0 rounded-lg object-cover"
-                    />
+                    <ImagePreviewDialog src={menu.images[0]} alt={menu.name}>
+                      <img
+                        src={menu.images[0]}
+                        alt={menu.name}
+                        className="size-20 shrink-0 rounded-lg object-cover"
+                      />
+                    </ImagePreviewDialog>
                   ) : (
                     <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
                       <UtensilsCrossed className="size-5 text-muted-foreground" />
