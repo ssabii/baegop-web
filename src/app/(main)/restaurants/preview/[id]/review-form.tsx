@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { createRestaurantWithReview } from "@/app/(main)/actions";
-import type { NaverSearchResult } from "@/types";
+import type { NaverPlaceDetail } from "@/types";
 
-export function ReviewForm({ naverItem }: { naverItem: NaverSearchResult }) {
+export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [content, setContent] = useState("");
@@ -18,7 +18,7 @@ export function ReviewForm({ naverItem }: { naverItem: NaverSearchResult }) {
     if (rating === 0) return;
 
     startTransition(async () => {
-      await createRestaurantWithReview(naverItem, {
+      await createRestaurantWithReview(placeDetail, {
         rating,
         content,
       });

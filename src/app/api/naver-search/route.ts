@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripHtml, fetchNaverImages } from "@/lib/naver";
 import type { NaverSearchResult } from "@/types";
+
+const GRAPHQL_URL = "https://pcmap-api.place.naver.com/place/graphql";
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("query");
@@ -8,47 +9,52 @@ export async function GET(request: NextRequest) {
   if (!query) {
     return NextResponse.json(
       { error: "query 파라미터가 필요합니다" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  const clientId = process.env.NAVER_CLIENT_ID;
-  const clientSecret = process.env.NAVER_CLIENT_SECRET;
+  try {
+    const res = await fetch(GRAPHQL_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent":
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+        Referer: "https://m.place.naver.com/",
+        Origin: "https://m.place.naver.com",
+      },
+      body: JSON.stringify([
+        {
+          operationName: "getPlaces",
+          variables: { input: { query, display: 5, start: 1 } },
+          query: `query getPlaces($input: PlacesInput!) {
+            places(input: $input) {
+              items {
+                id name category address roadAddress
+                phone x y imageUrl menus
+              }
+            }
+          }`,
+        },
+      ]),
+      signal: AbortSignal.timeout(5000),
+    });
 
-  if (!clientId || !clientSecret) {
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: "네이버 플레이스 검색 실패" },
+        { status: res.status },
+      );
+    }
+
+    const json = await res.json();
+    const items: NaverSearchResult[] = json[0]?.data?.places?.items ?? [];
+
+    return NextResponse.json(items);
+  } catch {
     return NextResponse.json(
-      { error: "네이버 API 키가 설정되지 않았습니다" },
-      { status: 500 }
+      { error: "네이버 플레이스 검색 중 오류 발생" },
+      { status: 500 },
     );
   }
-
-  const url = new URL("https://openapi.naver.com/v1/search/local.json");
-  url.searchParams.set("query", query);
-  url.searchParams.set("display", "5");
-
-  const res = await fetch(url.toString(), {
-    headers: {
-      "X-Naver-Client-Id": clientId,
-      "X-Naver-Client-Secret": clientSecret,
-    },
-  });
-
-  if (!res.ok) {
-    return NextResponse.json(
-      { error: "네이버 API 호출 실패" },
-      { status: res.status }
-    );
-  }
-
-  const data = (await res.json()) as { items: NaverSearchResult[] };
-
-  // 병렬로 각 결과에 대해 이미지 검색
-  const resultsWithImages = await Promise.all(
-    data.items.map(async (item) => {
-      const imageUrls = await fetchNaverImages(stripHtml(item.title));
-      return { ...item, imageUrls };
-    })
-  );
-
-  return NextResponse.json(resultsWithImages);
 }

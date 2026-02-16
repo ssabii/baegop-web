@@ -25,16 +25,38 @@ export type KonaCardStatus = "available" | "unavailable" | "unknown";
 export type ReactionType = "like" | "dislike";
 export type KonaVote = "available" | "unavailable";
 
-// 비DB 타입
+// 비DB 타입 — 네이버 플레이스 GraphQL 검색 결과 (places 쿼리)
 export interface NaverSearchResult {
-  title: string;
-  link: string;
+  id: string; // naver place ID
+  name: string;
   category: string;
-  description: string;
-  telephone: string;
   address: string;
   roadAddress: string;
-  mapx: string;
-  mapy: string;
-  imageUrls?: string[];
+  phone: string | null;
+  x: string; // longitude
+  y: string; // latitude
+  imageUrl: string | null;
+  menus: string[]; // ["메뉴명 가격", ...]
+}
+
+// 네이버 플레이스 상세 (placeDetail 쿼리)
+export interface NaverPlaceDetail {
+  id: string;
+  name: string;
+  category: string;
+  address: string;
+  roadAddress: string;
+  phone: string | null;
+  x: string;
+  y: string;
+  imageUrls: string[];
+  menus: NaverPlaceMenu[];
+}
+
+export interface NaverPlaceMenu {
+  name: string;
+  price: string | null;
+  images: string[];
+  description: string | null;
+  recommend: boolean;
 }

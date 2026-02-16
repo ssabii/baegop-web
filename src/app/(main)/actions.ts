@@ -2,13 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import {
-  stripHtml,
-  extractNaverPlaceId,
-  convertNaverCoord,
-  buildNaverMapLink,
-} from "@/lib/naver";
-import type { NaverSearchResult } from "@/types";
+import { buildNaverMapLink } from "@/lib/naver";
+import type { NaverPlaceDetail } from "@/types";
 
 export async function findRestaurantByNaverPlaceId(
   naverPlaceId: string
@@ -25,7 +20,7 @@ export async function findRestaurantByNaverPlaceId(
 }
 
 export async function createRestaurantWithReview(
-  item: NaverSearchResult,
+  place: NaverPlaceDetail,
   review: {
     rating: number;
     content: string;
@@ -41,55 +36,30 @@ export async function createRestaurantWithReview(
     throw new Error("로그인이 필요합니다");
   }
 
-  const naverPlaceId = extractNaverPlaceId(item.link);
-
   // 이미 등록된 맛집인지 확인
   let restaurantId: number;
 
-  if (naverPlaceId) {
-    const { data: existing } = await supabase
-      .from("restaurants")
-      .select("id")
-      .eq("naver_place_id", naverPlaceId)
-      .single();
+  const { data: existing } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("naver_place_id", place.id)
+    .single();
 
-    if (existing) {
-      restaurantId = existing.id;
-    } else {
-      const { data: created, error } = await supabase
-        .from("restaurants")
-        .insert({
-          name: stripHtml(item.title),
-          address: item.roadAddress || item.address,
-          category: item.category || null,
-          naver_place_id: naverPlaceId,
-          naver_link: buildNaverMapLink(stripHtml(item.title)),
-          telephone: item.telephone || null,
-          lat: item.mapy ? convertNaverCoord(item.mapy) : null,
-          lng: item.mapx ? convertNaverCoord(item.mapx) : null,
-          image_urls: item.imageUrls?.length ? item.imageUrls : null,
-          created_by: user.id,
-        })
-        .select("id")
-        .single();
-
-      if (error || !created) {
-        throw new Error("맛집 등록에 실패했습니다");
-      }
-      restaurantId = created.id;
-    }
+  if (existing) {
+    restaurantId = existing.id;
   } else {
     const { data: created, error } = await supabase
       .from("restaurants")
       .insert({
-        name: stripHtml(item.title),
-        address: item.roadAddress || item.address,
-        category: item.category || null,
-        naver_link: buildNaverMapLink(stripHtml(item.title)),
-        telephone: item.telephone || null,
-        lat: item.mapy ? convertNaverCoord(item.mapy) : null,
-        lng: item.mapx ? convertNaverCoord(item.mapx) : null,
-        image_urls: item.imageUrls?.length ? item.imageUrls : null,
+        name: place.name,
+        address: place.roadAddress || place.address,
+        category: place.category || null,
+        naver_place_id: place.id,
+        naver_link: buildNaverMapLink(place.name),
+        telephone: place.phone || null,
+        lat: place.y ? parseFloat(place.y) : null,
+        lng: place.x ? parseFloat(place.x) : null,
+        image_urls: place.imageUrls.length > 0 ? place.imageUrls : null,
         created_by: user.id,
       })
       .select("id")
