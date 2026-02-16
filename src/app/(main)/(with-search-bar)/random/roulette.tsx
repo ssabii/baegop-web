@@ -7,11 +7,11 @@ import { PlaceCard } from "@/components/place-card";
 
 interface PlaceData {
   id: number;
+  naver_place_id: string | null;
   name: string;
   address: string;
   category: string | null;
   kona_card_status: string | null;
-  like_count: number | null;
   image_urls: string[] | null;
 }
 

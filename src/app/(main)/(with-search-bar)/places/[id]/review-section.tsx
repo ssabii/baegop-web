@@ -22,6 +22,7 @@ interface ReviewData {
 
 interface ReviewSectionProps {
   placeId: number;
+  naverPlaceId: string;
   reviews: ReviewData[];
   currentUserId: string | null;
 }
@@ -46,17 +47,17 @@ function StarRating({ rating }: { rating: number }) {
 function ReviewCard({
   review,
   isOwner,
-  placeId,
+  naverPlaceId,
 }: {
   review: ReviewData;
   isOwner: boolean;
-  placeId: number;
+  naverPlaceId: string;
 }) {
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
     startTransition(async () => {
-      await deleteReview(review.id, placeId);
+      await deleteReview(review.id, naverPlaceId);
     });
   }
 
@@ -101,7 +102,7 @@ function ReviewCard({
   );
 }
 
-function ReviewForm({ placeId }: { placeId: number }) {
+function ReviewForm({ placeId, naverPlaceId }: { placeId: number; naverPlaceId: string }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [content, setContent] = useState("");
@@ -111,7 +112,7 @@ function ReviewForm({ placeId }: { placeId: number }) {
     if (rating === 0) return;
 
     startTransition(async () => {
-      await createReview(placeId, { rating, content });
+      await createReview(placeId, naverPlaceId, { rating, content });
       setRating(0);
       setContent("");
     });
@@ -172,12 +173,13 @@ function ReviewForm({ placeId }: { placeId: number }) {
 
 export function ReviewSection({
   placeId,
+  naverPlaceId,
   reviews,
   currentUserId,
 }: ReviewSectionProps) {
   return (
     <div className="space-y-4">
-      {currentUserId && <ReviewForm placeId={placeId} />}
+      {currentUserId && <ReviewForm placeId={placeId} naverPlaceId={naverPlaceId} />}
 
       {reviews.length === 0 ? (
         <p className="text-sm text-muted-foreground">아직 리뷰가 없습니다.</p>
@@ -188,7 +190,7 @@ export function ReviewSection({
               key={review.id}
               review={review}
               isOwner={currentUserId === review.user_id}
-              placeId={placeId}
+              naverPlaceId={naverPlaceId}
             />
           ))}
         </div>

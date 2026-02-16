@@ -4,11 +4,11 @@ import type { KonaCardStatus } from "@/types";
 
 interface PlaceCardProps {
   id: number;
+  naver_place_id: string | null;
   name: string;
   address: string;
   category: string | null;
   kona_card_status: string | null;
-  like_count: number | null;
   image_urls?: string[] | null;
 }
 
@@ -17,7 +17,7 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
 
   return (
     <Link
-      href={`/places/${place.id}`}
+      href={`/places/${place.naver_place_id ?? place.id}`}
       className="flex h-[7.5rem] gap-3 border-b border-border py-3 last:border-b-0"
     >
       {place.image_urls?.[0] ? (

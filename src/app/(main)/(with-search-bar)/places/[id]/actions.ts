@@ -2,10 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import type { ReactionType, KonaVote } from "@/types";
+import type { KonaVote } from "@/types";
 
 export async function createReview(
   placeId: number,
+  naverPlaceId: string,
   data: { rating: number; content: string }
 ) {
   const supabase = await createClient();
@@ -24,10 +25,13 @@ export async function createReview(
 
   if (error) throw new Error("리뷰 작성에 실패했습니다");
 
-  revalidatePath(`/places/${placeId}`);
+  revalidatePath(`/places/${naverPlaceId}`);
 }
 
-export async function deleteReview(reviewId: number, placeId: number) {
+export async function deleteReview(
+  reviewId: number,
+  naverPlaceId: string
+) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -43,53 +47,12 @@ export async function deleteReview(reviewId: number, placeId: number) {
 
   if (error) throw new Error("리뷰 삭제에 실패했습니다");
 
-  revalidatePath(`/places/${placeId}`);
-}
-
-export async function toggleReaction(
-  placeId: number,
-  type: ReactionType
-) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("로그인이 필요합니다");
-
-  // 기존 reaction 확인
-  const { data: existing } = await supabase
-    .from("reactions")
-    .select("id, type")
-    .eq("place_id", placeId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (existing) {
-    if (existing.type === type) {
-      // 같은 타입 → 취소
-      await supabase.from("reactions").delete().eq("id", existing.id);
-    } else {
-      // 다른 타입 → 변경
-      await supabase
-        .from("reactions")
-        .update({ type })
-        .eq("id", existing.id);
-    }
-  } else {
-    // 없으면 → 새로 생성
-    await supabase.from("reactions").insert({
-      place_id: placeId,
-      user_id: user.id,
-      type,
-    });
-  }
-
-  revalidatePath(`/places/${placeId}`);
+  revalidatePath(`/places/${naverPlaceId}`);
 }
 
 export async function voteKonaCard(
   placeId: number,
+  naverPlaceId: string,
   vote: KonaVote
 ) {
   const supabase = await createClient();
@@ -127,5 +90,5 @@ export async function voteKonaCard(
     });
   }
 
-  revalidatePath(`/places/${placeId}`);
+  revalidatePath(`/places/${naverPlaceId}`);
 }
