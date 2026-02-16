@@ -14,6 +14,7 @@ import { calculateDistance, estimateWalkingMinutes, formatDistance } from "@/lib
 import { ImageGallery } from "@/components/image-gallery";
 import { PlaceDetailTabs } from "./place-detail-tabs";
 import { KonaVoteSection } from "./kona-vote";
+import { RegisterPlaceButton } from "./register-place-button";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 export default async function PlaceDetailPage({
@@ -102,6 +103,12 @@ export default async function PlaceDetailPage({
             )}
           </div>
 
+          {detail.description && (
+            <p className="text-sm text-muted-foreground">
+              {detail.description}
+            </p>
+          )}
+
           {detail.category && (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
               <Tag className="size-4 shrink-0" />
@@ -135,6 +142,11 @@ export default async function PlaceDetailPage({
             <ExternalLink className="size-4" />
             네이버에서 보기
           </a>
+
+          {/* 장소 등록 버튼 (미등록 + 로그인 상태) */}
+          {!isRegistered && user && (
+            <RegisterPlaceButton placeDetail={detail} />
+          )}
 
           {/* 별점 + 코나카드 배지 */}
           {isRegistered && (

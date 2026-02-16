@@ -28,7 +28,7 @@ export async function fetchPlaceDetail(
           variables: { input: { id: placeId } },
           query: `query getPlaceDetail($input: PlaceDetailInput!) {
             placeDetail(input: $input) {
-              base { id name address roadAddress phone category coordinate { x y } }
+              base { id name description address roadAddress phone category coordinate { x y } }
               images { images { origin } }
               menus { name price images description recommend }
             }
@@ -48,6 +48,7 @@ export async function fetchPlaceDetail(
     return {
       id: base.id,
       name: base.name,
+      description: base.description ?? null,
       category: base.category ?? "",
       address: base.address ?? "",
       roadAddress: base.roadAddress ?? "",

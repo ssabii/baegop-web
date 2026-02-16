@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Flame, MessageSquare, UtensilsCrossed } from "lucide-react";
+import { Flame, UtensilsCrossed } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ReviewSection } from "./review-section";
@@ -46,18 +46,16 @@ export function PlaceDetailTabs({
   const hasMore = menus.length > MENU_PAGE_SIZE;
 
   return (
-    <Tabs defaultValue={menus.length > 0 ? "menu" : "review"}>
+    <Tabs defaultValue="review">
       <TabsList className="w-full">
+        <TabsTrigger value="review" className="flex-1">
+          리뷰 ({reviews.length})
+        </TabsTrigger>
         {menus.length > 0 && (
-          <TabsTrigger value="menu" className="flex-1 gap-1.5">
-            <UtensilsCrossed className="size-4" />
+          <TabsTrigger value="menu" className="flex-1">
             메뉴 ({menus.length})
           </TabsTrigger>
         )}
-        <TabsTrigger value="review" className="flex-1 gap-1.5">
-          <MessageSquare className="size-4" />
-          리뷰 ({reviews.length})
-        </TabsTrigger>
       </TabsList>
 
       {menus.length > 0 && (

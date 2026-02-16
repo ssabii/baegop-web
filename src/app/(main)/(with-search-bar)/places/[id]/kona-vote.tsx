@@ -50,7 +50,7 @@ export function KonaVoteSection({
 
       {isLoggedIn && (
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">코나카드:</span>
+          <span className="text-xs text-muted-foreground">코나카드 사용이 가능한가요?</span>
           <Button
             variant={userVote === "available" ? "default" : "outline"}
             size="sm"
