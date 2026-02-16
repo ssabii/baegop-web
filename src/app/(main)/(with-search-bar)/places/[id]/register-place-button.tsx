@@ -22,9 +22,10 @@ export function RegisterPlaceButton({ placeDetail }: RegisterPlaceButtonProps) {
   return (
     <Button
       variant="outline"
-      size="sm"
+      // size="sm"
       onClick={handleRegister}
       disabled={isPending}
+      className="w-full"
     >
       {isPending ? (
         <Loader2 className="size-4 animate-spin" />

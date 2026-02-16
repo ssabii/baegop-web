@@ -66,45 +66,49 @@ export function PlaceDetailTabs({
           <>
             <ul className="divide-y">
               {visibleMenus.map((menu) => (
-                <li key={menu.name} className="flex gap-3 py-3">
-                  {menu.images.length > 0 && (
-                    <img
-                      src={menu.images[0]}
-                      alt={menu.name}
-                      className="size-14 shrink-0 rounded-lg object-cover"
-                    />
-                  )}
-                  <div className="flex min-w-0 flex-1 items-center justify-between">
-                    <div className="flex flex-col gap-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{menu.name}</span>
-                        {menu.recommend && (
-                          <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                            <Flame className="size-3" />
-                            추천
-                          </span>
-                        )}
+                <li key={menu.name} className="flex gap-2 py-3">
+                  <div className="min-w-0 flex-1 space-y-0.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="truncate text-sm font-bold">
+                        {menu.name}
                       </div>
-                      {menu.description && (
-                        <span className="text-xs text-muted-foreground">
-                          {menu.description}
+                      {menu.recommend && (
+                        <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                          <Flame className="size-3" />
+                          추천
                         </span>
                       )}
                     </div>
+                    {menu.description && (
+                      <div className="line-clamp-2 text-sm text-muted-foreground">
+                        {menu.description}
+                      </div>
+                    )}
                     {menu.price && (
-                      <span className="shrink-0 text-sm text-muted-foreground">
+                      <div className="text-sm font-medium text-muted-foreground">
                         {Number(menu.price).toLocaleString()}원
-                      </span>
+                      </div>
                     )}
                   </div>
+                  {menu.images.length > 0 ? (
+                    <img
+                      src={menu.images[0]}
+                      alt={menu.name}
+                      className="size-20 shrink-0 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
+                      <UtensilsCrossed className="size-5 text-muted-foreground" />
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
             {hasMore && (
-              <div>
+              <div className="w-full flex justify-center">
                 <Button
                   variant="secondary"
-                  className="mt-3 rounded-full mx-auto"
+                  className="mt-3 rounded-full"
                   onClick={() =>
                     setVisibleCount((prev) => prev + MENU_PAGE_SIZE)
                   }

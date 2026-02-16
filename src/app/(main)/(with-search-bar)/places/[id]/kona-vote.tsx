@@ -51,15 +51,14 @@ export function KonaVoteSection({
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-1.5">
             <img src="/icons/kona.png" alt="코나카드" className="size-4" />
-            <span className="text-xs text-muted-foreground">
+            <span className="text-sm font-medium text-muted-foreground">
               코나카드 결제가 가능한가요?
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <Button
               variant={userVote === "available" ? "default" : "outline"}
-              size="sm"
-              className="h-7 text-xs"
+              size="xs"
               onClick={() => handleVote("available")}
               disabled={isPending}
             >
@@ -71,8 +70,7 @@ export function KonaVoteSection({
             </Button>
             <Button
               variant={userVote === "unavailable" ? "default" : "outline"}
-              size="sm"
-              className="h-7 text-xs"
+              size="xs"
               onClick={() => handleVote("unavailable")}
               disabled={isPending}
             >

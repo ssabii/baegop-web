@@ -110,7 +110,7 @@ export default async function PlaceDetailPage({
       {/* 이미지 갤러리 */}
       <ImageGallery images={detail.imageUrls} alt={detail.name} />
 
-      <div className="space-y-6 p-4">
+      <div className="space-y-8 p-4">
         {/* 기본 정보 */}
         <section className="space-y-2">
           {!isRegistered && <Badge variant="secondary">미등록 장소</Badge>}
@@ -145,7 +145,7 @@ export default async function PlaceDetailPage({
             href={naverLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-[#03C75A] hover:underline"
+            className="flex items-center gap-1.5 text-sm text-[#03C75A] hover:underline"
           >
             <NaverIcon className="size-4" />
             네이버에서 보기
@@ -158,7 +158,7 @@ export default async function PlaceDetailPage({
 
           {/* 별점 + 코나카드 배지 */}
           {isRegistered && (
-            <div className="flex flex-wrap items-center gap-2 pt-1">
+            <div className="flex flex-wrap items-center gap-2">
               {avgRating !== null && (
                 <span className="flex items-center gap-1 text-sm font-medium text-yellow-500">
                   <Star className="size-4 fill-current" />

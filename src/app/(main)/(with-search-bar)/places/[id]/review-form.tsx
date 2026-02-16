@@ -1,7 +1,14 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { ImagePlus, Loader2, MessageSquarePlus, Star, X } from "lucide-react";
+import {
+  ImagePlus,
+  Loader2,
+  Plus,
+  MessageSquarePlus,
+  Star,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -110,7 +117,7 @@ export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
           <Button size="sm" className="gap-2">
-            <MessageSquarePlus className="size-4" />
+            <Plus className="size-4" />
             리뷰 작성
           </Button>
         </DialogTrigger>
