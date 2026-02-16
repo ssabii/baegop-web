@@ -30,6 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 import { createReview, deleteReview } from "./actions";
 
 interface ReviewData {
@@ -42,6 +43,10 @@ interface ReviewData {
     nickname: string | null;
     avatar_url: string | null;
   } | null;
+  review_images: {
+    url: string;
+    display_order: number;
+  }[];
 }
 
 interface ReviewSectionProps {
@@ -117,6 +122,21 @@ function ReviewCard({
         </div>
         {review.content && (
           <p className="text-sm text-muted-foreground">{review.content}</p>
+        )}
+        {review.review_images.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pt-1">
+            {review.review_images
+              .sort((a, b) => a.display_order - b.display_order)
+              .map((img, i) => (
+                <ImagePreviewDialog key={i} src={img.url} alt={`리뷰 이미지 ${i + 1}`}>
+                  <img
+                    src={img.url}
+                    alt={`리뷰 이미지 ${i + 1}`}
+                    className="size-20 shrink-0 rounded-lg object-cover"
+                  />
+                </ImagePreviewDialog>
+              ))}
+          </div>
         )}
         <p className="text-xs text-muted-foreground/60">
           {new Date(review.created_at).toLocaleDateString("ko-KR")}

@@ -81,7 +81,7 @@ export default async function PlaceDetailPage({
   if (isRegistered) {
     const { data: reviewData } = await supabase
       .from("reviews")
-      .select("*, profiles(nickname, avatar_url)")
+      .select("*, profiles(nickname, avatar_url), review_images(url, display_order)")
       .eq("place_id", place.id)
       .order("created_at", { ascending: false });
 
@@ -201,4 +201,8 @@ interface ReviewData {
     nickname: string | null;
     avatar_url: string | null;
   } | null;
+  review_images: {
+    url: string;
+    display_order: number;
+  }[];
 }
