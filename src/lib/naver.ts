@@ -14,6 +14,10 @@ export function buildNaverMapLink(name: string): string {
   return `https://map.naver.com/p/search/${encodeURIComponent(name)}`;
 }
 
+export function buildNaverPlaceLink(placeId: string): string {
+  return `https://m.place.naver.com/restaurant/${placeId}/home`;
+}
+
 /** 네이버 플레이스 상세 정보 조회 (이미지 복수, 메뉴 이미지/추천 포함) */
 export async function fetchPlaceDetail(
   placeId: string,

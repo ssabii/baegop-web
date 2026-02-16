@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { PlaceCard } from "@/components/places";
 
 interface PlaceData {
-  id: number;
-  naver_place_id: string | null;
+  id: string;
   name: string;
   address: string;
   category: string | null;

@@ -8,7 +8,7 @@ export default async function RandomPage() {
 
   const { data: places } = await supabase
     .from("places")
-    .select("id, naver_place_id, name, address, category, kona_card_status, image_urls");
+    .select("id, name, address, category, kona_card_status, image_urls");
 
   if (!places || places.length === 0) {
     return (

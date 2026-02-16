@@ -1,13 +1,13 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { voteKonaCard } from "./actions";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface KonaVoteProps {
-  placeId: number;
+  placeId: string;
   naverPlaceId: string;
   status: KonaCardStatus;
   userVote: KonaVote | null;
@@ -22,15 +22,18 @@ export function KonaVoteSection({
   isLoggedIn,
 }: KonaVoteProps) {
   const [isPending, startTransition] = useTransition();
+  const [clickedVote, setClickedVote] = useState<KonaVote | null>(null);
 
   function handleVote(vote: KonaVote) {
+    setClickedVote(vote);
     startTransition(async () => {
       await voteKonaCard(placeId, naverPlaceId, vote);
+      setClickedVote(null);
     });
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="w-full flex flex-wrap items-center gap-3">
       {status !== "unknown" && (
         <span
           className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -39,36 +42,47 @@ export function KonaVoteSection({
               : "bg-muted text-muted-foreground"
           }`}
         >
-          <img
-            src="/icons/kona.png"
-            alt="코나카드"
-            className="size-3.5 rounded-sm"
-          />
+          <img src="/icons/kona.png" alt="코나카드" className="size-4" />
           {status === "available" ? "결제가능" : "결제불가"}
         </span>
       )}
 
       {isLoggedIn && (
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">코나카드 사용이 가능한가요?</span>
-          <Button
-            variant={userVote === "available" ? "default" : "outline"}
-            size="sm"
-            className="h-7 text-xs"
-            onClick={() => handleVote("available")}
-            disabled={isPending}
-          >
-            {isPending ? <Loader2 className="size-3 animate-spin" /> : "가능"}
-          </Button>
-          <Button
-            variant={userVote === "unavailable" ? "default" : "outline"}
-            size="sm"
-            className="h-7 text-xs"
-            onClick={() => handleVote("unavailable")}
-            disabled={isPending}
-          >
-            {isPending ? <Loader2 className="size-3 animate-spin" /> : "불가"}
-          </Button>
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <img src="/icons/kona.png" alt="코나카드" className="size-4" />
+            <span className="text-xs text-muted-foreground">
+              코나카드 결제가 가능한가요?
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant={userVote === "available" ? "default" : "outline"}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => handleVote("available")}
+              disabled={isPending}
+            >
+              {isPending && clickedVote === "available" ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : (
+                "가능"
+              )}
+            </Button>
+            <Button
+              variant={userVote === "unavailable" ? "default" : "outline"}
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => handleVote("unavailable")}
+              disabled={isPending}
+            >
+              {isPending && clickedVote === "unavailable" ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : (
+                "불가"
+              )}
+            </Button>
+          </div>
         </div>
       )}
     </div>

@@ -7,7 +7,7 @@ export default async function PlacesPage() {
 
   const { data: places } = await supabase
     .from("places")
-    .select("id, naver_place_id, name, address, category, kona_card_status, image_urls")
+    .select("id, name, address, category, kona_card_status, image_urls")
     .order("created_at", { ascending: false });
 
   if (!places || places.length === 0) {

@@ -33,21 +33,21 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
-          place_id: number
+          place_id: string
           user_id: string
           vote: string
         }
         Insert: {
           created_at?: string | null
           id?: number
-          place_id: number
+          place_id: string
           user_id: string
           vote: string
         }
         Update: {
           created_at?: string | null
           id?: number
-          place_id?: number
+          place_id?: string
           user_id?: string
           vote?: string
         }
@@ -94,14 +94,13 @@ export type Database = {
           created_by: string | null
           description: string | null
           dislike_count: number | null
-          id: number
+          id: string
           image_urls: string[] | null
           kona_card_status: string | null
           lat: number | null
           like_count: number | null
           lng: number | null
           name: string
-          naver_place_id: string | null
           postal_code: string | null
           updated_at: string | null
         }
@@ -112,14 +111,13 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           dislike_count?: number | null
-          id?: number
+          id: string
           image_urls?: string[] | null
           kona_card_status?: string | null
           lat?: number | null
           like_count?: number | null
           lng?: number | null
           name: string
-          naver_place_id?: string | null
           postal_code?: string | null
           updated_at?: string | null
         }
@@ -130,14 +128,13 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           dislike_count?: number | null
-          id?: number
+          id?: string
           image_urls?: string[] | null
           kona_card_status?: string | null
           lat?: number | null
           like_count?: number | null
           lng?: number | null
           name?: string
-          naver_place_id?: string | null
           postal_code?: string | null
           updated_at?: string | null
         }
@@ -179,21 +176,21 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
-          place_id: number
+          place_id: string
           type: string
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: number
-          place_id: number
+          place_id: string
           type: string
           user_id: string
         }
         Update: {
           created_at?: string | null
           id?: number
-          place_id?: number
+          place_id?: string
           type?: string
           user_id?: string
         }
@@ -251,7 +248,7 @@ export type Database = {
           content: string | null
           created_at: string | null
           id: number
-          place_id: number
+          place_id: string
           rating: number
           updated_at: string | null
           user_id: string
@@ -260,7 +257,7 @@ export type Database = {
           content?: string | null
           created_at?: string | null
           id?: number
-          place_id: number
+          place_id: string
           rating: number
           updated_at?: string | null
           user_id: string
@@ -269,7 +266,7 @@ export type Database = {
           content?: string | null
           created_at?: string | null
           id?: number
-          place_id?: number
+          place_id?: string
           rating?: number
           updated_at?: string | null
           user_id?: string

@@ -30,7 +30,7 @@ export default async function MyPage() {
   // 내가 등록한 장소
   const { data: myPlaces } = await supabase
     .from("places")
-    .select("id, naver_place_id, name, address, category, kona_card_status, image_urls")
+    .select("id, name, address, category, kona_card_status, image_urls")
     .eq("created_by", user.id)
     .order("created_at", { ascending: false });
 

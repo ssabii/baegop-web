@@ -7,13 +7,13 @@ export default async function HomePage() {
 
   const { data: popularPlaces } = await supabase
     .from("places")
-    .select("id, naver_place_id, name, address, category, kona_card_status, image_urls")
+    .select("id, name, address, category, kona_card_status, image_urls")
     .order("like_count", { ascending: false, nullsFirst: false })
     .limit(5);
 
   const { data: recentPlaces } = await supabase
     .from("places")
-    .select("id, naver_place_id, name, address, category, kona_card_status, image_urls")
+    .select("id, name, address, category, kona_card_status, image_urls")
     .order("created_at", { ascending: false })
     .limit(5);
 

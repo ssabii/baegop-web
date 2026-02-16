@@ -1,21 +1,16 @@
 import { notFound } from "next/navigation";
-import {
-  ExternalLink,
-  Footprints,
-  MapPin,
-  Phone,
-  Star,
-  Tag,
-} from "lucide-react";
+import { MapPin, Phone, Star, Tag } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { buildNaverMapLink, fetchPlaceDetailWithFallback } from "@/lib/naver";
-import { COMPANY_LOCATION } from "@/lib/constants";
-import {
-  calculateDistance,
-  estimateWalkingMinutes,
-  formatDistance,
-} from "@/lib/geo";
+import { buildNaverPlaceLink, fetchPlaceDetailWithFallback } from "@/lib/naver";
+// import { COMPANY_LOCATION } from "@/lib/constants";
+// import {
+//   calculateDistance,
+//   estimateWalkingMinutes,
+//   formatDistance,
+// } from "@/lib/geo";
+import { NaverIcon } from "@/components/naver-icon";
 import { ImageGallery } from "@/components/image-gallery";
+import { Badge } from "@/components/ui/badge";
 import { PlaceDetailTabs } from "./place-detail-tabs";
 import { KonaVoteSection } from "./kona-vote";
 import { RegisterPlaceButton } from "./register-place-button";
@@ -34,7 +29,7 @@ export default async function PlaceDetailPage({
   const { data: place } = await supabase
     .from("places")
     .select("*")
-    .eq("naver_place_id", naverPlaceId)
+    .eq("id", naverPlaceId)
     .single();
 
   const isRegistered = !!place;
@@ -63,15 +58,15 @@ export default async function PlaceDetailPage({
 
   if (!detail) notFound();
 
-  // 거리 계산 (네이버 API 좌표 기준)
-  const lat = detail.y ? parseFloat(detail.y) : null;
-  const lng = detail.x ? parseFloat(detail.x) : null;
-  let distanceText: string | null = null;
-  if (lat && lng) {
-    const meters = calculateDistance(COMPANY_LOCATION, { lat, lng });
-    const minutes = estimateWalkingMinutes(meters);
-    distanceText = `도보 약 ${minutes}분 (${formatDistance(meters)})`;
-  }
+  // 도보 거리 계산 (일시 비활성화)
+  // const lat = detail.y ? parseFloat(detail.y) : null;
+  // const lng = detail.x ? parseFloat(detail.x) : null;
+  // let distanceText: string | null = null;
+  // if (lat && lng) {
+  //   const meters = calculateDistance(COMPANY_LOCATION, { lat, lng });
+  //   const minutes = estimateWalkingMinutes(meters);
+  //   distanceText = `도보 약 ${minutes}분 (${formatDistance(meters)})`;
+  // }
 
   // 등록된 장소인 경우 DB 데이터 조회
   let reviews: ReviewData[] = [];
@@ -104,7 +99,7 @@ export default async function PlaceDetailPage({
   }
 
   const address = detail.roadAddress || detail.address;
-  const naverLink = buildNaverMapLink(detail.name);
+  const naverLink = buildNaverPlaceLink(naverPlaceId);
   const avgRating =
     reviews.length > 0
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
@@ -118,14 +113,8 @@ export default async function PlaceDetailPage({
       <div className="space-y-6 p-4">
         {/* 기본 정보 */}
         <section className="space-y-2">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">{detail.name}</h1>
-            {!isRegistered && (
-              <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                미등록
-              </span>
-            )}
-          </div>
+          {!isRegistered && <Badge variant="secondary">미등록 장소</Badge>}
+          <h1 className="text-2xl font-bold">{detail.name}</h1>
 
           {detail.category && (
             <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -145,19 +134,20 @@ export default async function PlaceDetailPage({
               </a>
             </p>
           )}
-          {distanceText && (
+          {/* 도보 거리 (일시 비활성화) */}
+          {/* {distanceText && (
             <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Footprints className="size-4 shrink-0" />
               {distanceText}
             </p>
-          )}
+          )} */}
           <a
             href={naverLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm text-[#03C75A] hover:underline"
           >
-            <ExternalLink className="size-4" />
+            <NaverIcon className="size-4" />
             네이버에서 보기
           </a>
 
