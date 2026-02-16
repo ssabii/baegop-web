@@ -3,7 +3,7 @@ import { Star, UtensilsCrossed } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlaceCard } from "@/components/place-card";
+import { PlaceCard } from "@/components/places";
 
 export default async function MyPage() {
   const supabase = await createClient();

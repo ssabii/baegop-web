@@ -1,8 +1,6 @@
-import Link from "next/link";
-import { Star, Clock, UtensilsCrossed } from "lucide-react";
+import { Star, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
-import { PlaceCard } from "@/components/place-card";
+import { PlaceCard, EmptyPlace } from "@/components/places";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -25,15 +23,8 @@ export default async function HomePage() {
 
   if (!hasPlaces) {
     return (
-      <main className="mx-auto flex h-[calc(100dvh-9rem)] max-w-4xl flex-col items-center justify-center px-4 text-center">
-        <UtensilsCrossed className="size-16 text-muted-foreground/30" />
-        <p className="mt-4 text-lg font-semibold">등록된 장소가 없어요.</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          장소 검색 후 장소를 등록해보세요.
-        </p>
-        <Button asChild className="mt-6">
-          <Link href="/search">장소 검색하기</Link>
-        </Button>
+      <main className="mx-auto flex h-[calc(100dvh-9rem)] w-full max-w-4xl items-center justify-center px-4">
+        <EmptyPlace />
       </main>
     );
   }
