@@ -30,7 +30,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ImagePreviewDialog } from "@/components/image-preview-dialog";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import { ImageCarouselDialog } from "@/components/image-preview-dialog";
+import { formatRelativeDate } from "@/lib/date";
 import { createReview, deleteReview } from "./actions";
 
 interface ReviewData {
@@ -62,14 +68,62 @@ function StarRating({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
-          className={`size-4 ${
+          className={`size-3.5 ${
             star <= rating
-              ? "fill-primary text-primary"
+              ? "fill-yellow-400 text-yellow-400"
               : "text-muted-foreground/30"
           }`}
         />
       ))}
     </div>
+  );
+}
+
+function ReviewImageCarousel({
+  images,
+}: {
+  images: ReviewData["review_images"];
+}) {
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState(0);
+
+  const sorted = images
+    .slice()
+    .sort((a, b) => a.display_order - b.display_order);
+  const urls = sorted.map((img) => img.url);
+
+  return (
+    <>
+      <Carousel className="w-full">
+        <CarouselContent>
+          {sorted.map((img, i) => (
+            <CarouselItem key={i} className="basis-auto">
+              <button
+                type="button"
+                className="cursor-pointer overflow-hidden rounded-xl"
+                onClick={() => {
+                  setPreviewIndex(i);
+                  setPreviewOpen(true);
+                }}
+              >
+                <img
+                  src={img.url}
+                  alt={`리뷰 이미지 ${i + 1}`}
+                  className="aspect-square h-32 object-cover"
+                />
+              </button>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+      <ImageCarouselDialog
+        images={urls}
+        initialIndex={previewIndex}
+        alt="리뷰 이미지"
+        open={previewOpen}
+        onOpenChange={setPreviewOpen}
+      />
+    </>
   );
 }
 
@@ -93,55 +147,45 @@ function ReviewCard({
   const nickname = review.profiles?.nickname ?? "익명";
 
   return (
-    <div className="flex gap-3 rounded-lg border p-4">
-      <Avatar className="size-8 shrink-0">
-        <AvatarImage src={review.profiles?.avatar_url ?? undefined} />
-        <AvatarFallback>{nickname[0]}</AvatarFallback>
-      </Avatar>
-      <div className="flex-1 space-y-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+    <div className="py-3 space-y-2">
+      <div className="flex items-start gap-3">
+        <Avatar className="size-10 shrink-0">
+          <AvatarImage src={review.profiles?.avatar_url ?? undefined} />
+          <AvatarFallback>{nickname[0]}</AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between">
             <span className="text-sm font-medium">{nickname}</span>
+            {isOwner && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-7 -mt-1 -mr-2"
+                onClick={handleDelete}
+                disabled={isPending}
+              >
+                {isPending ? (
+                  <Loader2 className="size-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="size-3.5 text-muted-foreground" />
+                )}
+              </Button>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5">
             <StarRating rating={review.rating} />
+            <span className="text-xs text-muted-foreground/60">
+              {formatRelativeDate(review.created_at)}
+            </span>
           </div>
-          {isOwner && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-7"
-              onClick={handleDelete}
-              disabled={isPending}
-            >
-              {isPending ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Trash2 className="size-3.5 text-muted-foreground" />
-              )}
-            </Button>
-          )}
         </div>
-        {review.content && (
-          <p className="text-sm text-muted-foreground">{review.content}</p>
-        )}
-        {review.review_images.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto pt-1">
-            {review.review_images
-              .sort((a, b) => a.display_order - b.display_order)
-              .map((img, i) => (
-                <ImagePreviewDialog key={i} src={img.url} alt={`리뷰 이미지 ${i + 1}`}>
-                  <img
-                    src={img.url}
-                    alt={`리뷰 이미지 ${i + 1}`}
-                    className="size-20 shrink-0 rounded-lg object-cover"
-                  />
-                </ImagePreviewDialog>
-              ))}
-          </div>
-        )}
-        <p className="text-xs text-muted-foreground/60">
-          {new Date(review.created_at).toLocaleDateString("ko-KR")}
-        </p>
       </div>
+      {review.content && (
+        <p className="text-sm text-muted-foreground">{review.content}</p>
+      )}
+      {review.review_images.length > 0 && (
+        <ReviewImageCarousel images={review.review_images} />
+      )}
     </div>
   );
 }
@@ -387,7 +431,7 @@ export function ReviewSection({
           <p className="text-sm">첫 번째 리뷰를 남겨보세요!</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="divide-y">
           {reviews.map((review) => (
             <ReviewCard
               key={review.id}
