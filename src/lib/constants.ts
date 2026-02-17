@@ -8,6 +8,10 @@ export const KONA_CARD_LABELS: Record<KonaCardStatus, string> = {
 
 // 코나카드 투표 임계값은 DB app_config 테이블에서 관리 (key: 'kona_vote_threshold')
 
+// 인기 장소 기준
+export const POPULAR_RATING_THRESHOLD = 4.3;
+export const POPULAR_MIN_REVIEW_COUNT = 3;
+
 // 크몽 사무실 좌표 (서울 강남구 테헤란로)
 export const COMPANY_LOCATION = {
   lat: 37.4924644,
