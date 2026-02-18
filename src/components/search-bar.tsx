@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export async function SearchBar() {
   const supabase = await createClient();
@@ -40,16 +41,19 @@ export async function SearchBar() {
             장소 이름으로 검색
           </span>
         </Link>
-        {user && (
-          <Link href="/mypage" className="shrink-0 pr-2">
-            <Avatar size="sm">
-              {profile?.avatar_url && (
-                <AvatarImage src={profile.avatar_url} alt={displayName} />
-              )}
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-          </Link>
-        )}
+        <div className="flex shrink-0 items-center pr-2">
+          <ThemeToggle />
+          {user && (
+            <Link href="/mypage">
+              <Avatar size="sm">
+                {profile?.avatar_url && (
+                  <AvatarImage src={profile.avatar_url} alt={displayName} />
+                )}
+                <AvatarFallback>{initials}</AvatarFallback>
+              </Avatar>
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
