@@ -1,15 +1,15 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+import { Building2, Home, MapPin, Shuffle, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, List, MapPin, Shuffle, User } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const tabs = [
   { label: "홈", icon: Home, href: "/", match: (p: string) => p === "/" },
   {
     label: "장소",
-    icon: List,
+    icon: Building2,
     href: "/places",
     match: (p: string) => p.startsWith("/places"),
   },
@@ -37,9 +37,8 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 shadow-top pb-[env(safe-area-inset-bottom)]"
-      style={{ backgroundColor: "var(--background)" }}>
-      <div className="mx-auto flex h-14 max-w-lg items-center justify-around">
+    <nav className="fixed inset-x-0 bottom-0 z-40 bg-background border-t">
+      <div className="flex max-w-lg items-center justify-around p-2 mx-auto">
         {tabs.map(({ label, icon: Icon, href, match }) => {
           const active = match(pathname);
           return (
@@ -48,7 +47,7 @@ export function BottomNav() {
               href={href}
               className={cn(
                 "flex flex-1 flex-col items-center gap-0.5 py-1 text-[10px] font-bold transition-colors",
-                active ? "text-primary" : "text-muted-foreground"
+                active ? "text-primary" : "text-muted-foreground",
               )}
             >
               <Icon className="size-5" />

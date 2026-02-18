@@ -8,7 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <ConfirmDialogProvider>
-      <main className="pb-20">{children}</main>
+      {children}
       <BottomNav />
     </ConfirmDialogProvider>
   );

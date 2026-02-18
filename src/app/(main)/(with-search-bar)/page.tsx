@@ -1,18 +1,25 @@
 import { Star, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PlaceCard, EmptyPlace } from "@/components/places";
-import { POPULAR_RATING_THRESHOLD, POPULAR_MIN_REVIEW_COUNT } from "@/lib/constants";
+import {
+  POPULAR_RATING_THRESHOLD,
+  POPULAR_MIN_REVIEW_COUNT,
+} from "@/lib/constants";
 
 export default async function HomePage() {
   const supabase = await createClient();
 
   const { data: rawPopular } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, image_urls, reviews(rating)");
+    .select(
+      "id, name, address, category, kona_card_status, image_urls, reviews(rating)",
+    );
 
   const { data: rawRecent } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, image_urls, reviews(rating)")
+    .select(
+      "id, name, address, category, kona_card_status, image_urls, reviews(rating)",
+    )
     .order("created_at", { ascending: false })
     .limit(5);
 
@@ -32,9 +39,12 @@ export default async function HomePage() {
       (p) =>
         p.avg_rating !== null &&
         p.avg_rating >= POPULAR_RATING_THRESHOLD &&
-        p.review_count >= POPULAR_MIN_REVIEW_COUNT
+        p.review_count >= POPULAR_MIN_REVIEW_COUNT,
     )
-    .sort((a, b) => b.avg_rating! - a.avg_rating! || b.review_count - a.review_count)
+    .sort(
+      (a, b) =>
+        b.avg_rating! - a.avg_rating! || b.review_count - a.review_count,
+    )
     .slice(0, 5);
   const recentPlaces = withRating(rawRecent);
 
@@ -51,7 +61,7 @@ export default async function HomePage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-4">
+    <main className="mx-auto max-w-4xl px-4 pt-4 pb-15">
       {/* 인기 장소 */}
       {popularPlaces && popularPlaces.length > 0 && (
         <section>

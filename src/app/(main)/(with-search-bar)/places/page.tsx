@@ -7,7 +7,9 @@ export default async function PlacesPage() {
 
   const { data: rawPlaces } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, image_urls, reviews(rating)")
+    .select(
+      "id, name, address, category, kona_card_status, image_urls, reviews(rating)",
+    )
     .order("created_at", { ascending: false });
 
   const places = rawPlaces?.map(({ reviews, ...rest }) => ({
@@ -28,7 +30,7 @@ export default async function PlacesPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-4">
+    <main className="mx-auto max-w-4xl px-4 pt-4 pb-15">
       {places.map((r) => (
         <PlaceCard key={r.id} place={r} />
       ))}
