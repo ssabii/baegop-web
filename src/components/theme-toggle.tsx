@@ -26,7 +26,14 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon-sm"
       className="rounded-full"
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      onClick={() => {
+        const next = resolvedTheme === "dark" ? "light" : "dark";
+        if (document.startViewTransition) {
+          document.startViewTransition(() => setTheme(next));
+        } else {
+          setTheme(next);
+        }
+      }}
     >
       {resolvedTheme === "dark" ? (
         <Sun className="size-4" />
