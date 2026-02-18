@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Loader2, MapPin, Search, Tag, X } from "lucide-react";
+import { Building2, ChevronLeft, Loader2, MapPin, Search, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { NaverSearchResult } from "@/types";
@@ -55,7 +55,9 @@ export function PlaceSearch({
       if (res.ok) {
         const data: NaverSearchResult[] = await res.json();
         setSuggestions(data);
+        setHighlightedIndex(-1);
         setShowPopover(data.length > 0);
+        console.log("setHighlightedIndex", -1);
       }
     } catch {
       // aborted
@@ -68,8 +70,10 @@ export function PlaceSearch({
       setShowPopover(false);
       return;
     }
+
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => searchSuggestions(input), 300);
+
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
@@ -90,11 +94,6 @@ export function PlaceSearch({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 팝오버 결과 바뀌면 하이라이트 리셋
-  useEffect(() => {
-    setHighlightedIndex(-1);
-  }, [suggestions]);
-
   // 하이라이트된 항목 스크롤
   useEffect(() => {
     if (highlightedIndex >= 0 && listRef.current) {
@@ -104,6 +103,7 @@ export function PlaceSearch({
   }, [highlightedIndex]);
 
   function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.nativeEvent.isComposing) return;
     if (!showPopover || suggestions.length === 0) return;
 
     switch (e.key) {
@@ -198,7 +198,7 @@ export function PlaceSearch({
         {showPopover && (
           <ul
             ref={listRef}
-            className="absolute right-0 left-0 z-50 mt-2 max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-xl border bg-popover shadow-lg"
+            className="absolute right-0 left-0 z-50 mt-2 max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-xl border-popover bg-popover shadow-lg"
           >
             {suggestions.map((item, index) => (
               <li key={item.id}>
@@ -232,7 +232,7 @@ export function PlaceSearch({
                     />
                   ) : (
                     <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted">
-                      <MapPin className="size-5 text-muted-foreground" />
+                      <Building2 className="size-5 text-muted-foreground" />
                     </div>
                   )}
                 </button>
@@ -333,7 +333,7 @@ export function PlaceSearch({
                 />
               ) : (
                 <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
-                  <MapPin className="size-5 text-muted-foreground" />
+                  <Building2 className="size-5 text-muted-foreground" />
                 </div>
               )}
             </button>
