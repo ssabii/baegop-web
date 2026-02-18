@@ -1,8 +1,9 @@
 "use client";
 
 import { useTransition } from "react";
-import { Loader2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { registerPlace } from "@/app/(main)/actions";
 import type { NaverPlaceDetail } from "@/types";
 
@@ -28,7 +29,7 @@ export function RegisterPlaceButton({ placeDetail }: RegisterPlaceButtonProps) {
       className="w-full"
     >
       {isPending ? (
-        <Loader2 className="size-4 animate-spin" />
+        <Spinner data-icon="inline-start" />
       ) : (
         <Plus className="size-4" />
       )}

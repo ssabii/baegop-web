@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { voteKonaCard } from "./actions";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
@@ -28,7 +28,7 @@ export function KonaVoteSection({
     setClickedVote(vote);
     startTransition(async () => {
       await voteKonaCard(placeId, naverPlaceId, vote);
-      setClickedVote(null);
+      // setClickedVote(null);
     });
   }
 
@@ -63,7 +63,7 @@ export function KonaVoteSection({
               disabled={isPending}
             >
               {isPending && clickedVote === "available" ? (
-                <Loader2 className="size-3 animate-spin" />
+                <Spinner className="size-3" data-icon="inline-start" />
               ) : (
                 "가능"
               )}
@@ -75,7 +75,7 @@ export function KonaVoteSection({
               disabled={isPending}
             >
               {isPending && clickedVote === "unavailable" ? (
-                <Loader2 className="size-3 animate-spin" />
+                <Spinner className="size-3" data-icon="inline-start" />
               ) : (
                 "불가"
               )}
