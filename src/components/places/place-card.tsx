@@ -19,11 +19,13 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
   return (
     <Link
       href={`/places/${place.id}`}
-      className="flex h-[7.5rem] gap-3 border-b border-border py-3 last:border-b-0"
+      className="flex min-h-30 max-h-[144px] gap-3 border-b border-border py-3 last:border-b-0"
     >
       <div className="flex min-w-0 flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
-          <h3 className="line-clamp-2 font-bold leading-snug">{place.name}</h3>
+          <h3 className="line-clamp-2 font-bold leading-snug text-left">
+            {place.name}
+          </h3>
           {place.category && (
             <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
               <Tag className="size-3 shrink-0" />
@@ -41,7 +43,9 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
             <span className="flex items-center gap-1 text-xs font-medium text-yellow-500">
               <Star className="size-3 fill-current" />
               {place.avg_rating!.toFixed(1)}
-              <span className="text-muted-foreground">({place.review_count})</span>
+              <span className="text-muted-foreground">
+                ({place.review_count})
+              </span>
             </span>
           )}
           {status !== "unknown" && (
@@ -67,10 +71,10 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
         <img
           src={place.image_urls[0]}
           alt={place.name}
-          className="h-full w-24 shrink-0 rounded-lg object-cover"
+          className="aspect-square w-24 shrink-0 rounded-lg object-cover"
         />
       ) : (
-        <div className="flex h-full w-24 shrink-0 items-center justify-center rounded-lg bg-muted">
+        <div className="flex aspect-square w-24 shrink-0 items-center justify-center rounded-lg bg-muted">
           <UtensilsCrossed className="size-6 text-muted-foreground" />
         </div>
       )}
