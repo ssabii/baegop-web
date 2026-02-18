@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { ImagePlus, Loader2, Plus, Star, X } from "lucide-react";
+import { ImagePlus, Plus, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -216,9 +217,8 @@ export function ReviewForm({ placeDetail }: { placeDetail: NaverPlaceDetail }) {
               <Button
                 onClick={handleSubmit}
                 disabled={rating === 0 || isPending}
-                className="gap-2"
               >
-                {isPending && <Loader2 className="size-4 animate-spin" />}
+                {isPending && <Spinner data-icon="inline-start" />}
                 작성
               </Button>
             </div>
