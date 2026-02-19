@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
@@ -8,6 +9,7 @@ import { deleteAccount } from "./actions";
 import { toast } from "sonner";
 
 export function DeleteAccountButton() {
+  const router = useRouter();
   const confirm = useConfirmDialog();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,8 +30,10 @@ export function DeleteAccountButton() {
       toast.success("회원탈퇴가 완료되었습니다.", {
         position: "top-center",
       });
-    } catch {
+      router.push("/signin");
+    } catch (e) {
       setIsLoading(false);
+      console.log("여기가 실행되는 거 같은데?", e);
       toast.error("회원탈퇴에 실패했습니다. 다시 시도해주세요.", {
         position: "top-center",
       });
@@ -38,7 +42,8 @@ export function DeleteAccountButton() {
 
   return (
     <Button className="w-full" disabled={isLoading} onClick={handleClick}>
-      {isLoading ? <Spinner /> : "회원탈퇴"}
+      {isLoading && <Spinner data-icon="inline-start" />}
+      회원탈퇴
     </Button>
   );
 }
