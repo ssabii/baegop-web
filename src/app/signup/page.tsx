@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { LoginForm } from "./login-form";
+import { SignUpForm } from "./signup-form";
 
-export default async function LoginPage({
+export default async function SignUpPage({
   searchParams,
 }: {
-  searchParams: Promise<{ redirect?: string; error?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -19,11 +19,10 @@ export default async function LoginPage({
   const params = await searchParams;
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <LoginForm
-        redirectTo={params.redirect}
-        error={params.error}
-      />
+    <div className="flex min-h-screen items-center justify-center px-6 py-12 bg-background">
+      <div className="w-full max-w-sm">
+        <SignUpForm error={params.error} />
+      </div>
     </div>
   );
 }
