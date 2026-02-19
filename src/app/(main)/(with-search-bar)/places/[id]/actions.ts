@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import type { KonaVote } from "@/types";
+import type { KonaCardStatus, KonaVote } from "@/types";
 
 export async function createReview(
   placeId: string,
@@ -214,5 +214,17 @@ export async function voteKonaCard(
     });
   }
 
+  // 트리거에 의해 업데이트된 kona_card_status 조회
+  const { data: updatedPlace } = await supabase
+    .from("places")
+    .select("kona_card_status")
+    .eq("id", placeId)
+    .single();
+
   revalidatePath(`/places/${naverPlaceId}`);
+
+  return {
+    status: (updatedPlace?.kona_card_status ?? "unknown") as KonaCardStatus,
+    userVote: existing?.vote === vote ? null : vote,
+  };
 }
