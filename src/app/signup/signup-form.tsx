@@ -34,11 +34,7 @@ export function SignUpForm({
 
   useEffect(() => {
     if (errorProp) {
-      setTimeout(() => {
-        toast.error("회원가입에 실패했습니다. 다시 시도해주세요.", {
-          position: "top-center",
-        });
-      }, 0);
+      toast.error("회원가입에 실패했습니다. 다시 시도해주세요.");
     }
   }, [errorProp]);
 
