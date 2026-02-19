@@ -30,7 +30,7 @@ export function AuthButton({ user, profile }: AuthButtonProps) {
   if (!user) {
     return (
       <Button variant="outline" size="sm" asChild>
-        <Link href="/login">로그인</Link>
+        <Link href="/signin">로그인</Link>
       </Button>
     );
   }
