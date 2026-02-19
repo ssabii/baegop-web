@@ -4,12 +4,21 @@
 
 -- RLS 활성화
 alter table profiles enable row level security;
-alter table restaurants enable row level security;
+alter table places enable row level security;
 alter table kona_postal_codes enable row level security;
 alter table kona_card_votes enable row level security;
+alter table app_config enable row level security;
 alter table reviews enable row level security;
 alter table review_images enable row level security;
 alter table reactions enable row level security;
+alter table place_menus enable row level security;
+
+-- ============================================
+-- app_config
+-- ============================================
+create policy "app_config: 누구나 조회 가능"
+  on app_config for select
+  using (true);
 
 -- ============================================
 -- profiles
@@ -23,22 +32,22 @@ create policy "profiles: 본인만 수정"
   using (auth.uid() = id);
 
 -- ============================================
--- restaurants
+-- places
 -- ============================================
-create policy "restaurants: 누구나 조회 가능"
-  on restaurants for select
+create policy "places: 누구나 조회 가능"
+  on places for select
   using (true);
 
-create policy "restaurants: 인증 사용자 등록"
-  on restaurants for insert
+create policy "places: 인증 사용자 등록"
+  on places for insert
   with check (auth.uid() = created_by);
 
-create policy "restaurants: 등록자만 수정"
-  on restaurants for update
+create policy "places: 등록자만 수정"
+  on places for update
   using (auth.uid() = created_by);
 
-create policy "restaurants: 등록자만 삭제"
-  on restaurants for delete
+create policy "places: 등록자만 삭제"
+  on places for delete
   using (auth.uid() = created_by);
 
 -- ============================================
@@ -104,6 +113,13 @@ create policy "review_images: 리뷰 작성자만 삭제"
   using (
     auth.uid() = (select user_id from reviews where id = review_id)
   );
+
+-- ============================================
+-- place_menus
+-- ============================================
+create policy "place_menus: 누구나 조회 가능"
+  on place_menus for select
+  using (true);
 
 -- ============================================
 -- reactions

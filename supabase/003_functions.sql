@@ -6,7 +6,7 @@
 create or replace function handle_new_user()
 returns trigger as $$
 begin
-  insert into profiles (id, email, nickname, avatar_url)
+  insert into public.profiles (id, email, nickname, avatar_url)
   values (
     new.id,
     new.email,
@@ -21,19 +21,19 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function handle_new_user();
 
--- 2. reactions 변경 시 restaurants.like_count / dislike_count 자동 업데이트
+-- 2. reactions 변경 시 places.like_count / dislike_count 자동 업데이트
 create or replace function update_reaction_counts()
 returns trigger as $$
 declare
-  target_restaurant_id int;
+  target_place_id text;
 begin
-  target_restaurant_id := coalesce(new.restaurant_id, old.restaurant_id);
+  target_place_id := coalesce(new.place_id, old.place_id);
 
-  update restaurants
+  update places
   set
-    like_count = (select count(*) from reactions where restaurant_id = target_restaurant_id and type = 'like'),
-    dislike_count = (select count(*) from reactions where restaurant_id = target_restaurant_id and type = 'dislike')
-  where id = target_restaurant_id;
+    like_count = (select count(*) from reactions where place_id = target_place_id and type = 'like'),
+    dislike_count = (select count(*) from reactions where place_id = target_place_id and type = 'dislike')
+  where id = target_place_id;
 
   return coalesce(new, old);
 end;
@@ -47,26 +47,34 @@ create trigger on_reaction_change
 create or replace function check_kona_votes()
 returns trigger as $$
 declare
-  target_restaurant_id int;
+  target_place_id text;
   available_count int;
   unavailable_count int;
-  threshold int := 3;
+  threshold int;
 begin
-  target_restaurant_id := coalesce(new.restaurant_id, old.restaurant_id);
+  target_place_id := coalesce(new.place_id, old.place_id);
+
+  select (value::int) into threshold
+  from app_config where key = 'kona_vote_threshold';
+
+  threshold := coalesce(threshold, 3);
 
   select
     count(*) filter (where vote = 'available'),
     count(*) filter (where vote = 'unavailable')
   into available_count, unavailable_count
   from kona_card_votes
-  where restaurant_id = target_restaurant_id;
+  where place_id = target_place_id;
 
   -- 불가능 투표가 임계값 이상이고 가능 투표보다 많으면 → 불가
   if unavailable_count >= threshold and unavailable_count > available_count then
-    update restaurants set kona_card_status = 'unavailable' where id = target_restaurant_id;
+    update places set kona_card_status = 'unavailable' where id = target_place_id;
   -- 가능 투표가 임계값 이상이고 불가능 투표보다 많으면 → 가능
   elsif available_count >= threshold and available_count > unavailable_count then
-    update restaurants set kona_card_status = 'available' where id = target_restaurant_id;
+    update places set kona_card_status = 'available' where id = target_place_id;
+  -- 임계값 미달 시 미확인으로 리셋
+  else
+    update places set kona_card_status = 'unknown' where id = target_place_id;
   end if;
 
   return coalesce(new, old);
@@ -86,8 +94,8 @@ begin
 end;
 $$ language plpgsql;
 
-create trigger set_restaurants_updated_at
-  before update on restaurants
+create trigger set_places_updated_at
+  before update on places
   for each row execute function update_updated_at();
 
 create trigger set_reviews_updated_at

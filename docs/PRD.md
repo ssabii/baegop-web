@@ -37,18 +37,27 @@
 
 ## 3. 핵심 기능 (MVP)
 
-### 3.1 맛집 등록 및 관리
+### 3.1 맛집 검색 및 자동 등록
 
-**등록 흐름 (최대한 간단하게):**
-1. 네이버 검색 API(Local Search)로 식당 이름 검색
-2. 검색 결과에서 선택 → 가게명, 주소, 카테고리, 좌표 자동 입력
-3. 코나카드 가능 여부 선택 (가능 / 불가 / 모름)
-4. 한줄 메모 (선택사항)
-5. 등록 완료 (이미지 업로드 없음)
+**별도 맛집 등록 페이지 없음.** 맛집은 리뷰 작성 시 자동으로 DB에 추가된다.
 
-**관리:**
-- 맛집 상세 페이지 (정보 + 리뷰 + 좋아요/싫어요)
-- 맛집 수정/삭제 (등록자 본인만)
+**검색 페이지 (`/search`):**
+1. 사용자가 키워드로 맛집 검색
+2. **DB에 등록된 맛집 우선 표시** + 네이버 검색 API 결과도 함께 표시
+3. 검색 결과에서 맛집 선택 → 맛집 상세 페이지로 이동
+4. DB에 없는 네이버 검색 결과 선택 시 → 네이버 정보 기반으로 상세 페이지 표시 (아직 DB 저장 X, 리뷰 작성 시 저장)
+
+**자동 등록 흐름:**
+1. 사용자가 맛집 상세에서 리뷰 작성
+2. 해당 맛집이 DB에 이미 있으면 → 그대로 리뷰 연결
+3. DB에 없으면 → 네이버 검색 정보(이름, 주소, 카테고리, 좌표, 전화번호, 링크)를 저장하여 맛집 자동 생성 후 리뷰 연결
+
+**맛집 상세 페이지:**
+- 네이버 기본 정보(이름, 주소, 카테고리, 전화번호) 표시
+- 네이버 상세 정보(메뉴, 소식, 리뷰, 사진)는 "네이버에서 보기" 링크로 연결
+- 배곱 리뷰 목록 + 평균 별점
+- 좋아요/싫어요
+- 코나카드 투표
 
 ### 3.2 코나카드 결제 가능 여부
 
@@ -77,9 +86,10 @@
 - 사업자 등록 주소지와 실제 주소가 다르면 결제 불가할 수 있음
 
 ### 3.3 리뷰 및 상호작용
-- **리뷰**: 여러 번 작성 가능
+- **리뷰**: 여러 번 작성 가능 (리뷰 작성이 맛집 등록을 겸함)
   - 별점(1~5) — 필수
-  - 의견 (텍스트) — 선택
+  - 설명 (텍스트) — 선택
+  - 코나카드 사용 여부 (사용함 / 사용 안 함 / 모름) — 선택
   - 사진 (여러 장 업로드 가능) — 선택. 0번째 이미지가 대표 썸네일
 - **좋아요/싫어요**: 맛집에 대한 간단한 평가 (1인 1회)
 - **코나카드 투표**: 결제 가능/불가능 투표 (3.2 참조)
@@ -107,12 +117,11 @@
 ## 4. 페이지 구조
 
 ```
-/                    → 홈 (추천 + 인기 맛집)
+/                    → 홈 (랜덤 추천 CTA + 최근/인기 맛집 + 카테고리별 추천 "xx 어때요?")
 /login               → 로그인
-/restaurants          → 맛집 목록 (리스트 + 지도 뷰 전환)
-/restaurants/new      → 맛집 등록 (네이버 검색 기반)
-/restaurants/[id]     → 맛집 상세 (리뷰, 좋아요/싫어요, 코나카드 투표)
-/restaurants/[id]/edit → 맛집 수정
+/search              → 맛집 검색 (DB 맛집 우선 + 네이버 API 결과 혼합)
+/places               → 맛집 목록 (리스트 + 지도 뷰 전환)
+/places/[id]          → 맛집 상세 (네이버 정보 + 배곱 리뷰 + 좋아요/싫어요 + 코나카드 투표)
 /random              → 랜덤 추천 (룰렛)
 /mypage              → 내 리뷰, 내가 등록한 맛집
 ```
@@ -124,10 +133,12 @@
 ### profiles (Supabase Auth 확장)
 - id, email, nickname, avatar_url, created_at
 
-### restaurants
+### places
 - id, name, category (text, 네이버 API 원본 카테고리. 예: "음식점>한식"), address, postal_code, lat, lng
 - naver_place_id (네이버 검색 결과 연동용)
-- description (한줄 메모)
+- naver_link (text, 네이버 플레이스 URL — 메뉴/소식/리뷰/사진 연결용)
+- telephone (text, 전화번호)
+- image_urls (text[], 네이버 이미지 검색 API에서 가져온 외부 이미지 URL 배열. 최대 10장)
 - kona_card_status (enum: 'available' | 'unavailable' | 'unknown')
 - kona_card_zone (boolean, 우편번호 기반 자동 판별 결과)
 - like_count, dislike_count
@@ -137,33 +148,40 @@
 - id, postal_code, dong_name (동명)
 
 ### kona_card_votes (코나카드 크라우드소싱 투표)
-- id, restaurant_id (FK), user_id (FK)
+- id, place_id (FK), user_id (FK)
 - vote (enum: 'available' | 'unavailable')
 - created_at
-- UNIQUE(restaurant_id, user_id) — 1인 1투표
+- UNIQUE(place_id, user_id) — 1인 1투표
 
 ### reviews (리뷰)
-- id, restaurant_id (FK), user_id (FK)
+- id, place_id (FK), user_id (FK)
 - rating (1~5, 필수)
-- content (nullable)
+- content (nullable, 설명)
+- kona_card_used (enum: 'yes' | 'no' | 'unknown', nullable — 코나카드 사용 여부)
 - image_urls (text[], 이미지 URL 배열. 0번째가 대표 썸네일)
 - created_at, updated_at
 
 ### reactions (좋아요/싫어요)
-- id, restaurant_id (FK), user_id (FK)
+- id, place_id (FK), user_id (FK)
 - type (enum: 'like' | 'dislike')
-- UNIQUE(restaurant_id, user_id) — 1인 1반응
+- UNIQUE(place_id, user_id) — 1인 1반응
 
-*(categories 테이블 없음 — 네이버 API 카테고리 문자열을 restaurants.category에 직접 저장)*
+*(categories 테이블 없음 — 네이버 API 카테고리 문자열을 places.category에 직접 저장)*
 
 ---
 
 ## 6. 외부 API
 
 ### Naver Search API (Local Search)
-- 맛집 등록 시 식당 검색에 사용
-- 응답: 가게명, 주소, 카테고리, 도로명주소, 좌표 등
+- 검색 페이지에서 맛집 검색 + 리뷰 작성 시 맛집 자동 등록에 사용
+- 응답: 가게명, 주소, 카테고리, 도로명주소, 좌표, 전화번호, 링크 등
 - API URL: https://openapi.naver.com/v1/search/local.json
+
+### Naver Search API (Image Search)
+- 맛집별 이미지를 서버사이드에서 가져옴 (로컬 검색 결과 5개에 대해 병렬 호출)
+- 각 맛집당 최대 10장, 유사도순 정렬
+- API URL: https://openapi.naver.com/v1/search/image
+- 가져온 이미지 URL은 `places.image_urls`에 저장하여 검색 드롭다운, 카드, 프리뷰/상세 페이지에서 갤러리로 표시
 
 ### Naver Maps API
 - 지도 표시, 마커, 거리 계산
@@ -185,12 +203,14 @@
 ### Step 3: 인증 구현
 - Supabase Auth (Google OAuth) + 미들웨어로 보호 라우트 설정
 
-### Step 4: 맛집 CRUD
-- 네이버 검색 API 연동 (식당 검색 → 자동 입력)
-- 등록/조회/수정/삭제 구현
+### Step 4: 검색 + 맛집 상세
+- 네이버 검색 API 연동 (검색 페이지)
+- DB 맛집 + 네이버 API 결과 혼합 검색
+- 맛집 상세 페이지 (네이버 기본 정보 + "네이버에서 보기" 링크)
 
 ### Step 5: 리뷰 및 상호작용 기능
-- 리뷰 (별점 + 의견 + 사진) CRUD
+- 리뷰 (별점 + 설명 + 코나카드 사용 여부 + 사진) CRUD
+- 리뷰 작성 시 맛집 자동 등록 (DB에 없으면 네이버 정보로 생성)
 - 좋아요/싫어요
 - 코나카드 투표
 
@@ -245,3 +265,5 @@
 - 슬랙 연동 (점심 알림)
 - AI 기반 취향 추천
 - **회사별 식대 카드 설정** — 코나카드 외 다른 회사 식대 카드도 지원 (범용 서비스 확장 시)
+- **카테고리 검색/필터** — 홈, 장소 목록 등에서 카테고리별 필터링 기능
+- **PlaceCard 평균 평점 표시** — reviews 테이블에서 평균 별점을 집계하여 장소 카드에 표시

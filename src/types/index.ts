@@ -1,80 +1,59 @@
+import type { Tables } from "./database";
+
+// DB 테이블 타입 (자동 생성 기반)
+export type Profile = Tables<"profiles">;
+export type Place = Tables<"places">;
+export type Review = Tables<"reviews">;
+export type ReviewImage = Tables<"review_images">;
+export type Reaction = Tables<"reactions">;
+export type KonaPostalCode = Tables<"kona_postal_codes">;
+
+// 릴레이션 포함 타입 (JOIN 조회용)
+export type PlaceWithProfile = Place & {
+  profile?: Profile;
+};
+
+export type ReviewWithProfile = Review & {
+  profile?: Profile;
+  images?: ReviewImage[];
+};
+
+// 리터럴 타입 (DB에서 text로 저장되지만 앱에서는 좁은 타입으로 사용)
 export type KonaCardStatus = "available" | "unavailable" | "unknown";
-
-export type ReactionType = "like" | "dislike";
-
 export type KonaVote = "available" | "unavailable";
 
-export interface Profile {
-  id: string;
-  email: string;
-  nickname: string;
-  avatar_url: string;
-  created_at: string;
-}
-
-export interface Restaurant {
-  id: number;
+// 비DB 타입 — 네이버 플레이스 GraphQL 검색 결과 (places 쿼리)
+export interface NaverSearchResult {
+  id: string; // naver place ID
   name: string;
   category: string;
   address: string;
-  postal_code: string | null;
-  lat: number;
-  lng: number;
-  naver_place_id: string | null;
-  description: string | null;
-  kona_card_status: KonaCardStatus;
-  like_count: number;
-  dislike_count: number;
-  created_by: string;
-  profile?: Profile;
-  created_at: string;
-  updated_at: string;
+  roadAddress: string;
+  phone: string | null;
+  x: string; // longitude
+  y: string; // latitude
+  imageUrl: string | null;
+  menus: string[]; // ["메뉴명 가격", ...]
 }
 
-export interface Review {
-  id: number;
-  restaurant_id: number;
-  user_id: string;
-  profile?: Profile;
-  rating: number;
-  content: string | null;
-  images?: ReviewImage[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface ReviewImage {
-  id: number;
-  review_id: number;
-  url: string;
-  display_order: number;
-  created_at: string;
-}
-
-export interface Reaction {
-  id: number;
-  restaurant_id: number;
-  user_id: string;
-  type: ReactionType;
-  created_at: string;
-}
-
-export interface KonaCardVote {
-  id: number;
-  restaurant_id: number;
-  user_id: string;
-  vote: KonaVote;
-  created_at: string;
-}
-
-export interface NaverSearchResult {
-  title: string;
-  link: string;
+// 네이버 플레이스 상세 (placeDetail 쿼리)
+export interface NaverPlaceDetail {
+  id: string;
+  name: string;
   category: string;
-  description: string;
-  telephone: string;
   address: string;
   roadAddress: string;
-  mapx: string;
-  mapy: string;
+  phone: string | null;
+  x: string;
+  y: string;
+  imageUrls: string[];
+  menus: NaverPlaceMenu[];
+}
+
+export interface NaverPlaceMenu {
+  name: string;
+  price: string | null;
+  images: string[];
+  description: string | null;
+  recommend: boolean;
 }
