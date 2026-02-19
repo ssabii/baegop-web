@@ -72,6 +72,9 @@ begin
   -- 가능 투표가 임계값 이상이고 불가능 투표보다 많으면 → 가능
   elsif available_count >= threshold and available_count > unavailable_count then
     update places set kona_card_status = 'available' where id = target_place_id;
+  -- 임계값 미달 시 미확인으로 리셋
+  else
+    update places set kona_card_status = 'unknown' where id = target_place_id;
   end if;
 
   return coalesce(new, old);

@@ -81,7 +81,9 @@ export default async function PlaceDetailPage({
   if (isRegistered) {
     const { data: reviewData } = await supabase
       .from("reviews")
-      .select("*, profiles(nickname, avatar_url), review_images(url, display_order)")
+      .select(
+        "*, profiles(nickname, avatar_url), review_images(url, display_order)",
+      )
       .eq("place_id", place.id)
       .order("created_at", { ascending: false });
 
@@ -156,25 +158,30 @@ export default async function PlaceDetailPage({
             <RegisterPlaceButton placeDetail={detail} />
           )}
 
-          {/* 별점 + 코나카드 배지 */}
-          {isRegistered && (
-            <div className="flex flex-wrap items-center gap-2">
-              {avgRating !== null && (
-                <span className="flex items-center gap-1 text-sm font-medium text-yellow-500">
-                  <Star className="size-4 fill-current" />
-                  {avgRating.toFixed(1)}
-                </span>
-              )}
-              <KonaVoteSection
-                placeId={place.id}
-                naverPlaceId={naverPlaceId}
-                status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
-                userVote={userKonaVote}
-                isLoggedIn={!!user}
-              />
+          {/* 별점 */}
+          {isRegistered && avgRating !== null && (
+            <div className="flex items-center gap-1">
+              <Star className="size-4 text-yellow-500 fill-yellow-500" />
+              <span className="text-sm font-medium text-yellow-500">
+                {avgRating.toFixed(1)}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                ({reviews.length})
+              </span>
             </div>
           )}
         </section>
+
+        {/* 코나카드 섹션 */}
+        {isRegistered && (
+          <KonaVoteSection
+            placeId={place.id}
+            naverPlaceId={naverPlaceId}
+            status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
+            userVote={userKonaVote}
+            isLoggedIn={!!user}
+          />
+        )}
 
         {/* 메뉴 / 리뷰 탭 */}
         <PlaceDetailTabs
