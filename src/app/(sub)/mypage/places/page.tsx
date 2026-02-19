@@ -11,11 +11,13 @@ export default async function MyPlacesPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   const { data: rawPlaces } = await supabase
     .from("places")
-    .select("id, name, address, category, kona_card_status, image_urls, reviews(rating)")
+    .select(
+      "id, name, address, category, kona_card_status, image_urls, reviews(rating)",
+    )
     .eq("created_by", user.id)
     .order("created_at", { ascending: false });
 
@@ -30,7 +32,7 @@ export default async function MyPlacesPage() {
 
   return (
     <>
-      <SubHeader title="내가 등록한 장소" />
+      <SubHeader title="내 장소" />
       {places && places.length > 0 ? (
         <div className="px-4">
           {places.map((place) => (

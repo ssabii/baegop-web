@@ -11,7 +11,7 @@ export default async function MyReviewsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/signin");
 
   const { data: reviews } = await supabase
     .from("reviews")
@@ -21,7 +21,7 @@ export default async function MyReviewsPage() {
 
   return (
     <>
-      <SubHeader title="내가 쓴 리뷰" />
+      <SubHeader title="내 리뷰" />
       {reviews && reviews.length > 0 ? (
         <div className="px-4">
           {reviews.map((review) => {
