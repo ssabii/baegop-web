@@ -23,8 +23,8 @@ export default function SignUpConfirmPage() {
           </EmptyMedia>
           <EmptyTitle className="font-bold">이메일을 확인해주세요</EmptyTitle>
           <EmptyDescription>
-            인증 메일을 발송했습니다. <br />
-            메일이 보이지 않으면 스팸함을 확인해주세요.
+            인증 메일을 발송했습니다 <br />
+            메일이 보이지 않으면 스팸함을 확인해주세요
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="flex-row justify-center">

@@ -17,8 +17,8 @@ export function SearchNoResults() {
         >
           <PackageOpen className="size-12 text-primary" />
         </EmptyMedia>
-        <EmptyTitle className="font-bold">검색 결과가 없어요.</EmptyTitle>
-        <EmptyDescription>다른 검색어로 검색해보세요.</EmptyDescription>
+        <EmptyTitle className="font-bold">검색 결과가 없어요</EmptyTitle>
+        <EmptyDescription>다른 검색어로 검색해보세요</EmptyDescription>
       </EmptyHeader>
     </Empty>
   );

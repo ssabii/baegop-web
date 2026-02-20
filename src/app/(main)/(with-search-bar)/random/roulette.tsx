@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Shuffle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PlaceCard } from "@/components/places";
 
@@ -69,9 +70,13 @@ export function Roulette({ places }: RouletteProps) {
 
       {result && (
         <div
-          className={`transition-all duration-300 ${
-            isSpinning ? "scale-95 opacity-50" : "scale-100 opacity-100"
-          }`}
+          className={cn(
+            "rounded-lg border py-3 transition-all duration-300",
+            {
+              "scale-95 opacity-50": isSpinning,
+              "scale-100 opacity-100": !isSpinning,
+            },
+          )}
         >
           <PlaceCard place={result} />
         </div>

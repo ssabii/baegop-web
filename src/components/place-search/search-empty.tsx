@@ -17,7 +17,7 @@ export function SearchEmpty() {
         >
           <Search className="size-12 text-primary" />
         </EmptyMedia>
-        <EmptyTitle className="font-bold">장소를 검색해보세요.</EmptyTitle>
+        <EmptyTitle className="font-bold">장소를 검색해보세요</EmptyTitle>
         <EmptyDescription>
           상호명, 지역명, 음식으로 검색할 수 있어요.
         </EmptyDescription>
