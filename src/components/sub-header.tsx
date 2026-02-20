@@ -12,9 +12,10 @@ export function SubHeader({ title }: SubHeaderProps) {
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-40 flex h-12 border-b border-border bg-background justify-center">
-      <div className="flex items-center gap-2 max-w-4xl w-full">
+    <header className="sticky top-0 z-40 flex h-12 items-center justify-center border-b border-border bg-background">
+      <div className="relative flex h-full w-full max-w-4xl items-center justify-center">
         <Button
+          className="absolute left-0"
           variant="ghost"
           size="icon"
           onClick={() => router.back()}
@@ -22,7 +23,9 @@ export function SubHeader({ title }: SubHeaderProps) {
         >
           <ChevronLeft className="size-5" />
         </Button>
-        <h1 className="text-base font-semibold">{title}</h1>
+        <h1 className="truncate px-12 text-center text-base font-bold">
+          {title}
+        </h1>
       </div>
     </header>
   );

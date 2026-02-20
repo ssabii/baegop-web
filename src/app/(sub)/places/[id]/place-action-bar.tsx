@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { BottomActionBar } from "@/components/bottom-action-bar";
 import { registerPlace } from "@/app/(main)/actions";
 import type { NaverPlaceDetail } from "@/types";
 
@@ -51,7 +52,7 @@ export function PlaceActionBar({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background px-4 py-3">
+    <BottomActionBar>
       <div className="mx-auto flex max-w-4xl gap-3">
         {!isRegistered && (
           <Button
@@ -74,6 +75,6 @@ export function PlaceActionBar({
           리뷰 작성
         </Button>
       </div>
-    </div>
+    </BottomActionBar>
   );
 }
