@@ -17,14 +17,50 @@ export async function GET(request: NextRequest) {
     50,
   );
 
-  if (tab !== "popular" && tab !== "recent") {
+  if (tab !== "popular" && tab !== "recent" && tab !== "all") {
     return NextResponse.json(
-      { error: "tab은 popular 또는 recent만 가능합니다" },
+      { error: "tab은 popular, recent, all만 가능합니다" },
       { status: 400 },
     );
   }
 
   const supabase = await createClient();
+
+  if (tab === "all") {
+    const { data: rawPlaces, error } = await supabase
+      .from("places")
+      .select(
+        "id, name, address, category, kona_card_status, image_urls, reviews(rating)",
+      );
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    const places = (rawPlaces ?? [])
+      .map(({ reviews, ...rest }) => {
+        const reviewCount = reviews.length;
+        const avgRating =
+          reviewCount > 0
+            ? reviews.reduce((s, r) => s + r.rating, 0) / reviewCount
+            : null;
+        return { ...rest, avg_rating: avgRating, review_count: reviewCount };
+      })
+      .sort((a, b) => {
+        if (a.avg_rating === null && b.avg_rating === null) return 0;
+        if (a.avg_rating === null) return 1;
+        if (b.avg_rating === null) return -1;
+        return (
+          b.avg_rating - a.avg_rating || b.review_count - a.review_count
+        );
+      });
+
+    const items = places.slice(cursor, cursor + limit);
+    const nextCursor =
+      cursor + limit < places.length ? cursor + limit : null;
+
+    return NextResponse.json({ items, nextCursor });
+  }
 
   if (tab === "popular") {
     const { data: rawPlaces, error } = await supabase
