@@ -1,4 +1,3 @@
-import { Shuffle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { EmptyPlace } from "@/components/places";
 import { Roulette } from "./roulette";

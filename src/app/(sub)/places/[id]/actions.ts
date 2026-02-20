@@ -144,7 +144,7 @@ export async function updateReview(
       .order("display_order", { ascending: false })
       .limit(1);
 
-    let nextOrder = (existingImages?.[0]?.display_order ?? -1) + 1;
+    const nextOrder = (existingImages?.[0]?.display_order ?? -1) + 1;
 
     for (const file of files) {
       if (!(file instanceof File) || file.size === 0) continue;

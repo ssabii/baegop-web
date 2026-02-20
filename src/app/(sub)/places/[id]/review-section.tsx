@@ -39,7 +39,6 @@ interface ReviewData {
 }
 
 interface ReviewSectionProps {
-  placeId: string;
   naverPlaceId: string;
   reviews: ReviewData[];
   currentUserId: string | null;
@@ -198,7 +197,6 @@ function ReviewCard({
 }
 
 export function ReviewSection({
-  placeId,
   naverPlaceId,
   reviews,
   currentUserId,
