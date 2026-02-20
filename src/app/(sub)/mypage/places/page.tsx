@@ -1,6 +1,8 @@
+import { Fragment } from "react";
 import { redirect } from "next/navigation";
 import { UtensilsCrossed } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { Separator } from "@/components/ui/separator";
 import { SubHeader } from "@/components/sub-header";
 import { PlaceCard } from "@/components/places";
 
@@ -34,9 +36,12 @@ export default async function MyPlacesPage() {
     <>
       <SubHeader title="내 장소" />
       {places && places.length > 0 ? (
-        <div className="px-4">
-          {places.map((place) => (
-            <PlaceCard key={place.id} place={place} />
+        <div className="flex flex-col px-4">
+          {places.map((place, index) => (
+            <Fragment key={place.id}>
+              {index > 0 && <Separator />}
+              <PlaceCard place={place} />
+            </Fragment>
           ))}
         </div>
       ) : (

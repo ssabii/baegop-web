@@ -18,11 +18,8 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
   const status = (place.kona_card_status ?? "unknown") as KonaCardStatus;
 
   return (
-    <Link
-      href={`/places/${place.id}`}
-      className="flex min-h-30 max-h-40 gap-3 border-b border-border py-3 last:border-b-0"
-    >
-      <div className="flex min-w-0 flex-1 flex-col justify-between overflow-hidden">
+    <Link href={`/places/${place.id}`} className="flex gap-3">
+      <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-1">
             <h3 className="line-clamp-2 font-bold leading-snug text-left">
@@ -76,10 +73,10 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
         <img
           src={place.image_urls[0]}
           alt={place.name}
-          className="aspect-square size-24 shrink-0 rounded-lg object-cover"
+          className="aspect-square size-28 shrink-0 rounded-lg object-cover"
         />
       ) : (
-        <div className="flex aspect-square w-24 shrink-0 items-center justify-center rounded-lg bg-muted">
+        <div className="flex aspect-square size-28 shrink-0 items-center justify-center rounded-lg bg-muted">
           <UtensilsCrossed className="size-6 text-muted-foreground" />
         </div>
       )}

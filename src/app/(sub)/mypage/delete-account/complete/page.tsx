@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -10,26 +10,27 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 
-export default function SignUpConfirmPage() {
+export default function DeleteAccountCompletePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex h-dvh items-center justify-center px-4">
       <Empty className="border-none">
         <EmptyHeader className="gap-1">
           <EmptyMedia
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <Mail className="size-12 text-primary" />
+            <CircleCheck className="size-12 text-primary" />
           </EmptyMedia>
-          <EmptyTitle className="font-bold">이메일을 확인해주세요</EmptyTitle>
+          <EmptyTitle className="font-bold">
+            회원탈퇴가 완료되었어요
+          </EmptyTitle>
           <EmptyDescription>
-            인증 메일을 발송했습니다 <br />
-            메일이 보이지 않으면 스팸함을 확인해주세요
+            그동안 배곱을 이용해주셔서 감사합니다
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="flex-row justify-center">
-          <Button asChild variant="outline">
-            <Link href="/signin">로그인 페이지로 이동</Link>
+          <Button asChild size="lg">
+            <Link href="/">홈으로 이동</Link>
           </Button>
         </EmptyContent>
       </Empty>

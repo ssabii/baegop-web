@@ -3,8 +3,30 @@ import type { NaverSearchResult } from "@/types";
 
 const GRAPHQL_URL = "https://pcmap-api.place.naver.com/place/graphql";
 
-export const searchPlaces = unstable_cache(
-  async (query: string, display: number): Promise<NaverSearchResult[]> => {
+export async function searchPlaces(
+  query: string,
+  display: number,
+  x?: string,
+  y?: string,
+  start: number = 1,
+): Promise<NaverSearchResult[]> {
+  const cacheKey = x && y ? `${query}:${display}:${start}:${x}:${y}` : `${query}:${display}:${start}`;
+  return cachedSearchPlaces(cacheKey, query, display, x, y, start);
+}
+
+const cachedSearchPlaces = unstable_cache(
+  async (
+    _cacheKey: string,
+    query: string,
+    display: number,
+    x?: string,
+    y?: string,
+    start: number = 1,
+  ): Promise<NaverSearchResult[]> => {
+    const input: Record<string, unknown> = { query, display, start };
+    if (x) input.x = x;
+    if (y) input.y = y;
+
     const res = await fetch(GRAPHQL_URL, {
       method: "POST",
       headers: {
@@ -17,7 +39,7 @@ export const searchPlaces = unstable_cache(
       body: JSON.stringify([
         {
           operationName: "getPlaces",
-          variables: { input: { query, display, start: 1 } },
+          variables: { input },
           query: `query getPlaces($input: PlacesInput!) {
             places(input: $input) {
               items {

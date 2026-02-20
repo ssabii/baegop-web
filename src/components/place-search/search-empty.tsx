@@ -1,4 +1,4 @@
-import { PackageOpen } from "lucide-react";
+import { Search } from "lucide-react";
 import {
   Empty,
   EmptyDescription,
@@ -7,7 +7,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 
-export function EmptyPlace() {
+export function SearchEmpty() {
   return (
     <Empty className="border-none">
       <EmptyHeader className="gap-1">
@@ -15,11 +15,11 @@ export function EmptyPlace() {
           variant="icon"
           className="size-12 rounded-none bg-transparent"
         >
-          <PackageOpen className="size-12 text-primary" />
+          <Search className="size-12 text-primary" />
         </EmptyMedia>
-        <EmptyTitle className="font-bold">등록된 장소가 없어요</EmptyTitle>
+        <EmptyTitle className="font-bold">장소를 검색해보세요</EmptyTitle>
         <EmptyDescription>
-          장소 검색 후 장소를 등록해보세요
+          상호명, 지역명, 음식으로 검색할 수 있어요.
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

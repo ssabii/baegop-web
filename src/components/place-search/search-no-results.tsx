@@ -7,7 +7,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 
-export function EmptyPlace() {
+export function SearchNoResults() {
   return (
     <Empty className="border-none">
       <EmptyHeader className="gap-1">
@@ -17,10 +17,8 @@ export function EmptyPlace() {
         >
           <PackageOpen className="size-12 text-primary" />
         </EmptyMedia>
-        <EmptyTitle className="font-bold">등록된 장소가 없어요</EmptyTitle>
-        <EmptyDescription>
-          장소 검색 후 장소를 등록해보세요
-        </EmptyDescription>
+        <EmptyTitle className="font-bold">검색 결과가 없어요</EmptyTitle>
+        <EmptyDescription>다른 검색어로 검색해보세요</EmptyDescription>
       </EmptyHeader>
     </Empty>
   );

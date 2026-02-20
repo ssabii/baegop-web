@@ -12,6 +12,9 @@ export const KONA_CARD_LABELS: Record<KonaCardStatus, string> = {
 export const POPULAR_RATING_THRESHOLD = 4.3;
 export const POPULAR_MIN_REVIEW_COUNT = 3;
 
+// 최근 장소 기준 일수
+export const RECENT_DAYS = 7;
+
 // 크몽 사무실 좌표 (서울 강남구 테헤란로)
 export const COMPANY_LOCATION = {
   lat: 37.4924644,

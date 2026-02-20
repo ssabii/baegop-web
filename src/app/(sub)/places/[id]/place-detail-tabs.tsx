@@ -5,9 +5,14 @@ import { Flame, MessageSquarePlus, UtensilsCrossed } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { ReviewSection } from "./review-section";
-import { ReviewForm } from "./review-form";
-import type { NaverPlaceDetail, NaverPlaceMenu } from "@/types";
+import type { NaverPlaceMenu } from "@/types";
 
 const MENU_PAGE_SIZE = 10;
 
@@ -34,7 +39,6 @@ interface PlaceDetailTabsProps {
   placeId: string | null;
   naverPlaceId: string;
   currentUserId: string | null;
-  placeDetail: NaverPlaceDetail;
 }
 
 export function PlaceDetailTabs({
@@ -44,7 +48,6 @@ export function PlaceDetailTabs({
   placeId,
   naverPlaceId,
   currentUserId,
-  placeDetail,
 }: PlaceDetailTabsProps) {
   const [visibleCount, setVisibleCount] = useState(MENU_PAGE_SIZE);
   const visibleMenus = menus.slice(0, visibleCount);
@@ -63,10 +66,19 @@ export function PlaceDetailTabs({
 
       <TabsContent value="menu" className="mt-4">
         {menus.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
-            <UtensilsCrossed className="size-8" />
-            <p className="text-sm">등록된 메뉴가 없습니다</p>
-          </div>
+          <Empty className="border-none py-12">
+            <EmptyHeader className="gap-1">
+              <EmptyMedia
+                variant="icon"
+                className="size-12 rounded-none bg-transparent"
+              >
+                <UtensilsCrossed className="size-12 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="font-bold">
+                등록된 메뉴가 없습니다
+              </EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <>
             <ul className="divide-y">
@@ -131,19 +143,24 @@ export function PlaceDetailTabs({
       <TabsContent value="review" className="mt-4">
         {isRegistered && placeId ? (
           <ReviewSection
-            placeId={placeId}
             naverPlaceId={naverPlaceId}
             reviews={reviews}
             currentUserId={currentUserId}
           />
         ) : (
-          <div className="space-y-4">
-            <div className="flex flex-col items-center gap-3 py-12 text-muted-foreground">
-              <MessageSquarePlus className="size-8" />
-              <p className="text-sm">리뷰를 작성하면 장소가 등록됩니다</p>
-              {currentUserId && <ReviewForm placeDetail={placeDetail} />}
-            </div>
-          </div>
+          <Empty className="border-none py-12">
+            <EmptyHeader className="gap-1">
+              <EmptyMedia
+                variant="icon"
+                className="size-12 rounded-none bg-transparent"
+              >
+                <MessageSquarePlus className="size-12 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="font-bold">
+                리뷰를 작성하면 장소가 등록됩니다
+              </EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         )}
       </TabsContent>
     </Tabs>

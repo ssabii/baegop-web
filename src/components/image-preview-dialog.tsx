@@ -26,14 +26,13 @@ export function ImageCarouselDialog({
   onOpenChange,
 }: ImageCarouselDialogProps) {
   const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(initialIndex);
 
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
 
   // Track current slide
   useEffect(() => {
     if (!api) return;
-    setCurrent(api.selectedScrollSnap());
     const onSelect = () => setCurrent(api.selectedScrollSnap());
     api.on("select", onSelect);
     return () => {
