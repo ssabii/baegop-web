@@ -8,9 +8,10 @@ export async function searchPlaces(
   display: number,
   x?: string,
   y?: string,
+  start: number = 1,
 ): Promise<NaverSearchResult[]> {
-  const cacheKey = x && y ? `${query}:${display}:${x}:${y}` : `${query}:${display}`;
-  return cachedSearchPlaces(cacheKey, query, display, x, y);
+  const cacheKey = x && y ? `${query}:${display}:${start}:${x}:${y}` : `${query}:${display}:${start}`;
+  return cachedSearchPlaces(cacheKey, query, display, x, y, start);
 }
 
 const cachedSearchPlaces = unstable_cache(
@@ -20,8 +21,9 @@ const cachedSearchPlaces = unstable_cache(
     display: number,
     x?: string,
     y?: string,
+    start: number = 1,
   ): Promise<NaverSearchResult[]> => {
-    const input: Record<string, unknown> = { query, display, start: 1 };
+    const input: Record<string, unknown> = { query, display, start };
     if (x) input.x = x;
     if (y) input.y = y;
 

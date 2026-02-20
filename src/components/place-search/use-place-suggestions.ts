@@ -5,7 +5,6 @@ const AUTOCOMPLETE_LIMIT = 5;
 
 interface UsePlaceSuggestionsOptions {
   inputRef: React.RefObject<HTMLInputElement | null>;
-  formRef: React.RefObject<HTMLFormElement | null>;
   input: string;
   setInput: (value: string) => void;
   isTyping: boolean;
@@ -14,36 +13,38 @@ interface UsePlaceSuggestionsOptions {
 
 interface UsePlaceSuggestionsReturn {
   suggestions: NaverSearchResult[];
-  showPopover: boolean;
+  popoverOpen: boolean;
+  setPopoverOpen: (open: boolean) => void;
   highlightedIndex: number;
   isSearching: boolean;
   listRef: React.RefObject<HTMLUListElement | null>;
   handleKeyDown: (e: React.KeyboardEvent) => void;
   handleClear: () => void;
+  handleFocus: () => void;
   dismissSuggestions: () => void;
 }
 
 export function usePlaceSuggestions({
   inputRef,
-  formRef,
   input,
   setInput,
   isTyping,
   onSelect,
 }: UsePlaceSuggestionsOptions): UsePlaceSuggestionsReturn {
   const [suggestions, setSuggestions] = useState<NaverSearchResult[]>([]);
-  const [showPopover, setShowPopover] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isSearching, setIsSearching] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
   const suggestControllerRef = useRef<AbortController>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const skipFocusRef = useRef(false);
 
   const searchSuggestions = useCallback(async (q: string) => {
     if (q.trim().length < 2) {
       setSuggestions([]);
-      setShowPopover(false);
+      setPopoverOpen(false);
       setIsSearching(false);
       return;
     }
@@ -60,7 +61,7 @@ export function usePlaceSuggestions({
         const data: NaverSearchResult[] = await res.json();
         setSuggestions(data);
         setHighlightedIndex(-1);
-        setShowPopover(data.length > 0);
+        setPopoverOpen(data.length > 0);
       }
     } catch {
       // aborted
@@ -73,10 +74,7 @@ export function usePlaceSuggestions({
 
   // 디바운스 자동완성 (입력 중일 때만)
   useEffect(() => {
-    if (!isTyping) {
-      setShowPopover(false);
-      return;
-    }
+    if (!isTyping) return;
 
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => searchSuggestions(input), 300);
@@ -86,17 +84,6 @@ export function usePlaceSuggestions({
     };
   }, [input, isTyping, searchSuggestions]);
 
-  // 팝오버 외부 클릭 닫기
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (formRef.current && !formRef.current.contains(e.target as Node)) {
-        setShowPopover(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [formRef]);
-
   // 하이라이트된 항목 스크롤
   useEffect(() => {
     if (highlightedIndex >= 0 && listRef.current) {
@@ -105,9 +92,19 @@ export function usePlaceSuggestions({
     }
   }, [highlightedIndex]);
 
+  function handleFocus() {
+    if (skipFocusRef.current) {
+      skipFocusRef.current = false;
+      return;
+    }
+    if (input.trim().length >= 2) {
+      searchSuggestions(input);
+    }
+  }
+
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.nativeEvent.isComposing) return;
-    if (!showPopover || suggestions.length === 0) return;
+    if (!popoverOpen || suggestions.length === 0) return;
 
     switch (e.key) {
       case "ArrowDown":
@@ -130,7 +127,7 @@ export function usePlaceSuggestions({
         break;
       case "Escape":
         e.preventDefault();
-        setShowPopover(false);
+        setPopoverOpen(false);
         break;
     }
   }
@@ -139,8 +136,9 @@ export function usePlaceSuggestions({
     setInput("");
     suggestControllerRef.current?.abort();
     setSuggestions([]);
-    setShowPopover(false);
+    setPopoverOpen(false);
     setIsSearching(false);
+    skipFocusRef.current = true;
     inputRef.current?.focus();
   }
 
@@ -148,7 +146,7 @@ export function usePlaceSuggestions({
     if (timerRef.current) clearTimeout(timerRef.current);
     suggestControllerRef.current?.abort();
     setSuggestions([]);
-    setShowPopover(false);
+    setPopoverOpen(false);
     setIsSearching(false);
     inputRef.current?.blur();
   }
@@ -160,12 +158,14 @@ export function usePlaceSuggestions({
 
   return {
     suggestions,
-    showPopover,
+    popoverOpen,
+    setPopoverOpen,
     highlightedIndex,
     isSearching,
     listRef,
     handleKeyDown,
     handleClear,
+    handleFocus,
     dismissSuggestions,
   };
 }

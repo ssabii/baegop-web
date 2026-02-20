@@ -13,13 +13,13 @@ import {
 export default function DeleteAccountCompletePage() {
   return (
     <div className="flex h-dvh items-center justify-center px-4">
-      <Empty>
-        <EmptyHeader>
+      <Empty className="border-none">
+        <EmptyHeader className="gap-1">
           <EmptyMedia
             variant="icon"
-            className="size-12 rounded-full bg-primary/10"
+            className="size-12 rounded-none bg-transparent"
           >
-            <CircleCheck className="size-6 text-primary" />
+            <CircleCheck className="size-12 text-primary" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">
             회원탈퇴가 완료되었어요.

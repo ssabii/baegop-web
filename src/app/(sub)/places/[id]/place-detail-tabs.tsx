@@ -5,7 +5,12 @@ import { Flame, MessageSquarePlus, UtensilsCrossed } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
-import { Empty, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { ReviewSection } from "./review-section";
 import type { NaverPlaceMenu } from "@/types";
 
@@ -61,11 +66,18 @@ export function PlaceDetailTabs({
 
       <TabsContent value="menu" className="mt-4">
         {menus.length === 0 ? (
-          <Empty className="py-12">
-            <EmptyMedia>
-              <UtensilsCrossed className="size-8" />
-            </EmptyMedia>
-            <EmptyTitle>등록된 메뉴가 없습니다</EmptyTitle>
+          <Empty className="border-none py-12">
+            <EmptyHeader className="gap-1">
+              <EmptyMedia
+                variant="icon"
+                className="size-12 rounded-none bg-transparent"
+              >
+                <UtensilsCrossed className="size-12 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="font-bold">
+                등록된 메뉴가 없습니다
+              </EmptyTitle>
+            </EmptyHeader>
           </Empty>
         ) : (
           <>
@@ -136,11 +148,18 @@ export function PlaceDetailTabs({
             currentUserId={currentUserId}
           />
         ) : (
-          <Empty className="py-12">
-            <EmptyMedia>
-              <MessageSquarePlus className="size-8" />
-            </EmptyMedia>
-            <EmptyTitle>리뷰를 작성하면 장소가 등록됩니다</EmptyTitle>
+          <Empty className="border-none py-12">
+            <EmptyHeader className="gap-1">
+              <EmptyMedia
+                variant="icon"
+                className="size-12 rounded-none bg-transparent"
+              >
+                <MessageSquarePlus className="size-12 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="font-bold">
+                리뷰를 작성하면 장소가 등록됩니다
+              </EmptyTitle>
+            </EmptyHeader>
           </Empty>
         )}
       </TabsContent>

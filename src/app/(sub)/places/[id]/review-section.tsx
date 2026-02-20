@@ -15,6 +15,7 @@ import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import {
   Empty,
   EmptyDescription,
+  EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
@@ -204,12 +205,19 @@ export function ReviewSection({
   return (
     <div className="space-y-4">
       {reviews.length === 0 ? (
-        <Empty className="py-12">
-          <EmptyMedia>
-            <MessageSquarePlus className="size-8" />
-          </EmptyMedia>
-          <EmptyTitle>아직 리뷰가 없습니다</EmptyTitle>
-          <EmptyDescription>첫 번째 리뷰를 남겨보세요!</EmptyDescription>
+        <Empty className="border-none py-12">
+          <EmptyHeader className="gap-1">
+            <EmptyMedia
+              variant="icon"
+              className="size-12 rounded-none bg-transparent"
+            >
+              <MessageSquarePlus className="size-12 text-primary" />
+            </EmptyMedia>
+            <EmptyTitle className="font-bold">
+              아직 리뷰가 없습니다
+            </EmptyTitle>
+            <EmptyDescription>첫 번째 리뷰를 남겨보세요!</EmptyDescription>
+          </EmptyHeader>
         </Empty>
       ) : (
         <div className="divide-y">
