@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Building2, MapPin, Tag } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { NaverSearchResult } from "@/types";
 
 interface PlaceItemProps {
@@ -28,20 +29,22 @@ export function PlaceItem({
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-center gap-3 ${paddingClass} text-left transition-colors ${
-        highlighted ? "bg-accent" : "hover:bg-accent"
-      }`}
+      className={cn(
+        "flex w-full items-center gap-3 text-left transition-colors",
+        paddingClass,
+        highlighted ? "bg-accent" : "hover:bg-accent",
+      )}
     >
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className={nameClass}>{item.name}</span>
-        <span className={`flex items-center gap-1 ${metaClass}`}>
+        <span className={cn("flex items-center gap-1", metaClass)}>
           <MapPin className="size-3 shrink-0" />
           <span className="truncate">
             {item.roadAddress || item.address}
           </span>
         </span>
         {item.category && (
-          <span className={`flex items-center gap-1 ${metaClass}`}>
+          <span className={cn("flex items-center gap-1", metaClass)}>
             <Tag className="size-3 shrink-0" />
             <span className="truncate">{item.category}</span>
           </span>
@@ -51,12 +54,12 @@ export function PlaceItem({
         <img
           src={item.imageUrl.replace(/^http:\/\//, "https://")}
           alt=""
-          className={`${thumbClass} shrink-0 rounded-lg object-cover`}
+          className={cn(thumbClass, "shrink-0 rounded-lg object-cover")}
           onError={() => setImgError(true)}
         />
       ) : (
         <div
-          className={`flex ${thumbClass} shrink-0 items-center justify-center rounded-lg bg-muted`}
+          className={cn("flex shrink-0 items-center justify-center rounded-lg bg-muted", thumbClass)}
         >
           <Building2 className="size-5 text-muted-foreground" />
         </div>

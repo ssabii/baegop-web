@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("query");
   const displayParam = Number(request.nextUrl.searchParams.get("display")) || 10;
   const display = Math.min(Math.max(displayParam, 1), 100);
+  const start = Math.max(Number(request.nextUrl.searchParams.get("start")) || 1, 1);
 
   if (!query) {
     return NextResponse.json(
@@ -20,6 +21,7 @@ export async function GET(request: NextRequest) {
       display,
       String(COMPANY_LOCATION.lng),
       String(COMPANY_LOCATION.lat),
+      start,
     );
     return NextResponse.json(items);
   } catch {
