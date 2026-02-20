@@ -33,7 +33,6 @@ export function DeleteAccountButton() {
       router.push("/signin");
     } catch (e) {
       setIsLoading(false);
-      console.log("여기가 실행되는 거 같은데?", e);
       toast.error("회원탈퇴에 실패했습니다. 다시 시도해주세요.", {
         position: "top-center",
       });
