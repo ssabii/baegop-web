@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { PlaceSearch } from "@/components/place-search";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import { searchPlaces } from "@/lib/search";
 
 const DEFAULT_DISPLAY = 10;
@@ -15,15 +16,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     100,
   );
 
-  const results = query ? await searchPlaces(query, displayNum) : null;
+  const results = query
+    ? await searchPlaces(
+        query,
+        displayNum,
+        String(COMPANY_LOCATION.lng),
+        String(COMPANY_LOCATION.lat),
+      )
+    : null;
 
   return (
     <Suspense>
-      <PlaceSearch
-        autoFocus={!query}
-        initialQuery={query ?? ""}
-        initialResults={results}
-      />
+      <PlaceSearch autoFocus={!query} initialResults={results} />
     </Suspense>
   );
 }

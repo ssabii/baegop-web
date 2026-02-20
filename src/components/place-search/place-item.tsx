@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Building2, MapPin, Tag } from "lucide-react";
 import type { NaverSearchResult } from "@/types";
 
@@ -14,6 +15,7 @@ export function PlaceItem({
   highlighted,
   onClick,
 }: PlaceItemProps) {
+  const [imgError, setImgError] = useState(false);
   const isSmall = thumbnailSize === "sm";
   const thumbClass = isSmall ? "size-12" : "size-20";
   const nameClass = isSmall ? "text-sm font-bold" : "text-base font-bold";
@@ -45,11 +47,12 @@ export function PlaceItem({
           </span>
         )}
       </div>
-      {item.imageUrl ? (
+      {item.imageUrl && !imgError ? (
         <img
-          src={item.imageUrl}
+          src={item.imageUrl.replace(/^http:\/\//, "https://")}
           alt=""
           className={`${thumbClass} shrink-0 rounded-lg object-cover`}
+          onError={() => setImgError(true)}
         />
       ) : (
         <div

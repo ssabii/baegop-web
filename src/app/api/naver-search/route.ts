@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import { searchPlaces } from "@/lib/search";
 
 export async function GET(request: NextRequest) {
@@ -14,7 +15,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const items = await searchPlaces(query, display);
+    const items = await searchPlaces(
+      query,
+      display,
+      String(COMPANY_LOCATION.lng),
+      String(COMPANY_LOCATION.lat),
+    );
     return NextResponse.json(items);
   } catch {
     return NextResponse.json(
