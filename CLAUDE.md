@@ -55,7 +55,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - **Import alias**: `@/*` → `src/*`
 - **컴포넌트**: 모든 UI 컴포넌트는 shadcn/ui를 우선 사용한다. shadcn/ui에 없는 경우에만 외부 라이브러리 또는 커스텀 컴포넌트를 사용한다. `src/components/ui/`에 위치.
 - **className**: 조건부 클래스가 포함되면 템플릿 리터럴 대신 `cn()`을 사용한다. 삼항 연산자 대신 객체 구문을 사용한다. (`cn("base", { "class-a": condition, "class-b": !condition })`)
-- **페이지 레이아웃**: 페이지 콘텐츠 영역은 `px-4 pt-4 pb-23`을 기본으로 사용한다. (`pb-23` = 바텀 네비 60px + 여백 32px)
+- **페이지 레이아웃**: 페이지 콘텐츠 영역은 `px-4 pt-4 pb-23`을 기본으로 사용한다. (`pb-23` = 바텀 네비 60px + 여백 32px). 지도 페이지는 예외로 `fixed inset-x-0 top-0 bottom-15`으로 전체 화면을 사용한다.
 - **브랜딩**: 프라이머리 컬러 오렌지/코랄 계열. 라임 계열 사용 금지 (크몽 컬러와 구분)
 - **빈 상태 페이지**: 콘텐츠가 없는 화면(검색 전, 데이터 없음 등)은 `h-dvh` + `flex flex-col` + `flex-1`로 뷰포트 높이에 딱 맞춰 스크롤이 생기지 않게 한다.
 - **UI와 로직 분리**: 커스텀 훅은 데이터 페칭/상태 관리 등 로직만 담당한다. IntersectionObserver, DOM 조작 등 UI 관심사는 훅에 포함하지 않고 사용하는 컴포넌트에서 처리한다.
