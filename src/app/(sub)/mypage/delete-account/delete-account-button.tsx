@@ -8,7 +8,11 @@ import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { deleteAccount } from "./actions";
 import { toast } from "sonner";
 
-export function DeleteAccountButton() {
+interface DeleteAccountButtonProps {
+  disabled?: boolean;
+}
+
+export function DeleteAccountButton({ disabled }: DeleteAccountButtonProps) {
   const router = useRouter();
   const confirm = useConfirmDialog();
   const [isLoading, setIsLoading] = useState(false);
@@ -27,11 +31,8 @@ export function DeleteAccountButton() {
     setIsLoading(true);
     try {
       await deleteAccount();
-      toast.success("회원탈퇴가 완료되었습니다.", {
-        position: "top-center",
-      });
-      router.push("/signin");
-    } catch (e) {
+      router.replace("/mypage/delete-account/complete");
+    } catch {
       setIsLoading(false);
       toast.error("회원탈퇴에 실패했습니다. 다시 시도해주세요.", {
         position: "top-center",
@@ -40,7 +41,7 @@ export function DeleteAccountButton() {
   };
 
   return (
-    <Button className="w-full" disabled={isLoading} onClick={handleClick}>
+    <Button className="w-full" size="lg" disabled={disabled || isLoading} onClick={handleClick}>
       {isLoading && <Spinner data-icon="inline-start" />}
       회원탈퇴
     </Button>
