@@ -91,7 +91,7 @@ export function PlaceSearch() {
           >
             <PopoverAnchor
               asChild
-              className={cn("bg-background -sm rounded-full", {
+              className={cn("bg-background shadow-sm rounded-full", {
                 "rounded-t-3xl rounded-b-none border-t border-x border-b-0":
                   popoverOpen,
                 border: !popoverOpen,
@@ -101,7 +101,7 @@ export function PlaceSearch() {
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                  className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 >
                   <ChevronLeft className="size-5" />
                 </button>

@@ -1,9 +1,6 @@
-import Link from "next/link";
-import { MapPinOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { PackageOpen } from "lucide-react";
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -18,18 +15,13 @@ export function EmptyPlace() {
           variant="icon"
           className="size-12 rounded-none bg-transparent"
         >
-          <MapPinOff className="size-12 text-primary" />
+          <PackageOpen className="size-12 text-primary" />
         </EmptyMedia>
-        <EmptyTitle className="font-bold">등록된 장소가 없어요.</EmptyTitle>
+        <EmptyTitle className="font-bold">등록된 장소가 없어요</EmptyTitle>
         <EmptyDescription>
-          장소 검색 후 장소를 등록해보세요.
+          장소 검색 후 장소를 등록해보세요
         </EmptyDescription>
       </EmptyHeader>
-      <EmptyContent className="flex-row justify-center">
-        <Button asChild>
-          <Link href="/search">장소 검색하기</Link>
-        </Button>
-      </EmptyContent>
     </Empty>
   );
 }

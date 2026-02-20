@@ -22,10 +22,10 @@ export default function DeleteAccountCompletePage() {
             <CircleCheck className="size-12 text-primary" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">
-            회원탈퇴가 완료되었어요.
+            회원탈퇴가 완료되었어요
           </EmptyTitle>
           <EmptyDescription>
-            그동안 배곱을 이용해주셔서 감사합니다.
+            그동안 배곱을 이용해주셔서 감사합니다
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="flex-row justify-center">

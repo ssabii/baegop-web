@@ -8,7 +8,7 @@ export default function WithSearchBarLayout({
   return (
     <>
       <SearchBar />
-      {children}
+      <div className="pt-17">{children}</div>
     </>
   );
 }
