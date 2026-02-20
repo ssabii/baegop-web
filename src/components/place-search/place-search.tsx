@@ -91,7 +91,7 @@ export function PlaceSearch() {
           >
             <PopoverAnchor
               asChild
-              className={cn("bg-background shadow rounded-full", {
+              className={cn("bg-background -sm rounded-full", {
                 "rounded-t-3xl rounded-b-none border-t border-x border-b-0":
                   popoverOpen,
                 border: !popoverOpen,
@@ -137,7 +137,7 @@ export function PlaceSearch() {
           <PopoverContent
             align="start"
             sideOffset={0}
-            className="w-(--radix-popper-anchor-width) rounded-t-none rounded-b-3xl border-x border-b bg-background p-0 shadow"
+            className="w-(--radix-popper-anchor-width) rounded-t-none rounded-b-3xl border-x border-b bg-background p-0 shadow-sm"
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >

@@ -10,12 +10,12 @@ import {
 export function SearchNoResults() {
   return (
     <Empty className="border-none">
-      <EmptyHeader>
+      <EmptyHeader className="gap-1">
         <EmptyMedia
           variant="icon"
-          className="size-12 rounded-full bg-primary/10"
+          className="size-12 rounded-none bg-transparent"
         >
-          <PackageOpen className="size-6 text-primary" />
+          <PackageOpen className="size-12 text-primary" />
         </EmptyMedia>
         <EmptyTitle className="font-bold">검색 결과가 없어요.</EmptyTitle>
         <EmptyDescription>다른 검색어로 검색해보세요.</EmptyDescription>

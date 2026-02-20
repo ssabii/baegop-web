@@ -13,13 +13,13 @@ import {
 export default function SignUpConfirmPage() {
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
-      <Empty>
-        <EmptyHeader>
+      <Empty className="border-none">
+        <EmptyHeader className="gap-1">
           <EmptyMedia
             variant="icon"
-            className="size-12 bg-primary/10 rounded-full"
+            className="size-12 rounded-none bg-transparent"
           >
-            <Mail className="text-primary size-6" />
+            <Mail className="size-12 text-primary" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">이메일을 확인해주세요</EmptyTitle>
           <EmptyDescription>
