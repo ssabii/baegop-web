@@ -59,7 +59,7 @@ export function KonaVoteSection({
     <section className="rounded-xl bg-muted p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src="/icons/kona.png" alt="코나카드" className="size-5" />
+          <img src="/icons/kona.png" alt="코나카드" className="size-4" />
           <span className="text-sm font-bold">코나카드</span>
         </div>
         <span className={`text-sm font-semibold ${config.className}`}>
