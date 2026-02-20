@@ -10,10 +10,6 @@ const GRAPHQL_HEADERS = {
   Origin: "https://m.place.naver.com",
 };
 
-export function buildNaverMapLink(name: string): string {
-  return `https://map.naver.com/p/search/${encodeURIComponent(name)}`;
-}
-
 export function buildNaverPlaceLink(placeId: string): string {
   return `https://m.place.naver.com/restaurant/${placeId}/home`;
 }
