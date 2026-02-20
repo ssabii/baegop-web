@@ -38,7 +38,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex snap-x snap-mandatory overflow-x-auto rounded-t-xl scrollbar-none"
+          className="flex snap-x snap-mandatory overflow-x-auto scrollbar-none"
           onScroll={(e) => {
             const el = e.currentTarget;
             const index = Math.round(el.scrollLeft / el.clientWidth);
