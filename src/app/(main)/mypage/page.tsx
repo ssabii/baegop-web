@@ -8,7 +8,6 @@ import {
   ItemActions,
   ItemContent,
   ItemGroup,
-  ItemSeparator,
   ItemTitle,
 } from "@/components/ui/item";
 import { LogoutMenuItem } from "./logout-menu-item";

@@ -1,4 +1,3 @@
-import { List } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PlaceCard, EmptyPlace } from "@/components/places";
 

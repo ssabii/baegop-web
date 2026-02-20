@@ -131,7 +131,6 @@ export function PlaceDetailTabs({
       <TabsContent value="review" className="mt-4">
         {isRegistered && placeId ? (
           <ReviewSection
-            placeId={placeId}
             naverPlaceId={naverPlaceId}
             reviews={reviews}
             currentUserId={currentUserId}

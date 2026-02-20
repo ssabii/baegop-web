@@ -12,13 +12,11 @@ import type { NaverSearchResult } from "@/types";
 
 interface PlaceSearchProps {
   autoFocus?: boolean;
-  initialQuery?: string;
   initialResults?: NaverSearchResult[] | null;
 }
 
 export function PlaceSearch({
   autoFocus,
-  initialQuery = "",
   initialResults = null,
 }: PlaceSearchProps) {
   const router = useRouter();
