@@ -29,7 +29,7 @@ export default function DeleteAccountCompletePage() {
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="flex-row justify-center">
-          <Button asChild size="lg">
+          <Button asChild size="xl">
             <Link href="/">홈으로 이동</Link>
           </Button>
         </EmptyContent>

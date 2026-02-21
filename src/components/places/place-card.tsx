@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { KonaCardStatus } from "@/types";
-import { MapPin, Star, Tag, UtensilsCrossed } from "lucide-react";
+import { Building2, MapPin, Star, Tag } from "lucide-react";
 import Link from "next/link";
 
 interface PlaceCardProps {
@@ -77,7 +77,7 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
         />
       ) : (
         <div className="flex aspect-square size-28 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <UtensilsCrossed className="size-6 text-muted-foreground" />
+          <Building2 className="size-6 text-muted-foreground" />
         </div>
       )}
     </Link>

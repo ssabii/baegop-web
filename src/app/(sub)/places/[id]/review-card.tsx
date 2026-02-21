@@ -124,7 +124,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
         </div>
       </div>
       {review.content && (
-        <p className="text-sm text-muted-foreground">{review.content}</p>
+        <p className="text-sm text-secondary-foreground">{review.content}</p>
       )}
       {review.review_images.length > 0 && (
         <ReviewImages images={review.review_images} />

@@ -59,7 +59,7 @@ export function Roulette({ places }: RouletteProps) {
   return (
     <div className="space-y-6">
       <Button
-        size="lg"
+        size="xl"
         className="gap-2"
         onClick={spin}
         disabled={isSpinning}

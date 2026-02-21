@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, Star, Tag, UtensilsCrossed, X } from "lucide-react";
+import { Building2, ImagePlus, Star, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -132,7 +132,7 @@ export function ReviewEditFormPage({
         formData,
         deletedImageUrls.length > 0 ? deletedImageUrls : undefined,
       );
-      router.push(`/places/${naverPlaceId}`);
+      router.replace(`/places/${naverPlaceId}`);
     });
   }
 
@@ -173,7 +173,7 @@ export function ReviewEditFormPage({
               />
             ) : (
               <div className="flex aspect-square size-17 shrink-0 items-center justify-center rounded-lg bg-muted">
-                <UtensilsCrossed className="size-5 text-muted-foreground" />
+                <Building2 className="size-5 text-muted-foreground" />
               </div>
             )}
           </div>
@@ -264,7 +264,7 @@ export function ReviewEditFormPage({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2 flex aspect-[5/1] w-full items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="mt-2 flex aspect-[5/1] w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
               >
                 <ImagePlus className="size-5" />
               </button>
@@ -324,7 +324,7 @@ export function ReviewEditFormPage({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex aspect-square w-full items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
                   >
                     <ImagePlus className="size-5" />
                   </button>

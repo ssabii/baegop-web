@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, UtensilsCrossed } from "lucide-react";
+import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 
 interface ImageGalleryProps {
@@ -18,7 +18,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
   if (images.length === 0) {
     return (
       <div className="flex h-48 w-full items-center justify-center rounded-t-lg bg-muted">
-        <UtensilsCrossed className="size-12 text-muted-foreground" />
+        <Building2 className="size-12 text-muted-foreground" />
       </div>
     );
   }

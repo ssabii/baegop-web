@@ -1,6 +1,8 @@
 "use client";
 
-import { MessageSquarePlus } from "lucide-react";
+import { useInView } from "react-intersection-observer";
+import { MessageCircle } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Empty,
   EmptyDescription,
@@ -9,63 +11,72 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { ReviewCard } from "./review-card";
-
-interface ReviewData {
-  id: number;
-  rating: number;
-  content: string | null;
-  created_at: string;
-  user_id: string;
-  profiles: {
-    nickname: string | null;
-    avatar_url: string | null;
-  } | null;
-  review_images: {
-    url: string;
-    display_order: number;
-  }[];
-}
+import { useReviews } from "./use-reviews";
 
 interface ReviewSectionProps {
+  placeId: string;
   naverPlaceId: string;
-  reviews: ReviewData[];
   currentUserId: string | null;
 }
 
 export function ReviewSection({
+  placeId,
   naverPlaceId,
-  reviews,
   currentUserId,
 }: ReviewSectionProps) {
+  const { reviews, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useReviews(placeId);
+
+  const { ref: sentinelRef } = useInView({
+    onChange: (inView) => {
+      if (inView && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner className="size-8 text-primary" />
+      </div>
+    );
+  }
+
+  if (reviews.length === 0) {
+    return (
+      <Empty className="border-none py-12">
+        <EmptyHeader className="gap-1">
+          <EmptyMedia
+            variant="icon"
+            className="size-12 rounded-none bg-transparent"
+          >
+            <MessageCircle className="size-12 text-primary" />
+          </EmptyMedia>
+          <EmptyTitle className="font-bold">
+            작성된 리뷰가 없어요
+          </EmptyTitle>
+          <EmptyDescription>첫 번째 리뷰를 작성해보세요!</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      {reviews.length === 0 ? (
-        <Empty className="border-none py-12">
-          <EmptyHeader className="gap-1">
-            <EmptyMedia
-              variant="icon"
-              className="size-12 rounded-none bg-transparent"
-            >
-              <MessageSquarePlus className="size-12 text-primary" />
-            </EmptyMedia>
-            <EmptyTitle className="font-bold">
-              아직 리뷰가 없습니다
-            </EmptyTitle>
-            <EmptyDescription>첫 번째 리뷰를 남겨보세요!</EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      ) : (
-        <div className="divide-y">
-          {reviews.map((review) => (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              isOwner={currentUserId === review.user_id}
-              naverPlaceId={naverPlaceId}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    <>
+      <div className="divide-y">
+        {reviews.map((review) => (
+          <ReviewCard
+            key={review.id}
+            review={review}
+            isOwner={currentUserId === review.user_id}
+            naverPlaceId={naverPlaceId}
+          />
+        ))}
+      </div>
+      <div ref={sentinelRef} className="flex justify-center">
+        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+      </div>
+    </>
   );
 }

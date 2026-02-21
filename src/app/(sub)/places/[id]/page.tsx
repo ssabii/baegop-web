@@ -50,7 +50,8 @@ export default async function PlaceDetailPage({
 
   if (!detail) notFound();
 
-  let reviews: ReviewData[] = [];
+  let reviewCount = 0;
+  let avgRating: number | null = null;
   let userKonaVote: KonaVote | null = null;
   let user: { id: string } | null = null;
 
@@ -62,13 +63,15 @@ export default async function PlaceDetailPage({
   if (isRegistered) {
     const { data: reviewData } = await supabase
       .from("reviews")
-      .select(
-        "*, profiles(nickname, avatar_url), review_images(url, display_order)",
-      )
-      .eq("place_id", place.id)
-      .order("created_at", { ascending: false });
+      .select("rating")
+      .eq("place_id", place.id);
 
-    reviews = (reviewData as ReviewData[]) ?? [];
+    const ratings = reviewData ?? [];
+    reviewCount = ratings.length;
+    avgRating =
+      reviewCount > 0
+        ? ratings.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+        : null;
 
     if (user) {
       const { data: vote } = await supabase
@@ -83,14 +86,10 @@ export default async function PlaceDetailPage({
 
   const address = detail.roadAddress || detail.address;
   const naverLink = buildNaverPlaceLink(naverPlaceId);
-  const avgRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : null;
 
   return (
     <>
-      <SubHeader title={detail.name} />
+      <SubHeader title="장소" />
       <main className="mx-auto max-w-4xl pb-20">
         {/* 이미지 갤러리 */}
         <ImageGallery images={detail.imageUrls} alt={detail.name} />
@@ -137,7 +136,7 @@ export default async function PlaceDetailPage({
                   {avgRating.toFixed(1)}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  ({reviews.length})
+                  ({reviewCount})
                 </span>
               </div>
             )}
@@ -157,7 +156,6 @@ export default async function PlaceDetailPage({
           {/* 메뉴 / 리뷰 탭 */}
           <PlaceDetailTabs
             menus={detail.menus}
-            reviews={reviews}
             isRegistered={isRegistered}
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}
@@ -174,20 +172,4 @@ export default async function PlaceDetailPage({
       />
     </>
   );
-}
-
-interface ReviewData {
-  id: number;
-  rating: number;
-  content: string | null;
-  created_at: string;
-  user_id: string;
-  profiles: {
-    nickname: string | null;
-    avatar_url: string | null;
-  } | null;
-  review_images: {
-    url: string;
-    display_order: number;
-  }[];
 }
