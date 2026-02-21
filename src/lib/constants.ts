@@ -15,6 +15,12 @@ export const POPULAR_MIN_REVIEW_COUNT = 3;
 // 최근 장소 기준 일수
 export const RECENT_DAYS = 7;
 
+// 비밀번호 유효성 규칙
+export const PASSWORD_MIN_LENGTH =
+  process.env.NODE_ENV === "production" ? 8 : 6;
+export const PASSWORD_REQUIRES_MIX =
+  process.env.NODE_ENV === "production";
+
 // 크몽 사무실 좌표 (서울 강남구 테헤란로)
 export const COMPANY_LOCATION = {
   lat: 37.4924644,

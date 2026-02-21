@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
+import { validatePassword } from "@/lib/password";
 import { generateRandomNickname } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -59,8 +61,9 @@ export function SignUpForm({
       return;
     }
 
-    if (password.length < 6) {
-      setPasswordError("비밀번호는 6자 이상이어야 합니다.");
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
       return;
     }
 
@@ -144,7 +147,7 @@ export function SignUpForm({
             <Input
               id="password"
               type="password"
-              placeholder="6자 이상 입력하세요"
+              placeholder={`${PASSWORD_MIN_LENGTH}자 이상 입력하세요`}
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
