@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Item,
   ItemActions,
   ItemContent,
+  ItemDescription,
   ItemGroup,
+  ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
 import { LogoutMenuItem } from "./logout-menu-item";
@@ -42,26 +45,50 @@ export default async function MyPage() {
 
   return (
     <main className="bg-muted w-full h-screen">
-      <div className="mx-auto max-w-4xl ">
-        {/* 프로필 섹션 */}
-        <div className="flex items-center gap-2 px-4 py-8">
-          <Avatar className="size-12">
-            <AvatarImage src={profile?.avatar_url ?? undefined} />
-            <AvatarFallback className="text-lg">{nickname[0]}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="text-xl font-bold">{nickname}</h1>
-            <p className="text-sm text-muted-foreground font-medium">
-              {user.email}
-            </p>
-          </div>
-        </div>
-
-        {/* 메뉴 리스트 */}
-        <nav className="flex flex-col px-4 gap-3" aria-labelledby="mypage-menu">
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <nav className="flex flex-col gap-3" aria-labelledby="mypage-menu">
+          {/* 메뉴 리스트 */}
           <h2 id="mypage-menu" className="sr-only">
             마이페이지 메뉴
           </h2>
+
+          {/* 프로필 섹션 */}
+          <ItemGroup>
+            <Item asChild className="gap-2">
+              <Link href="/mypage/profile">
+                <ItemMedia
+                  variant="icon"
+                  className="shrink-0 size-14 bg-transparent border-none"
+                >
+                  <Avatar className="size-14">
+                    <AvatarImage
+                      className="object-cover"
+                      src={
+                        profile?.avatar_url
+                          ? optimizeSupabaseImageUrl(profile.avatar_url)
+                          : undefined
+                      }
+                    />
+                    <AvatarFallback>
+                      <UserRound className="size-12 text-muted-foreground" />
+                    </AvatarFallback>
+                  </Avatar>
+                </ItemMedia>
+                <ItemContent className="flex-1">
+                  <ItemTitle className="text-base font-bold line-clamp-1">
+                    {nickname}
+                  </ItemTitle>
+                  <ItemDescription className="text-sm line-clamp-1">
+                    {user.email}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions className="shrink-0">
+                  <ChevronRight className="size-5" />
+                </ItemActions>
+              </Link>
+            </Item>
+          </ItemGroup>
+
           <ItemGroup className="rounded-xl bg-background">
             <Item asChild>
               <Link href="/mypage/theme">
