@@ -96,7 +96,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   <div className="mx-auto flex w-full max-w-4xl flex-col py-2">
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-2 text-base font-bold"
+                      className="flex items-center gap-3 px-4 py-2 text-base font-bold cursor-pointer"
                       onClick={handleEdit}
                     >
                       <Pencil className="size-4" />
@@ -104,7 +104,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-2 text-base font-bold"
+                      className="flex items-center gap-3 px-4 py-2 text-base font-bold cursor-pointer"
                       onClick={handleDelete}
                     >
                       <Trash2 className="size-4" />
