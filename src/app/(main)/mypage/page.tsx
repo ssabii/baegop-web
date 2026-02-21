@@ -74,11 +74,11 @@ export default async function MyPage() {
                     </AvatarFallback>
                   </Avatar>
                 </ItemMedia>
-                <ItemContent className="flex-1">
-                  <ItemTitle className="text-base font-bold line-clamp-1">
+                <ItemContent className="flex-1 gap-0">
+                  <ItemTitle className="text-xl font-bold line-clamp-1">
                     {nickname}
                   </ItemTitle>
-                  <ItemDescription className="text-sm line-clamp-1">
+                  <ItemDescription className="text-base line-clamp-1">
                     {user.email}
                   </ItemDescription>
                 </ItemContent>
