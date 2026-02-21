@@ -41,7 +41,7 @@ export default async function MyPage() {
   const nickname = profile?.nickname ?? user.email ?? "사용자";
 
   return (
-    <main className="bg-muted/50 w-full h-svh">
+    <main className="bg-muted w-full h-screen">
       <div className="mx-auto max-w-4xl ">
         {/* 프로필 섹션 */}
         <div className="flex items-center gap-2 px-4 py-8">
@@ -63,13 +63,15 @@ export default async function MyPage() {
             마이페이지 메뉴
           </h2>
           <ItemGroup className="rounded-xl bg-background">
-            <Item size="sm" className="text-muted-foreground">
-              <ItemContent>
-                <ItemTitle className="font-bold">테마</ItemTitle>
-              </ItemContent>
-              <ItemActions>
-                <ChevronRight className="size-4" />
-              </ItemActions>
+            <Item asChild>
+              <Link href="/mypage/theme">
+                <ItemContent>
+                  <ItemTitle className="font-bold">테마</ItemTitle>
+                </ItemContent>
+                <ItemActions>
+                  <ChevronRight className="size-4" />
+                </ItemActions>
+              </Link>
             </Item>
           </ItemGroup>
           <ItemGroup className="rounded-xl bg-background">

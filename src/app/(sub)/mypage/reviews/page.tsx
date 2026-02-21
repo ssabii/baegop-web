@@ -26,7 +26,7 @@ export default async function MyReviewsPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <>
+    <div className="bg-muted min-h-dvh">
       <SubHeader title="내 리뷰" />
       {reviews && reviews.length > 0 ? (
         <div className="px-4">
@@ -63,6 +63,6 @@ export default async function MyReviewsPage() {
           </Empty>
         </div>
       )}
-    </>
+    </div>
   );
 }
