@@ -37,17 +37,17 @@ export function PlaceActionBar({
 
   function handleWriteReview() {
     if (!isLoggedIn) {
-      router.push(`/signin?redirect=/places/${naverPlaceId}/review`);
+      router.push(`/signin?redirect=/places/${naverPlaceId}/review/new`);
       return;
     }
 
     if (!isRegistered) {
       startTransition(async () => {
         await registerPlace(placeDetail);
-        router.push(`/places/${naverPlaceId}/review`);
+        router.push(`/places/${naverPlaceId}/review/new`);
       });
     } else {
-      router.push(`/places/${naverPlaceId}/review`);
+      router.push(`/places/${naverPlaceId}/review/new`);
     }
   }
 
