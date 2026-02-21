@@ -141,6 +141,18 @@ export default async function MyPage() {
           </ItemGroup>
           <ItemGroup className="rounded-xl bg-background">
             <LogoutMenuItem />
+            {user.app_metadata.providers?.includes("email") && (
+              <Item asChild>
+                <Link href="/reset-password">
+                  <ItemContent>
+                    <ItemTitle className="font-bold">비밀번호 변경</ItemTitle>
+                  </ItemContent>
+                  <ItemActions>
+                    <ChevronRight className="size-4" />
+                  </ItemActions>
+                </Link>
+              </Item>
+            )}
             <Item asChild>
               <Link href="/mypage/delete-account">
                 <ItemContent>

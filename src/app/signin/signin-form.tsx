@@ -130,7 +130,15 @@ export function SignInForm({
               {emailError && <FieldDescription>{emailError}</FieldDescription>}
             </Field>
             <Field data-invalid={passwordError ? true : undefined}>
-              <FieldLabel htmlFor="password">비밀번호</FieldLabel>
+              <div className="flex items-center justify-between">
+                <FieldLabel htmlFor="password">비밀번호</FieldLabel>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm underline-offset-4 hover:underline"
+                >
+                  비밀번호를 잊으셨나요?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
