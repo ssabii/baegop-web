@@ -1,7 +1,6 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { PG_UNIQUE_VIOLATION } from "@/lib/constants";
 import type { NaverPlaceDetail } from "@/types";
@@ -137,6 +136,4 @@ export async function registerPlace(place: NaverPlaceDetail) {
   if (error && error.code !== PG_UNIQUE_VIOLATION) {
     throw new Error("장소 등록에 실패했습니다");
   }
-
-  revalidatePath(`/places/${place.id}`);
 }

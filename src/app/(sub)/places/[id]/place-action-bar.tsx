@@ -38,6 +38,7 @@ export function PlaceActionBar({
 
     startTransition(async () => {
       await registerPlace(placeDetail);
+      router.refresh();
     });
   }
 

@@ -147,7 +147,6 @@ export default async function PlaceDetailPage({
           {isRegistered && (
             <KonaVoteSection
               placeId={place.id}
-              naverPlaceId={naverPlaceId}
               status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
               userVote={userKonaVote}
               isLoggedIn={!!user}

@@ -1,15 +1,13 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { toOriginalSupabaseImageUrl } from "@/lib/image";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 export async function createReview(
   placeId: string,
-  naverPlaceId: string,
   data: { rating: number; content: string },
-  images?: FormData
+  images?: FormData,
 ) {
   const supabase = await createClient();
   const {
@@ -40,7 +38,7 @@ export async function createReview(
       if (!(file instanceof File) || file.size === 0) continue;
 
       const ext = file.name.split(".").pop() ?? "jpg";
-      const path = `${naverPlaceId}/${user.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+      const path = `${placeId}/${user.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("review-images")
@@ -60,18 +58,13 @@ export async function createReview(
           review_id: review.id,
           url,
           display_order: i,
-        }))
+        })),
       );
     }
   }
-
-  revalidatePath(`/places/${naverPlaceId}`);
 }
 
-export async function deleteReview(
-  reviewId: number,
-  naverPlaceId: string
-) {
+export async function deleteReview(reviewId: number) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -86,16 +79,14 @@ export async function deleteReview(
     .eq("user_id", user.id);
 
   if (error) throw new Error("리뷰 삭제에 실패했습니다");
-
-  revalidatePath(`/places/${naverPlaceId}`);
 }
 
 export async function updateReview(
   reviewId: number,
-  naverPlaceId: string,
+  placeId: string,
   data: { rating: number; content: string },
   newImages?: FormData,
-  deletedImageUrls?: string[]
+  deletedImageUrls?: string[],
 ) {
   const supabase = await createClient();
   const {
@@ -153,7 +144,7 @@ export async function updateReview(
       if (!(file instanceof File) || file.size === 0) continue;
 
       const ext = file.name.split(".").pop() ?? "jpg";
-      const path = `${naverPlaceId}/${user.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+      const path = `${placeId}/${user.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("review-images")
@@ -173,19 +164,13 @@ export async function updateReview(
           review_id: reviewId,
           url,
           display_order: nextOrder + i,
-        }))
+        })),
       );
     }
   }
-
-  revalidatePath(`/places/${naverPlaceId}`);
 }
 
-export async function voteKonaCard(
-  placeId: string,
-  naverPlaceId: string,
-  vote: KonaVote
-) {
+export async function voteKonaCard(placeId: string, vote: KonaVote) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -223,8 +208,6 @@ export async function voteKonaCard(
     .select("kona_card_status")
     .eq("id", placeId)
     .single();
-
-  revalidatePath(`/places/${naverPlaceId}`);
 
   return {
     status: (updatedPlace?.kona_card_status ?? "unknown") as KonaCardStatus,

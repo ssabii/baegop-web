@@ -60,7 +60,8 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     if (!ok) return;
 
     startTransition(async () => {
-      await deleteReview(review.id, naverPlaceId);
+      await deleteReview(review.id);
+      router.refresh();
     });
   }
 

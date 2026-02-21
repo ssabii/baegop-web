@@ -25,7 +25,6 @@ const MAX_CONTENT_LENGTH = 300;
 
 interface ReviewFormPageProps {
   placeId: string;
-  naverPlaceId: string;
   place: {
     name: string;
     category: string | null;
@@ -35,7 +34,6 @@ interface ReviewFormPageProps {
 
 export function ReviewFormPage({
   placeId,
-  naverPlaceId,
   place,
 }: ReviewFormPageProps) {
   const router = useRouter();
@@ -102,7 +100,7 @@ export function ReviewFormPage({
         selectedFiles.forEach((file) => formData!.append("images", file));
       }
 
-      await createReview(placeId, naverPlaceId, { rating, content }, formData);
+      await createReview(placeId, { rating, content }, formData);
       router.back();
     } catch {
       setIsPending(false);
