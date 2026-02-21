@@ -56,10 +56,10 @@ export function Roulette({ places }: RouletteProps) {
   }, [places]);
 
   return (
-    <div className="w-full h-full relative flex items-center justify-center px-4">
+    <div className="w-full max-w-4xl h-full relative px-4">
       {result ? (
         <div
-          className={cn("w-full transition-all duration-300", {
+          className={cn("pt-4 transition-all duration-300", {
             "scale-95 opacity-50": isSpinning,
             "scale-100 opacity-100": !isSpinning,
           })}
@@ -67,20 +67,22 @@ export function Roulette({ places }: RouletteProps) {
           <PlaceCard place={result} />
         </div>
       ) : (
-        <Empty className="border-none py-12">
-          <EmptyHeader className="gap-1">
-            <EmptyMedia
-              variant="icon"
-              className="size-12 rounded-none bg-transparent"
-            >
-              <CircleQuestionMarkIcon className="size-12 text-primary" />
-            </EmptyMedia>
-            <EmptyTitle className="font-bold">오늘 뭐 먹지?</EmptyTitle>
-            <EmptyDescription>
-              랜덤 버튼을 누르면 장소를 추천해 드릴게요!
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+        <div className="h-full flex items-center justify-center px-4">
+          <Empty className="border-none py-12">
+            <EmptyHeader className="gap-1">
+              <EmptyMedia
+                variant="icon"
+                className="size-12 rounded-none bg-transparent"
+              >
+                <CircleQuestionMarkIcon className="size-12 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="font-bold">오늘 뭐 먹지?</EmptyTitle>
+              <EmptyDescription>
+                랜덤 버튼을 누르면 장소를 추천해 드려요!
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </div>
       )}
 
       <div className="absolute bottom-4 right-4 flex flex-col gap-2">
