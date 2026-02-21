@@ -137,7 +137,7 @@ export function PlaceSearch() {
           <PopoverContent
             align="start"
             sideOffset={0}
-            className="w-(--radix-popper-anchor-width) rounded-t-none rounded-b-3xl border-x border-b bg-background p-0 shadow-sm"
+            className="w-(--radix-popper-anchor-width) overflow-hidden rounded-t-none rounded-b-3xl border-x border-b bg-background p-0 shadow-sm"
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >

@@ -47,7 +47,7 @@ export function MyPlaceList({ userId }: MyPlaceListProps) {
               variant="icon"
               className="size-12 rounded-none bg-transparent"
             >
-              <Building2 className="size-12 text-primary" />
+              <Building2 className="size-12" />
             </EmptyMedia>
             <EmptyTitle className="font-bold">
               등록한 장소가 없어요

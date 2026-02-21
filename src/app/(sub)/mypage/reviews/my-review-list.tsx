@@ -45,7 +45,7 @@ export function MyReviewList({ userId }: MyReviewListProps) {
               variant="icon"
               className="size-12 rounded-none bg-transparent"
             >
-              <MessageCircle className="size-12 text-primary" />
+              <MessageCircle className="size-12" />
             </EmptyMedia>
             <EmptyTitle className="font-bold">
               작성한 리뷰가 없어요

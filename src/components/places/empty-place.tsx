@@ -15,7 +15,7 @@ export function EmptyPlace() {
           variant="icon"
           className="size-12 rounded-none bg-transparent"
         >
-          <PackageOpen className="size-12 text-primary" />
+          <PackageOpen className="size-12" />
         </EmptyMedia>
         <EmptyTitle className="font-bold">등록된 장소가 없어요</EmptyTitle>
         <EmptyDescription>

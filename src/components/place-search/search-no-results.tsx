@@ -15,7 +15,7 @@ export function SearchNoResults() {
           variant="icon"
           className="size-12 rounded-none bg-transparent"
         >
-          <PackageOpen className="size-12 text-primary" />
+          <PackageOpen className="size-12" />
         </EmptyMedia>
         <EmptyTitle className="font-bold">검색 결과가 없어요</EmptyTitle>
         <EmptyDescription>다른 검색어로 검색해보세요</EmptyDescription>

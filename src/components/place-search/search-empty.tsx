@@ -15,7 +15,7 @@ export function SearchEmpty() {
           variant="icon"
           className="size-12 rounded-none bg-transparent"
         >
-          <Search className="size-12 text-primary" />
+          <Search className="size-12" />
         </EmptyMedia>
         <EmptyTitle className="font-bold">장소를 검색해보세요</EmptyTitle>
         <EmptyDescription>

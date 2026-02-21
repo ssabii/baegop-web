@@ -64,7 +64,7 @@ export function PlaceDetailTabs({
                 variant="icon"
                 className="size-12 rounded-none bg-transparent"
               >
-                <UtensilsCrossed className="size-12 text-primary" />
+                <UtensilsCrossed className="size-12" />
               </EmptyMedia>
               <EmptyTitle className="font-bold">
                 등록된 메뉴가 없어요
@@ -75,11 +75,11 @@ export function PlaceDetailTabs({
           <>
             <ul className="divide-y">
               {visibleMenus.map((menu) => (
-                <li key={menu.name} className="flex gap-2 py-3">
+                <li key={menu.name} className="flex items-start gap-2 py-3">
                   <div className="flex min-w-0 flex-1 flex-col justify-between">
-                    <div className="space-y-0.5">
+                    <div className="space-y-1">
                       {menu.recommend && (
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
                           추천
                         </span>
                       )}
@@ -137,7 +137,7 @@ export function PlaceDetailTabs({
                 variant="icon"
                 className="size-12 rounded-none bg-transparent"
               >
-                <MessageCircle className="size-12 text-primary" />
+                <MessageCircle className="size-12" />
               </EmptyMedia>
               <EmptyTitle className="font-bold">
                 작성된 리뷰가 없어요
