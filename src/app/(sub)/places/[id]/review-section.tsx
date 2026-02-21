@@ -53,9 +53,7 @@ export function ReviewSection({
           >
             <MessageCircle className="size-12 text-primary" />
           </EmptyMedia>
-          <EmptyTitle className="font-bold">
-            작성된 리뷰가 없어요
-          </EmptyTitle>
+          <EmptyTitle className="font-bold">작성된 리뷰가 없어요</EmptyTitle>
           <EmptyDescription>첫 번째 리뷰를 작성해보세요!</EmptyDescription>
         </EmptyHeader>
       </Empty>

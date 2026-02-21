@@ -11,8 +11,8 @@ import { BottomActionBar } from "@/components/bottom-action-bar";
 import {
   Drawer,
   DrawerContent,
+  DrawerFooter,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
@@ -47,6 +47,9 @@ export function ReviewFormPage({
   const [previews, setPreviews] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
+  const [drawerContent, setDrawerContent] = useState("");
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
@@ -171,31 +174,35 @@ export function ReviewFormPage({
           </div>
 
           {/* 내용 */}
-          <Drawer repositionInputs={false}>
-            <div>
-              <Label className="text-base font-bold">
-                어떤 점이 좋았나요?
-              </Label>
-              <DrawerTrigger asChild>
-                <button
-                  type="button"
-                  className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                >
-                  {content ? (
-                    <div className="w-full min-w-0 line-clamp-4 whitespace-pre-wrap text-left">
-                      {content}
-                    </div>
-                  ) : (
-                    <div className="w-full text-left text-muted-foreground">
-                      장소에 대한 자세한 리뷰를 남겨주세요
-                    </div>
-                  )}
-                </button>
-              </DrawerTrigger>
-              <p className="mt-1 text-right text-sm text-muted-foreground">
-                {content.length}/{MAX_CONTENT_LENGTH}
-              </p>
-            </div>
+          <div>
+            <Label className="text-base font-bold">어떤 점이 좋았나요?</Label>
+            <button
+              type="button"
+              onClick={() => {
+                setDrawerContent(content);
+                setContentDrawerOpen(true);
+              }}
+              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+            >
+              {content ? (
+                <div className="w-full min-w-0 line-clamp-4 whitespace-pre-wrap text-left">
+                  {content}
+                </div>
+              ) : (
+                <div className="w-full text-left text-muted-foreground">
+                  장소에 대한 자세한 리뷰를 남겨주세요
+                </div>
+              )}
+            </button>
+            <p className="mt-1 text-right text-sm text-muted-foreground">
+              {content.length}/{MAX_CONTENT_LENGTH}
+            </p>
+          </div>
+          <Drawer
+            repositionInputs={false}
+            open={contentDrawerOpen}
+            onOpenChange={setContentDrawerOpen}
+          >
             <DrawerContent>
               <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
               <div className="p-4">
@@ -203,9 +210,11 @@ export function ReviewFormPage({
                   autoFocus
                   className="field-sizing-fixed resize-none"
                   placeholder="장소에 대한 자세한 리뷰를 남겨주세요"
-                  value={content}
+                  value={drawerContent}
                   onChange={(e) =>
-                    setContent(e.target.value.slice(0, MAX_CONTENT_LENGTH))
+                    setDrawerContent(
+                      e.target.value.slice(0, MAX_CONTENT_LENGTH),
+                    )
                   }
                   onFocus={(e) => {
                     const el = e.currentTarget;
@@ -215,9 +224,20 @@ export function ReviewFormPage({
                   rows={5}
                 />
                 <p className="mt-2 text-right text-sm text-muted-foreground">
-                  {content.length}/{MAX_CONTENT_LENGTH}
+                  {drawerContent.length}/{MAX_CONTENT_LENGTH}
                 </p>
               </div>
+              <DrawerFooter>
+                <Button
+                  size="xl"
+                  onClick={() => {
+                    setContent(drawerContent);
+                    setContentDrawerOpen(false);
+                  }}
+                >
+                  확인
+                </Button>
+              </DrawerFooter>
             </DrawerContent>
           </Drawer>
 
@@ -233,7 +253,7 @@ export function ReviewFormPage({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2 flex aspect-[5/1] w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
               >
                 <ImagePlus className="size-5" />
               </button>
