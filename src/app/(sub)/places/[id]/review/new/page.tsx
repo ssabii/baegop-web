@@ -16,7 +16,8 @@ export default async function ReviewWritePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/signin?redirect=/places/${naverPlaceId}/review/new`);
+    const params = new URLSearchParams({ redirect: `/places/${naverPlaceId}/review/new` });
+    redirect(`/signin?${params}`);
   }
 
   const { data: place } = await supabase

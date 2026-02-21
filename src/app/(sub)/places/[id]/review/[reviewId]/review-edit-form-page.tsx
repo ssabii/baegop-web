@@ -135,7 +135,7 @@ export function ReviewEditFormPage({
         formData,
         deletedImageUrls.length > 0 ? deletedImageUrls : undefined,
       );
-      router.replace(`/places/${naverPlaceId}`);
+      router.back();
     });
   }
 

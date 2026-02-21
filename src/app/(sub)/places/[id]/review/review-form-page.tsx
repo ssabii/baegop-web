@@ -102,7 +102,7 @@ export function ReviewFormPage({
       }
 
       await createReview(placeId, naverPlaceId, { rating, content }, formData);
-      router.replace(`/places/${naverPlaceId}`);
+      router.back();
     });
   }
 

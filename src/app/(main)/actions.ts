@@ -42,7 +42,7 @@ export async function createPlaceWithReview(
       created_by: user.id,
     });
 
-    if (error) {
+    if (error && error.code !== "23505") {
       throw new Error("장소 등록에 실패했습니다");
     }
   }
@@ -134,7 +134,7 @@ export async function registerPlace(place: NaverPlaceDetail) {
     created_by: user.id,
   });
 
-  if (error) {
+  if (error && error.code !== "23505") {
     throw new Error("장소 등록에 실패했습니다");
   }
 
