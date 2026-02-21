@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,18 @@ interface SubHeaderProps {
 export function SubHeader({ title, onBack }: SubHeaderProps) {
   const router = useRouter();
 
+  const handleBack = useCallback(() => {
+    const nav = (window as { navigation?: { canGoBack?: boolean } }).navigation;
+    const canGoBack =
+      nav?.canGoBack ?? document.referrer.startsWith(window.location.origin);
+
+    if (canGoBack) {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  }, [router]);
+
   return (
     <header className="sticky top-0 z-40 flex h-12 items-center justify-center border-b border-border bg-background">
       <div className="relative flex h-full w-full max-w-4xl items-center justify-center">
@@ -19,7 +32,7 @@ export function SubHeader({ title, onBack }: SubHeaderProps) {
           className="absolute left-0"
           variant="ghost"
           size="icon"
-          onClick={onBack ?? (() => router.back())}
+          onClick={onBack ?? handleBack}
           aria-label="뒤로 가기"
         >
           <ChevronLeft className="size-5" />

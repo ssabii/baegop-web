@@ -60,6 +60,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - **빈 상태 페이지**: 콘텐츠가 없는 화면(검색 전, 데이터 없음 등)은 `h-dvh` + `flex flex-col` + `flex-1`로 뷰포트 높이에 딱 맞춰 스크롤이 생기지 않게 한다.
 - **UI와 로직 분리**: 커스텀 훅은 데이터 페칭/상태 관리 등 로직만 담당한다. IntersectionObserver, DOM 조작 등 UI 관심사는 훅에 포함하지 않고 사용하는 컴포넌트에서 처리한다.
 - **쿼리 훅 분리**: React Query(`useQuery`, `useInfiniteQuery` 등) 로직은 항상 `use-*.ts` 커스텀 훅으로 분리한다. 컴포넌트에 직접 작성하지 않는다.
+- **버튼 사이즈**: 모든 액션 버튼(BottomActionBar, 독립 액션 등)과 다이어로그 버튼은 `size="xl"`을 사용한다.
 - **Empty 컴포넌트 패턴**: 빈 상태 UI는 반드시 아래 형태를 따른다. 아이콘은 `variant="icon"` + `size-12 rounded-none bg-transparent`, 내부 아이콘은 `size-12 text-primary`, 타이틀은 `font-bold`. 텍스트에 마침표를 사용하지 않는다.
   ```tsx
   <Empty className="border-none">

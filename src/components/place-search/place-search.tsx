@@ -46,7 +46,7 @@ export function PlaceSearch() {
     setInput,
     isTyping,
     onSelect: (item) => {
-      router.push(`/places/${item.id}`);
+      router.replace(`/places/${item.id}`);
     },
   });
 
@@ -70,12 +70,12 @@ export function PlaceSearch() {
     const trimmed = input.trim();
     if (trimmed.length < 2) return;
     dismissSuggestions();
-    router.push(`/search?query=${encodeURIComponent(trimmed)}`);
+    router.replace(`/search?query=${encodeURIComponent(trimmed)}`);
   }
 
   function handleSelect(item: NaverSearchResult) {
     dismissSuggestions();
-    router.push(`/places/${item.id}`);
+    router.replace(`/places/${item.id}`);
   }
 
   const hasResults = queryParam && !isLoading && results.length > 0;

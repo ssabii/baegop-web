@@ -46,7 +46,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         )}
       </div>
       {review.content && (
-        <p className="line-clamp-2 text-sm text-muted-foreground">
+        <p className="line-clamp-2 text-sm text-secondary-foreground">
           {review.content}
         </p>
       )}

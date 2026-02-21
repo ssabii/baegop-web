@@ -1,8 +1,14 @@
 import { redirect } from "next/navigation";
-import { MessageSquarePlus } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { SubHeader } from "@/components/sub-header";
 import { ReviewCard } from "@/components/reviews";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 export default async function MyReviewsPage() {
   const supabase = await createClient();
@@ -41,9 +47,20 @@ export default async function MyReviewsPage() {
           })}
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted-foreground">
-          <MessageSquarePlus className="size-8" />
-          <p className="text-sm">아직 작성한 리뷰가 없습니다.</p>
+        <div className="flex flex-1 items-center justify-center">
+          <Empty className="border-none">
+            <EmptyHeader className="gap-1">
+              <EmptyMedia
+                variant="icon"
+                className="size-12 rounded-none bg-transparent"
+              >
+                <MessageCircle className="size-12 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="font-bold">
+                작성된 리뷰가 없어요
+              </EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         </div>
       )}
     </>
