@@ -1,10 +1,19 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Shuffle } from "lucide-react";
+import { RotateCcw, Shuffle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PlaceCard } from "@/components/places";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
+import { CircleQuestionMarkIcon } from "lucide-react";
 
 interface PlaceData {
   id: string;
@@ -29,9 +38,7 @@ export function Roulette({ places }: RouletteProps) {
     if (places.length === 0) return;
 
     setIsSpinning(true);
-    setResult(null);
 
-    // 슬롯머신 느낌의 빠른 변경 후 최종 결과
     let count = 0;
     const totalTicks = 15;
     const interval = setInterval(() => {
@@ -48,39 +55,57 @@ export function Roulette({ places }: RouletteProps) {
     }, 100);
   }, [places]);
 
-  if (places.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        등록된 장소가 없습니다. 먼저 장소를 등록해주세요!
-      </p>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <Button
-        size="xl"
-        className="gap-2"
-        onClick={spin}
-        disabled={isSpinning}
-      >
-        <Shuffle className={`size-4 ${isSpinning ? "animate-spin" : ""}`} />
-        {isSpinning ? "고르는 중..." : result ? "다시 뽑기" : "장소 뽑기!"}
-      </Button>
-
-      {result && (
+    <div className="w-full h-full relative flex items-center justify-center px-4">
+      {result ? (
         <div
-          className={cn(
-            "rounded-lg border py-3 transition-all duration-300",
-            {
-              "scale-95 opacity-50": isSpinning,
-              "scale-100 opacity-100": !isSpinning,
-            },
-          )}
+          className={cn("w-full transition-all duration-300", {
+            "scale-95 opacity-50": isSpinning,
+            "scale-100 opacity-100": !isSpinning,
+          })}
         >
           <PlaceCard place={result} />
         </div>
+      ) : (
+        <Empty className="border-none py-12">
+          <EmptyHeader className="gap-1">
+            <EmptyMedia
+              variant="icon"
+              className="size-12 rounded-none bg-transparent"
+            >
+              <CircleQuestionMarkIcon className="size-12 text-primary" />
+            </EmptyMedia>
+            <EmptyTitle className="font-bold">오늘 뭐 먹지?</EmptyTitle>
+            <EmptyDescription>
+              랜덤 버튼을 누르면 장소를 추천해 드릴게요!
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       )}
+
+      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+        {result && (
+          <Button
+            variant="secondary"
+            className="rounded-full size-12 bg-muted"
+            onClick={() => setResult(null)}
+            disabled={isSpinning}
+          >
+            <RotateCcw className="size-6" />
+          </Button>
+        )}
+        <Button
+          className="rounded-full size-12"
+          onClick={spin}
+          disabled={isSpinning}
+        >
+          {isSpinning ? (
+            <Spinner className="size-6" aria-label="로딩 중" />
+          ) : (
+            <Shuffle className="size-6" />
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
