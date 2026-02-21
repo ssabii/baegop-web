@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { redirect } from "next/navigation";
 import { UtensilsCrossed } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { optimizeNaverImageUrls } from "@/lib/image";
 import { Separator } from "@/components/ui/separator";
 import { SubHeader } from "@/components/sub-header";
 import { PlaceCard } from "@/components/places";
@@ -23,8 +24,9 @@ export default async function MyPlacesPage() {
     .eq("created_by", user.id)
     .order("created_at", { ascending: false });
 
-  const places = rawPlaces?.map(({ reviews, ...rest }) => ({
+  const places = rawPlaces?.map(({ reviews, image_urls, ...rest }) => ({
     ...rest,
+    image_urls: image_urls ? optimizeNaverImageUrls(image_urls) : image_urls,
     avg_rating:
       reviews.length > 0
         ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length

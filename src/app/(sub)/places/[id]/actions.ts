@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { toOriginalSupabaseImageUrl } from "@/lib/image";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 export async function createReview(
@@ -116,8 +117,10 @@ export async function updateReview(
 
   // 삭제할 이미지 처리
   if (deletedImageUrls && deletedImageUrls.length > 0) {
+    const originalUrls = deletedImageUrls.map(toOriginalSupabaseImageUrl);
+
     // Storage에서 파일 삭제
-    const storagePaths = deletedImageUrls.map((url) => {
+    const storagePaths = originalUrls.map((url) => {
       const parts = url.split("/review-images/");
       return parts[1];
     });
@@ -128,7 +131,7 @@ export async function updateReview(
       .from("review_images")
       .delete()
       .eq("review_id", reviewId)
-      .in("url", deletedImageUrls);
+      .in("url", originalUrls);
   }
 
   // 새 이미지 업로드

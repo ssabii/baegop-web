@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { MapPin, Phone, Star, Tag } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { buildNaverPlaceLink, fetchPlaceDetailWithFallback } from "@/lib/naver";
+import { optimizeNaverImageUrls } from "@/lib/image";
 import { NaverIcon } from "@/components/naver-icon";
 import { ImageGallery } from "@/components/image-gallery";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +44,7 @@ export default async function PlaceDetailPage({
       phone: null,
       x: place.lng?.toString() ?? "",
       y: place.lat?.toString() ?? "",
-      imageUrls: place.image_urls ?? [],
+      imageUrls: optimizeNaverImageUrls(place.image_urls ?? []),
       menus: [],
     };
   }

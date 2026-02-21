@@ -5,6 +5,7 @@ import {
   POPULAR_MIN_REVIEW_COUNT,
   RECENT_DAYS,
 } from "@/lib/constants";
+import { optimizeNaverImageUrls } from "@/lib/image";
 
 const DEFAULT_LIMIT = 10;
 
@@ -38,13 +39,18 @@ export async function GET(request: NextRequest) {
     }
 
     const places = (rawPlaces ?? [])
-      .map(({ reviews, ...rest }) => {
+      .map(({ reviews, image_urls, ...rest }) => {
         const reviewCount = reviews.length;
         const avgRating =
           reviewCount > 0
             ? reviews.reduce((s, r) => s + r.rating, 0) / reviewCount
             : null;
-        return { ...rest, avg_rating: avgRating, review_count: reviewCount };
+        return {
+          ...rest,
+          image_urls: image_urls ? optimizeNaverImageUrls(image_urls) : image_urls,
+          avg_rating: avgRating,
+          review_count: reviewCount,
+        };
       })
       .sort((a, b) => {
         if (a.avg_rating === null && b.avg_rating === null) return 0;
@@ -74,13 +80,18 @@ export async function GET(request: NextRequest) {
     }
 
     const places = (rawPlaces ?? [])
-      .map(({ reviews, ...rest }) => {
+      .map(({ reviews, image_urls, ...rest }) => {
         const reviewCount = reviews.length;
         const avgRating =
           reviewCount > 0
             ? reviews.reduce((s, r) => s + r.rating, 0) / reviewCount
             : null;
-        return { ...rest, avg_rating: avgRating, review_count: reviewCount };
+        return {
+          ...rest,
+          image_urls: image_urls ? optimizeNaverImageUrls(image_urls) : image_urls,
+          avg_rating: avgRating,
+          review_count: reviewCount,
+        };
       })
       .filter(
         (p) =>
@@ -117,13 +128,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const items = (rawPlaces ?? []).map(({ reviews, ...rest }) => {
+  const items = (rawPlaces ?? []).map(({ reviews, image_urls, ...rest }) => {
     const reviewCount = reviews.length;
     const avgRating =
       reviewCount > 0
         ? reviews.reduce((s, r) => s + r.rating, 0) / reviewCount
         : null;
-    return { ...rest, avg_rating: avgRating, review_count: reviewCount };
+    return {
+      ...rest,
+      image_urls: image_urls ? optimizeNaverImageUrls(image_urls) : image_urls,
+      avg_rating: avgRating,
+      review_count: reviewCount,
+    };
   });
 
   const nextCursor = items.length === limit ? cursor + limit : null;
