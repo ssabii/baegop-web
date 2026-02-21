@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { optimizeNaverImageUrl } from "@/lib/image";
 import { ReviewFormPage } from "../review-form-page";
 
 export default async function ReviewWritePage({
@@ -33,7 +34,7 @@ export default async function ReviewWritePage({
       place={{
         name: place.name,
         category: place.category,
-        imageUrl: place.image_urls?.[0] ?? null,
+        imageUrl: place.image_urls?.[0] ? optimizeNaverImageUrl(place.image_urls[0]) : null,
       }}
     />
   );

@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { optimizeNaverImageUrl, optimizeSupabaseImageUrl } from "@/lib/image";
 import { ReviewEditFormPage } from "./review-edit-form-page";
 
 export default async function ReviewEditPage({
@@ -42,13 +43,16 @@ export default async function ReviewEditPage({
         id: review.id,
         rating: review.rating,
         content: review.content,
-        review_images: review.review_images ?? [],
+        review_images: (review.review_images ?? []).map((img) => ({
+          ...img,
+          url: optimizeSupabaseImageUrl(img.url),
+        })),
       }}
       naverPlaceId={naverPlaceId}
       place={{
         name: place.name,
         category: place.category,
-        imageUrl: place.image_urls?.[0] ?? null,
+        imageUrl: place.image_urls?.[0] ? optimizeNaverImageUrl(place.image_urls[0]) : null,
       }}
     />
   );

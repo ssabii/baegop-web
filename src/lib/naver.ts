@@ -1,4 +1,5 @@
 import type { NaverPlaceDetail, NaverSearchResult } from "@/types";
+import { optimizeNaverImageUrl, optimizeNaverImageUrls } from "@/lib/image";
 
 const GRAPHQL_URL = "https://pcmap-api.place.naver.com/place/graphql";
 
@@ -54,10 +55,12 @@ export async function fetchPlaceDetail(
       phone: base.phone ?? null,
       x: base.coordinate?.x ?? "",
       y: base.coordinate?.y ?? "",
-      imageUrls: ((detail.images?.images ?? []) as { origin: string | null }[])
-        .map((img) => img.origin)
-        .filter(Boolean)
-        .slice(0, 10) as string[],
+      imageUrls: optimizeNaverImageUrls(
+        ((detail.images?.images ?? []) as { origin: string | null }[])
+          .map((img) => img.origin)
+          .filter(Boolean)
+          .slice(0, 10) as string[],
+      ),
       menus: (detail.menus ?? []).map(
         (m: {
           name: string;
@@ -68,7 +71,7 @@ export async function fetchPlaceDetail(
         }) => ({
           name: m.name,
           price: m.price ?? null,
-          images: m.images ?? [],
+          images: (m.images ?? []).map(optimizeNaverImageUrl),
           description: m.description || null,
           recommend: m.recommend ?? false,
         }),
@@ -121,7 +124,7 @@ async function fetchPlaceBySearch(
       phone: match.phone ?? null,
       x: match.x ?? "",
       y: match.y ?? "",
-      imageUrls: match.imageUrl ? [match.imageUrl] : [],
+      imageUrls: match.imageUrl ? [optimizeNaverImageUrl(match.imageUrl)] : [],
       menus: (match.menus ?? []).map((menuStr) => ({
         name: menuStr,
         price: null,

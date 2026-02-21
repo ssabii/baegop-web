@@ -29,7 +29,6 @@ export async function SearchBar() {
           href="/search"
           className="flex min-w-0 flex-1 items-center gap-3 px-4 py-2 shadow-none"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/baegop.svg"
             alt="배곱"
