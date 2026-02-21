@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, ImagePlus, Star, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -57,7 +57,7 @@ export function ReviewEditFormPage({
   const [keptImageUrls, setKeptImageUrls] = useState<string[]>(existingUrls);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
@@ -114,10 +114,11 @@ export function ReviewEditFormPage({
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (rating === 0) return;
 
-    startTransition(async () => {
+    setIsPending(true);
+    try {
       let formData: FormData | undefined;
       if (selectedFiles.length > 0) {
         formData = new FormData();
@@ -136,7 +137,9 @@ export function ReviewEditFormPage({
         deletedImageUrls.length > 0 ? deletedImageUrls : undefined,
       );
       router.back();
-    });
+    } catch {
+      setIsPending(false);
+    }
   }
 
   async function handleBack() {
