@@ -21,6 +21,9 @@ export const PASSWORD_MIN_LENGTH =
 export const PASSWORD_REQUIRES_MIX =
   process.env.NODE_ENV === "production";
 
+// PostgreSQL 에러 코드
+export const PG_UNIQUE_VIOLATION = "23505";
+
 // 크몽 사무실 좌표 (서울 강남구 테헤란로)
 export const COMPANY_LOCATION = {
   lat: 37.4924644,
