@@ -57,10 +57,10 @@ export function PlaceDetailTabs({
     <Tabs defaultValue="review">
       <TabsList className="w-full">
         <TabsTrigger value="review" className="flex-1">
-          리뷰 ({reviews.length})
+          리뷰
         </TabsTrigger>
         <TabsTrigger value="menu" className="flex-1">
-          메뉴 ({menus.length})
+          메뉴
         </TabsTrigger>
       </TabsList>
 
