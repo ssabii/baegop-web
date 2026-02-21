@@ -128,14 +128,19 @@ export function ReviewEditFormPage({
         (url) => !keptImageUrls.includes(url),
       );
 
-      await updateReview(
-        review.id,
-        naverPlaceId,
-        { rating, content },
-        formData,
-        deletedImageUrls.length > 0 ? deletedImageUrls : undefined,
-      );
-      router.replace(`/places/${naverPlaceId}`);
+      try {
+        await updateReview(
+          review.id,
+          naverPlaceId,
+          { rating, content },
+          formData,
+          deletedImageUrls.length > 0 ? deletedImageUrls : undefined,
+        );
+        toast.success("리뷰가 수정되었어요.", { position: "top-center" });
+        router.back();
+      } catch {
+        toast.error("리뷰 수정에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+      }
     });
   }
 

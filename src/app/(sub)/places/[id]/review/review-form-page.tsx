@@ -101,8 +101,13 @@ export function ReviewFormPage({
         selectedFiles.forEach((file) => formData!.append("images", file));
       }
 
-      await createReview(placeId, naverPlaceId, { rating, content }, formData);
-      router.replace(`/places/${naverPlaceId}`);
+      try {
+        await createReview(placeId, naverPlaceId, { rating, content }, formData);
+        toast.success("리뷰가 등록되었어요.", { position: "top-center" });
+        router.back();
+      } catch {
+        toast.error("리뷰 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+      }
     });
   }
 
