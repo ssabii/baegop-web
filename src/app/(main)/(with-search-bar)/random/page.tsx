@@ -22,23 +22,15 @@ export default async function RandomPage() {
 
   if (!places || places.length === 0) {
     return (
-      <main className="flex h-[calc(100svh-8rem)] items-center justify-center px-4">
+      <main className="flex h-[calc(100dvh-4rem)] items-center justify-center pt-17">
         <EmptyPlace />
       </main>
     );
   }
 
   return (
-    <main className="flex h-[calc(100svh-8rem)] items-center justify-center px-4">
-      <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <p className="mt-4 text-lg font-semibold">
-          버튼을 눌러 랜덤으로 장소를 추천받아보세요!
-        </p>
-
-        <div className="mt-8 w-full">
-          <Roulette places={places} />
-        </div>
-      </div>
+    <main className="flex h-[calc(100dvh-4rem)] items-center justify-center pt-17">
+      <Roulette places={places} />
     </main>
   );
 }
