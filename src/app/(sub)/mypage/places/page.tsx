@@ -35,7 +35,7 @@ export default async function MyPlacesPage() {
   }));
 
   return (
-    <>
+    <div className="bg-muted min-h-dvh">
       <SubHeader title="내 장소" />
       {places && places.length > 0 ? (
         <div className="flex flex-col px-4">
@@ -52,6 +52,6 @@ export default async function MyPlacesPage() {
           <p className="text-sm">아직 등록한 장소가 없습니다.</p>
         </div>
       )}
-    </>
+    </div>
   );
 }
