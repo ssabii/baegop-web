@@ -59,6 +59,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - **레이아웃 패딩은 페이지에서 처리**: 검색바(`pt-17`) 등 고정 요소의 오프셋 패딩은 공통 레이아웃이 아닌 각 페이지에서 직접 적용한다. 페이지별로 레이아웃을 커스텀하거나 독립적으로 변경할 수 있도록 한다.
 - **브랜딩**: 프라이머리 컬러 오렌지/코랄 계열. 라임 계열 사용 금지 (크몽 컬러와 구분)
 - **빈 상태 페이지**: 콘텐츠가 없는 화면(검색 전, 데이터 없음 등)은 `h-dvh` + `flex flex-col` + `flex-1`로 뷰포트 높이에 딱 맞춰 스크롤이 생기지 않게 한다.
+- **서버 액션 단일 책임**: 서버 액션(`"use server"`)은 데이터 변경만 담당한다. `revalidatePath`/`revalidateTag` 등 캐시 무효화는 서버 액션 내부에 넣지 않고 호출하는 쪽에서 결정한다. 같은 페이지 갱신은 `router.refresh()`, 다른 페이지로 이동은 `router.back()`을 사용한다. `startTransition` 내에서 서버 액션의 `revalidatePath`와 `router.back()`이 함께 실행되면 히스토리가 오염될 수 있다.
 - **UI와 로직 분리**: 커스텀 훅은 데이터 페칭/상태 관리 등 로직만 담당한다. IntersectionObserver, DOM 조작 등 UI 관심사는 훅에 포함하지 않고 사용하는 컴포넌트에서 처리한다.
 - **쿼리 훅 분리**: React Query(`useQuery`, `useInfiniteQuery` 등) 로직은 항상 `use-*.ts` 커스텀 훅으로 분리한다. 컴포넌트에 직접 작성하지 않는다.
 - **버튼 사이즈**: 모든 액션 버튼(BottomActionBar, 독립 액션 등)과 다이어로그 버튼은 `size="xl"`을 사용한다.
