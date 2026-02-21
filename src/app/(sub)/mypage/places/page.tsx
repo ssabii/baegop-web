@@ -13,7 +13,7 @@ export default async function MyPlacesPage() {
   if (!user) redirect("/signin");
 
   return (
-    <div className="bg-muted flex min-h-dvh flex-col">
+    <div className="bg-background flex min-h-dvh flex-col">
       <SubHeader title="내 장소" />
       <div className="flex flex-1 flex-col">
         <MyPlaceList userId={user.id} />
