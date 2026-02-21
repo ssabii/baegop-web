@@ -120,7 +120,6 @@ export async function registerPlace(place: NaverPlaceDetail) {
     .single();
 
   if (existing) {
-    revalidatePath(`/places/${place.id}`);
     return;
   }
 
