@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SubHeader } from "@/components/sub-header";
 import { ReviewEditFormPage } from "./review-edit-form-page";
 
 export default async function ReviewEditPage({
@@ -29,18 +28,28 @@ export default async function ReviewEditPage({
 
   if (review.user_id !== user.id) notFound();
 
+  const { data: place } = await supabase
+    .from("places")
+    .select("name, category, image_urls")
+    .eq("id", review.place_id)
+    .single();
+
+  if (!place) notFound();
+
   return (
-    <>
-      <SubHeader title="리뷰 수정" />
-      <ReviewEditFormPage
-        review={{
-          id: review.id,
-          rating: review.rating,
-          content: review.content,
-          review_images: review.review_images ?? [],
-        }}
-        naverPlaceId={naverPlaceId}
-      />
-    </>
+    <ReviewEditFormPage
+      review={{
+        id: review.id,
+        rating: review.rating,
+        content: review.content,
+        review_images: review.review_images ?? [],
+      }}
+      naverPlaceId={naverPlaceId}
+      place={{
+        name: place.name,
+        category: place.category,
+        imageUrl: place.image_urls?.[0] ?? null,
+      }}
+    />
   );
 }

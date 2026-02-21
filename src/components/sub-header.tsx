@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 
 interface SubHeaderProps {
   title: string;
+  onBack?: () => void;
 }
 
-export function SubHeader({ title }: SubHeaderProps) {
+export function SubHeader({ title, onBack }: SubHeaderProps) {
   const router = useRouter();
 
   return (
@@ -18,7 +19,7 @@ export function SubHeader({ title }: SubHeaderProps) {
           className="absolute left-0"
           variant="ghost"
           size="icon"
-          onClick={() => router.back()}
+          onClick={onBack ?? (() => router.back())}
           aria-label="뒤로 가기"
         >
           <ChevronLeft className="size-5" />

@@ -2,13 +2,21 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, Star, X } from "lucide-react";
+import { ImagePlus, Star, Tag, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { BottomActionBar } from "@/components/bottom-action-bar";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { SubHeader } from "@/components/sub-header";
 import { toast } from "sonner";
 import { createReview } from "../actions";
 
@@ -18,9 +26,18 @@ const MAX_CONTENT_LENGTH = 300;
 interface ReviewFormPageProps {
   placeId: string;
   naverPlaceId: string;
+  place: {
+    name: string;
+    category: string | null;
+    imageUrl: string | null;
+  };
 }
 
-export function ReviewFormPage({ placeId, naverPlaceId }: ReviewFormPageProps) {
+export function ReviewFormPage({
+  placeId,
+  naverPlaceId,
+  place,
+}: ReviewFormPageProps) {
   const router = useRouter();
   const confirm = useConfirmDialog();
   const [rating, setRating] = useState(0);
@@ -100,11 +117,37 @@ export function ReviewFormPage({ placeId, naverPlaceId }: ReviewFormPageProps) {
 
   return (
     <>
-      <main className="mx-auto max-w-4xl p-4">
+      <SubHeader title="리뷰 작성" onBack={handleBack} />
+
+      <main className="mx-auto max-w-4xl px-4 pt-4 pb-23">
         <div className="space-y-6">
+          {/* 가게 정보 */}
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <h2 className="line-clamp-2 font-bold">{place.name}</h2>
+              {place.category && (
+                <p className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+                  <Tag className="size-3 shrink-0" />
+                  <span className="truncate">{place.category}</span>
+                </p>
+              )}
+            </div>
+            {place.imageUrl ? (
+              <img
+                src={place.imageUrl}
+                alt={place.name}
+                className="aspect-square size-17 shrink-0 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="flex aspect-square size-17 shrink-0 items-center justify-center rounded-lg bg-muted">
+                <UtensilsCrossed className="size-5 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+
           {/* 별점 */}
           <div>
-            <Label className="text-sm font-medium">별점</Label>
+            <Label className="text-base font-bold">얼마나 만족하시나요?</Label>
             <div className="mt-2 flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -116,7 +159,7 @@ export function ReviewFormPage({ placeId, naverPlaceId }: ReviewFormPageProps) {
                   className="transition-colors"
                 >
                   <Star
-                    className={`size-8 ${
+                    className={`size-7 ${
                       star <= (hoverRating || rating)
                         ? "fill-yellow-500 text-yellow-500"
                         : "text-muted-foreground/30"
@@ -128,70 +171,110 @@ export function ReviewFormPage({ placeId, naverPlaceId }: ReviewFormPageProps) {
           </div>
 
           {/* 내용 */}
-          <div>
-            <div className="flex items-baseline justify-between">
-              <Label htmlFor="review-content" className="text-sm font-medium">
-                리뷰 내용
+          <Drawer repositionInputs={false}>
+            <div>
+              <Label className="text-base font-bold">
+                어떤 점이 좋았나요?
               </Label>
-              <span className="text-xs text-muted-foreground">
+              <DrawerTrigger asChild>
+                <button
+                  type="button"
+                  className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                >
+                  {content ? (
+                    <div className="w-full min-w-0 line-clamp-4 whitespace-pre-wrap text-left">
+                      {content}
+                    </div>
+                  ) : (
+                    <div className="w-full text-left text-muted-foreground">
+                      장소에 대한 자세한 리뷰를 남겨주세요
+                    </div>
+                  )}
+                </button>
+              </DrawerTrigger>
+              <p className="mt-1 text-right text-sm text-muted-foreground">
                 {content.length}/{MAX_CONTENT_LENGTH}
-              </span>
+              </p>
             </div>
-            <Textarea
-              id="review-content"
-              placeholder="맛, 분위기, 서비스 등 자유롭게 작성해주세요"
-              value={content}
-              onChange={(e) => setContent(e.target.value.slice(0, MAX_CONTENT_LENGTH))}
-              className="mt-2"
-              rows={5}
-              maxLength={MAX_CONTENT_LENGTH}
-            />
-          </div>
+            <DrawerContent>
+              <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
+              <div className="p-4">
+                <Textarea
+                  autoFocus
+                  className="field-sizing-fixed resize-none"
+                  placeholder="장소에 대한 자세한 리뷰를 남겨주세요"
+                  value={content}
+                  onChange={(e) =>
+                    setContent(e.target.value.slice(0, MAX_CONTENT_LENGTH))
+                  }
+                  onFocus={(e) => {
+                    const el = e.currentTarget;
+                    el.setSelectionRange(el.value.length, el.value.length);
+                  }}
+                  maxLength={MAX_CONTENT_LENGTH}
+                  rows={5}
+                />
+                <p className="mt-2 text-right text-sm text-muted-foreground">
+                  {content.length}/{MAX_CONTENT_LENGTH}
+                </p>
+              </div>
+            </DrawerContent>
+          </Drawer>
 
           {/* 이미지 업로드 */}
           <div>
             <div className="flex items-baseline gap-1.5">
-              <Label className="text-sm font-medium">사진</Label>
-              <span className="text-xs text-muted-foreground">
+              <Label className="text-base font-bold">사진</Label>
+              <span className="text-sm text-muted-foreground">
                 {selectedFiles.length}/{MAX_IMAGES}
               </span>
             </div>
-            <div className="mt-2 grid grid-cols-5 gap-2">
-              {previews.map((src, i) => (
-                <div key={src} className="relative">
+            {selectedFiles.length === 0 ? (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="mt-2 flex aspect-[5/1] w-full items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              >
+                <ImagePlus className="size-5" />
+              </button>
+            ) : (
+              <div className="mt-2 grid grid-cols-5 gap-2">
+                {previews.map((src, i) => (
+                  <div key={src} className="relative">
+                    <button
+                      type="button"
+                      className="w-full cursor-pointer overflow-hidden rounded-lg"
+                      onClick={() => {
+                        setPreviewIndex(i);
+                        setPreviewOpen(true);
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt={`미리보기 ${i + 1}`}
+                        className="aspect-square w-full object-cover"
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(i)}
+                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+                {selectedFiles.length < MAX_IMAGES && (
                   <button
                     type="button"
-                    className="w-full cursor-pointer overflow-hidden rounded-lg"
-                    onClick={() => {
-                      setPreviewIndex(i);
-                      setPreviewOpen(true);
-                    }}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex aspect-square w-full items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
                   >
-                    <img
-                      src={src}
-                      alt={`미리보기 ${i + 1}`}
-                      className="aspect-square w-full object-cover"
-                    />
+                    <ImagePlus className="size-5" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(i)}
-                    className="absolute -top-1.5 -right-1.5 rounded-full bg-foreground p-0.5 text-background shadow-sm"
-                  >
-                    <X className="size-3" />
-                  </button>
-                </div>
-              ))}
-              {selectedFiles.length < MAX_IMAGES && (
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex aspect-square w-full items-center justify-center rounded-lg border-2 border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
-                >
-                  <ImagePlus className="size-5" />
-                </button>
-              )}
-            </div>
+                )}
+              </div>
+            )}
             <input
               ref={fileInputRef}
               type="file"
@@ -201,28 +284,31 @@ export function ReviewFormPage({ placeId, naverPlaceId }: ReviewFormPageProps) {
               onChange={handleFilesChange}
             />
           </div>
-
-          {/* 버튼 */}
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={handleBack}
-              disabled={isPending}
-            >
-              취소
-            </Button>
-            <Button
-              className="flex-1"
-              onClick={handleSubmit}
-              disabled={rating === 0 || isPending}
-            >
-              {isPending && <Spinner data-icon="inline-start" />}
-              작성
-            </Button>
-          </div>
         </div>
       </main>
+
+      <BottomActionBar>
+        <div className="mx-auto flex max-w-4xl gap-3">
+          <Button
+            variant="outline"
+            size="xl"
+            className="flex-1"
+            onClick={handleBack}
+            disabled={isPending}
+          >
+            취소
+          </Button>
+          <Button
+            size="xl"
+            className="flex-1"
+            onClick={handleSubmit}
+            disabled={rating === 0 || isPending}
+          >
+            {isPending && <Spinner data-icon="inline-start" />}
+            작성
+          </Button>
+        </div>
+      </BottomActionBar>
 
       {previews.length > 0 && (
         <ImageCarouselDialog
