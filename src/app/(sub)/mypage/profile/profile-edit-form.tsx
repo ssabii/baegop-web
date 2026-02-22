@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
-import { useProfile } from "@/hooks/use-profile";
+import { type Profile, useProfile } from "@/hooks/use-profile";
 import { useUpdateProfileMutation } from "@/hooks/use-update-profile-mutation";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,37 +26,10 @@ const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]+(?:\s[가-힣a-zA-Z0-9]+)*$/;
 
 export function ProfileEditForm() {
   const { profile, isLoading } = useProfile();
-  const { mutateAsync: updateProfile } = useUpdateProfileMutation();
-  const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isPending, setIsPending] = useState(false);
-
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [nickname, setNickname] = useState("");
-  const [isNicknameInitialized, setIsNicknameInitialized] = useState(false);
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerNickname, setDrawerNickname] = useState("");
-  const [nicknameError, setNicknameError] = useState("");
-
-  // 프로필 로드 후 닉네임 초기화
-  useEffect(() => {
-    if (profile && !isNicknameInitialized) {
-      setNickname(profile.nickname);
-      setIsNicknameInitialized(true);
-    }
-  }, [profile, isNicknameInitialized]);
-
-  useEffect(() => {
-    return () => {
-      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-    };
-  }, [avatarPreview]);
 
   if (isLoading || !profile) {
     return (
-      <>
+      <div className="max-w-4xl mx-auto w-full px-4 py-8">
         <div className="flex justify-center px-4 pt-8 pb-6">
           <Skeleton className="size-24 rounded-full" />
         </div>
@@ -64,9 +37,32 @@ export function ProfileEditForm() {
           <Skeleton className="h-4 w-12" />
           <Skeleton className="h-12 w-full" />
         </div>
-      </>
+      </div>
     );
   }
+
+  return <ProfileEditFormContent profile={profile} />;
+}
+
+function ProfileEditFormContent({ profile }: { profile: Profile }) {
+  const { mutateAsync: updateProfile } = useUpdateProfileMutation();
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isPending, setIsPending] = useState(false);
+
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [nickname, setNickname] = useState(profile.nickname);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerNickname, setDrawerNickname] = useState("");
+  const [nicknameError, setNicknameError] = useState("");
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
 
   const isDirty = avatarFile !== null || nickname !== profile.nickname;
 
@@ -144,7 +140,7 @@ export function ProfileEditForm() {
   };
 
   return (
-    <>
+    <div className="max-w-4xl mx-auto w-full px-4 py-8">
       {/* 아바타 섹션 */}
       <div className="flex justify-center px-4 pt-8 pb-6">
         <button
@@ -197,7 +193,7 @@ export function ProfileEditForm() {
           <DrawerHeader>
             <DrawerTitle className="sr-only">닉네임 변경</DrawerTitle>
           </DrawerHeader>
-          <div className="px-4">
+          <div className="px-4 max-w-4xl mx-auto w-full">
             <Input
               autoFocus
               value={drawerNickname}
@@ -216,7 +212,7 @@ export function ProfileEditForm() {
               <p className="mt-2 text-sm text-destructive">{nicknameError}</p>
             )}
           </div>
-          <DrawerFooter>
+          <DrawerFooter className="max-w-4xl mx-auto w-full">
             <Button size="xl" onClick={handleDrawerConfirm}>
               확인
             </Button>
@@ -226,16 +222,18 @@ export function ProfileEditForm() {
 
       {/* 저장 버튼 */}
       <BottomActionBar>
-        <Button
-          className="w-full"
-          size="xl"
-          disabled={!isDirty || isPending}
-          onClick={handleSave}
-        >
-          {isPending && <Spinner data-icon="inline-start" />}
-          수정
-        </Button>
+        <div className="mx-auto flex max-w-4xl">
+          <Button
+            className="w-full"
+            size="xl"
+            disabled={!isDirty || isPending}
+            onClick={handleSave}
+          >
+            {isPending && <Spinner data-icon="inline-start" />}
+            수정
+          </Button>
+        </div>
       </BottomActionBar>
-    </>
+    </div>
   );
 }

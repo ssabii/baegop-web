@@ -10,8 +10,8 @@ export function DeleteAccountForm() {
   const [agreed, setAgreed] = useState(false);
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex-1 px-4 py-8">
+    <>
+      <div className="max-w-4xl mx-auto w-full px-4 py-8">
         <h2 className="text-base font-bold">탈퇴 시 유의사항</h2>
         <ul className="ml-4 mt-3 flex flex-col gap-2 text-sm text-secondary-foreground list-disc list-outside">
           <li>탈퇴 즉시 계정 정보가 삭제되며, 복구할 수 없습니다.</li>
@@ -33,8 +33,10 @@ export function DeleteAccountForm() {
         </div>
       </div>
       <BottomActionBar>
-        <DeleteAccountButton disabled={!agreed} />
+        <div className="mx-auto flex max-w-4xl">
+          <DeleteAccountButton disabled={!agreed} />
+        </div>
       </BottomActionBar>
-    </div>
+    </>
   );
 }
