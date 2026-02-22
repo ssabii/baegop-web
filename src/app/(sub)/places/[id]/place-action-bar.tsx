@@ -38,6 +38,7 @@ export function PlaceActionBar({
 
     startTransition(async () => {
       await registerPlace(placeDetail);
+      router.refresh();
     });
   }
 
@@ -53,7 +54,7 @@ export function PlaceActionBar({
     if (!isRegistered) {
       startTransition(async () => {
         await registerPlace(placeDetail);
-        router.push(`/places/${naverPlaceId}/review/new`);
+        router.replace(`/places/${naverPlaceId}/review/new`);
       });
     } else {
       router.push(`/places/${naverPlaceId}/review/new`);

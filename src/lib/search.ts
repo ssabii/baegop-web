@@ -10,7 +10,10 @@ export async function searchPlaces(
   y?: string,
   start: number = 1,
 ): Promise<NaverSearchResult[]> {
-  const cacheKey = x && y ? `${query}:${display}:${start}:${x}:${y}` : `${query}:${display}:${start}`;
+  const cacheKey =
+    x && y
+      ? `${query}:${display}:${start}:${x}:${y}`
+      : `${query}:${display}:${start}`;
   return cachedSearchPlaces(cacheKey, query, display, x, y, start);
 }
 

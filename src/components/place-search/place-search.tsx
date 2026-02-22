@@ -46,7 +46,7 @@ export function PlaceSearch() {
     setInput,
     isTyping,
     onSelect: (item) => {
-      router.replace(`/places/${item.id}`);
+      router.push(`/places/${item.id}`);
     },
   });
 
@@ -75,8 +75,13 @@ export function PlaceSearch() {
 
   function handleSelect(item: NaverSearchResult) {
     dismissSuggestions();
-    router.replace(`/places/${item.id}`);
+    router.push(`/places/${item.id}`);
   }
+
+  const handleBack = () => {
+    dismissSuggestions();
+    router.back();
+  };
 
   const hasResults = queryParam && !isLoading && results.length > 0;
 
@@ -100,7 +105,7 @@ export function PlaceSearch() {
               <div className="relative flex h-11 items-center">
                 <button
                   type="button"
-                  onClick={() => router.back()}
+                  onClick={handleBack}
                   className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 >
                   <ChevronLeft className="size-5" />

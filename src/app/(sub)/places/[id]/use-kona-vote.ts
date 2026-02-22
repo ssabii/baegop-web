@@ -5,14 +5,12 @@ import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface UseKonaVoteOptions {
   placeId: string;
-  naverPlaceId: string;
   initialStatus: KonaCardStatus;
   initialUserVote: KonaVote | null;
 }
 
 export function useKonaVote({
   placeId,
-  naverPlaceId,
   initialStatus,
   initialUserVote,
 }: UseKonaVoteOptions) {
@@ -20,8 +18,7 @@ export function useKonaVote({
   const [userVote, setUserVote] = useState<KonaVote | null>(initialUserVote);
 
   const mutation = useMutation({
-    mutationFn: (vote: KonaVote) =>
-      voteKonaCard(placeId, naverPlaceId, vote),
+    mutationFn: (vote: KonaVote) => voteKonaCard(placeId, vote),
     onMutate: (vote) => {
       const previousStatus = status;
       const previousUserVote = userVote;
