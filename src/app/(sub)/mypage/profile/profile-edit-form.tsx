@@ -109,7 +109,7 @@ export function ProfileEditForm({ userId }: ProfileEditFormProps) {
         await updateNickname(nickname);
       }
 
-      queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
+      await queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
       toast.success("프로필이 수정되었습니다", { position: "top-center" });
       router.back();
     } catch {
