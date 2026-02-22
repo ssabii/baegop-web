@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useKonaVote } from "./use-kona-vote";
 import type { KonaCardStatus, KonaVote } from "@/types";
@@ -35,10 +36,12 @@ export function KonaVoteSection({
   userVote: initialUserVote,
   isLoggedIn,
 }: KonaVoteProps) {
+  const router = useRouter();
   const { status, userVote, vote } = useKonaVote({
     placeId,
     initialStatus,
     initialUserVote,
+    onSuccess: () => router.refresh(),
   });
 
   function handleVote(v: KonaVote) {
