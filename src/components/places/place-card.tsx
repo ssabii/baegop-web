@@ -18,7 +18,7 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
   const status = (place.kona_card_status ?? "unknown") as KonaCardStatus;
 
   return (
-    <Link href={`/places/${place.id}`} className="flex gap-3">
+    <Link href={`/places/${place.id}`} className="flex gap-3 rounded-xl p-3 -m-3 transition-colors hover:bg-accent">
       <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-1">

@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 interface SubHeaderProps {
   title: string;
   onBack?: () => void;
+  rightElement?: React.ReactNode;
 }
 
-export function SubHeader({ title, onBack }: SubHeaderProps) {
+export function SubHeader({ title, onBack, rightElement }: SubHeaderProps) {
   const router = useRouter();
 
   const handleBack = useCallback(() => {
@@ -40,6 +41,9 @@ export function SubHeader({ title, onBack }: SubHeaderProps) {
         <h1 className="truncate px-12 text-center text-base font-bold">
           {title}
         </h1>
+        {rightElement && (
+          <div className="absolute right-0">{rightElement}</div>
+        )}
       </div>
     </header>
   );

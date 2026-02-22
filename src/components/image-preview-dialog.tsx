@@ -78,7 +78,7 @@ export function ImageCarouselDialog({
         zIndex: 9999,
         display: "flex",
         flexDirection: "column",
-        background: "#000",
+        background: "rgba(0, 0, 0, 0.8)",
         height: "100dvh",
         pointerEvents: "auto",
       }}
@@ -93,7 +93,7 @@ export function ImageCarouselDialog({
         <button
           type="button"
           onClick={close}
-          className="flex size-10 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
+          className="flex size-10 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
         >
           <X className="size-5" />
         </button>
@@ -128,7 +128,7 @@ export function ImageCarouselDialog({
           <button
             type="button"
             onClick={() => api?.scrollPrev()}
-            className="absolute left-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
+            className="absolute left-3 top-1/2 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -137,7 +137,7 @@ export function ImageCarouselDialog({
           <button
             type="button"
             onClick={() => api?.scrollNext()}
-            className="absolute right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
+            className="absolute right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
           >
             <ChevronRight className="size-5" />
           </button>
@@ -157,7 +157,7 @@ export function ImageCarouselDialog({
               tabIndex={0}
               onClick={() => api?.scrollTo(i)}
               onKeyDown={(e) => e.key === "Enter" && api?.scrollTo(i)}
-              className={`block size-2 rounded-full transition-colors ${
+              className={`block size-2 cursor-pointer rounded-full transition-colors ${
                 i === current ? "bg-white" : "bg-white/50"
               }`}
             />
