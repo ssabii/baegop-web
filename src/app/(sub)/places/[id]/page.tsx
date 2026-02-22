@@ -91,7 +91,7 @@ export default async function PlaceDetailPage({
   return (
     <>
       <SubHeader title="장소" />
-      <main className="mx-auto max-w-4xl pb-20">
+      <main className="mx-auto max-w-4xl pb-40">
         {/* 이미지 갤러리 */}
         <ImageGallery images={detail.imageUrls} alt={detail.name} />
 
