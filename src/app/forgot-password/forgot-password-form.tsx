@@ -61,7 +61,7 @@ export function ForgotPasswordForm() {
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <Mail className="size-12 text-muted-foreground" />
+            <Mail className="size-12 text-primary" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">이메일을 확인해주세요</EmptyTitle>
           <EmptyDescription>

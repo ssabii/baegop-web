@@ -64,7 +64,7 @@ export function PlaceDetailTabs({
                 variant="icon"
                 className="size-12 rounded-none bg-transparent"
               >
-                <UtensilsCrossed className="size-12 text-muted-foreground" />
+                <UtensilsCrossed className="size-12 text-primary" />
               </EmptyMedia>
               <EmptyTitle className="font-bold">
                 등록된 메뉴가 없어요
@@ -137,7 +137,7 @@ export function PlaceDetailTabs({
                 variant="icon"
                 className="size-12 rounded-none bg-transparent"
               >
-                <MessageCircle className="size-12 text-muted-foreground" />
+                <MessageCircle className="size-12 text-primary" />
               </EmptyMedia>
               <EmptyTitle className="font-bold">
                 작성된 리뷰가 없어요
