@@ -43,6 +43,9 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 ### Kona Card Crowdsourcing
 코나카드 결제 가능 여부는 등록자 입력 + 사용자 투표로 관리. 투표 임계값(`KONA_VOTE_THRESHOLD = 3`) 초과 시 상태 자동 변경.
 
+### Account Deletion (Soft Delete + Anonymization)
+회원탈퇴 시 소프트 삭제 + 익명화 방식 사용. 개인정보(프로필, 아바타)는 즉시 삭제하되, 콘텐츠(리뷰, 장소)는 `user_id`/`created_by`를 `null`로 설정하여 "탈퇴한 사용자"로 익명화 유지. 리액션/코나카드 투표는 행 삭제. `reviews.user_id`는 nullable.
+
 ## Key Files
 
 - `src/types/index.ts` — 전체 TypeScript 타입 정의
