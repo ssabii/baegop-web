@@ -21,63 +21,69 @@ export async function fetchPlaceDetail(
   placeId: string,
 ): Promise<NaverPlaceDetail | null> {
   try {
-    const res = await fetch(GRAPHQL_URL, {
-      method: "POST",
-      headers: GRAPHQL_HEADERS,
-      body: JSON.stringify([
-        {
-          operationName: "getPlaceDetail",
-          variables: { input: { id: placeId } },
-          query: `query getPlaceDetail($input: PlaceDetailInput!) {
-            placeDetail(input: $input) {
-              base { id name address roadAddress phone category coordinate { x y } }
-              images { images { origin } }
-              menus { name price images description recommend }
-            }
-          }`,
-        },
-      ]),
-      signal: AbortSignal.timeout(5000),
-    });
+    return await unstable_cache(
+      async () => {
+        const res = await fetch(GRAPHQL_URL, {
+          method: "POST",
+          headers: GRAPHQL_HEADERS,
+          body: JSON.stringify([
+            {
+              operationName: "getPlaceDetail",
+              variables: { input: { id: placeId } },
+              query: `query getPlaceDetail($input: PlaceDetailInput!) {
+                placeDetail(input: $input) {
+                  base { id name address roadAddress phone category coordinate { x y } }
+                  images { images { origin } }
+                  menus { name price images description recommend }
+                }
+              }`,
+            },
+          ]),
+          signal: AbortSignal.timeout(5000),
+        });
 
-    if (!res.ok) return null;
+        if (!res.ok) throw new Error("Failed to fetch place detail");
 
-    const json = await res.json();
-    const detail = json[0]?.data?.placeDetail;
-    if (!detail?.base) return null;
+        const json = await res.json();
+        const detail = json[0]?.data?.placeDetail;
+        if (!detail?.base) throw new Error("No place detail found");
 
-    const base = detail.base;
-    return {
-      id: base.id,
-      name: base.name,
-      category: base.category ?? "",
-      address: base.address ?? "",
-      roadAddress: base.roadAddress ?? "",
-      phone: base.phone ?? null,
-      x: base.coordinate?.x ?? "",
-      y: base.coordinate?.y ?? "",
-      imageUrls: optimizeNaverImageUrls(
-        ((detail.images?.images ?? []) as { origin: string | null }[])
-          .map((img) => img.origin)
-          .filter(Boolean)
-          .slice(0, 10) as string[],
-      ),
-      menus: (detail.menus ?? []).map(
-        (m: {
-          name: string;
-          price: string | null;
-          images: string[] | null;
-          description: string | null;
-          recommend: boolean | null;
-        }) => ({
-          name: m.name,
-          price: m.price ?? null,
-          images: (m.images ?? []).map(optimizeNaverImageUrl),
-          description: m.description || null,
-          recommend: m.recommend ?? false,
-        }),
-      ),
-    };
+        const base = detail.base;
+        return {
+          id: base.id,
+          name: base.name,
+          category: base.category ?? "",
+          address: base.address ?? "",
+          roadAddress: base.roadAddress ?? "",
+          phone: base.phone ?? null,
+          x: base.coordinate?.x ?? "",
+          y: base.coordinate?.y ?? "",
+          imageUrls: optimizeNaverImageUrls(
+            ((detail.images?.images ?? []) as { origin: string | null }[])
+              .map((img) => img.origin)
+              .filter(Boolean)
+              .slice(0, 10) as string[],
+          ),
+          menus: (detail.menus ?? []).map(
+            (m: {
+              name: string;
+              price: string | null;
+              images: string[] | null;
+              description: string | null;
+              recommend: boolean | null;
+            }) => ({
+              name: m.name,
+              price: m.price ?? null,
+              images: (m.images ?? []).map(optimizeNaverImageUrl),
+              description: m.description || null,
+              recommend: m.recommend ?? false,
+            }),
+          ),
+        };
+      },
+      [`place-detail-${placeId}`],
+      { revalidate: 3600 },
+    )();
   } catch {
     return null;
   }
@@ -89,51 +95,62 @@ export async function fetchPlaceBySearch(
   placeName: string,
 ): Promise<NaverPlaceDetail | null> {
   try {
-    const res = await fetch(GRAPHQL_URL, {
-      method: "POST",
-      headers: GRAPHQL_HEADERS,
-      body: JSON.stringify([
-        {
-          operationName: "getPlaces",
-          variables: { input: { query: placeName, display: 10, start: 1 } },
-          query: `query getPlaces($input: PlacesInput!) {
-            places(input: $input) {
-              items {
-                id name category address roadAddress
-                phone x y imageUrl menus
-              }
-            }
-          }`,
-        },
-      ]),
-      signal: AbortSignal.timeout(5000),
-    });
+    return await unstable_cache(
+      async () => {
+        const res = await fetch(GRAPHQL_URL, {
+          method: "POST",
+          headers: GRAPHQL_HEADERS,
+          body: JSON.stringify([
+            {
+              operationName: "getPlaces",
+              variables: {
+                input: { query: placeName, display: 10, start: 1 },
+              },
+              query: `query getPlaces($input: PlacesInput!) {
+                places(input: $input) {
+                  items {
+                    id name category address roadAddress
+                    phone x y imageUrl menus
+                  }
+                }
+              }`,
+            },
+          ]),
+          signal: AbortSignal.timeout(5000),
+        });
 
-    if (!res.ok) return null;
+        if (!res.ok) throw new Error("Failed to search place");
 
-    const json = await res.json();
-    const items: NaverSearchResult[] = json[0]?.data?.places?.items ?? [];
-    const match = items.find((item) => item.id === placeId);
-    if (!match) return null;
+        const json = await res.json();
+        const items: NaverSearchResult[] =
+          json[0]?.data?.places?.items ?? [];
+        const match = items.find((item) => item.id === placeId);
+        if (!match) throw new Error("No matching place found");
 
-    return {
-      id: match.id,
-      name: match.name,
-      category: match.category ?? "",
-      address: match.address ?? "",
-      roadAddress: match.roadAddress ?? "",
-      phone: match.phone ?? null,
-      x: match.x ?? "",
-      y: match.y ?? "",
-      imageUrls: match.imageUrl ? [optimizeNaverImageUrl(match.imageUrl)] : [],
-      menus: (match.menus ?? []).map((menuStr) => ({
-        name: menuStr,
-        price: null,
-        images: [],
-        description: null,
-        recommend: false,
-      })),
-    };
+        return {
+          id: match.id,
+          name: match.name,
+          category: match.category ?? "",
+          address: match.address ?? "",
+          roadAddress: match.roadAddress ?? "",
+          phone: match.phone ?? null,
+          x: match.x ?? "",
+          y: match.y ?? "",
+          imageUrls: match.imageUrl
+            ? [optimizeNaverImageUrl(match.imageUrl)]
+            : [],
+          menus: (match.menus ?? []).map((menuStr) => ({
+            name: menuStr,
+            price: null,
+            images: [],
+            description: null,
+            recommend: false,
+          })),
+        };
+      },
+      [`place-search-${placeId}`],
+      { revalidate: 3600 },
+    )();
   } catch {
     return null;
   }

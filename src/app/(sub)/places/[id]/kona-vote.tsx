@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import { useKonaVote } from "./use-kona-vote";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
@@ -38,18 +35,13 @@ export function KonaVoteSection({
   userVote: initialUserVote,
   isLoggedIn,
 }: KonaVoteProps) {
-  const router = useRouter();
-  const [clickedVote, setClickedVote] = useState<KonaVote | null>(null);
-  const { status, userVote, vote, isPending } = useKonaVote({
+  const { status, userVote, vote } = useKonaVote({
     placeId,
     initialStatus,
     initialUserVote,
-    onSuccess: () => router.refresh(),
   });
 
   function handleVote(v: KonaVote) {
-    if (userVote === v) return;
-    setClickedVote(v);
     vote(v);
   }
 
@@ -77,22 +69,14 @@ export function KonaVoteSection({
               variant={userVote === "available" ? "default" : "outline"}
               size="xs"
               onClick={() => handleVote("available")}
-              disabled={isPending}
             >
-              {isPending && clickedVote === "available" && (
-                <Spinner className="size-3" data-icon="inline-start" />
-              )}
               가능
             </Button>
             <Button
               variant={userVote === "unavailable" ? "default" : "outline"}
               size="xs"
               onClick={() => handleVote("unavailable")}
-              disabled={isPending}
             >
-              {isPending && clickedVote === "unavailable" && (
-                <Spinner className="size-3" data-icon="inline-start" />
-              )}
               불가
             </Button>
           </div>
