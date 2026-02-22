@@ -93,10 +93,7 @@ export function PlaceActionBar({
               onClick={handleRegister}
               disabled={isPending}
             >
-              {isPending && pendingAction === "register" && (
-                <Spinner data-icon="inline-start" />
-              )}
-              장소 등록
+              {isPending && pendingAction === "register" ? <Spinner /> : "장소 등록"}
             </Button>
           )}
           <Button
@@ -104,10 +101,7 @@ export function PlaceActionBar({
             disabled={isPending}
             size="xl"
           >
-            {isPending && pendingAction === "review" && (
-              <Spinner data-icon="inline-start" />
-            )}
-            리뷰 작성
+            {isPending && pendingAction === "review" ? <Spinner /> : "리뷰 작성"}
           </Button>
         </div>
       </BottomActionBar>
