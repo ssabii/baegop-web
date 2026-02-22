@@ -78,6 +78,11 @@ export function PlaceSearch() {
     router.push(`/places/${item.id}`);
   }
 
+  const handleBack = () => {
+    dismissSuggestions();
+    router.back();
+  };
+
   const hasResults = queryParam && !isLoading && results.length > 0;
 
   return (
@@ -100,7 +105,7 @@ export function PlaceSearch() {
               <div className="relative flex h-11 items-center">
                 <button
                   type="button"
-                  onClick={() => router.back()}
+                  onClick={handleBack}
                   className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 >
                   <ChevronLeft className="size-5" />
