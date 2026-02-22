@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tanstack/react-query-devtools": "^5.91.3",
     "@types/navermaps": "^3.9.1",
     "@types/node": "^20",
     "@types/react": "^19",
