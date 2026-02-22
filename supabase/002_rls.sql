@@ -5,14 +5,10 @@
 -- RLS 활성화
 alter table profiles enable row level security;
 alter table places enable row level security;
-alter table kona_postal_codes enable row level security;
 alter table kona_card_votes enable row level security;
 alter table app_config enable row level security;
 alter table reviews enable row level security;
 alter table review_images enable row level security;
-alter table reactions enable row level security;
-alter table place_menus enable row level security;
-
 -- ============================================
 -- app_config
 -- ============================================
@@ -49,13 +45,6 @@ create policy "places: 등록자만 수정"
 create policy "places: 등록자만 삭제"
   on places for delete
   using (auth.uid() = created_by);
-
--- ============================================
--- kona_postal_codes
--- ============================================
-create policy "kona_postal_codes: 누구나 조회 가능"
-  on kona_postal_codes for select
-  using (true);
 
 -- ============================================
 -- kona_card_votes
@@ -114,28 +103,3 @@ create policy "review_images: 리뷰 작성자만 삭제"
     auth.uid() = (select user_id from reviews where id = review_id)
   );
 
--- ============================================
--- place_menus
--- ============================================
-create policy "place_menus: 누구나 조회 가능"
-  on place_menus for select
-  using (true);
-
--- ============================================
--- reactions
--- ============================================
-create policy "reactions: 누구나 조회 가능"
-  on reactions for select
-  using (true);
-
-create policy "reactions: 인증 사용자 반응"
-  on reactions for insert
-  with check (auth.uid() = user_id);
-
-create policy "reactions: 본인 반응 수정"
-  on reactions for update
-  using (auth.uid() = user_id);
-
-create policy "reactions: 본인 반응 삭제"
-  on reactions for delete
-  using (auth.uid() = user_id);

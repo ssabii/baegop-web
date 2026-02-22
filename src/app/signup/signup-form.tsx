@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
+import { validatePassword } from "@/lib/password";
 import { generateRandomNickname } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -20,8 +22,10 @@ import { Spinner } from "@/components/ui/spinner";
 
 export function SignUpForm({
   error: errorProp,
+  redirectTo,
 }: React.ComponentProps<"div"> & {
   error?: string;
+  redirectTo?: string;
 }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -59,8 +63,9 @@ export function SignUpForm({
       return;
     }
 
-    if (password.length < 6) {
-      setPasswordError("비밀번호는 6자 이상이어야 합니다.");
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
       return;
     }
 
@@ -96,10 +101,15 @@ export function SignUpForm({
 
   const handleGoogleLogin = async () => {
     const supabase = createClient();
+
+    const callbackParams = new URLSearchParams({
+      redirect: redirectTo || "/",
+    });
+
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
       },
     });
   };
@@ -109,12 +119,10 @@ export function SignUpForm({
       <form onSubmit={handleSignUp} noValidate>
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
-            <div className="flex items-center gap-1">
-              <Link href="/" className="">
-                <img src="/baegop.svg" alt="배곱" className="size-6" />
-              </Link>
+            <Link href="/" className="flex items-center gap-1">
+              <img src="/baegop.svg" alt="배곱" className="size-6" />
               <h1 className="text-2xl font-bold">배곱</h1>
-            </div>
+            </Link>
             <FieldDescription>
               회원가입 후 배곱을 시작해보세요.
             </FieldDescription>
@@ -125,6 +133,7 @@ export function SignUpForm({
               id="email"
               type="email"
               placeholder="name@example.com"
+              size="lg"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -144,7 +153,8 @@ export function SignUpForm({
             <Input
               id="password"
               type="password"
-              placeholder="6자 이상 입력하세요"
+              placeholder={`${PASSWORD_MIN_LENGTH}자 이상 입력하세요`}
+              size="lg"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -167,6 +177,7 @@ export function SignUpForm({
               id="confirm-password"
               type="password"
               placeholder="비밀번호를 다시 입력하세요"
+              size="lg"
               value={confirmPassword}
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
@@ -181,7 +192,7 @@ export function SignUpForm({
             )}
           </Field>
           <Field>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
               {isLoading ? <Spinner /> : "회원가입"}
             </Button>
           </Field>
@@ -190,6 +201,7 @@ export function SignUpForm({
             <Button
               type="button"
               variant="outline"
+              size="xl"
               className="w-full"
               onClick={handleGoogleLogin}
               disabled={isLoading}
@@ -203,7 +215,16 @@ export function SignUpForm({
               Google로 시작하기
             </Button>
             <FieldDescription className="text-center">
-              이미 계정이 있으신가요? <Link href="/signin">로그인</Link>
+              이미 계정이 있으신가요?{" "}
+              <Link
+                href={
+                  redirectTo
+                    ? `/signin?redirect=${encodeURIComponent(redirectTo)}`
+                    : "/signin"
+                }
+              >
+                로그인
+              </Link>
             </FieldDescription>
           </Field>
         </FieldGroup>

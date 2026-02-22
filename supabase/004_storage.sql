@@ -14,6 +14,10 @@ create policy "review-images: 인증 사용자 업로드"
   on storage.objects for insert
   with check (bucket_id = 'review-images' and auth.role() = 'authenticated');
 
+create policy "review-images: 본인 이미지 수정"
+  on storage.objects for update
+  using (bucket_id = 'review-images' and auth.uid()::text = (storage.foldername(name))[1]);
+
 create policy "review-images: 본인 이미지 삭제"
   on storage.objects for delete
   using (bucket_id = 'review-images' and auth.uid()::text = (storage.foldername(name))[1]);

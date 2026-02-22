@@ -6,7 +6,7 @@
 "배곱" = 배고플 때 찾아보는 서비스. 30~100명 규모의 사내 사용자를 대상으로 하며, 회사 주변 맛집을 등록/공유/추천받을 수 있다.
 
 > **컨셉: "사용자가 함께 만들어가는 맛집 추천 서비스"**
-> 관리자 없이 구성원 모두가 맛집을 등록하고, 리뷰와 좋아요로 평가하며, 코나카드 정보까지 투표로 함께 관리한다.
+> 관리자 없이 구성원 모두가 맛집을 등록하고, 리뷰로 평가하며, 코나카드 정보까지 투표로 함께 관리한다.
 
 ---
 
@@ -56,7 +56,6 @@
 - 네이버 기본 정보(이름, 주소, 카테고리, 전화번호) 표시
 - 네이버 상세 정보(메뉴, 소식, 리뷰, 사진)는 "네이버에서 보기" 링크로 연결
 - 배곱 리뷰 목록 + 평균 별점
-- 좋아요/싫어요
 - 코나카드 투표
 
 ### 3.2 코나카드 결제 가능 여부
@@ -91,7 +90,6 @@
   - 설명 (텍스트) — 선택
   - 코나카드 사용 여부 (사용함 / 사용 안 함 / 모름) — 선택
   - 사진 (여러 장 업로드 가능) — 선택. 0번째 이미지가 대표 썸네일
-- **좋아요/싫어요**: 맛집에 대한 간단한 평가 (1인 1회)
 - **코나카드 투표**: 결제 가능/불가능 투표 (3.2 참조)
 - 맛집 상세에 평균 별점 표시
 
@@ -121,7 +119,7 @@
 /login               → 로그인
 /search              → 맛집 검색 (DB 맛집 우선 + 네이버 API 결과 혼합)
 /places               → 맛집 목록 (리스트 + 지도 뷰 전환)
-/places/[id]          → 맛집 상세 (네이버 정보 + 배곱 리뷰 + 좋아요/싫어요 + 코나카드 투표)
+/places/[id]          → 맛집 상세 (네이버 정보 + 배곱 리뷰 + 코나카드 투표)
 /random              → 랜덤 추천 (룰렛)
 /mypage              → 내 리뷰, 내가 등록한 맛집
 ```
@@ -134,18 +132,10 @@
 - id, email, nickname, avatar_url, created_at
 
 ### places
-- id, name, category (text, 네이버 API 원본 카테고리. 예: "음식점>한식"), address, postal_code, lat, lng
-- naver_place_id (네이버 검색 결과 연동용)
-- naver_link (text, 네이버 플레이스 URL — 메뉴/소식/리뷰/사진 연결용)
-- telephone (text, 전화번호)
+- id (text PK, 네이버 장소 ID), name, category (text, 네이버 API 원본 카테고리. 예: "음식점>한식"), address, lat, lng
 - image_urls (text[], 네이버 이미지 검색 API에서 가져온 외부 이미지 URL 배열. 최대 10장)
 - kona_card_status (enum: 'available' | 'unavailable' | 'unknown')
-- kona_card_zone (boolean, 우편번호 기반 자동 판별 결과)
-- like_count, dislike_count
 - created_by (FK → users), created_at, updated_at
-
-### kona_postal_codes (코나카드 사용가능 우편번호)
-- id, postal_code, dong_name (동명)
 
 ### kona_card_votes (코나카드 크라우드소싱 투표)
 - id, place_id (FK), user_id (FK)
@@ -160,11 +150,6 @@
 - kona_card_used (enum: 'yes' | 'no' | 'unknown', nullable — 코나카드 사용 여부)
 - image_urls (text[], 이미지 URL 배열. 0번째가 대표 썸네일)
 - created_at, updated_at
-
-### reactions (좋아요/싫어요)
-- id, place_id (FK), user_id (FK)
-- type (enum: 'like' | 'dislike')
-- UNIQUE(place_id, user_id) — 1인 1반응
 
 *(categories 테이블 없음 — 네이버 API 카테고리 문자열을 places.category에 직접 저장)*
 
@@ -211,7 +196,6 @@
 ### Step 5: 리뷰 및 상호작용 기능
 - 리뷰 (별점 + 설명 + 코나카드 사용 여부 + 사진) CRUD
 - 리뷰 작성 시 맛집 자동 등록 (DB에 없으면 네이버 정보로 생성)
-- 좋아요/싫어요
 - 코나카드 투표
 
 ### Step 6: 지도 연동

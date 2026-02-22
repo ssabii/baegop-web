@@ -21,11 +21,10 @@ PRD(`docs/PRD.md`) 기반 MVP 구현 로드맵. 각 스텝은 순서대로 진�
 
 ## Step 2: Supabase DB 스키마 + RLS ✅ (PR #2)
 
-- 테이블: profiles, places, kona_postal_codes, kona_card_votes, reviews, reactions
+- 테이블: profiles, places, kona_card_votes, reviews
 - RLS 정책: 공개 조회, 인증 사용자 생성, 소유자만 수정/삭제
 - 트리거/함수:
   - `handle_new_user()` — OAuth 가입 시 profiles 자동 생성
-  - `update_reaction_counts()` — 좋아요/싫어요 카운트 동기화
   - `check_kona_votes()` — 투표 임계값(3) 초과 시 코나카드 상태 자동 변경
   - `update_updated_at()` — updated_at 자동 갱신
 - Storage: review-images 버킷 (공개 조회, 인증 업로드, 본인 삭제)

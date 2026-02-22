@@ -16,8 +16,8 @@ interface ReviewCardProps {
 }
 
 export function ReviewCard({ review }: ReviewCardProps) {
-  const card = (
-    <div className="space-y-1 border-b border-border py-3 last:border-b-0">
+  const content = (
+    <div className="space-y-1 py-3">
       <div className="flex items-center gap-1">
         <span className="truncate text-sm font-semibold">
           {review.place?.name ?? "알 수 없는 장소"}
@@ -46,7 +46,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         )}
       </div>
       {review.content && (
-        <p className="line-clamp-2 text-sm text-muted-foreground">
+        <p className="line-clamp-2 text-sm text-secondary-foreground">
           {review.content}
         </p>
       )}
@@ -55,11 +55,11 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
   if (review.place) {
     return (
-      <Link href={`/places/${review.place.id}`} className="block">
-        {card}
+      <Link href={`/places/${review.place.id}`} className="block rounded-xl p-3 -m-3 transition-colors hover:bg-accent">
+        {content}
       </Link>
     );
   }
 
-  return card;
+  return content;
 }

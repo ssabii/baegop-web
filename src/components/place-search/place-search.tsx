@@ -70,13 +70,18 @@ export function PlaceSearch() {
     const trimmed = input.trim();
     if (trimmed.length < 2) return;
     dismissSuggestions();
-    router.push(`/search?query=${encodeURIComponent(trimmed)}`);
+    router.replace(`/search?query=${encodeURIComponent(trimmed)}`);
   }
 
   function handleSelect(item: NaverSearchResult) {
     dismissSuggestions();
     router.push(`/places/${item.id}`);
   }
+
+  const handleBack = () => {
+    dismissSuggestions();
+    router.back();
+  };
 
   const hasResults = queryParam && !isLoading && results.length > 0;
 
@@ -100,7 +105,7 @@ export function PlaceSearch() {
               <div className="relative flex h-11 items-center">
                 <button
                   type="button"
-                  onClick={() => router.back()}
+                  onClick={handleBack}
                   className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 >
                   <ChevronLeft className="size-5" />
@@ -122,7 +127,7 @@ export function PlaceSearch() {
                   <button
                     type="button"
                     onClick={handleClear}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {isSearching ? (
                       <Spinner className="size-5" />
@@ -137,14 +142,11 @@ export function PlaceSearch() {
           <PopoverContent
             align="start"
             sideOffset={0}
-            className="w-(--radix-popper-anchor-width) rounded-t-none rounded-b-3xl border-x border-b bg-background p-0 shadow-sm"
+            className="w-(--radix-popper-anchor-width) overflow-hidden rounded-t-none rounded-b-3xl border-x border-b bg-background p-0 shadow-sm"
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
-            <ul
-              ref={listRef}
-              className="max-h-[calc(100dvh-8rem)] overflow-y-auto"
-            >
+            <ul ref={listRef} className="max-h-dvh overflow-y-auto">
               {suggestions.map((item, index) => (
                 <li key={item.id}>
                   <PlaceItem
@@ -179,7 +181,7 @@ export function PlaceSearch() {
       )}
 
       {hasResults && (
-        <div className="mx-auto max-w-4xl px-4 pt-[68px] pb-8">
+        <div className="px-4 pt-[68px] pb-8 max-w-4xl mx-auto w-full">
           <ul className="divide-y">
             {results.map((item) => (
               <li key={item.id}>

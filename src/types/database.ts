@@ -68,40 +68,18 @@ export type Database = {
           },
         ]
       }
-      kona_postal_codes: {
-        Row: {
-          dong_name: string | null
-          id: number
-          postal_code: string
-        }
-        Insert: {
-          dong_name?: string | null
-          id?: number
-          postal_code: string
-        }
-        Update: {
-          dong_name?: string | null
-          id?: number
-          postal_code?: string
-        }
-        Relationships: []
-      }
       places: {
         Row: {
           address: string
           category: string | null
           created_at: string | null
           created_by: string | null
-          description: string | null
-          dislike_count: number | null
           id: string
           image_urls: string[] | null
           kona_card_status: string | null
           lat: number | null
-          like_count: number | null
           lng: number | null
           name: string
-          postal_code: string | null
           updated_at: string | null
         }
         Insert: {
@@ -109,16 +87,12 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           created_by?: string | null
-          description?: string | null
-          dislike_count?: number | null
           id: string
           image_urls?: string[] | null
           kona_card_status?: string | null
           lat?: number | null
-          like_count?: number | null
           lng?: number | null
           name: string
-          postal_code?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -126,16 +100,12 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           created_by?: string | null
-          description?: string | null
-          dislike_count?: number | null
           id?: string
           image_urls?: string[] | null
           kona_card_status?: string | null
           lat?: number | null
-          like_count?: number | null
           lng?: number | null
           name?: string
-          postal_code?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -171,45 +141,6 @@ export type Database = {
           nickname?: string | null
         }
         Relationships: []
-      }
-      reactions: {
-        Row: {
-          created_at: string | null
-          id: number
-          place_id: string
-          type: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: number
-          place_id: string
-          type: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: number
-          place_id?: string
-          type?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reactions_place_id_fkey"
-            columns: ["place_id"]
-            isOneToOne: false
-            referencedRelation: "places"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       review_images: {
         Row: {
@@ -251,7 +182,7 @@ export type Database = {
           place_id: string
           rating: number
           updated_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           content?: string | null
@@ -260,7 +191,7 @@ export type Database = {
           place_id: string
           rating: number
           updated_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           content?: string | null
@@ -269,7 +200,7 @@ export type Database = {
           place_id?: string
           rating?: number
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -293,7 +224,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      nullify_storage_owner: {
+        Args: { target_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

@@ -25,10 +25,12 @@
     "react-dom": "19.2.3",
     "react-intersection-observer": "^10.0.3",
     "sonner": "^2.0.7",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tanstack/react-query-devtools": "^5.91.3",
     "@types/navermaps": "^3.9.1",
     "@types/node": "^20",
     "@types/react": "^19",

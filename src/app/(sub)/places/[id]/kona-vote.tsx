@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { voteKonaCard } from "./actions";
+import { useKonaVote } from "./use-kona-vote";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface KonaVoteProps {
   placeId: string;
-  naverPlaceId: string;
   status: KonaCardStatus;
   userVote: KonaVote | null;
   isLoggedIn: boolean;
@@ -34,23 +34,23 @@ const STATUS_CONFIG: Record<
 
 export function KonaVoteSection({
   placeId,
-  naverPlaceId,
   status: initialStatus,
   userVote: initialUserVote,
   isLoggedIn,
 }: KonaVoteProps) {
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const [clickedVote, setClickedVote] = useState<KonaVote | null>(null);
-  const [status, setStatus] = useState<KonaCardStatus>(initialStatus);
-  const [userVote, setUserVote] = useState<KonaVote | null>(initialUserVote);
+  const { status, userVote, vote, isPending } = useKonaVote({
+    placeId,
+    initialStatus,
+    initialUserVote,
+    onSuccess: () => router.refresh(),
+  });
 
-  function handleVote(vote: KonaVote) {
-    setClickedVote(vote);
-    startTransition(async () => {
-      const result = await voteKonaCard(placeId, naverPlaceId, vote);
-      setStatus(result.status);
-      setUserVote(result.userVote);
-    });
+  function handleVote(v: KonaVote) {
+    if (userVote === v) return;
+    setClickedVote(v);
+    vote(v);
   }
 
   const config = STATUS_CONFIG[status];

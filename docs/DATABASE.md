@@ -18,18 +18,13 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
-| id | serial (PK) | |
+| id | text (PK) | 네이버 장소 ID (중복 등록 방지) |
 | name | text (NOT NULL) | 맛집 이름 |
 | category | text | 네이버 API 카테고리 문자열 (예: `음식점>한식`) |
 | address | text (NOT NULL) | 도로명 주소 |
-| postal_code | text | 우편번호 |
 | lat / lng | double precision | 위도/경도 |
-| naver_place_id | text (UNIQUE) | 네이버 장소 ID (중복 등록 방지) |
-| naver_link | text | 네이버 플레이스 URL (메뉴/소식/리뷰/사진 연결용) |
-| telephone | text | 전화번호 |
+| image_urls | text[] | 네이버 이미지 URL 배열 |
 | kona_card_status | text | `available` / `unavailable` / `unknown` |
-| like_count | int | 좋아요 수 (반정규화, 트리거 동기화) |
-| dislike_count | int | 싫어요 수 (반정규화, 트리거 동기화) |
 | created_by | uuid (FK → profiles) | 최초 리뷰 작성자 (자동 등록자) |
 | created_at / updated_at | timestamptz | 생성/수정일 |
 
@@ -56,17 +51,6 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | display_order | int (NOT NULL) | 표시 순서 (0 = 썸네일) |
 | created_at | timestamptz | 생성일 |
 
-### reactions
-장소 좋아요/싫어요. 유저당 장소 1개만 (UNIQUE 제약).
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| id | serial (PK) | |
-| place_id | int (FK → places) | 장소 |
-| user_id | uuid (FK → profiles) | 유저 |
-| type | text | `like` / `dislike` |
-| created_at | timestamptz | 생성일 |
-
 ### kona_card_votes
 코나카드 사용 가능 여부 크라우드소싱 투표. 유저당 장소 1표.
 
@@ -77,15 +61,6 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | user_id | uuid (FK → profiles) | 유저 |
 | vote | text | `available` / `unavailable` |
 | created_at | timestamptz | 생성일 |
-
-### kona_postal_codes
-코나카드 사용 가능 우편번호 목록 (시드 데이터).
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| id | serial (PK) | |
-| postal_code | text (UNIQUE, NOT NULL) | 우편번호 |
-| dong_name | text | 동 이름 |
 
 ### app_config
 앱 설정 key-value 저장소. 코드 변경 없이 설정값 변경 가능.
@@ -112,15 +87,7 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | 동작 | Google OAuth 가입 시 `profiles`에 닉네임, 아바타 자동 복사 |
 | 이유 | `auth.users`는 Supabase 내부 테이블이라 직접 조회/JOIN이 제한적. 앱에서 사용할 유저 정보를 `profiles`로 분리 |
 
-### 2. `update_reaction_counts()` — 좋아요/싫어요 카운트 동기화
-
-| 항목 | 내용 |
-|------|------|
-| 트리거 | `on_reaction_change` (AFTER INSERT/UPDATE/DELETE on `reactions`) |
-| 동작 | `places.like_count`, `dislike_count`를 실시간 갱신 |
-| 이유 | 장소 목록에서 매번 `COUNT(*)` 집계하면 느림. 반정규화된 카운트를 트리거로 동기화하여 조회 성능 확보 |
-
-### 3. `check_kona_votes()` — 코나카드 상태 자동 변경
+### 2. `check_kona_votes()` — 코나카드 상태 자동 변경
 
 | 항목 | 내용 |
 |------|------|
@@ -134,7 +101,7 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 update app_config set value = '5' where key = 'kona_vote_threshold';
 ```
 
-### 4. `update_updated_at()` — 수정 시간 자동 갱신
+### 3. `update_updated_at()` — 수정 시간 자동 갱신
 
 | 항목 | 내용 |
 |------|------|
@@ -152,9 +119,7 @@ update app_config set value = '5' where key = 'kona_vote_threshold';
 | places | 모두 | 인증 유저 (created_by = 본인) | 등록자만 | 등록자만 |
 | reviews | 모두 | 인증 유저 (user_id = 본인) | 작성자만 | 작성자만 |
 | review_images | 모두 | 리뷰 작성자만 | - | 리뷰 작성자만 |
-| reactions | 모두 | 인증 유저 (user_id = 본인) | 본인만 | 본인만 |
 | kona_card_votes | 모두 | 인증 유저 (user_id = 본인) | 본인만 | 본인만 |
-| kona_postal_codes | 모두 | - | - | - |
 | app_config | 모두 | - | - | - |
 
 ---
@@ -183,3 +148,5 @@ profile-images/{user_id}/{파일명}
 | `supabase/002_rls.sql` | RLS 정책 |
 | `supabase/003_functions.sql` | 함수, 트리거 |
 | `supabase/004_storage.sql` | Storage 버킷 |
+| `supabase/005_seed.sql` | 시드 데이터 (개발 환경 전용) |
+| `supabase/012_drop_unused_columns.sql` | 미사용 컬럼/테이블 제거 마이그레이션 |

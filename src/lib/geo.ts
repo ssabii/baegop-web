@@ -21,10 +21,23 @@ export function estimateWalkingMinutes(meters: number): number {
   return Math.round(meters / 80);
 }
 
-/** 거리를 사람이 읽기 쉬운 문자열로 (ex: "350m", "1.2km") */
+/** 거리를 사람이 읽기 쉬운 문자열로 (ex: "512m", "1.2km") */
 export function formatDistance(meters: number): string {
   if (meters < 1000) {
-    return `${Math.round(meters)}m`;
+    return `${Math.round(meters).toLocaleString()}m`;
   }
   return `${(meters / 1000).toFixed(1)}km`;
+}
+
+/** 도보 시간을 사람이 읽기 쉬운 문자열로 (ex: "5분", "1시간 10분") */
+export function formatWalkingDuration(minutes: number): string {
+  if (minutes < 60) {
+    return `${minutes}분`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (remainingMinutes === 0) {
+    return `${hours}시간`;
+  }
+  return `${hours}시간 ${remainingMinutes}분`;
 }

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SubHeader } from "@/components/sub-header";
-import { ReviewFormPage } from "./review-form-page";
+import { optimizeNaverImageUrl } from "@/lib/image";
+import { ReviewFormPage } from "../review-form-page";
 
 export default async function ReviewWritePage({
   params,
@@ -16,21 +16,26 @@ export default async function ReviewWritePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/signin?redirect=/places/${naverPlaceId}/review`);
+    const params = new URLSearchParams({ redirect: `/places/${naverPlaceId}/review/new` });
+    redirect(`/signin?${params}`);
   }
 
   const { data: place } = await supabase
     .from("places")
-    .select("id")
+    .select("id, name, category, image_urls")
     .eq("id", naverPlaceId)
     .single();
 
   if (!place) notFound();
 
   return (
-    <>
-      <SubHeader title="리뷰 작성" />
-      <ReviewFormPage placeId={place.id} naverPlaceId={naverPlaceId} />
-    </>
+    <ReviewFormPage
+      placeId={place.id}
+      place={{
+        name: place.name,
+        category: place.category,
+        imageUrl: place.image_urls?.[0] ? optimizeNaverImageUrl(place.image_urls[0]) : null,
+      }}
+    />
   );
 }

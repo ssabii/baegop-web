@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import { optimizeNaverImageUrls } from "@/lib/image";
 import { EmptyPlace } from "@/components/places";
 import { Roulette } from "./roulette";
+import { Spinner } from "@/components/ui/spinner";
 
 export default async function RandomPage() {
   const supabase = await createClient();
@@ -11,8 +13,9 @@ export default async function RandomPage() {
       "id, name, address, category, kona_card_status, image_urls, reviews(rating)",
     );
 
-  const places = rawPlaces?.map(({ reviews, ...rest }) => ({
+  const places = rawPlaces?.map(({ reviews, image_urls, ...rest }) => ({
     ...rest,
+    image_urls: image_urls ? optimizeNaverImageUrls(image_urls) : image_urls,
     avg_rating:
       reviews.length > 0
         ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
@@ -22,23 +25,15 @@ export default async function RandomPage() {
 
   if (!places || places.length === 0) {
     return (
-      <main className="flex h-[calc(100svh-8rem)] items-center justify-center px-4">
+      <main className="flex h-[calc(100dvh-4rem)] items-center justify-center pt-17">
         <EmptyPlace />
       </main>
     );
   }
 
   return (
-    <main className="flex h-[calc(100svh-8rem)] items-center justify-center px-4">
-      <div className="flex flex-1 flex-col items-center justify-center text-center">
-        <p className="mt-4 text-lg font-semibold">
-          버튼을 눌러 랜덤으로 장소를 추천받아보세요!
-        </p>
-
-        <div className="mt-8 w-full">
-          <Roulette places={places} />
-        </div>
-      </div>
+    <main className="flex h-[calc(100dvh-4rem)] items-center justify-center pt-17">
+      <Roulette places={places} />
     </main>
   );
 }

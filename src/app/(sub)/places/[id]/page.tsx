@@ -1,10 +1,28 @@
 import { notFound } from "next/navigation";
-import { MapPin, Phone, Star, Tag } from "lucide-react";
+import {
+  Dot,
+  ExternalLink,
+  Footprints,
+  Home,
+  MapPin,
+  Phone,
+  Star,
+  Tag,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { buildNaverPlaceLink, fetchPlaceDetailWithFallback } from "@/lib/naver";
-import { NaverIcon } from "@/components/naver-icon";
+import {
+  buildNaverPlaceLink,
+  buildNaverWalkingRouteLink,
+  fetchPlaceDetailWithFallback,
+  fetchWalkingRoutes,
+} from "@/lib/naver";
+import { formatDistance, formatWalkingDuration } from "@/lib/geo";
+import { COMPANY_LOCATION } from "@/lib/constants";
+import { optimizeNaverImageUrls } from "@/lib/image";
+import Link from "next/link";
 import { ImageGallery } from "@/components/image-gallery";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SubHeader } from "@/components/sub-header";
 import { PlaceDetailTabs } from "./place-detail-tabs";
 import { KonaVoteSection } from "./kona-vote";
@@ -43,14 +61,22 @@ export default async function PlaceDetailPage({
       phone: null,
       x: place.lng?.toString() ?? "",
       y: place.lat?.toString() ?? "",
-      imageUrls: place.image_urls ?? [],
+      imageUrls: optimizeNaverImageUrls(place.image_urls ?? []),
       menus: [],
     };
   }
 
   if (!detail) notFound();
 
-  let reviews: ReviewData[] = [];
+  const walkingRoutes = await fetchWalkingRoutes(
+    { lng: String(COMPANY_LOCATION.lng), lat: String(COMPANY_LOCATION.lat) },
+    { lng: detail.x, lat: detail.y },
+  );
+  const walkingRoute = walkingRoutes?.[0] ?? null;
+  console.log("walkingRoutes", walkingRoutes);
+
+  let reviewCount = 0;
+  let avgRating: number | null = null;
   let userKonaVote: KonaVote | null = null;
   let user: { id: string } | null = null;
 
@@ -62,13 +88,15 @@ export default async function PlaceDetailPage({
   if (isRegistered) {
     const { data: reviewData } = await supabase
       .from("reviews")
-      .select(
-        "*, profiles(nickname, avatar_url), review_images(url, display_order)",
-      )
-      .eq("place_id", place.id)
-      .order("created_at", { ascending: false });
+      .select("rating")
+      .eq("place_id", place.id);
 
-    reviews = (reviewData as ReviewData[]) ?? [];
+    const ratings = reviewData ?? [];
+    reviewCount = ratings.length;
+    avgRating =
+      reviewCount > 0
+        ? ratings.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+        : null;
 
     if (user) {
       const { data: vote } = await supabase
@@ -83,15 +111,20 @@ export default async function PlaceDetailPage({
 
   const address = detail.roadAddress || detail.address;
   const naverLink = buildNaverPlaceLink(naverPlaceId);
-  const avgRating =
-    reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : null;
 
   return (
     <>
-      <SubHeader title={detail.name} />
-      <main className="mx-auto max-w-4xl pb-20">
+      <SubHeader
+        title="장소"
+        rightElement={
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/" aria-label="홈으로">
+              <Home className="size-5" />
+            </Link>
+          </Button>
+        }
+      />
+      <main className="mx-auto max-w-4xl pb-30">
         {/* 이미지 갤러리 */}
         <ImageGallery images={detail.imageUrls} alt={detail.name} />
 
@@ -102,33 +135,61 @@ export default async function PlaceDetailPage({
             <h1 className="text-2xl font-bold">{detail.name}</h1>
 
             {detail.category && (
-              <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Tag className="size-4 shrink-0" />
                 {detail.category}
-              </p>
+              </div>
             )}
             <p className="flex items-start gap-2 text-sm font-medium text-muted-foreground">
-              <MapPin className="size-4 shrink-0" />
-              {address}
+              <MapPin className="size-4 shrink-0 mt-0.5" />
+              <span>
+                {address}{" "}
+                <a
+                  href={naverLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="네이버 플레이스에서 보기"
+                  className="inline-flex align-text-bottom"
+                >
+                  <ExternalLink className="size-4 text-muted-foreground hover:text-accent-foreground" />
+                </a>
+              </span>
             </p>
+            {walkingRoute && (
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Footprints className="size-4 shrink-0" />
+                <div className="flex items-center">
+                  <div>
+                    {formatWalkingDuration(
+                      Math.round(walkingRoute.summary.duration / 60),
+                    )}
+                  </div>
+                  <Dot className="size-4 shrink-0" />
+                  <div>{formatDistance(walkingRoute.summary.distance)}</div>
+                </div>
+                <a
+                  href={buildNaverWalkingRouteLink(COMPANY_LOCATION, {
+                    lng: Number(detail.x),
+                    lat: Number(detail.y),
+                    name: detail.name,
+                    placeId: naverPlaceId,
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 flex items-center justify-center"
+                >
+                  <ExternalLink className="size-4 text-muted-foreground hover:text-accent-foreground" />
+                </a>
+              </div>
+            )}
             {detail.phone && (
               <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Phone className="size-4 shrink-0" />
-                <a href={`tel:${detail.phone}`} className="hover:underline">
+                <a href={`tel:${detail.phone}`} className="underline">
                   {detail.phone}
                 </a>
               </p>
             )}
-            <a
-              href={naverLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-[#03C75A] hover:underline"
-            >
-              <NaverIcon className="size-4" />
-              네이버에서 보기
-            </a>
-
             {/* 별점 */}
             {isRegistered && avgRating !== null && (
               <div className="flex items-center gap-1">
@@ -137,7 +198,7 @@ export default async function PlaceDetailPage({
                   {avgRating.toFixed(1)}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  ({reviews.length})
+                  ({reviewCount})
                 </span>
               </div>
             )}
@@ -147,7 +208,6 @@ export default async function PlaceDetailPage({
           {isRegistered && (
             <KonaVoteSection
               placeId={place.id}
-              naverPlaceId={naverPlaceId}
               status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
               userVote={userKonaVote}
               isLoggedIn={!!user}
@@ -157,7 +217,6 @@ export default async function PlaceDetailPage({
           {/* 메뉴 / 리뷰 탭 */}
           <PlaceDetailTabs
             menus={detail.menus}
-            reviews={reviews}
             isRegistered={isRegistered}
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}
@@ -174,20 +233,4 @@ export default async function PlaceDetailPage({
       />
     </>
   );
-}
-
-interface ReviewData {
-  id: number;
-  rating: number;
-  content: string | null;
-  created_at: string;
-  user_id: string;
-  profiles: {
-    nickname: string | null;
-    avatar_url: string | null;
-  } | null;
-  review_images: {
-    url: string;
-    display_order: number;
-  }[];
 }

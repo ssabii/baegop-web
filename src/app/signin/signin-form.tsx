@@ -87,15 +87,15 @@ export function SignInForm({
 
   const handleGoogleLogin = async () => {
     const supabase = createClient();
-    const callbackUrl = new URL("/auth/callback", window.location.origin);
-    if (redirectTo) {
-      callbackUrl.searchParams.set("redirect", redirectTo);
-    }
+
+    const callbackParams = new URLSearchParams({
+      redirect: redirectTo || "/",
+    });
 
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: callbackUrl.toString(),
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
       },
     });
   };
@@ -106,12 +106,10 @@ export function SignInForm({
         <form onSubmit={handleEmailLogin} noValidate>
           <FieldGroup>
             <div className="flex flex-col items-center gap-2 text-center">
-              <div className="flex items-center gap-1">
-                <Link href="/" className="">
-                  <img src="/baegop.svg" alt="배곱" className="size-6" />
-                </Link>
+              <Link href="/" className="flex items-center gap-1">
+                <img src="/baegop.svg" alt="배곱" className="size-6" />
                 <h1 className="text-2xl font-bold">배곱</h1>
-              </div>
+              </Link>
               <FieldDescription>
                 로그인 후 배곱을 시작해보세요.
               </FieldDescription>
@@ -122,6 +120,7 @@ export function SignInForm({
                 id="email"
                 type="email"
                 placeholder="name@example.com"
+                size="lg"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -134,11 +133,20 @@ export function SignInForm({
               {emailError && <FieldDescription>{emailError}</FieldDescription>}
             </Field>
             <Field data-invalid={passwordError ? true : undefined}>
-              <FieldLabel htmlFor="password">비밀번호</FieldLabel>
+              <div className="flex items-center justify-between">
+                <FieldLabel htmlFor="password">비밀번호</FieldLabel>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm underline-offset-4 hover:underline"
+                >
+                  비밀번호를 잊으셨나요?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
                 placeholder="비밀번호를 입력하세요"
+                size="lg"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -153,7 +161,7 @@ export function SignInForm({
               )}
             </Field>
             <Field>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
                 {isLoading ? <Spinner /> : "로그인"}
               </Button>
             </Field>
@@ -162,6 +170,7 @@ export function SignInForm({
               <Button
                 type="button"
                 variant="outline"
+                size="xl"
                 className="w-full"
                 onClick={handleGoogleLogin}
                 disabled={isLoading}
@@ -175,7 +184,16 @@ export function SignInForm({
                 Google로 시작하기
               </Button>
               <FieldDescription className="text-center">
-                계정이 없으신가요? <Link href="/signup">회원가입</Link>
+                계정이 없으신가요?{" "}
+                <Link
+                  href={
+                    redirectTo
+                      ? `/signup?redirect=${encodeURIComponent(redirectTo)}`
+                      : "/signup"
+                  }
+                >
+                  회원가입
+                </Link>
               </FieldDescription>
             </Field>
           </FieldGroup>

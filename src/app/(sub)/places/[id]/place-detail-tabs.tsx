@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Flame, MessageSquarePlus, UtensilsCrossed } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useInView } from "react-intersection-observer";
+import { MessageCircle, UtensilsCrossed } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 import {
   Empty,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
@@ -16,25 +18,8 @@ import type { NaverPlaceMenu } from "@/types";
 
 const MENU_PAGE_SIZE = 10;
 
-interface ReviewData {
-  id: number;
-  rating: number;
-  content: string | null;
-  created_at: string;
-  user_id: string;
-  profiles: {
-    nickname: string | null;
-    avatar_url: string | null;
-  } | null;
-  review_images: {
-    url: string;
-    display_order: number;
-  }[];
-}
-
 interface PlaceDetailTabsProps {
   menus: NaverPlaceMenu[];
-  reviews: ReviewData[];
   isRegistered: boolean;
   placeId: string | null;
   naverPlaceId: string;
@@ -43,30 +28,45 @@ interface PlaceDetailTabsProps {
 
 export function PlaceDetailTabs({
   menus,
-  reviews,
   isRegistered,
   placeId,
   naverPlaceId,
   currentUserId,
 }: PlaceDetailTabsProps) {
+  const tabsRef = useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = useState(MENU_PAGE_SIZE);
   const visibleMenus = menus.slice(0, visibleCount);
   const hasMore = menus.length > visibleCount;
 
+  const { ref: menuSentinelRef } = useInView({
+    onChange: (inView) => {
+      if (inView && hasMore) {
+        setVisibleCount((prev) => prev + MENU_PAGE_SIZE);
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (sessionStorage.getItem("scrollToReview") === "true") {
+      sessionStorage.removeItem("scrollToReview");
+      tabsRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
   return (
-    <Tabs defaultValue="review">
+    <Tabs ref={tabsRef} defaultValue="review">
       <TabsList className="w-full">
-        <TabsTrigger value="review" className="flex-1">
-          리뷰 ({reviews.length})
+        <TabsTrigger value="review" className="flex-1 cursor-pointer">
+          리뷰
         </TabsTrigger>
-        <TabsTrigger value="menu" className="flex-1">
-          메뉴 ({menus.length})
+        <TabsTrigger value="menu" className="flex-1 cursor-pointer">
+          메뉴
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="menu" className="mt-4">
         {menus.length === 0 ? (
-          <Empty className="border-none py-12">
+          <Empty className="h-[calc(100dvh*0.5)]">
             <EmptyHeader className="gap-1">
               <EmptyMedia
                 variant="icon"
@@ -75,20 +75,19 @@ export function PlaceDetailTabs({
                 <UtensilsCrossed className="size-12 text-primary" />
               </EmptyMedia>
               <EmptyTitle className="font-bold">
-                등록된 메뉴가 없습니다
+                등록된 메뉴가 없어요
               </EmptyTitle>
             </EmptyHeader>
           </Empty>
         ) : (
-          <>
+          <div className="min-h-[calc(100dvh*0.5)]">
             <ul className="divide-y">
               {visibleMenus.map((menu) => (
-                <li key={menu.name} className="flex gap-2 py-3">
+                <li key={menu.name} className="flex items-start gap-2 py-3">
                   <div className="flex min-w-0 flex-1 flex-col justify-between">
-                    <div className="space-y-0.5">
+                    <div className="space-y-1">
                       {menu.recommend && (
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
-                          <Flame className="size-3" />
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
                           추천
                         </span>
                       )}
@@ -124,27 +123,19 @@ export function PlaceDetailTabs({
               ))}
             </ul>
             {hasMore && (
-              <div className="w-full flex justify-center">
-                <Button
-                  variant="secondary"
-                  className="mt-3 rounded-full"
-                  onClick={() =>
-                    setVisibleCount((prev) => prev + MENU_PAGE_SIZE)
-                  }
-                >
-                  메뉴 더보기 ({menus.length - visibleCount}개 더)
-                </Button>
+              <div ref={menuSentinelRef} className="flex justify-center py-4">
+                <Spinner className="size-6 text-primary" />
               </div>
             )}
-          </>
+          </div>
         )}
       </TabsContent>
 
       <TabsContent value="review" className="mt-4">
         {isRegistered && placeId ? (
           <ReviewSection
+            placeId={placeId}
             naverPlaceId={naverPlaceId}
-            reviews={reviews}
             currentUserId={currentUserId}
           />
         ) : (
@@ -154,11 +145,12 @@ export function PlaceDetailTabs({
                 variant="icon"
                 className="size-12 rounded-none bg-transparent"
               >
-                <MessageSquarePlus className="size-12 text-primary" />
+                <MessageCircle className="size-12 text-primary" />
               </EmptyMedia>
               <EmptyTitle className="font-bold">
-                리뷰를 작성하면 장소가 등록됩니다
+                작성된 리뷰가 없어요
               </EmptyTitle>
+              <EmptyDescription>첫 번째 리뷰를 남겨보세요!</EmptyDescription>
             </EmptyHeader>
           </Empty>
         )}

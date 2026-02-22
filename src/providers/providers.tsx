@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider } from "next-themes";
 import { ConfirmDialogProvider } from "@/components/confirm-dialog-provider";
 
@@ -20,6 +21,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           {children}
         </ConfirmDialogProvider>
       </ThemeProvider>
+      {process.env.NODE_ENV === "development" && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
     </QueryClientProvider>
   );
 }
