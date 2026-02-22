@@ -57,17 +57,7 @@ create table review_images (
   created_at timestamptz default now()
 );
 
--- 6. reactions (좋아요/싫어요)
-create table reactions (
-  id bigserial primary key,
-  place_id text references places(id) on delete cascade not null,
-  user_id uuid references profiles(id) on delete cascade not null,
-  type text not null check (type in ('like', 'dislike')),
-  created_at timestamptz default now(),
-  unique(place_id, user_id)
-);
-
--- 7. app_config (앱 설정)
+-- 6. app_config (앱 설정)
 create table app_config (
   key text primary key,
   value text not null
@@ -83,5 +73,4 @@ create index idx_places_created_by on places(created_by);
 create index idx_reviews_place_id on reviews(place_id);
 create index idx_reviews_user_id on reviews(user_id);
 create index idx_review_images_review_id on review_images(review_id);
-create index idx_reactions_place_id on reactions(place_id);
 create index idx_kona_card_votes_place_id on kona_card_votes(place_id);

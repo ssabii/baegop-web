@@ -13,5 +13,6 @@ drop trigger if exists on_reaction_change on reactions;
 drop function if exists update_reaction_counts();
 
 -- 사용하지 않는 테이블 제거
+drop table if exists reactions;
 drop table if exists kona_postal_codes;
 drop table if exists place_menus;
