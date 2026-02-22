@@ -12,6 +12,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { useQueryClient } from "@tanstack/react-query";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { toast } from "sonner";
 import { formatRelativeDate } from "@/lib/date";
@@ -41,6 +42,7 @@ interface ReviewCardProps {
 
 export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const confirm = useConfirmDialog();
@@ -63,10 +65,13 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     startTransition(async () => {
       try {
         await deleteReview(review.id);
+        queryClient.invalidateQueries({ queryKey: ["reviews"] });
         router.refresh();
         toast.success("리뷰가 삭제되었어요.", { position: "top-center" });
       } catch {
-        toast.error("리뷰 삭제에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+        toast.error("리뷰 삭제에 실패했어요. 다시 시도해주세요.", {
+          position: "top-center",
+        });
       }
     });
   }
@@ -103,7 +108,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   <div className="mx-auto flex w-full max-w-4xl flex-col py-2">
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-2 text-base font-bold cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-3 text-base font-bold cursor-pointer"
                       onClick={handleEdit}
                     >
                       <Pencil className="size-4" />
@@ -111,7 +116,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-2 text-base font-bold cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-3 text-base font-bold cursor-pointer"
                       onClick={handleDelete}
                     >
                       <Trash2 className="size-4" />

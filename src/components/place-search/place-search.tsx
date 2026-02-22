@@ -181,7 +181,7 @@ export function PlaceSearch() {
       )}
 
       {hasResults && (
-        <div className="px-4 pt-[68px] pb-8">
+        <div className="px-4 pt-[68px] pb-8 max-w-4xl mx-auto w-full">
           <ul className="divide-y">
             {results.map((item) => (
               <li key={item.id}>
