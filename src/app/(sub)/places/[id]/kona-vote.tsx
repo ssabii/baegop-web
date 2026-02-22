@@ -8,7 +8,6 @@ import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface KonaVoteProps {
   placeId: string;
-  naverPlaceId: string;
   status: KonaCardStatus;
   userVote: KonaVote | null;
   isLoggedIn: boolean;
@@ -34,7 +33,6 @@ const STATUS_CONFIG: Record<
 
 export function KonaVoteSection({
   placeId,
-  naverPlaceId,
   status: initialStatus,
   userVote: initialUserVote,
   isLoggedIn,
@@ -42,7 +40,6 @@ export function KonaVoteSection({
   const [clickedVote, setClickedVote] = useState<KonaVote | null>(null);
   const { status, userVote, vote, isPending } = useKonaVote({
     placeId,
-    naverPlaceId,
     initialStatus,
     initialUserVote,
   });

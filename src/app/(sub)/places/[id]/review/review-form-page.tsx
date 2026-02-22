@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, ImagePlus, Star, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,6 @@ const MAX_CONTENT_LENGTH = 300;
 
 interface ReviewFormPageProps {
   placeId: string;
-  naverPlaceId: string;
   place: {
     name: string;
     category: string | null;
@@ -35,7 +34,6 @@ interface ReviewFormPageProps {
 
 export function ReviewFormPage({
   placeId,
-  naverPlaceId,
   place,
 }: ReviewFormPageProps) {
   const router = useRouter();
@@ -45,7 +43,7 @@ export function ReviewFormPage({
   const [content, setContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
@@ -91,19 +89,24 @@ export function ReviewFormPage({
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (rating === 0) return;
 
-    startTransition(async () => {
+    setIsPending(true);
+    try {
       let formData: FormData | undefined;
       if (selectedFiles.length > 0) {
         formData = new FormData();
         selectedFiles.forEach((file) => formData!.append("images", file));
       }
 
-      await createReview(placeId, naverPlaceId, { rating, content }, formData);
-      router.replace(`/places/${naverPlaceId}`);
-    });
+      await createReview(placeId, { rating, content }, formData);
+      toast.success("리뷰가 등록되었어요.", { position: "top-center" });
+      router.back();
+    } catch {
+      toast.error("리뷰 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+      setIsPending(false);
+    }
   }
 
   async function handleBack() {
@@ -122,7 +125,7 @@ export function ReviewFormPage({
     <>
       <SubHeader title="리뷰 작성" onBack={handleBack} />
 
-      <main className="mx-auto max-w-4xl px-4 pt-4 pb-23">
+      <main className="px-4 pt-4 pb-32">
         <div className="space-y-6">
           {/* 가게 정보 */}
           <div className="flex gap-3">

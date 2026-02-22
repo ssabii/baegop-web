@@ -67,7 +67,7 @@ export function ReviewSection({
           <ReviewCard
             key={review.id}
             review={review}
-            isOwner={currentUserId === review.user_id}
+            isOwner={!!currentUserId && currentUserId === review.user_id}
             naverPlaceId={naverPlaceId}
           />
         ))}
