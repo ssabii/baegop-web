@@ -13,7 +13,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   buildNaverPlaceLink,
   buildNaverWalkingRouteLink,
-  fetchPlaceDetailWithFallback,
+  fetchPlaceDetail,
+  fetchPlaceBySearch,
   fetchWalkingRoutes,
 } from "@/lib/naver";
 import { formatDistance, formatWalkingDuration } from "@/lib/geo";
@@ -38,19 +39,22 @@ export default async function PlaceDetailPage({
 
   const supabase = await createClient();
 
-  const { data: place } = await supabase
-    .from("places")
-    .select("*")
-    .eq("id", naverPlaceId)
-    .single();
+  // Step 1: 독립적인 요청 병렬 실행
+  const [{ data: place }, { data: { user: authUser } }, naverDetail] =
+    await Promise.all([
+      supabase.from("places").select("*").eq("id", naverPlaceId).single(),
+      supabase.auth.getUser(),
+      fetchPlaceDetail(naverPlaceId),
+    ]);
 
   const isRegistered = !!place;
+  const user = authUser ? { id: authUser.id } : null;
 
-  let detail: NaverPlaceDetail | null = await fetchPlaceDetailWithFallback(
-    naverPlaceId,
-    place?.name,
-  );
-
+  // Step 2: 네이버 상세 정보 폴백
+  let detail: NaverPlaceDetail | null = naverDetail;
+  if (!detail && place?.name) {
+    detail = await fetchPlaceBySearch(naverPlaceId, place.name);
+  }
   if (!detail && place) {
     detail = {
       id: naverPlaceId,
@@ -68,46 +72,34 @@ export default async function PlaceDetailPage({
 
   if (!detail) notFound();
 
-  const walkingRoutes = await fetchWalkingRoutes(
-    { lng: String(COMPANY_LOCATION.lng), lat: String(COMPANY_LOCATION.lat) },
-    { lng: detail.x, lat: detail.y },
-  );
+  // Step 3: 나머지 데이터 병렬 페칭
+  const [walkingRoutes, reviewData, konaVoteData] = await Promise.all([
+    fetchWalkingRoutes(
+      { lng: String(COMPANY_LOCATION.lng), lat: String(COMPANY_LOCATION.lat) },
+      { lng: detail.x, lat: detail.y },
+    ),
+    isRegistered
+      ? supabase.from("reviews").select("rating").eq("place_id", place.id)
+      : Promise.resolve({ data: null }),
+    isRegistered && user
+      ? supabase
+          .from("kona_card_votes")
+          .select("vote")
+          .eq("place_id", place.id)
+          .eq("user_id", user.id)
+          .single()
+      : Promise.resolve({ data: null }),
+  ]);
+
   const walkingRoute = walkingRoutes?.[0] ?? null;
-  console.log("walkingRoutes", walkingRoutes);
-
-  let reviewCount = 0;
-  let avgRating: number | null = null;
-  let userKonaVote: KonaVote | null = null;
-  let user: { id: string } | null = null;
-
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
-  user = authUser ? { id: authUser.id } : null;
-
-  if (isRegistered) {
-    const { data: reviewData } = await supabase
-      .from("reviews")
-      .select("rating")
-      .eq("place_id", place.id);
-
-    const ratings = reviewData ?? [];
-    reviewCount = ratings.length;
-    avgRating =
-      reviewCount > 0
-        ? ratings.reduce((sum, r) => sum + r.rating, 0) / reviewCount
-        : null;
-
-    if (user) {
-      const { data: vote } = await supabase
-        .from("kona_card_votes")
-        .select("vote")
-        .eq("place_id", place.id)
-        .eq("user_id", user.id)
-        .single();
-      userKonaVote = (vote?.vote as KonaVote) ?? null;
-    }
-  }
+  const ratings = reviewData?.data ?? [];
+  const reviewCount = ratings.length;
+  const avgRating =
+    reviewCount > 0
+      ? ratings.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+      : null;
+  const userKonaVote: KonaVote | null =
+    (konaVoteData?.data?.vote as KonaVote) ?? null;
 
   const address = detail.roadAddress || detail.address;
   const naverLink = buildNaverPlaceLink(naverPlaceId);

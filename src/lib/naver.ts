@@ -84,7 +84,7 @@ export async function fetchPlaceDetail(
 }
 
 /** 검색 API(getPlaces)로 장소명 검색 → ID 매칭하여 상세 정보 구성 (Tier 2 폴백) */
-async function fetchPlaceBySearch(
+export async function fetchPlaceBySearch(
   placeId: string,
   placeName: string,
 ): Promise<NaverPlaceDetail | null> {
