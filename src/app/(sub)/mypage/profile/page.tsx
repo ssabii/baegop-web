@@ -22,6 +22,7 @@ export default async function ProfileEditPage() {
     <div className="min-h-dvh flex flex-col">
       <SubHeader title="프로필" />
       <ProfileEditForm
+        userId={user.id}
         initialNickname={profile?.nickname ?? ""}
         initialAvatarUrl={profile?.avatar_url ?? null}
       />

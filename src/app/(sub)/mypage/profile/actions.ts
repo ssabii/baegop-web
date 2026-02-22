@@ -1,6 +1,5 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { toOriginalSupabaseImageUrl } from "@/lib/image";
 
@@ -19,9 +18,6 @@ export async function updateNickname(nickname: string) {
     .eq("id", user.id);
 
   if (error) throw new Error("닉네임 변경에 실패했습니다.");
-
-  revalidatePath("/mypage");
-  revalidatePath("/mypage/profile");
 }
 
 export async function uploadAvatar(formData: FormData) {
@@ -72,6 +68,5 @@ export async function uploadAvatar(formData: FormData) {
 
   if (updateError) throw new Error("아바타 저장에 실패했습니다.");
 
-  revalidatePath("/mypage");
-  revalidatePath("/mypage/profile");
+  return publicUrl;
 }

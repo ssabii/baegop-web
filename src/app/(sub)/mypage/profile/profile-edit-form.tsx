@@ -1,12 +1,8 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { Camera, UserRound } from "lucide-react";
-import { toast } from "sonner";
+import { BottomActionBar } from "@/components/bottom-action-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Drawer,
   DrawerContent,
@@ -14,25 +10,34 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { BottomActionBar } from "@/components/bottom-action-bar";
+import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
-import { uploadAvatar, updateNickname } from "./actions";
+import { Camera, UserRound } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { Profile, profileQueryKey } from "@/hooks/use-profile";
+import { updateNickname, uploadAvatar } from "./actions";
 
-const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]+$/;
+const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]+(?:\s[가-힣a-zA-Z0-9]+)*$/;
 
 interface ProfileEditFormProps {
+  userId: string;
   initialNickname: string;
   initialAvatarUrl: string | null;
 }
 
 export function ProfileEditForm({
+  userId,
   initialNickname,
   initialAvatarUrl,
 }: ProfileEditFormProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -44,6 +49,12 @@ export function ProfileEditForm({
 
   const isDirty = avatarFile !== null || nickname !== initialNickname;
 
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
+
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
   };
@@ -52,6 +63,7 @@ export function ProfileEditForm({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   };
@@ -89,27 +101,39 @@ export function ProfileEditForm({
     setDrawerOpen(false);
   };
 
-  const handleSave = () => {
-    startTransition(async () => {
-      try {
-        if (avatarFile) {
-          const formData = new FormData();
-          formData.append("avatar", avatarFile);
-          await uploadAvatar(formData);
-        }
+  const handleSave = async () => {
+    setIsPending(true);
+    try {
+      let newAvatarUrl: string | undefined;
 
-        if (nickname !== initialNickname) {
-          await updateNickname(nickname);
-        }
-
-        toast.success("프로필이 수정되었습니다", { position: "top-center" });
-        router.back();
-      } catch {
-        toast.error("프로필 수정에 실패했습니다. 다시 시도해주세요.", {
-          position: "top-center",
-        });
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("avatar", avatarFile);
+        newAvatarUrl = await uploadAvatar(formData);
       }
-    });
+
+      if (nickname !== initialNickname) {
+        await updateNickname(nickname);
+      }
+
+      queryClient.setQueryData<Profile>(profileQueryKey(userId), (old) =>
+        old
+          ? {
+              ...old,
+              nickname,
+              avatarUrl: newAvatarUrl ?? old.avatarUrl,
+            }
+          : old,
+      );
+
+      toast.success("프로필이 수정되었습니다", { position: "top-center" });
+      router.back();
+    } catch {
+      toast.error("프로필 수정에 실패했습니다. 다시 시도해주세요.", {
+        position: "top-center",
+      });
+      setIsPending(false);
+    }
   };
 
   return (
