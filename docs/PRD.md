@@ -134,18 +134,10 @@
 - id, email, nickname, avatar_url, created_at
 
 ### places
-- id, name, category (text, 네이버 API 원본 카테고리. 예: "음식점>한식"), address, postal_code, lat, lng
-- naver_place_id (네이버 검색 결과 연동용)
-- naver_link (text, 네이버 플레이스 URL — 메뉴/소식/리뷰/사진 연결용)
-- telephone (text, 전화번호)
+- id (text PK, 네이버 장소 ID), name, category (text, 네이버 API 원본 카테고리. 예: "음식점>한식"), address, lat, lng
 - image_urls (text[], 네이버 이미지 검색 API에서 가져온 외부 이미지 URL 배열. 최대 10장)
 - kona_card_status (enum: 'available' | 'unavailable' | 'unknown')
-- kona_card_zone (boolean, 우편번호 기반 자동 판별 결과)
-- like_count, dislike_count
 - created_by (FK → users), created_at, updated_at
-
-### kona_postal_codes (코나카드 사용가능 우편번호)
-- id, postal_code, dong_name (동명)
 
 ### kona_card_votes (코나카드 크라우드소싱 투표)
 - id, place_id (FK), user_id (FK)
