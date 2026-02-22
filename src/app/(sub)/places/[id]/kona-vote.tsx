@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useKonaVote } from "./use-kona-vote";
@@ -37,11 +38,13 @@ export function KonaVoteSection({
   userVote: initialUserVote,
   isLoggedIn,
 }: KonaVoteProps) {
+  const router = useRouter();
   const [clickedVote, setClickedVote] = useState<KonaVote | null>(null);
   const { status, userVote, vote, isPending } = useKonaVote({
     placeId,
     initialStatus,
     initialUserVote,
+    onSuccess: () => router.refresh(),
   });
 
   function handleVote(v: KonaVote) {
