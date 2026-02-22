@@ -21,12 +21,12 @@ export function ReviewImages({ images }: ReviewImagesProps) {
 
   return (
     <>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="flex gap-2 overflow-x-auto scrollbar-none md:grid md:grid-cols-5">
         {sorted.map((img, i) => (
           <button
             key={i}
             type="button"
-            className="cursor-pointer overflow-hidden rounded-lg"
+            className="w-1/3 shrink-0 cursor-pointer overflow-hidden rounded-lg md:w-auto md:shrink"
             onClick={() => {
               setPreviewIndex(i);
               setPreviewOpen(true);
