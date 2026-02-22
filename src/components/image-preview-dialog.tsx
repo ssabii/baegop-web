@@ -79,7 +79,7 @@ export function ImageCarouselDialog({
         display: "flex",
         flexDirection: "column",
         background: "#000",
-        height: "100svh",
+        height: "100dvh",
         pointerEvents: "auto",
       }}
     >
