@@ -21,7 +21,7 @@ export function ProfileSection() {
 
   if (isLoading) {
     return (
-      <ItemGroup>
+      <ItemGroup className="rounded-xl bg-background">
         <Item className="gap-2">
           <ItemMedia
             variant="icon"
@@ -41,7 +41,7 @@ export function ProfileSection() {
   if (!profile) return null;
 
   return (
-    <ItemGroup>
+    <ItemGroup className="rounded-xl bg-background">
       <Item asChild className="gap-2">
         <Link href="/mypage/profile">
           <ItemMedia
