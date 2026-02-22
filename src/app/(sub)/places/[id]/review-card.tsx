@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Ellipsis, Pencil, Trash2 } from "lucide-react";
+import { Ellipsis, Pencil, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -76,14 +76,16 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     });
   }
 
-  const nickname = review.profiles?.nickname ?? "익명";
+  const nickname = review.profiles?.nickname ?? "탈퇴한 사용자";
 
   return (
     <div className="py-3 space-y-2">
       <div className="flex items-start gap-3">
         <Avatar className="size-10 shrink-0">
           <AvatarImage src={review.profiles?.avatar_url ?? undefined} />
-          <AvatarFallback>{nickname[0]}</AvatarFallback>
+          <AvatarFallback>
+            <UserRound className="size-10 text-muted-foreground" />
+          </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
