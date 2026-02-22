@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { BottomActionBar } from "@/components/bottom-action-bar";
@@ -80,12 +81,15 @@ export function PlaceActionBar({
   return (
     <>
       <BottomActionBar>
-        <div className="mx-auto flex max-w-4xl gap-3">
+        <div
+          className={cn("mx-auto max-w-4xl grid gap-3", {
+            "grid-cols-2": !isRegistered,
+          })}
+        >
           {!isRegistered && (
             <Button
               variant="outline"
               size="xl"
-              className="flex-1"
               onClick={handleRegister}
               disabled={isPending}
             >
@@ -96,7 +100,6 @@ export function PlaceActionBar({
             </Button>
           )}
           <Button
-            className="flex-1"
             onClick={handleWriteReview}
             disabled={isPending}
             size="xl"
