@@ -1,15 +1,8 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { ItemGroup } from "@/components/ui/item";
 import { createClient } from "@/lib/supabase/server";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemGroup,
-  ItemTitle,
-} from "@/components/ui/item";
+import { redirect } from "next/navigation";
 import { LogoutMenuItem } from "./logout-menu-item";
+import { MypageMenuItem } from "./mypage-menu-item";
 import { ProfileSection } from "./profile-section";
 
 export default async function MyPage() {
@@ -33,8 +26,8 @@ export default async function MyPage() {
   ]);
 
   return (
-    <main className="w-full max-w-4xl h-dvh mx-auto">
-      <div className="px-4 py-8">
+    <main className="w-full h-dvh bg-muted">
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
         <nav className="flex flex-col gap-3" aria-labelledby="mypage-menu">
           {/* 메뉴 리스트 */}
           <h2 id="mypage-menu" className="sr-only">
@@ -44,80 +37,43 @@ export default async function MyPage() {
           {/* 프로필 섹션 */}
           <ProfileSection />
 
+          <MypageMenuItem href="/mypage/theme" title="테마" />
           <ItemGroup className="rounded-xl bg-background">
-            <Item asChild>
-              <Link href="/mypage/theme">
-                <ItemContent>
-                  <ItemTitle className="font-bold">테마</ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <ChevronRight className="size-4" />
-                </ItemActions>
-              </Link>
-            </Item>
-          </ItemGroup>
-          <ItemGroup className="rounded-xl bg-background">
-            <Item asChild>
-              <Link href="/mypage/reviews">
-                <ItemContent>
-                  <ItemTitle className="font-bold">내 리뷰</ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <span className="text-sm text-muted-foreground font-semibold">
-                    {reviewCount ?? 0}
-                  </span>
-                  <ChevronRight className="size-4" />
-                </ItemActions>
-              </Link>
-            </Item>
-            <Item asChild>
-              <Link href="/mypage/places">
-                <ItemContent>
-                  <ItemTitle className="font-bold">내 장소</ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <span className="text-sm text-muted-foreground font-semibold">
-                    {placeCount ?? 0}
-                  </span>
-                  <ChevronRight className="size-4" />
-                </ItemActions>
-              </Link>
-            </Item>
-          </ItemGroup>
-          <ItemGroup className="rounded-xl bg-background">
-            <Item className="text-muted-foreground">
-              <ItemContent>
-                <ItemTitle className="font-bold">공지사항</ItemTitle>
-              </ItemContent>
-              <ItemActions>
-                <ChevronRight className="size-4" />
-              </ItemActions>
-            </Item>
+            <MypageMenuItem
+              href="/mypage/reviews"
+              title="내 리뷰"
+              badge={
+                <span className="text-sm text-muted-foreground font-semibold">
+                  {reviewCount ?? 0}
+                </span>
+              }
+              inGroup
+            />
+            <MypageMenuItem
+              href="/mypage/places"
+              title="내 장소"
+              badge={
+                <span className="text-sm text-muted-foreground font-semibold">
+                  {placeCount ?? 0}
+                </span>
+              }
+              inGroup
+            />
           </ItemGroup>
           <ItemGroup className="rounded-xl bg-background">
             <LogoutMenuItem />
             {user.app_metadata.providers?.includes("email") && (
-              <Item asChild>
-                <Link href="/reset-password">
-                  <ItemContent>
-                    <ItemTitle className="font-bold">비밀번호 변경</ItemTitle>
-                  </ItemContent>
-                  <ItemActions>
-                    <ChevronRight className="size-4" />
-                  </ItemActions>
-                </Link>
-              </Item>
+              <MypageMenuItem
+                href="/reset-password"
+                title="비밀번호 변경"
+                inGroup
+              />
             )}
-            <Item asChild>
-              <Link href="/mypage/delete-account">
-                <ItemContent>
-                  <ItemTitle className="font-bold">회원탈퇴</ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <ChevronRight className="size-4" />
-                </ItemActions>
-              </Link>
-            </Item>
+            <MypageMenuItem
+              href="/mypage/delete-account"
+              title="회원탈퇴"
+              inGroup
+            />
           </ItemGroup>
         </nav>
       </div>
