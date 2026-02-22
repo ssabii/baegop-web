@@ -1,9 +1,23 @@
 import { notFound } from "next/navigation";
-import { MapPin, Phone, Star, Tag } from "lucide-react";
+import {
+  Dot,
+  ExternalLink,
+  Footprints,
+  MapPin,
+  Phone,
+  Star,
+  Tag,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { buildNaverPlaceLink, fetchPlaceDetailWithFallback } from "@/lib/naver";
+import {
+  buildNaverPlaceLink,
+  buildNaverWalkingRouteLink,
+  fetchPlaceDetailWithFallback,
+  fetchWalkingRoutes,
+} from "@/lib/naver";
+import { formatDistance, formatWalkingDuration } from "@/lib/geo";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import { optimizeNaverImageUrls } from "@/lib/image";
-import { NaverIcon } from "@/components/naver-icon";
 import { ImageGallery } from "@/components/image-gallery";
 import { Badge } from "@/components/ui/badge";
 import { SubHeader } from "@/components/sub-header";
@@ -50,6 +64,13 @@ export default async function PlaceDetailPage({
   }
 
   if (!detail) notFound();
+
+  const walkingRoutes = await fetchWalkingRoutes(
+    { lng: String(COMPANY_LOCATION.lng), lat: String(COMPANY_LOCATION.lat) },
+    { lng: detail.x, lat: detail.y },
+  );
+  const walkingRoute = walkingRoutes?.[0] ?? null;
+  console.log("walkingRoutes", walkingRoutes);
 
   let reviewCount = 0;
   let avgRating: number | null = null;
@@ -102,33 +123,61 @@ export default async function PlaceDetailPage({
             <h1 className="text-2xl font-bold">{detail.name}</h1>
 
             {detail.category && (
-              <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Tag className="size-4 shrink-0" />
                 {detail.category}
-              </p>
+              </div>
             )}
             <p className="flex items-start gap-2 text-sm font-medium text-muted-foreground">
-              <MapPin className="size-4 shrink-0" />
-              {address}
+              <MapPin className="size-4 shrink-0 mt-0.5" />
+              <span>
+                {address}{" "}
+                <a
+                  href={naverLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="네이버 플레이스에서 보기"
+                  className="inline-flex align-text-bottom"
+                >
+                  <ExternalLink className="size-4 text-muted-foreground hover:text-accent-foreground" />
+                </a>
+              </span>
             </p>
+            {walkingRoute && (
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Footprints className="size-4 shrink-0" />
+                <div className="flex items-center">
+                  <div>
+                    {formatWalkingDuration(
+                      Math.round(walkingRoute.summary.duration / 60),
+                    )}
+                  </div>
+                  <Dot className="size-4 shrink-0" />
+                  <div>{formatDistance(walkingRoute.summary.distance)}</div>
+                </div>
+                <a
+                  href={buildNaverWalkingRouteLink(COMPANY_LOCATION, {
+                    lng: Number(detail.x),
+                    lat: Number(detail.y),
+                    name: detail.name,
+                    placeId: naverPlaceId,
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 flex items-center justify-center"
+                >
+                  <ExternalLink className="size-4 text-muted-foreground hover:text-accent-foreground" />
+                </a>
+              </div>
+            )}
             {detail.phone && (
               <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Phone className="size-4 shrink-0" />
-                <a href={`tel:${detail.phone}`} className="hover:underline">
+                <a href={`tel:${detail.phone}`} className="underline">
                   {detail.phone}
                 </a>
               </p>
             )}
-            <a
-              href={naverLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-[#03C75A] hover:underline"
-            >
-              <NaverIcon className="size-4" />
-              네이버에서 보기
-            </a>
-
             {/* 별점 */}
             {isRegistered && avgRating !== null && (
               <div className="flex items-center gap-1">
