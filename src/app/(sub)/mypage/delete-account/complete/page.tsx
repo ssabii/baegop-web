@@ -12,7 +12,7 @@ import {
 
 export default function DeleteAccountCompletePage() {
   return (
-    <div className="flex h-dvh items-center justify-center bg-muted px-4">
+    <div className="flex h-dvh items-center justify-center px-4">
       <Empty className="border-none">
         <EmptyHeader className="gap-1">
           <EmptyMedia
