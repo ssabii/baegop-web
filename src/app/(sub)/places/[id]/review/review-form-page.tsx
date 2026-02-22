@@ -125,7 +125,7 @@ export function ReviewFormPage({
     <>
       <SubHeader title="리뷰 작성" onBack={handleBack} />
 
-      <main className="mx-auto max-w-4xl px-4 pt-4 pb-23">
+      <main className="px-4 pt-4 pb-32">
         <div className="space-y-6">
           {/* 가게 정보 */}
           <div className="flex gap-3">

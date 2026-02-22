@@ -13,7 +13,7 @@ export default async function DeleteAccountPage() {
   if (!user) redirect("/signin");
 
   return (
-    <div className="bg-muted min-h-dvh">
+    <div className="bg-background min-h-dvh">
       <SubHeader title="회원탈퇴" />
       <DeleteAccountForm />
     </div>
