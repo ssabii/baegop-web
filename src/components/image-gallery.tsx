@@ -71,7 +71,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
               <button
                 type="button"
                 onClick={() => scrollTo(current - 1)}
-                className="absolute left-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/60"
+                className="absolute left-2 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/60"
               >
                 <ChevronLeft className="size-4" />
               </button>
@@ -80,7 +80,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
               <button
                 type="button"
                 onClick={() => scrollTo(current + 1)}
-                className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/60"
+                className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/60"
               >
                 <ChevronRight className="size-4" />
               </button>
@@ -96,7 +96,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
                 key={i}
                 type="button"
                 onClick={() => scrollTo(i)}
-                className={`size-1.5 rounded-full transition-colors ${
+                className={`size-1.5 cursor-pointer rounded-full transition-colors ${
                   i === current ? "bg-white" : "bg-white/50"
                 }`}
               />

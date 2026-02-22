@@ -127,7 +127,7 @@ export function PlaceSearch() {
                   <button
                     type="button"
                     onClick={handleClear}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {isSearching ? (
                       <Spinner className="size-5" />

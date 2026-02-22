@@ -100,6 +100,7 @@ export function ForgotPasswordForm() {
               id="email"
               type="email"
               placeholder="name@example.com"
+              size="lg"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -112,7 +113,7 @@ export function ForgotPasswordForm() {
             {emailError && <FieldDescription>{emailError}</FieldDescription>}
           </Field>
           <Field>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
               {isLoading ? <Spinner /> : "재설정 링크 보내기"}
             </Button>
           </Field>

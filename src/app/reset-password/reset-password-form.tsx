@@ -91,6 +91,7 @@ export function ResetPasswordForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder={`${PASSWORD_MIN_LENGTH}자 이상 입력하세요`}
+                size="lg"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -103,7 +104,7 @@ export function ResetPasswordForm() {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground"
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
@@ -128,6 +129,7 @@ export function ResetPasswordForm() {
                 id="confirm-password"
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="비밀번호를 다시 입력하세요"
+                size="lg"
                 value={confirmPassword}
                 onChange={(e) => {
                   setConfirmPassword(e.target.value);
@@ -140,7 +142,7 @@ export function ResetPasswordForm() {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 tabIndex={-1}
               >
@@ -156,7 +158,7 @@ export function ResetPasswordForm() {
             )}
           </Field>
           <Field>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
               {isLoading ? <Spinner /> : "비밀번호 변경"}
             </Button>
           </Field>

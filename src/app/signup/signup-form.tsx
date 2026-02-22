@@ -133,6 +133,7 @@ export function SignUpForm({
               id="email"
               type="email"
               placeholder="name@example.com"
+              size="lg"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -153,6 +154,7 @@ export function SignUpForm({
               id="password"
               type="password"
               placeholder={`${PASSWORD_MIN_LENGTH}자 이상 입력하세요`}
+              size="lg"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -175,6 +177,7 @@ export function SignUpForm({
               id="confirm-password"
               type="password"
               placeholder="비밀번호를 다시 입력하세요"
+              size="lg"
               value={confirmPassword}
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
@@ -189,7 +192,7 @@ export function SignUpForm({
             )}
           </Field>
           <Field>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
               {isLoading ? <Spinner /> : "회원가입"}
             </Button>
           </Field>
@@ -198,6 +201,7 @@ export function SignUpForm({
             <Button
               type="button"
               variant="outline"
+              size="xl"
               className="w-full"
               onClick={handleGoogleLogin}
               disabled={isLoading}

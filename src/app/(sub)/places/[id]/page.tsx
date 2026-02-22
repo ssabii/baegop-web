@@ -3,6 +3,7 @@ import {
   Dot,
   ExternalLink,
   Footprints,
+  Home,
   MapPin,
   Phone,
   Star,
@@ -18,8 +19,10 @@ import {
 import { formatDistance, formatWalkingDuration } from "@/lib/geo";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { optimizeNaverImageUrls } from "@/lib/image";
+import Link from "next/link";
 import { ImageGallery } from "@/components/image-gallery";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SubHeader } from "@/components/sub-header";
 import { PlaceDetailTabs } from "./place-detail-tabs";
 import { KonaVoteSection } from "./kona-vote";
@@ -111,7 +114,16 @@ export default async function PlaceDetailPage({
 
   return (
     <>
-      <SubHeader title="장소" />
+      <SubHeader
+        title="장소"
+        rightElement={
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/" aria-label="홈으로">
+              <Home className="size-5" />
+            </Link>
+          </Button>
+        }
+      />
       <main className="mx-auto max-w-4xl pb-30">
         {/* 이미지 갤러리 */}
         <ImageGallery images={detail.imageUrls} alt={detail.name} />
