@@ -5,7 +5,7 @@ import { SignUpForm } from "./signup-form";
 export default async function SignUpPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; redirect?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -21,7 +21,7 @@ export default async function SignUpPage({
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-12 bg-background">
       <div className="w-full max-w-sm">
-        <SignUpForm error={params.error} />
+        <SignUpForm error={params.error} redirectTo={params.redirect} />
       </div>
     </div>
   );

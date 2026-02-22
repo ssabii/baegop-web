@@ -22,8 +22,10 @@ import { Spinner } from "@/components/ui/spinner";
 
 export function SignUpForm({
   error: errorProp,
+  redirectTo,
 }: React.ComponentProps<"div"> & {
   error?: string;
+  redirectTo?: string;
 }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -99,10 +101,15 @@ export function SignUpForm({
 
   const handleGoogleLogin = async () => {
     const supabase = createClient();
+
+    const callbackParams = new URLSearchParams({
+      redirect: redirectTo || "/",
+    });
+
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
       },
     });
   };
@@ -204,7 +211,16 @@ export function SignUpForm({
               Google로 시작하기
             </Button>
             <FieldDescription className="text-center">
-              이미 계정이 있으신가요? <Link href="/signin">로그인</Link>
+              이미 계정이 있으신가요?{" "}
+              <Link
+                href={
+                  redirectTo
+                    ? `/signin?redirect=${encodeURIComponent(redirectTo)}`
+                    : "/signin"
+                }
+              >
+                로그인
+              </Link>
             </FieldDescription>
           </Field>
         </FieldGroup>
