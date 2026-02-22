@@ -53,11 +53,14 @@ export async function GET(request: NextRequest) {
         };
       })
       .sort((a, b) => {
-        if (a.avg_rating === null && b.avg_rating === null) return 0;
+        if (a.avg_rating === null && b.avg_rating === null)
+          return a.id.localeCompare(b.id);
         if (a.avg_rating === null) return 1;
         if (b.avg_rating === null) return -1;
         return (
-          b.avg_rating - a.avg_rating || b.review_count - a.review_count
+          b.avg_rating - a.avg_rating ||
+          b.review_count - a.review_count ||
+          a.id.localeCompare(b.id)
         );
       });
 
@@ -101,7 +104,9 @@ export async function GET(request: NextRequest) {
       )
       .sort(
         (a, b) =>
-          b.avg_rating! - a.avg_rating! || b.review_count - a.review_count,
+          b.avg_rating! - a.avg_rating! ||
+          b.review_count - a.review_count ||
+          a.id.localeCompare(b.id),
       );
 
     const items = places.slice(cursor, cursor + limit);
@@ -122,6 +127,7 @@ export async function GET(request: NextRequest) {
     )
     .gte("created_at", since.toISOString())
     .order("created_at", { ascending: false })
+    .order("id")
     .range(cursor, cursor + limit - 1);
 
   if (error) {
