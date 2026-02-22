@@ -44,13 +44,10 @@ export async function deleteAccount() {
     .update({ created_by: null })
     .eq("created_by", user.id);
 
-  // 4. 리액션 삭제
-  await adminClient.from("reactions").delete().eq("user_id", user.id);
-
-  // 5. 코나카드 투표 삭제
+  // 4. 코나카드 투표 삭제
   await adminClient.from("kona_card_votes").delete().eq("user_id", user.id);
 
-  // 6. auth user 삭제 (profile은 cascade 삭제)
+  // 5. auth user 삭제 (profile은 cascade 삭제)
   const { error } = await adminClient.auth.admin.deleteUser(user.id);
 
   if (error) {

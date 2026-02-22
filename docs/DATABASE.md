@@ -51,17 +51,6 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | display_order | int (NOT NULL) | 표시 순서 (0 = 썸네일) |
 | created_at | timestamptz | 생성일 |
 
-### reactions
-장소 좋아요/싫어요. 유저당 장소 1개만 (UNIQUE 제약).
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| id | serial (PK) | |
-| place_id | int (FK → places) | 장소 |
-| user_id | uuid (FK → profiles) | 유저 |
-| type | text | `like` / `dislike` |
-| created_at | timestamptz | 생성일 |
-
 ### kona_card_votes
 코나카드 사용 가능 여부 크라우드소싱 투표. 유저당 장소 1표.
 
@@ -130,7 +119,6 @@ update app_config set value = '5' where key = 'kona_vote_threshold';
 | places | 모두 | 인증 유저 (created_by = 본인) | 등록자만 | 등록자만 |
 | reviews | 모두 | 인증 유저 (user_id = 본인) | 작성자만 | 작성자만 |
 | review_images | 모두 | 리뷰 작성자만 | - | 리뷰 작성자만 |
-| reactions | 모두 | 인증 유저 (user_id = 본인) | 본인만 | 본인만 |
 | kona_card_votes | 모두 | 인증 유저 (user_id = 본인) | 본인만 | 본인만 |
 | app_config | 모두 | - | - | - |
 

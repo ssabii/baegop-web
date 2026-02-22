@@ -9,8 +9,6 @@ alter table kona_card_votes enable row level security;
 alter table app_config enable row level security;
 alter table reviews enable row level security;
 alter table review_images enable row level security;
-alter table reactions enable row level security;
-
 -- ============================================
 -- app_config
 -- ============================================
@@ -105,21 +103,3 @@ create policy "review_images: 리뷰 작성자만 삭제"
     auth.uid() = (select user_id from reviews where id = review_id)
   );
 
--- ============================================
--- reactions
--- ============================================
-create policy "reactions: 누구나 조회 가능"
-  on reactions for select
-  using (true);
-
-create policy "reactions: 인증 사용자 반응"
-  on reactions for insert
-  with check (auth.uid() = user_id);
-
-create policy "reactions: 본인 반응 수정"
-  on reactions for update
-  using (auth.uid() = user_id);
-
-create policy "reactions: 본인 반응 삭제"
-  on reactions for delete
-  using (auth.uid() = user_id);
