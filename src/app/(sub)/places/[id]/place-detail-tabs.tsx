@@ -58,7 +58,7 @@ export function PlaceDetailTabs({
 
       <TabsContent value="menu" className="mt-4">
         {menus.length === 0 ? (
-          <Empty className="border-none py-12">
+          <Empty className="h-[calc(100dvh*0.5)]">
             <EmptyHeader className="gap-1">
               <EmptyMedia
                 variant="icon"
@@ -72,7 +72,7 @@ export function PlaceDetailTabs({
             </EmptyHeader>
           </Empty>
         ) : (
-          <>
+          <div className="min-h-[calc(100dvh*0.5)]">
             <ul className="divide-y">
               {visibleMenus.map((menu) => (
                 <li key={menu.name} className="flex items-start gap-2 py-3">
@@ -119,7 +119,7 @@ export function PlaceDetailTabs({
                 <Spinner className="size-6 text-primary" />
               </div>
             )}
-          </>
+          </div>
         )}
       </TabsContent>
 
