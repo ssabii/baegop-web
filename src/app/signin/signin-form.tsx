@@ -103,7 +103,7 @@ export function SignInForm({
   return (
     <div className="flex flex-col gap-6">
       <div className="w-full max-w-sm">
-        <form onSubmit={handleEmailLogin} noValidate>
+        <div>
           <FieldGroup>
             <div className="flex flex-col items-center gap-2 text-center">
               <Link href="/" className="flex items-center gap-1">
@@ -111,10 +111,10 @@ export function SignInForm({
                 <h1 className="text-2xl font-bold">배곱</h1>
               </Link>
               <FieldDescription>
-                로그인 후 배곱을 시작해보세요.
+                Google로 배곱을 시작해보세요
               </FieldDescription>
             </div>
-            <Field data-invalid={emailError ? true : undefined}>
+            {/* <Field data-invalid={emailError ? true : undefined}>
               <FieldLabel htmlFor="email">이메일</FieldLabel>
               <Input
                 id="email"
@@ -165,7 +165,7 @@ export function SignInForm({
                 {isLoading ? <Spinner /> : "로그인"}
               </Button>
             </Field>
-            <FieldSeparator>또는</FieldSeparator>
+            <FieldSeparator>또는</FieldSeparator> */}
             <Field>
               <Button
                 type="button"
@@ -183,7 +183,7 @@ export function SignInForm({
                 />
                 Google로 시작하기
               </Button>
-              <FieldDescription className="text-center">
+              {/* <FieldDescription className="text-center">
                 계정이 없으신가요?{" "}
                 <Link
                   href={
@@ -194,10 +194,10 @@ export function SignInForm({
                 >
                   회원가입
                 </Link>
-              </FieldDescription>
+              </FieldDescription> */}
             </Field>
           </FieldGroup>
-        </form>
+        </div>
       </div>
     </div>
   );
