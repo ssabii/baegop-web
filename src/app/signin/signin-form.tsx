@@ -88,10 +88,14 @@ export function SignInForm({
   const handleGoogleLogin = async () => {
     const supabase = createClient();
 
+    const callbackParams = new URLSearchParams({
+      redirect: redirectTo || "/",
+    });
+
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
       },
     });
   };
@@ -177,7 +181,16 @@ export function SignInForm({
                 Google로 시작하기
               </Button>
               <FieldDescription className="text-center">
-                계정이 없으신가요? <Link href="/signup">회원가입</Link>
+                계정이 없으신가요?{" "}
+                <Link
+                  href={
+                    redirectTo
+                      ? `/signup?redirect=${encodeURIComponent(redirectTo)}`
+                      : "/signup"
+                  }
+                >
+                  회원가입
+                </Link>
               </FieldDescription>
             </Field>
           </FieldGroup>
