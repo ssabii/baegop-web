@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { optimizeNaverImageUrls } from "@/lib/image";
 import { EmptyPlace } from "@/components/places";
 import { Roulette } from "./roulette";
+import { Spinner } from "@/components/ui/spinner";
 
 export default async function RandomPage() {
   const supabase = await createClient();

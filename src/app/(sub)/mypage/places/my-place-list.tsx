@@ -49,9 +49,7 @@ export function MyPlaceList({ userId }: MyPlaceListProps) {
             >
               <Building2 className="size-12 text-primary" />
             </EmptyMedia>
-            <EmptyTitle className="font-bold">
-              등록한 장소가 없어요
-            </EmptyTitle>
+            <EmptyTitle className="font-bold">등록한 장소가 없어요</EmptyTitle>
           </EmptyHeader>
         </Empty>
       </div>
@@ -59,20 +57,18 @@ export function MyPlaceList({ userId }: MyPlaceListProps) {
   }
 
   return (
-    <>
-      <div className="px-4 py-8">
-        <div className="flex flex-col">
-          {places.map((place, index) => (
-            <Fragment key={place.id}>
-              {index > 0 && <Separator className="my-4" />}
-              <PlaceCard place={place} />
-            </Fragment>
-          ))}
-        </div>
+    <div className="max-w-4xl mx-auto w-full px-4 py-8">
+      <div className="flex flex-col">
+        {places.map((place, index) => (
+          <Fragment key={place.id}>
+            {index > 0 && <Separator className="my-4" />}
+            <PlaceCard place={place} />
+          </Fragment>
+        ))}
       </div>
       <div ref={sentinelRef} className="flex justify-center">
         {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
       </div>
-    </>
+    </div>
   );
 }

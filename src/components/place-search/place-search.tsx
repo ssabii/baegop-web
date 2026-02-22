@@ -146,10 +146,7 @@ export function PlaceSearch() {
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
-            <ul
-              ref={listRef}
-              className="max-h-[calc(100dvh-8rem)] overflow-y-auto"
-            >
+            <ul ref={listRef} className="max-h-dvh overflow-y-auto">
               {suggestions.map((item, index) => (
                 <li key={item.id}>
                   <PlaceItem

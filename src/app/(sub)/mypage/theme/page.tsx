@@ -1,15 +1,15 @@
 "use client";
 
-import { useTheme } from "next-themes";
-import { Check } from "lucide-react";
 import { SubHeader } from "@/components/sub-header";
 import {
   Item,
-  ItemContent,
   ItemActions,
+  ItemContent,
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
+import { Check } from "lucide-react";
+import { useTheme } from "next-themes";
 
 const THEME_OPTIONS = [
   { value: "light", label: "라이트" },
@@ -29,9 +29,9 @@ export default function ThemePage() {
   };
 
   return (
-    <div className="h-screen">
+    <div className="h-dvh">
       <SubHeader title="테마" />
-      <div className="px-4 pt-8">
+      <div className="mx-auto w-full max-w-4xl px-4 pt-8">
         <ItemGroup className="rounded-xl bg-card">
           {THEME_OPTIONS.map(({ value, label }) => (
             <Item

@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/empty";
 import { ReviewCard } from "@/components/reviews";
 import { useMyReviews } from "./use-my-reviews";
+import { Fragment } from "react/jsx-runtime";
+import { Separator } from "@/components/ui/separator";
 
 interface MyReviewListProps {
   userId: string;
@@ -47,9 +49,7 @@ export function MyReviewList({ userId }: MyReviewListProps) {
             >
               <MessageCircle className="size-12 text-primary" />
             </EmptyMedia>
-            <EmptyTitle className="font-bold">
-              작성한 리뷰가 없어요
-            </EmptyTitle>
+            <EmptyTitle className="font-bold">작성한 리뷰가 없어요</EmptyTitle>
           </EmptyHeader>
         </Empty>
       </div>
@@ -59,15 +59,16 @@ export function MyReviewList({ userId }: MyReviewListProps) {
   return (
     <>
       <div className="px-4 py-8">
-        {reviews.map((review) => {
+        {reviews.map((review, index) => {
           const place = review.places
             ? { id: String(review.places.id), name: review.places.name }
             : null;
+
           return (
-            <ReviewCard
-              key={review.id}
-              review={{ ...review, place }}
-            />
+            <Fragment key={review.id}>
+              {index > 0 && <Separator className="my-4" />}
+              <ReviewCard review={{ ...review, place }} />
+            </Fragment>
           );
         })}
       </div>

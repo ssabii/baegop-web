@@ -45,13 +45,13 @@ export function ReviewSection({
 
   if (reviews.length === 0) {
     return (
-      <Empty className="border-none py-12">
+      <Empty className="h-[calc(100dvh*0.5)]">
         <EmptyHeader className="gap-1">
           <EmptyMedia
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <MessageCircle className="size-12" />
+            <MessageCircle className="size-12 text-primary" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">작성된 리뷰가 없어요</EmptyTitle>
           <EmptyDescription>첫 번째 리뷰를 작성해보세요!</EmptyDescription>
@@ -61,7 +61,7 @@ export function ReviewSection({
   }
 
   return (
-    <>
+    <div className="min-h-[calc(100dvh*0.5)]">
       <div className="divide-y">
         {reviews.map((review) => (
           <ReviewCard
@@ -75,6 +75,6 @@ export function ReviewSection({
       <div ref={sentinelRef} className="flex justify-center">
         {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
       </div>
-    </>
+    </div>
   );
 }
