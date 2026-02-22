@@ -18,22 +18,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Profile, profileQueryKey } from "@/hooks/use-profile";
+import { profileQueryKey, useProfile } from "@/hooks/use-profile";
 import { updateNickname, uploadAvatar } from "./actions";
 
 const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]+(?:\s[가-힣a-zA-Z0-9]+)*$/;
 
 interface ProfileEditFormProps {
   userId: string;
-  initialNickname: string;
-  initialAvatarUrl: string | null;
 }
 
-export function ProfileEditForm({
-  userId,
-  initialNickname,
-  initialAvatarUrl,
-}: ProfileEditFormProps) {
+export function ProfileEditForm({ userId }: ProfileEditFormProps) {
+  const { profile } = useProfile(userId);
   const router = useRouter();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -41,13 +36,13 @@ export function ProfileEditForm({
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [nickname, setNickname] = useState(initialNickname);
+  const [nickname, setNickname] = useState(profile.nickname);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerNickname, setDrawerNickname] = useState(initialNickname);
+  const [drawerNickname, setDrawerNickname] = useState(profile.nickname);
   const [nicknameError, setNicknameError] = useState("");
 
-  const isDirty = avatarFile !== null || nickname !== initialNickname;
+  const isDirty = avatarFile !== null || nickname !== profile.nickname;
 
   useEffect(() => {
     return () => {
@@ -104,28 +99,17 @@ export function ProfileEditForm({
   const handleSave = async () => {
     setIsPending(true);
     try {
-      let newAvatarUrl: string | undefined;
-
       if (avatarFile) {
         const formData = new FormData();
         formData.append("avatar", avatarFile);
-        newAvatarUrl = await uploadAvatar(formData);
+        await uploadAvatar(formData);
       }
 
-      if (nickname !== initialNickname) {
+      if (nickname !== profile.nickname) {
         await updateNickname(nickname);
       }
 
-      queryClient.setQueryData<Profile>(profileQueryKey(userId), (old) =>
-        old
-          ? {
-              ...old,
-              nickname,
-              avatarUrl: newAvatarUrl ?? old.avatarUrl,
-            }
-          : old,
-      );
-
+      queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
       toast.success("프로필이 수정되었습니다", { position: "top-center" });
       router.back();
     } catch {
@@ -149,8 +133,8 @@ export function ProfileEditForm({
             <AvatarImage
               src={
                 avatarPreview ??
-                (initialAvatarUrl
-                  ? optimizeSupabaseImageUrl(initialAvatarUrl)
+                (profile.avatarUrl
+                  ? optimizeSupabaseImageUrl(profile.avatarUrl)
                   : undefined)
               }
               className="object-cover"

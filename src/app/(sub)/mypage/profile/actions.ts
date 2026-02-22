@@ -67,6 +67,4 @@ export async function uploadAvatar(formData: FormData) {
     .eq("id", user.id);
 
   if (updateError) throw new Error("아바타 저장에 실패했습니다.");
-
-  return publicUrl;
 }
