@@ -2,10 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
+import { toast } from "sonner";
 import { registerPlace } from "@/app/(main)/actions";
 import type { NaverPlaceDetail } from "@/types";
 
@@ -24,6 +26,9 @@ export function PlaceActionBar({
 }: PlaceActionBarProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [pendingAction, setPendingAction] = useState<
+    "register" | "review" | null
+  >(null);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogDescription, setLoginDialogDescription] = useState("");
 
@@ -36,9 +41,15 @@ export function PlaceActionBar({
       return;
     }
 
+    setPendingAction("register");
     startTransition(async () => {
-      await registerPlace(placeDetail);
-      router.refresh();
+      try {
+        await registerPlace(placeDetail);
+        router.refresh();
+        toast.success("장소가 등록되었어요.", { position: "top-center" });
+      } catch {
+        toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+      }
     });
   }
 
@@ -52,8 +63,14 @@ export function PlaceActionBar({
     }
 
     if (!isRegistered) {
+      setPendingAction("review");
       startTransition(async () => {
-        await registerPlace(placeDetail);
+        try {
+          await registerPlace(placeDetail);
+        } catch {
+          toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+          return;
+        }
         router.replace(`/places/${naverPlaceId}/review/new`);
       });
     } else {
@@ -64,26 +81,32 @@ export function PlaceActionBar({
   return (
     <>
       <BottomActionBar>
-        <div className="mx-auto flex max-w-4xl gap-3">
+        <div
+          className={cn("mx-auto max-w-4xl grid gap-3", {
+            "grid-cols-2": !isRegistered,
+          })}
+        >
           {!isRegistered && (
             <Button
               variant="outline"
               size="xl"
-              className="flex-1"
               onClick={handleRegister}
               disabled={isPending}
             >
-              {isPending ? <Spinner data-icon="inline-start" /> : null}
+              {isPending && pendingAction === "register" && (
+                <Spinner data-icon="inline-start" />
+              )}
               장소 등록
             </Button>
           )}
           <Button
-            className="flex-1"
             onClick={handleWriteReview}
             disabled={isPending}
             size="xl"
           >
-            {isPending ? <Spinner data-icon="inline-start" /> : null}
+            {isPending && pendingAction === "review" && (
+              <Spinner data-icon="inline-start" />
+            )}
             리뷰 작성
           </Button>
         </div>

@@ -24,7 +24,7 @@ export async function SearchBar() {
           />
           <span className="truncate text-muted-foreground">장소 검색</span>
         </Link>
-        <div className="flex shrink-0 items-center pr-2">
+        <div className="flex shrink-0 items-center pr-4">
           {user && <SearchBarAvatar />}
         </div>
       </div>

@@ -34,7 +34,7 @@ export default async function MyPage() {
 
   return (
     <main className="bg-muted w-full h-screen">
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <div className="px-4 py-8">
         <nav className="flex flex-col gap-3" aria-labelledby="mypage-menu">
           {/* 메뉴 리스트 */}
           <h2 id="mypage-menu" className="sr-only">
