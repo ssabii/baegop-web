@@ -72,6 +72,7 @@ export default async function MyPage() {
             <MypageMenuItem
               href="/mypage/delete-account"
               title="회원탈퇴"
+              variant="destructive"
               inGroup
             />
           </ItemGroup>

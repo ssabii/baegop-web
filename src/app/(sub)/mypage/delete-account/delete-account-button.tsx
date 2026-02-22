@@ -21,7 +21,7 @@ export function DeleteAccountButton({ disabled }: DeleteAccountButtonProps) {
     const confirmed = await confirm({
       title: "정말 탈퇴하시겠습니까?",
       description:
-        "탈퇴하면 계정 정보가 삭제되며, 작성하신 리뷰와 등록한 장소는 모두 삭제되지 않습니다.",
+        "계정 정보는 삭제되며\n작성하신 리뷰는 익명화되어 유지됩니다.",
       confirmLabel: "탈퇴하기",
       cancelLabel: "취소",
     });

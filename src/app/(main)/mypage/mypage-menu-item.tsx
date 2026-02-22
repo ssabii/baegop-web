@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   Item,
   ItemActions,
@@ -14,6 +15,7 @@ type MypageMenuItemProps = {
   badge?: React.ReactNode;
   /** true이면 ItemGroup으로 감싸지 않고 Item만 렌더 (여러 항목을 한 그룹에 넣을 때 사용) */
   inGroup?: boolean;
+  variant?: "default" | "destructive";
 };
 
 export function MypageMenuItem({
@@ -21,12 +23,15 @@ export function MypageMenuItem({
   title,
   badge,
   inGroup = false,
+  variant = "default",
 }: MypageMenuItemProps) {
+  const isDestructive = variant === "destructive";
+
   const content = (
     <Item asChild>
       <Link href={href}>
         <ItemContent>
-          <ItemTitle className="font-bold">{title}</ItemTitle>
+          <ItemTitle className={cn("font-bold", { "text-destructive": isDestructive })}>{title}</ItemTitle>
         </ItemContent>
         <ItemActions>
           {badge}

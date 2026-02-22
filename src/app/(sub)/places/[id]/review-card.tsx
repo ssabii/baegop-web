@@ -26,7 +26,7 @@ interface ReviewCardProps {
     rating: number;
     content: string | null;
     created_at: string;
-    user_id: string;
+    user_id: string | null;
     profiles: {
       nickname: string | null;
       avatar_url: string | null;
@@ -118,7 +118,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-3 text-base font-bold cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-3 text-base font-bold text-destructive cursor-pointer"
                       onClick={handleDelete}
                     >
                       <Trash2 className="size-4" />
