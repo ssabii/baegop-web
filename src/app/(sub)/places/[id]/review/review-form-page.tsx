@@ -15,6 +15,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { SubHeader } from "@/components/sub-header";
 import { toast } from "sonner";
@@ -32,11 +33,9 @@ interface ReviewFormPageProps {
   };
 }
 
-export function ReviewFormPage({
-  placeId,
-  place,
-}: ReviewFormPageProps) {
+export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const confirm = useConfirmDialog();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -101,10 +100,14 @@ export function ReviewFormPage({
       }
 
       await createReview(placeId, { rating, content }, formData);
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
       toast.success("리뷰가 등록되었어요.", { position: "top-center" });
+      sessionStorage.setItem("scrollToReview", "true");
       router.back();
     } catch {
-      toast.error("리뷰 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+      toast.error("리뷰 등록에 실패했어요. 다시 시도해주세요.", {
+        position: "top-center",
+      });
       setIsPending(false);
     }
   }
@@ -125,7 +128,7 @@ export function ReviewFormPage({
     <>
       <SubHeader title="리뷰 작성" onBack={handleBack} />
 
-      <main className="px-4 pt-4 pb-32">
+      <main className="max-w-4xl mx-auto w-full px-4 pt-4 pb-32">
         <div className="space-y-6">
           {/* 가게 정보 */}
           <div className="flex gap-3">
@@ -208,7 +211,7 @@ export function ReviewFormPage({
           >
             <DrawerContent>
               <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
-              <div className="p-4">
+              <div className="max-w-4xl mx-auto w-full p-4">
                 <Textarea
                   autoFocus
                   className="field-sizing-fixed resize-none"
@@ -231,15 +234,18 @@ export function ReviewFormPage({
                 </p>
               </div>
               <DrawerFooter>
-                <Button
-                  size="xl"
-                  onClick={() => {
-                    setContent(drawerContent);
-                    setContentDrawerOpen(false);
-                  }}
-                >
-                  확인
-                </Button>
+                <div className="max-w-4xl mx-auto w-full">
+                  <Button
+                    className="w-full"
+                    size="xl"
+                    onClick={() => {
+                      setContent(drawerContent);
+                      setContentDrawerOpen(false);
+                    }}
+                  >
+                    확인
+                  </Button>
+                </div>
               </DrawerFooter>
             </DrawerContent>
           </Drawer>

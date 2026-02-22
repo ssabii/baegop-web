@@ -71,7 +71,7 @@ export function PlaceActionBar({
           toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
           return;
         }
-        router.replace(`/places/${naverPlaceId}/review/new`);
+        router.push(`/places/${naverPlaceId}/review/new`);
       });
     } else {
       router.push(`/places/${naverPlaceId}/review/new`);

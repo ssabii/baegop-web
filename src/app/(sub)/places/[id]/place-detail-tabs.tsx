@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { MessageCircle, UtensilsCrossed } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,6 +33,7 @@ export function PlaceDetailTabs({
   naverPlaceId,
   currentUserId,
 }: PlaceDetailTabsProps) {
+  const tabsRef = useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = useState(MENU_PAGE_SIZE);
   const visibleMenus = menus.slice(0, visibleCount);
   const hasMore = menus.length > visibleCount;
@@ -45,8 +46,15 @@ export function PlaceDetailTabs({
     },
   });
 
+  useEffect(() => {
+    if (sessionStorage.getItem("scrollToReview") === "true") {
+      sessionStorage.removeItem("scrollToReview");
+      tabsRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
   return (
-    <Tabs defaultValue="review">
+    <Tabs ref={tabsRef} defaultValue="review">
       <TabsList className="w-full">
         <TabsTrigger value="review" className="flex-1 cursor-pointer">
           리뷰
