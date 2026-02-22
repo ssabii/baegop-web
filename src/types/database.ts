@@ -68,40 +68,18 @@ export type Database = {
           },
         ]
       }
-      kona_postal_codes: {
-        Row: {
-          dong_name: string | null
-          id: number
-          postal_code: string
-        }
-        Insert: {
-          dong_name?: string | null
-          id?: number
-          postal_code: string
-        }
-        Update: {
-          dong_name?: string | null
-          id?: number
-          postal_code?: string
-        }
-        Relationships: []
-      }
       places: {
         Row: {
           address: string
           category: string | null
           created_at: string | null
           created_by: string | null
-          description: string | null
-          dislike_count: number | null
           id: string
           image_urls: string[] | null
           kona_card_status: string | null
           lat: number | null
-          like_count: number | null
           lng: number | null
           name: string
-          postal_code: string | null
           updated_at: string | null
         }
         Insert: {
@@ -109,16 +87,12 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           created_by?: string | null
-          description?: string | null
-          dislike_count?: number | null
           id: string
           image_urls?: string[] | null
           kona_card_status?: string | null
           lat?: number | null
-          like_count?: number | null
           lng?: number | null
           name: string
-          postal_code?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -126,16 +100,12 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           created_by?: string | null
-          description?: string | null
-          dislike_count?: number | null
           id?: string
           image_urls?: string[] | null
           kona_card_status?: string | null
           lat?: number | null
-          like_count?: number | null
           lng?: number | null
           name?: string
-          postal_code?: string | null
           updated_at?: string | null
         }
         Relationships: [

@@ -6,7 +6,6 @@ export type Place = Tables<"places">;
 export type Review = Tables<"reviews">;
 export type ReviewImage = Tables<"review_images">;
 export type Reaction = Tables<"reactions">;
-export type KonaPostalCode = Tables<"kona_postal_codes">;
 
 // 릴레이션 포함 타입 (JOIN 조회용)
 export type PlaceWithProfile = Place & {
