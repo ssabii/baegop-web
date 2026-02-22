@@ -40,6 +40,7 @@ export function PlaceActionBar({
     startTransition(async () => {
       try {
         await registerPlace(placeDetail);
+        router.refresh();
         toast.success("장소가 등록되었어요.", { position: "top-center" });
       } catch {
         toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
@@ -64,7 +65,7 @@ export function PlaceActionBar({
           toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
           return;
         }
-        router.push(`/places/${naverPlaceId}/review/new`);
+        router.replace(`/places/${naverPlaceId}/review/new`);
       });
     } else {
       router.push(`/places/${naverPlaceId}/review/new`);
