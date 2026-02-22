@@ -12,19 +12,10 @@ export default async function ProfileEditPage() {
 
   if (!user) redirect("/signin");
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("nickname, avatar_url")
-    .eq("id", user.id)
-    .single();
-
   return (
     <div className="min-h-dvh flex flex-col">
       <SubHeader title="프로필" />
-      <ProfileEditForm
-        initialNickname={profile?.nickname ?? ""}
-        initialAvatarUrl={profile?.avatar_url ?? null}
-      />
+      <ProfileEditForm />
     </div>
   );
 }

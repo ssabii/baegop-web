@@ -1,24 +1,12 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SearchBarAvatar } from "./search-bar-avatar";
+
 export async function SearchBar() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  let profile = null;
-  if (user) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("nickname, avatar_url")
-      .eq("id", user.id)
-      .single();
-    profile = data;
-  }
-
-  const displayName = profile?.nickname || user?.email || "사용자";
-  const initials = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="fixed inset-x-0 top-0 z-40 px-4 py-3">
@@ -37,16 +25,7 @@ export async function SearchBar() {
           <span className="truncate text-muted-foreground">장소 검색</span>
         </Link>
         <div className="flex shrink-0 items-center pr-4">
-          {user && (
-            <Link href="/mypage">
-              <Avatar size="sm">
-                {profile?.avatar_url && (
-                  <AvatarImage src={profile.avatar_url} alt={displayName} />
-                )}
-                <AvatarFallback>{initials}</AvatarFallback>
-              </Avatar>
-            </Link>
-          )}
+          {user && <SearchBarAvatar />}
         </div>
       </div>
     </div>

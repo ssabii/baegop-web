@@ -1,19 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight, UserRound } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { optimizeSupabaseImageUrl } from "@/lib/image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Item,
   ItemActions,
   ItemContent,
-  ItemDescription,
   ItemGroup,
-  ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
 import { LogoutMenuItem } from "./logout-menu-item";
+import { ProfileSection } from "./profile-section";
 
 export default async function MyPage() {
   const supabase = await createClient();
@@ -24,24 +21,16 @@ export default async function MyPage() {
 
   if (!user) redirect("/signin");
 
-  const [{ data: profile }, { count: reviewCount }, { count: placeCount }] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("nickname, avatar_url")
-        .eq("id", user.id)
-        .single(),
-      supabase
-        .from("reviews")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id),
-      supabase
-        .from("places")
-        .select("*", { count: "exact", head: true })
-        .eq("created_by", user.id),
-    ]);
-
-  const nickname = profile?.nickname ?? user.email ?? "사용자";
+  const [{ count: reviewCount }, { count: placeCount }] = await Promise.all([
+    supabase
+      .from("reviews")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id),
+    supabase
+      .from("places")
+      .select("*", { count: "exact", head: true })
+      .eq("created_by", user.id),
+  ]);
 
   return (
     <main className="bg-muted w-full h-screen">
@@ -53,41 +42,7 @@ export default async function MyPage() {
           </h2>
 
           {/* 프로필 섹션 */}
-          <ItemGroup>
-            <Item asChild className="gap-2">
-              <Link href="/mypage/profile">
-                <ItemMedia
-                  variant="icon"
-                  className="shrink-0 size-14 bg-transparent border-none"
-                >
-                  <Avatar className="size-14">
-                    <AvatarImage
-                      className="object-cover"
-                      src={
-                        profile?.avatar_url
-                          ? optimizeSupabaseImageUrl(profile.avatar_url)
-                          : undefined
-                      }
-                    />
-                    <AvatarFallback>
-                      <UserRound className="size-12 text-muted-foreground" />
-                    </AvatarFallback>
-                  </Avatar>
-                </ItemMedia>
-                <ItemContent className="flex-1 gap-0">
-                  <ItemTitle className="text-xl font-bold line-clamp-1">
-                    {nickname}
-                  </ItemTitle>
-                  <ItemDescription className="text-base line-clamp-1">
-                    {user.email}
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions className="shrink-0">
-                  <ChevronRight className="size-5" />
-                </ItemActions>
-              </Link>
-            </Item>
-          </ItemGroup>
+          <ProfileSection />
 
           <ItemGroup className="rounded-xl bg-background">
             <Item asChild>

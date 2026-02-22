@@ -2,7 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { ChevronRight } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
+import { profileQueryKey } from "@/hooks/use-profile";
 import {
   Item,
   ItemActions,
@@ -12,10 +14,12 @@ import {
 
 export function LogoutMenuItem() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
+    queryClient.setQueryData(profileQueryKey, null);
     router.refresh();
     router.push("/signin");
   };

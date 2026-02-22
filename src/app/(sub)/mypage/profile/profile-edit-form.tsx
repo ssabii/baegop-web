@@ -1,12 +1,15 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Camera, UserRound } from "lucide-react";
 import { toast } from "sonner";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
+import { useProfile } from "@/hooks/use-profile";
+import { useUpdateProfileMutation } from "@/hooks/use-update-profile-mutation";
+import { BottomActionBar } from "@/components/bottom-action-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Drawer,
   DrawerContent,
@@ -14,35 +17,58 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { BottomActionBar } from "@/components/bottom-action-bar";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { optimizeSupabaseImageUrl } from "@/lib/image";
-import { uploadAvatar, updateNickname } from "./actions";
+import { uploadAvatar } from "./actions";
 
-const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]+$/;
+const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]+(?:\s[가-힣a-zA-Z0-9]+)*$/;
 
-interface ProfileEditFormProps {
-  initialNickname: string;
-  initialAvatarUrl: string | null;
-}
-
-export function ProfileEditForm({
-  initialNickname,
-  initialAvatarUrl,
-}: ProfileEditFormProps) {
+export function ProfileEditForm() {
+  const { profile, isLoading } = useProfile();
+  const { mutateAsync: updateProfile } = useUpdateProfileMutation();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isPending, setIsPending] = useState(false);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [nickname, setNickname] = useState(initialNickname);
+  const [nickname, setNickname] = useState("");
+  const [isNicknameInitialized, setIsNicknameInitialized] = useState(false);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerNickname, setDrawerNickname] = useState(initialNickname);
+  const [drawerNickname, setDrawerNickname] = useState("");
   const [nicknameError, setNicknameError] = useState("");
 
-  const isDirty = avatarFile !== null || nickname !== initialNickname;
+  // 프로필 로드 후 닉네임 초기화
+  useEffect(() => {
+    if (profile && !isNicknameInitialized) {
+      setNickname(profile.nickname);
+      setIsNicknameInitialized(true);
+    }
+  }, [profile, isNicknameInitialized]);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
+
+  if (isLoading || !profile) {
+    return (
+      <>
+        <div className="flex justify-center px-4 pt-8 pb-6">
+          <Skeleton className="size-24 rounded-full" />
+        </div>
+        <div className="flex flex-col gap-2 px-4">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      </>
+    );
+  }
+
+  const isDirty = avatarFile !== null || nickname !== profile.nickname;
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -52,6 +78,7 @@ export function ProfileEditForm({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     setAvatarFile(file);
     setAvatarPreview(URL.createObjectURL(file));
   };
@@ -89,27 +116,31 @@ export function ProfileEditForm({
     setDrawerOpen(false);
   };
 
-  const handleSave = () => {
-    startTransition(async () => {
-      try {
-        if (avatarFile) {
-          const formData = new FormData();
-          formData.append("avatar", avatarFile);
-          await uploadAvatar(formData);
-        }
+  const handleSave = async () => {
+    setIsPending(true);
+    try {
+      let newAvatarUrl: string | undefined;
 
-        if (nickname !== initialNickname) {
-          await updateNickname(nickname);
-        }
-
-        toast.success("프로필이 수정되었습니다", { position: "top-center" });
-        router.back();
-      } catch {
-        toast.error("프로필 수정에 실패했습니다. 다시 시도해주세요.", {
-          position: "top-center",
-        });
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("avatar", avatarFile);
+        newAvatarUrl = await uploadAvatar(formData);
       }
-    });
+
+      const updates: { nickname?: string; avatarUrl?: string } = {};
+      if (nickname !== profile.nickname) updates.nickname = nickname;
+      if (newAvatarUrl) updates.avatarUrl = newAvatarUrl;
+
+      await updateProfile(updates);
+
+      toast.success("프로필이 수정되었습니다", { position: "top-center" });
+      router.back();
+    } catch {
+      toast.error("프로필 수정에 실패했습니다. 다시 시도해주세요.", {
+        position: "top-center",
+      });
+      setIsPending(false);
+    }
   };
 
   return (
@@ -125,8 +156,8 @@ export function ProfileEditForm({
             <AvatarImage
               src={
                 avatarPreview ??
-                (initialAvatarUrl
-                  ? optimizeSupabaseImageUrl(initialAvatarUrl)
+                (profile.avatarUrl
+                  ? optimizeSupabaseImageUrl(profile.avatarUrl)
                   : undefined)
               }
               className="object-cover"

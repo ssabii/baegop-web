@@ -1,28 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { toOriginalSupabaseImageUrl } from "@/lib/image";
-
-export async function updateNickname(nickname: string) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("로그인이 필요합니다.");
-
-  const { error } = await supabase
-    .from("profiles")
-    .update({ nickname })
-    .eq("id", user.id);
-
-  if (error) throw new Error("닉네임 변경에 실패했습니다.");
-
-  revalidatePath("/mypage");
-  revalidatePath("/mypage/profile");
-}
 
 export async function uploadAvatar(formData: FormData) {
   const supabase = await createClient();
@@ -65,13 +44,5 @@ export async function uploadAvatar(formData: FormData) {
     data: { publicUrl },
   } = supabase.storage.from("profile-images").getPublicUrl(path);
 
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({ avatar_url: publicUrl })
-    .eq("id", user.id);
-
-  if (updateError) throw new Error("아바타 저장에 실패했습니다.");
-
-  revalidatePath("/mypage");
-  revalidatePath("/mypage/profile");
+  return publicUrl;
 }
