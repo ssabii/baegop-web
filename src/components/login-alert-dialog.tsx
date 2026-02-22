@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +24,8 @@ export function LoginAlertDialog({
   onOpenChange,
   description,
 }: LoginAlertDialogProps) {
+  const pathname = usePathname();
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent size="sm">
@@ -33,7 +36,11 @@ export function LoginAlertDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Link href="/signin">로그인</Link>
+            <Link
+              href={`/signin?redirect=${encodeURIComponent(pathname)}`}
+            >
+              로그인
+            </Link>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
