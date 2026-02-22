@@ -7,12 +7,14 @@ interface UseKonaVoteOptions {
   placeId: string;
   initialStatus: KonaCardStatus;
   initialUserVote: KonaVote | null;
+  onSuccess?: () => void;
 }
 
 export function useKonaVote({
   placeId,
   initialStatus,
   initialUserVote,
+  onSuccess,
 }: UseKonaVoteOptions) {
   const [status, setStatus] = useState<KonaCardStatus>(initialStatus);
   const [userVote, setUserVote] = useState<KonaVote | null>(initialUserVote);
@@ -38,6 +40,7 @@ export function useKonaVote({
     onSuccess: (result) => {
       setStatus(result.status);
       setUserVote(result.userVote);
+      onSuccess?.();
     },
   });
 
