@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/use-profile";
 
-interface SearchBarAvatarProps {
-  userId: string;
-}
+export function SearchBarAvatar() {
+  const { profile, isLoading } = useProfile();
 
-export function SearchBarAvatar({ userId }: SearchBarAvatarProps) {
-  const { profile } = useProfile(userId);
+  if (isLoading) return <Skeleton className="size-7 rounded-full" />;
+  if (!profile) return null;
 
   const initials = profile.nickname.charAt(0).toUpperCase();
 

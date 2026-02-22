@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronRight, UserRound } from "lucide-react";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Item,
   ItemActions,
@@ -15,12 +16,29 @@ import {
 } from "@/components/ui/item";
 import { useProfile } from "@/hooks/use-profile";
 
-interface ProfileSectionProps {
-  userId: string;
-}
+export function ProfileSection() {
+  const { profile, isLoading } = useProfile();
 
-export function ProfileSection({ userId }: ProfileSectionProps) {
-  const { profile } = useProfile(userId);
+  if (isLoading) {
+    return (
+      <ItemGroup>
+        <Item className="gap-2">
+          <ItemMedia
+            variant="icon"
+            className="shrink-0 size-14 bg-transparent border-none"
+          >
+            <Skeleton className="size-14 rounded-full" />
+          </ItemMedia>
+          <ItemContent className="flex-1 gap-1">
+            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-5 w-40" />
+          </ItemContent>
+        </Item>
+      </ItemGroup>
+    );
+  }
+
+  if (!profile) return null;
 
   return (
     <ItemGroup>

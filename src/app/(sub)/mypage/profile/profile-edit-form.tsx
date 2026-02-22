@@ -1,5 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { Camera, UserRound } from "lucide-react";
+import { toast } from "sonner";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
+import { useProfile } from "@/hooks/use-profile";
+import { useUpdateProfileMutation } from "@/hooks/use-update-profile-mutation";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,44 +18,57 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import { optimizeSupabaseImageUrl } from "@/lib/image";
-import { Camera, UserRound } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { profileQueryKey, useProfile } from "@/hooks/use-profile";
-import { updateNickname, uploadAvatar } from "./actions";
+import { uploadAvatar } from "./actions";
 
 const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]+(?:\s[가-힣a-zA-Z0-9]+)*$/;
 
-interface ProfileEditFormProps {
-  userId: string;
-}
-
-export function ProfileEditForm({ userId }: ProfileEditFormProps) {
-  const { profile } = useProfile(userId);
+export function ProfileEditForm() {
+  const { profile, isLoading } = useProfile();
+  const { mutateAsync: updateProfile } = useUpdateProfileMutation();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, setIsPending] = useState(false);
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [nickname, setNickname] = useState(profile.nickname);
+  const [nickname, setNickname] = useState("");
+  const [isNicknameInitialized, setIsNicknameInitialized] = useState(false);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerNickname, setDrawerNickname] = useState(profile.nickname);
+  const [drawerNickname, setDrawerNickname] = useState("");
   const [nicknameError, setNicknameError] = useState("");
 
-  const isDirty = avatarFile !== null || nickname !== profile.nickname;
+  // 프로필 로드 후 닉네임 초기화
+  useEffect(() => {
+    if (profile && !isNicknameInitialized) {
+      setNickname(profile.nickname);
+      setIsNicknameInitialized(true);
+    }
+  }, [profile, isNicknameInitialized]);
 
   useEffect(() => {
     return () => {
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     };
   }, [avatarPreview]);
+
+  if (isLoading || !profile) {
+    return (
+      <>
+        <div className="flex justify-center px-4 pt-8 pb-6">
+          <Skeleton className="size-24 rounded-full" />
+        </div>
+        <div className="flex flex-col gap-2 px-4">
+          <Skeleton className="h-4 w-12" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      </>
+    );
+  }
+
+  const isDirty = avatarFile !== null || nickname !== profile.nickname;
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -99,17 +119,20 @@ export function ProfileEditForm({ userId }: ProfileEditFormProps) {
   const handleSave = async () => {
     setIsPending(true);
     try {
+      let newAvatarUrl: string | undefined;
+
       if (avatarFile) {
         const formData = new FormData();
         formData.append("avatar", avatarFile);
-        await uploadAvatar(formData);
+        newAvatarUrl = await uploadAvatar(formData);
       }
 
-      if (nickname !== profile.nickname) {
-        await updateNickname(nickname);
-      }
+      const updates: { nickname?: string; avatarUrl?: string } = {};
+      if (nickname !== profile.nickname) updates.nickname = nickname;
+      if (newAvatarUrl) updates.avatarUrl = newAvatarUrl;
 
-      await queryClient.invalidateQueries({ queryKey: profileQueryKey(userId) });
+      await updateProfile(updates);
+
       toast.success("프로필이 수정되었습니다", { position: "top-center" });
       router.back();
     } catch {

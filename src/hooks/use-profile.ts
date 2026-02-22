@@ -1,4 +1,5 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { createClient } from "@/lib/supabase/client";
 
 export interface Profile {
   nickname: string;
@@ -6,22 +7,33 @@ export interface Profile {
   email: string | null;
 }
 
-export const profileQueryKey = (userId: string) => [
-  "mypage",
-  "profile",
-  userId,
-];
+export const profileQueryKey = ["profile"];
 
-export function useProfile(userId: string) {
-  const { data } = useSuspenseQuery({
-    queryKey: profileQueryKey(userId),
+export function useProfile() {
+  const { data, isLoading } = useQuery({
+    queryKey: profileQueryKey,
     queryFn: async () => {
-      const res = await fetch("/api/mypage/profile");
-      if (!res.ok) throw new Error("Failed to fetch profile");
-      return res.json() as Promise<Profile>;
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("nickname, avatar_url")
+        .eq("id", user.id)
+        .single();
+
+      return {
+        nickname: profile?.nickname ?? user.email ?? "사용자",
+        avatarUrl: profile?.avatar_url ?? null,
+        email: user.email ?? null,
+      } as Profile;
     },
-    staleTime: Infinity,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 
-  return { profile: data };
+  return { profile: data ?? null, isLoading };
 }

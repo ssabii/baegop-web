@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronRight } from "lucide-react";
-import {
-  dehydrate,
-  HydrationBoundary,
-  QueryClient,
-} from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/server";
-import { profileQueryKey } from "@/hooks/use-profile";
 import {
   Item,
   ItemActions,
@@ -27,24 +21,7 @@ export default async function MyPage() {
 
   if (!user) redirect("/signin");
 
-  const queryClient = new QueryClient();
-
-  const [, { count: reviewCount }, { count: placeCount }] = await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: profileQueryKey(user.id),
-      queryFn: async () => {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("nickname, avatar_url")
-          .eq("id", user.id)
-          .single();
-        return {
-          nickname: profile?.nickname ?? user.email ?? "사용자",
-          avatarUrl: profile?.avatar_url ?? null,
-          email: user.email ?? null,
-        };
-      },
-    }),
+  const [{ count: reviewCount }, { count: placeCount }] = await Promise.all([
     supabase
       .from("reviews")
       .select("*", { count: "exact", head: true })
@@ -65,9 +42,7 @@ export default async function MyPage() {
           </h2>
 
           {/* 프로필 섹션 */}
-          <HydrationBoundary state={dehydrate(queryClient)}>
-            <ProfileSection userId={user.id} />
-          </HydrationBoundary>
+          <ProfileSection />
 
           <ItemGroup className="rounded-xl bg-background">
             <Item asChild>
