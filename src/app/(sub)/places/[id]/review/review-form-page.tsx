@@ -101,8 +101,10 @@ export function ReviewFormPage({
       }
 
       await createReview(placeId, { rating, content }, formData);
+      toast.success("리뷰가 등록되었어요.", { position: "top-center" });
       router.back();
     } catch {
+      toast.error("리뷰 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
       setIsPending(false);
     }
   }

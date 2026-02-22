@@ -13,6 +13,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { toast } from "sonner";
 import { formatRelativeDate } from "@/lib/date";
 import { StarRating } from "./star-rating";
 import { ReviewImages } from "./review-images";
@@ -60,8 +61,13 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     if (!ok) return;
 
     startTransition(async () => {
-      await deleteReview(review.id);
-      router.refresh();
+      try {
+        await deleteReview(review.id);
+        router.refresh();
+        toast.success("리뷰가 삭제되었어요.", { position: "top-center" });
+      } catch {
+        toast.error("리뷰 삭제에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+      }
     });
   }
 
