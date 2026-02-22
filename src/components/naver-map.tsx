@@ -21,6 +21,12 @@ interface NaverMapProps {
 
 const DARK_STYLE_ID = "94230366-adba-4e0e-ac5a-e82a0e137b5e";
 
+// Module-level cache: map instance and DOM survive unmount
+let cachedMapEl: HTMLDivElement | null = null;
+let cachedMapInstance: naver.maps.Map | null = null;
+let cachedInfoWindow: naver.maps.InfoWindow | null = null;
+let cachedTheme: string | undefined = undefined;
+
 function loadNaverMapsScript(): Promise<void> {
   return new Promise((resolve, reject) => {
     if (window.naver?.maps) {
@@ -51,55 +57,86 @@ export default function NaverMap({
   markers = [],
   className,
 }: NaverMapProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<naver.maps.Map | null>(null);
-  const infoWindowRef = useRef<naver.maps.InfoWindow | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const markerInstancesRef = useRef<naver.maps.Marker[]>([]);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { resolvedTheme } = useTheme();
 
-  const createMap = useCallback(() => {
-    if (!mapRef.current) return;
+  const initMap = useCallback(
+    (container: HTMLDivElement) => {
+      if (cachedMapInstance) {
+        cachedMapInstance.destroy();
+        cachedMapInstance = null;
+      }
+      if (cachedMapEl) {
+        cachedMapEl.remove();
+      }
 
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.destroy();
-      mapInstanceRef.current = null;
+      cachedMapEl = document.createElement("div");
+      cachedMapEl.style.cssText = "width:100%;height:100%";
+      container.appendChild(cachedMapEl);
+
+      const isDark = resolvedTheme === "dark";
+      cachedMapInstance = new naver.maps.Map(cachedMapEl, {
+        gl: true,
+        center: new naver.maps.LatLng(center.lat, center.lng),
+        zoom,
+        customStyleId: isDark ? DARK_STYLE_ID : undefined,
+      });
+
+      cachedInfoWindow = new naver.maps.InfoWindow({
+        content: "",
+        borderWidth: 0,
+        backgroundColor: "transparent",
+        disableAnchor: true,
+        pixelOffset: new naver.maps.Point(0, -8),
+      });
+
+      cachedTheme = resolvedTheme;
+
+      naver.maps.Event.addListener(cachedMapInstance, "click", () => {
+        cachedInfoWindow?.close();
+      });
+
+      const idleListener = naver.maps.Event.addListener(
+        cachedMapInstance,
+        "idle",
+        () => {
+          naver.maps.Event.removeListener(idleListener);
+          setReady(true);
+        },
+      );
+    },
+    [center.lat, center.lng, zoom, resolvedTheme],
+  );
+
+  // Mount: reattach cached DOM or create new map
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Cache exists and theme matches — reattach instantly
+    if (cachedMapEl && cachedMapInstance && cachedTheme === resolvedTheme) {
+      container.appendChild(cachedMapEl);
+      cachedMapInstance.autoResize();
+      setReady(true);
+
+      return () => {
+        markerInstancesRef.current.forEach((m) => m.setMap(null));
+        markerInstancesRef.current = [];
+        cachedInfoWindow?.close();
+        cachedMapEl?.remove();
+        setReady(false);
+      };
     }
 
-    const isDark = resolvedTheme === "dark";
-    const map = new naver.maps.Map(mapRef.current, {
-      gl: true,
-      center: new naver.maps.LatLng(center.lat, center.lng),
-      zoom,
-      customStyleId: isDark ? DARK_STYLE_ID : undefined,
-    });
-
-    mapInstanceRef.current = map;
-
-    infoWindowRef.current = new naver.maps.InfoWindow({
-      content: "",
-      borderWidth: 0,
-      backgroundColor: "transparent",
-      disableAnchor: true,
-      pixelOffset: new naver.maps.Point(0, -8),
-    });
-
-    naver.maps.Event.addListener(map, "click", () => {
-      infoWindowRef.current?.close();
-    });
-
-    setReady(true);
-  }, [center.lat, center.lng, zoom, resolvedTheme]);
-
-  // Initialize script + create map
-  useEffect(() => {
+    // No cache or theme changed — load script and create map
     let mounted = true;
 
     loadNaverMapsScript()
       .then(() => {
-        if (!mounted) return;
-        createMap();
+        if (mounted) initMap(container);
       })
       .catch((err) => {
         if (mounted) setError(err.message);
@@ -107,26 +144,33 @@ export default function NaverMap({
 
     return () => {
       mounted = false;
+      markerInstancesRef.current.forEach((m) => m.setMap(null));
+      markerInstancesRef.current = [];
+      cachedInfoWindow?.close();
+      cachedMapEl?.remove();
+      setReady(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Recreate map on theme change (after initial load)
+  // Theme change while mounted — recreate map
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    createMap();
+    if (!cachedMapInstance || !containerRef.current) return;
+    if (cachedTheme === resolvedTheme) return;
+    setReady(false);
+    initMap(containerRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedTheme]);
 
   // Update markers
   useEffect(() => {
-    const map = mapInstanceRef.current;
+    const map = cachedMapInstance;
     if (!ready || !map) return;
 
     markerInstancesRef.current.forEach((m) => m.setMap(null));
     markerInstancesRef.current = [];
 
-    const infoWindow = infoWindowRef.current;
+    const infoWindow = cachedInfoWindow;
 
     markers.forEach(({ id, lat, lng, title, category }) => {
       const marker = new naver.maps.Marker({
@@ -177,5 +221,5 @@ export default function NaverMap({
     );
   }
 
-  return <div ref={mapRef} className={className} />;
+  return <div ref={containerRef} className={className} />;
 }
