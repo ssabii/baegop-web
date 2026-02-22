@@ -13,7 +13,7 @@ export default async function MyReviewsPage() {
   if (!user) redirect("/signin");
 
   return (
-    <div className="bg-background flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col">
       <SubHeader title="내 리뷰" />
       <div className="flex flex-1 flex-col">
         <MyReviewList userId={user.id} />

@@ -29,7 +29,7 @@ export default function ThemePage() {
   };
 
   return (
-    <div className="bg-background h-screen">
+    <div className="h-screen">
       <SubHeader title="테마" />
       <div className="px-4 pt-8">
         <ItemGroup className="rounded-xl bg-card">

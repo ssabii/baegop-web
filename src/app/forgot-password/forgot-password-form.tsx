@@ -84,12 +84,10 @@ export function ForgotPasswordForm() {
       <form onSubmit={handleSubmit} noValidate>
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
-            <div className="flex items-center gap-1">
-              <Link href="/">
-                <img src="/baegop.svg" alt="배곱" className="size-6" />
-              </Link>
+            <Link href="/" className="flex items-center gap-1">
+              <img src="/baegop.svg" alt="배곱" className="size-6" />
               <h1 className="text-2xl font-bold">배곱</h1>
-            </div>
+            </Link>
             <FieldDescription>
               가입한 이메일을 입력하면
               <br />
