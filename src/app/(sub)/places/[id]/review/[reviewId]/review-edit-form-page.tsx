@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, ImagePlus, Star, Tag, X } from "lucide-react";
+import { Building2, ImagePlus, Loader2, Star, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,6 +19,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { SubHeader } from "@/components/sub-header";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
+import { compressImage, optimizeSupabaseImageUrl } from "@/lib/image";
 import { updateReview } from "../../actions";
 
 const MAX_IMAGES = 5;
@@ -60,7 +62,10 @@ export function ReviewEditFormPage({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isPending, setIsPending] = useState(false);
+  const [compressingCount, setCompressingCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewsRef = useRef(previews);
+  previewsRef.current = previews;
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
   const [drawerContent, setDrawerContent] = useState("");
@@ -77,7 +82,13 @@ export function ReviewEditFormPage({
     keptImageUrls.length !== existingUrls.length ||
     selectedFiles.length > 0;
 
-  function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
+  useEffect(() => {
+    return () => {
+      previewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
+
+  async function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
 
@@ -96,10 +107,18 @@ export function ReviewEditFormPage({
     }
 
     if (allowed.length > 0) {
-      setSelectedFiles((prev) => [...prev, ...allowed]);
+      setCompressingCount(allowed.length);
+      const compressed = await Promise.all(
+        allowed.map(async (file) => {
+          const result = await compressImage(file);
+          setCompressingCount((prev) => prev - 1);
+          return result;
+        }),
+      );
+      setSelectedFiles((prev) => [...prev, ...compressed]);
       setPreviews((prev) => [
         ...prev,
-        ...allowed.map((f) => URL.createObjectURL(f)),
+        ...compressed.map((f) => URL.createObjectURL(f)),
       ]);
     }
 
@@ -116,32 +135,53 @@ export function ReviewEditFormPage({
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   }
 
+  async function uploadImages(files: File[]): Promise<string[]> {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) throw new Error("로그인이 필요합니다");
+
+    const results = await Promise.all(
+      files.map(async (file) => {
+        const ext = file.name.split(".").pop() ?? "jpg";
+        const path = `${naverPlaceId}/${user.id}/${crypto.randomUUID()}.${ext}`;
+
+        const { error } = await supabase.storage
+          .from("review-images")
+          .upload(path, file);
+
+        if (error) return null;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("review-images").getPublicUrl(path);
+        return publicUrl;
+      }),
+    );
+
+    return results.filter((url: string | null): url is string => url !== null);
+  }
+
   async function handleSubmit() {
     if (rating === 0) return;
 
     setIsPending(true);
     try {
-      let formData: FormData | undefined;
-      if (selectedFiles.length > 0) {
-        formData = new FormData();
-        selectedFiles.forEach((file) => formData!.append("images", file));
-      }
-
-      const deletedImageUrls = existingUrls.filter(
-        (url) => !keptImageUrls.includes(url),
-      );
+      const newImageUrls =
+        selectedFiles.length > 0 ? await uploadImages(selectedFiles) : undefined;
 
       await updateReview(
         review.id,
-        naverPlaceId,
         { rating, content },
-        formData,
-        deletedImageUrls.length > 0 ? deletedImageUrls : undefined,
+        keptImageUrls,
+        newImageUrls,
       );
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
       toast.success("리뷰가 수정되었어요.", { position: "top-center" });
       sessionStorage.setItem("scrollToReview", "true");
       router.back();
+      router.refresh();
     } catch {
       toast.error("리뷰 수정에 실패했어요. 다시 시도해주세요.", {
         position: "top-center",
@@ -200,10 +240,11 @@ export function ReviewEditFormPage({
                 <button
                   key={star}
                   type="button"
+                  disabled={isPending || compressingCount > 0}
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
-                  className="transition-colors"
+                  className="transition-colors disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Star
                     className={`size-7 ${
@@ -222,11 +263,12 @@ export function ReviewEditFormPage({
             <Label className="text-base font-bold">어떤 점이 좋았나요?</Label>
             <button
               type="button"
+              disabled={isPending || compressingCount > 0}
               onClick={() => {
                 setDrawerContent(content);
                 setContentDrawerOpen(true);
               }}
-              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
             >
               {content ? (
                 <div className="w-full min-w-0 line-clamp-4 whitespace-pre-wrap text-left">
@@ -299,10 +341,15 @@ export function ReviewEditFormPage({
             {totalImageCount === 0 ? (
               <button
                 type="button"
+                disabled={isPending || compressingCount > 0}
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
               >
-                <ImagePlus className="size-5" />
+                {compressingCount > 0 ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <ImagePlus className="size-5" />
+                )}
               </button>
             ) : (
               <div className="mt-2 grid grid-cols-5 gap-2">
@@ -310,22 +357,25 @@ export function ReviewEditFormPage({
                   <div key={url} className="relative">
                     <button
                       type="button"
-                      className="w-full cursor-pointer overflow-hidden rounded-lg"
+                      disabled={isPending || compressingCount > 0}
+                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
                       onClick={() => {
                         setPreviewIndex(i);
                         setPreviewOpen(true);
                       }}
                     >
                       <img
-                        src={url}
+                        src={optimizeSupabaseImageUrl(url, { width: 200 })}
+                        decoding="async"
                         alt="기존 이미지"
                         className="aspect-square w-full object-cover"
                       />
                     </button>
                     <button
                       type="button"
+                      disabled={isPending || compressingCount > 0}
                       onClick={() => removeExistingImage(url)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm"
+                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
@@ -335,7 +385,8 @@ export function ReviewEditFormPage({
                   <div key={src} className="relative">
                     <button
                       type="button"
-                      className="w-full cursor-pointer overflow-hidden rounded-lg"
+                      disabled={isPending || compressingCount > 0}
+                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
                       onClick={() => {
                         setPreviewIndex(keptImageUrls.length + i);
                         setPreviewOpen(true);
@@ -343,26 +394,33 @@ export function ReviewEditFormPage({
                     >
                       <img
                         src={src}
+                        decoding="async"
                         alt={`미리보기 ${i + 1}`}
                         className="aspect-square w-full object-cover"
                       />
                     </button>
                     <button
                       type="button"
+                      disabled={isPending || compressingCount > 0}
                       onClick={() => removeNewFile(i)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm"
+                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
                   </div>
                 ))}
-                {totalImageCount < MAX_IMAGES && (
+                {totalImageCount + compressingCount < MAX_IMAGES && (
                   <button
                     type="button"
+                    disabled={isPending || compressingCount > 0}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
                   >
-                    <ImagePlus className="size-5" />
+                    {compressingCount > 0 ? (
+                      <Loader2 className="size-5 animate-spin" />
+                    ) : (
+                      <ImagePlus className="size-5" />
+                    )}
                   </button>
                 )}
               </div>
@@ -370,7 +428,7 @@ export function ReviewEditFormPage({
             <input
               ref={fileInputRef}
               type="file"
-              multiple
+              multiple={MAX_IMAGES - totalImageCount > 1}
               accept="image/*"
               className="hidden"
               onChange={handleFilesChange}
@@ -386,17 +444,17 @@ export function ReviewEditFormPage({
             size="xl"
             className="flex-1"
             onClick={handleBack}
-            disabled={isPending}
+            disabled={isPending || compressingCount > 0}
           >
             취소
           </Button>
           <Button
             size="xl"
-            className="flex-1"
+            className="flex-1 transition-none has-[>svg]:px-8"
             onClick={handleSubmit}
-            disabled={rating === 0 || isPending}
+            disabled={rating === 0 || isPending || compressingCount > 0}
           >
-            {isPending && <Spinner data-icon="inline-start" />}
+            {isPending && <Spinner />}
             수정
           </Button>
         </div>

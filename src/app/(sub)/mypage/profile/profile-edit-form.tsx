@@ -224,12 +224,12 @@ function ProfileEditFormContent({ profile }: { profile: Profile }) {
       <BottomActionBar>
         <div className="mx-auto flex max-w-4xl">
           <Button
-            className="w-full"
+            className="w-full transition-none has-[>svg]:px-8"
             size="xl"
             disabled={!isDirty || isPending}
             onClick={handleSave}
           >
-            {isPending && <Spinner data-icon="inline-start" />}
+            {isPending && <Spinner />}
             수정
           </Button>
         </div>
