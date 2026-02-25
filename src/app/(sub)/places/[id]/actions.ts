@@ -7,7 +7,7 @@ import type { KonaCardStatus, KonaVote } from "@/types";
 export async function createReview(
   placeId: string,
   data: { rating: number; content: string },
-  images?: FormData,
+  imageUrls?: string[],
 ) {
   const supabase = await createClient();
   const {
@@ -29,38 +29,14 @@ export async function createReview(
 
   if (error || !review) throw new Error("리뷰 작성에 실패했습니다");
 
-  // 이미지 업로드
-  if (images) {
-    const files = images.getAll("images") as File[];
-    const imageUrls: string[] = [];
-
-    for (const file of files) {
-      if (!(file instanceof File) || file.size === 0) continue;
-
-      const ext = file.name.split(".").pop() ?? "jpg";
-      const path = `${placeId}/${user.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("review-images")
-        .upload(path, file);
-
-      if (!uploadError) {
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("review-images").getPublicUrl(path);
-        imageUrls.push(publicUrl);
-      }
-    }
-
-    if (imageUrls.length > 0) {
-      await supabase.from("review_images").insert(
-        imageUrls.map((url, i) => ({
-          review_id: review.id,
-          url,
-          display_order: i,
-        })),
-      );
-    }
+  if (imageUrls && imageUrls.length > 0) {
+    await supabase.from("review_images").insert(
+      imageUrls.map((url, i) => ({
+        review_id: review.id,
+        url,
+        display_order: i,
+      })),
+    );
   }
 }
 
@@ -83,10 +59,9 @@ export async function deleteReview(reviewId: number) {
 
 export async function updateReview(
   reviewId: number,
-  placeId: string,
   data: { rating: number; content: string },
-  newImages?: FormData,
-  deletedImageUrls?: string[],
+  keptImageUrls: string[],
+  newImageUrls?: string[],
 ) {
   const supabase = await createClient();
   const {
@@ -95,78 +70,53 @@ export async function updateReview(
 
   if (!user) throw new Error("로그인이 필요합니다");
 
-  const { error } = await supabase
-    .from("reviews")
-    .update({
-      rating: data.rating,
-      content: data.content || null,
-    })
-    .eq("id", reviewId)
-    .eq("user_id", user.id);
+  // 리뷰 수정 + 기존 이미지 조회 병렬 실행
+  const [updateResult, existingResult] = await Promise.all([
+    supabase
+      .from("reviews")
+      .update({ rating: data.rating, content: data.content || null })
+      .eq("id", reviewId)
+      .eq("user_id", user.id),
+    supabase
+      .from("review_images")
+      .select("url")
+      .eq("review_id", reviewId),
+  ]);
 
-  if (error) throw new Error("리뷰 수정에 실패했습니다");
+  if (updateResult.error) throw new Error("리뷰 수정에 실패했습니다");
 
-  // 삭제할 이미지 처리
-  if (deletedImageUrls && deletedImageUrls.length > 0) {
-    const originalUrls = deletedImageUrls.map(toOriginalSupabaseImageUrl);
+  // 삭제할 이미지 계산: DB에 있지만 keptImageUrls에 없는 이미지
+  const keptOriginalUrls = new Set(keptImageUrls.map(toOriginalSupabaseImageUrl));
+  const toDelete = (existingResult.data ?? [])
+    .map((row) => row.url as string)
+    .filter((url) => !keptOriginalUrls.has(url));
 
-    // Storage에서 파일 삭제
-    const storagePaths = originalUrls.map((url) => {
+  if (toDelete.length > 0) {
+    const storagePaths = toDelete.map((url) => {
       const parts = url.split("/review-images/");
       return parts[1];
     });
-    await supabase.storage.from("review-images").remove(storagePaths);
 
-    // DB에서 레코드 삭제
-    await supabase
-      .from("review_images")
-      .delete()
-      .eq("review_id", reviewId)
-      .in("url", originalUrls);
+    await Promise.all([
+      supabase.storage.from("review-images").remove(storagePaths),
+      supabase
+        .from("review_images")
+        .delete()
+        .eq("review_id", reviewId)
+        .in("url", toDelete),
+    ]);
   }
 
-  // 새 이미지 업로드
-  if (newImages) {
-    const files = newImages.getAll("images") as File[];
-    const imageUrls: string[] = [];
-
-    // 현재 이미지 최대 display_order 조회
-    const { data: existingImages } = await supabase
-      .from("review_images")
-      .select("display_order")
-      .eq("review_id", reviewId)
-      .order("display_order", { ascending: false })
-      .limit(1);
-
-    const nextOrder = (existingImages?.[0]?.display_order ?? -1) + 1;
-
-    for (const file of files) {
-      if (!(file instanceof File) || file.size === 0) continue;
-
-      const ext = file.name.split(".").pop() ?? "jpg";
-      const path = `${placeId}/${user.id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("review-images")
-        .upload(path, file);
-
-      if (!uploadError) {
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("review-images").getPublicUrl(path);
-        imageUrls.push(publicUrl);
-      }
-    }
-
-    if (imageUrls.length > 0) {
-      await supabase.from("review_images").insert(
-        imageUrls.map((url, i) => ({
-          review_id: reviewId,
-          url,
-          display_order: nextOrder + i,
-        })),
-      );
-    }
+  // 새 이미지 DB 등록
+  if (newImageUrls && newImageUrls.length > 0) {
+    const nextOrder = keptImageUrls.length;
+    await supabase.from("review_images").insert(
+      newImageUrls.map((url, i) => ({
+        review_id: reviewId,
+        url,
+        display_order: nextOrder + i,
+      })),
+    );
   }
 }
 
