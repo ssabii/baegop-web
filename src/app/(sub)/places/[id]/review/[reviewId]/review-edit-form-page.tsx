@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, ImagePlus, Star, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -61,6 +61,8 @@ export function ReviewEditFormPage({
   const [previews, setPreviews] = useState<string[]>([]);
   const [isPending, setIsPending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewsRef = useRef(previews);
+  previewsRef.current = previews;
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
   const [drawerContent, setDrawerContent] = useState("");
@@ -76,6 +78,12 @@ export function ReviewEditFormPage({
     content !== (review.content ?? "") ||
     keptImageUrls.length !== existingUrls.length ||
     selectedFiles.length > 0;
+
+  useEffect(() => {
+    return () => {
+      previewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
 
   function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -142,6 +150,7 @@ export function ReviewEditFormPage({
       toast.success("리뷰가 수정되었어요.", { position: "top-center" });
       sessionStorage.setItem("scrollToReview", "true");
       router.back();
+      router.refresh();
     } catch {
       toast.error("리뷰 수정에 실패했어요. 다시 시도해주세요.", {
         position: "top-center",
@@ -200,10 +209,11 @@ export function ReviewEditFormPage({
                 <button
                   key={star}
                   type="button"
+                  disabled={isPending}
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
-                  className="transition-colors"
+                  className="transition-colors disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Star
                     className={`size-7 ${
@@ -222,11 +232,12 @@ export function ReviewEditFormPage({
             <Label className="text-base font-bold">어떤 점이 좋았나요?</Label>
             <button
               type="button"
+              disabled={isPending}
               onClick={() => {
                 setDrawerContent(content);
                 setContentDrawerOpen(true);
               }}
-              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
             >
               {content ? (
                 <div className="w-full min-w-0 line-clamp-4 whitespace-pre-wrap text-left">
@@ -299,8 +310,9 @@ export function ReviewEditFormPage({
             {totalImageCount === 0 ? (
               <button
                 type="button"
+                disabled={isPending}
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
               >
                 <ImagePlus className="size-5" />
               </button>
@@ -324,8 +336,9 @@ export function ReviewEditFormPage({
                     </button>
                     <button
                       type="button"
+                      disabled={isPending}
                       onClick={() => removeExistingImage(url)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm"
+                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
@@ -349,8 +362,9 @@ export function ReviewEditFormPage({
                     </button>
                     <button
                       type="button"
+                      disabled={isPending}
                       onClick={() => removeNewFile(i)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm"
+                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
@@ -359,8 +373,9 @@ export function ReviewEditFormPage({
                 {totalImageCount < MAX_IMAGES && (
                   <button
                     type="button"
+                    disabled={isPending}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
                   >
                     <ImagePlus className="size-5" />
                   </button>
@@ -392,11 +407,11 @@ export function ReviewEditFormPage({
           </Button>
           <Button
             size="xl"
-            className="flex-1"
+            className="flex-1 transition-none has-[>svg]:px-8"
             onClick={handleSubmit}
             disabled={rating === 0 || isPending}
           >
-            {isPending && <Spinner data-icon="inline-start" />}
+            {isPending && <Spinner />}
             수정
           </Button>
         </div>
