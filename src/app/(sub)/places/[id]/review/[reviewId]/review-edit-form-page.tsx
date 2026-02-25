@@ -135,16 +135,12 @@ export function ReviewEditFormPage({
         selectedFiles.forEach((file) => formData!.append("images", file));
       }
 
-      const deletedImageUrls = existingUrls.filter(
-        (url) => !keptImageUrls.includes(url),
-      );
-
       await updateReview(
         review.id,
         naverPlaceId,
         { rating, content },
+        keptImageUrls,
         formData,
-        deletedImageUrls.length > 0 ? deletedImageUrls : undefined,
       );
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
       toast.success("리뷰가 수정되었어요.", { position: "top-center" });
@@ -322,7 +318,8 @@ export function ReviewEditFormPage({
                   <div key={url} className="relative">
                     <button
                       type="button"
-                      className="w-full cursor-pointer overflow-hidden rounded-lg"
+                      disabled={isPending}
+                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
                       onClick={() => {
                         setPreviewIndex(i);
                         setPreviewOpen(true);
@@ -348,7 +345,8 @@ export function ReviewEditFormPage({
                   <div key={src} className="relative">
                     <button
                       type="button"
-                      className="w-full cursor-pointer overflow-hidden rounded-lg"
+                      disabled={isPending}
+                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
                       onClick={() => {
                         setPreviewIndex(keptImageUrls.length + i);
                         setPreviewOpen(true);

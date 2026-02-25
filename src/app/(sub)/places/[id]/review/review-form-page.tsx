@@ -284,7 +284,8 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
                   <div key={src} className="relative">
                     <button
                       type="button"
-                      className="w-full cursor-pointer overflow-hidden rounded-lg"
+                      disabled={isPending}
+                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
                       onClick={() => {
                         setPreviewIndex(i);
                         setPreviewOpen(true);
