@@ -29,6 +29,16 @@ export function optimizeSupabaseImageUrl(
   ) + `?width=${width}&resize=contain`;
 }
 
+export async function compressImage(file: File): Promise<File> {
+  const imageCompression = (await import("browser-image-compression")).default;
+  return imageCompression(file, {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1280,
+    initialQuality: 0.7,
+    useWebWorker: true,
+  });
+}
+
 export function toOriginalSupabaseImageUrl(url: string): string {
   if (!url.includes("/storage/v1/render/image/public/")) return url;
   const withoutRender = url.replace(
