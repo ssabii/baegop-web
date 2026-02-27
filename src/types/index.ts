@@ -19,6 +19,12 @@ export type ReviewWithProfile = Review & {
 export type KonaCardStatus = "available" | "unavailable" | "unknown";
 export type KonaVote = "available" | "unavailable";
 
+/** 리뷰 이미지 (컴포넌트용 — DB 전체 컬럼이 아닌 필요 필드만) */
+export interface ReviewImageItem {
+  url: string;
+  display_order: number;
+}
+
 // 비DB 타입 — 네이버 플레이스 GraphQL 검색 결과 (places 쿼리)
 export interface NaverSearchResult {
   id: string; // naver place ID

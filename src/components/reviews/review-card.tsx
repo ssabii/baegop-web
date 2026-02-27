@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { ChevronRight, Star } from "lucide-react";
 import { formatRelativeDate } from "@/lib/date";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
+import type { ReviewImageItem } from "@/types";
 
 interface ReviewCardProps {
   review: {
@@ -16,10 +18,7 @@ interface ReviewCardProps {
       id: string;
       name: string;
     } | null;
-    review_images?: {
-      url: string;
-      display_order: number;
-    }[];
+    review_images?: ReviewImageItem[];
   };
 }
 
@@ -30,7 +29,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
   const sortedImages = (review.review_images ?? [])
     .slice()
     .sort((a, b) => a.display_order - b.display_order);
-  const imageUrls = sortedImages.map((img) => img.url);
+  const imageUrls = sortedImages.map((img) => optimizeSupabaseImageUrl(img.url));
 
   const content = (
     <div className="space-y-2 py-3">
@@ -83,7 +82,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
               }}
             >
               <img
-                src={img.url}
+                src={optimizeSupabaseImageUrl(img.url)}
                 alt={`리뷰 이미지 ${i + 1}`}
                 className="aspect-square w-full object-cover"
               />

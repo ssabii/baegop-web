@@ -16,6 +16,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { toast } from "sonner";
 import { formatRelativeDate } from "@/lib/date";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
+import type { ReviewImageItem } from "@/types";
 import { StarRating } from "./star-rating";
 import { ReviewImages } from "./review-images";
 import { deleteReview } from "./actions";
@@ -31,10 +33,7 @@ interface ReviewCardProps {
       nickname: string | null;
       avatar_url: string | null;
     } | null;
-    review_images: {
-      url: string;
-      display_order: number;
-    }[];
+    review_images: ReviewImageItem[];
   };
   isOwner: boolean;
   naverPlaceId: string;
@@ -82,7 +81,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     <div className="py-3 space-y-2">
       <div className="flex items-start gap-3">
         <Avatar className="size-10 shrink-0">
-          <AvatarImage src={review.profiles?.avatar_url ?? undefined} />
+          <AvatarImage src={review.profiles?.avatar_url ? optimizeSupabaseImageUrl(review.profiles.avatar_url) : undefined} />
           <AvatarFallback>
             <UserRound className="size-10 text-muted-foreground" />
           </AvatarFallback>
