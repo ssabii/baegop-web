@@ -1,7 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Check, Info } from "lucide-react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Spinner } from "@/components/ui/spinner";
+import { Toggle } from "@/components/ui/toggle";
+import { cn } from "@/lib/utils";
 import { useKonaVote } from "./use-kona-vote";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
@@ -37,16 +48,12 @@ export function KonaVoteSection({
   isLoggedIn,
 }: KonaVoteProps) {
   const router = useRouter();
-  const { status, userVote, vote } = useKonaVote({
+  const { status, userVote, vote, isPending } = useKonaVote({
     placeId,
     initialStatus,
     initialUserVote,
     onSuccess: () => router.refresh(),
   });
-
-  function handleVote(v: KonaVote) {
-    vote(v);
-  }
 
   const config = STATUS_CONFIG[status];
 
@@ -57,31 +64,72 @@ export function KonaVoteSection({
           <img src="/icons/kona.png" alt="코나카드" className="size-4" />
           <span className="text-sm font-bold">코나카드</span>
         </div>
-        <span className={`text-sm font-semibold ${config.className}`}>
+        <span className={cn("text-sm font-semibold", config.className)}>
           {config.label}
         </span>
       </div>
 
       {isLoggedIn && (
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
-            코나카드 결제가 가능한가요?
-          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-sm text-muted-foreground">
+              코나카드 결제가 가능한가요?
+            </span>
+            <Drawer>
+              <DrawerTrigger asChild>
+                <button
+                  type="button"
+                  className="text-muted-foreground"
+                  aria-label="코나카드 결제 안내"
+                >
+                  <Info className="size-3.5" />
+                </button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>코나카드 결제 여부</DrawerTitle>
+                  <DrawerDescription>
+                    코나카드 결제가 가능하다면 동료가 알 수 있게 투표해주세요.
+                  </DrawerDescription>
+                </DrawerHeader>
+              </DrawerContent>
+            </Drawer>
+          </div>
           <div className="flex items-center gap-1.5">
-            <Button
-              variant={userVote === "available" ? "default" : "outline"}
-              size="xs"
-              onClick={() => handleVote("available")}
+            <Toggle
+              variant="outline"
+              size="sm"
+              pressed={userVote === "available"}
+              onPressedChange={() => vote("available")}
+              disabled={isPending}
             >
+              {isPending && userVote === "available" ? (
+                <Spinner />
+              ) : (
+                <Check
+                  className={cn({ "fill-foreground": userVote === "available" })}
+                />
+              )}
               가능
-            </Button>
-            <Button
-              variant={userVote === "unavailable" ? "default" : "outline"}
-              size="xs"
-              onClick={() => handleVote("unavailable")}
+            </Toggle>
+            <Toggle
+              variant="outline"
+              size="sm"
+              pressed={userVote === "unavailable"}
+              onPressedChange={() => vote("unavailable")}
+              disabled={isPending}
             >
+              {isPending && userVote === "unavailable" ? (
+                <Spinner />
+              ) : (
+                <Check
+                  className={cn({
+                    "fill-foreground": userVote === "unavailable",
+                  })}
+                />
+              )}
               불가
-            </Button>
+            </Toggle>
           </div>
         </div>
       )}
