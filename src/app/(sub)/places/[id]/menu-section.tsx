@@ -10,6 +10,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
+import { optimizeNaverImageUrl } from "@/lib/image";
 import { useMenus, type MenusResponse } from "./use-menus";
 
 interface MenuSectionProps {
@@ -79,9 +80,9 @@ export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
               )}
             </div>
             {menu.images.length > 0 ? (
-              <ImagePreviewDialog src={menu.images[0]} alt={menu.name}>
+              <ImagePreviewDialog src={optimizeNaverImageUrl(menu.images[0])} alt={menu.name}>
                 <img
-                  src={menu.images[0]}
+                  src={optimizeNaverImageUrl(menu.images[0])}
                   alt={menu.name}
                   className="size-20 shrink-0 rounded-lg object-cover"
                 />

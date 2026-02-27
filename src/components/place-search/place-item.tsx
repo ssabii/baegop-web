@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Building2, MapPin, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { optimizeNaverImageUrl } from "@/lib/image";
 import type { NaverSearchResult } from "@/types";
 
 interface PlaceItemProps {
@@ -52,7 +53,7 @@ export function PlaceItem({
       </div>
       {item.imageUrl && !imgError ? (
         <img
-          src={item.imageUrl.replace(/^http:\/\//, "https://")}
+          src={optimizeNaverImageUrl(item.imageUrl.replace(/^http:\/\//, "https://"))}
           alt=""
           className={cn(thumbClass, "shrink-0 rounded-lg object-cover")}
           onError={() => setImgError(true)}
