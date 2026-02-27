@@ -37,12 +37,15 @@ export function PlaceDetailTabs({
   useEffect(() => {
     if (sessionStorage.getItem("scrollToReview") === "true") {
       sessionStorage.removeItem("scrollToReview");
-      tabsRef.current?.scrollIntoView({ behavior: "smooth" });
+      tabsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, []);
 
   return (
-    <Tabs ref={tabsRef} defaultValue="review">
+    <Tabs ref={tabsRef} defaultValue="review" className="scroll-mt-16">
       <TabsList className="w-full">
         <TabsTrigger value="review" className="flex-1 cursor-pointer">
           리뷰
@@ -53,10 +56,7 @@ export function PlaceDetailTabs({
       </TabsList>
 
       <TabsContent value="menu" className="mt-4">
-        <MenuSection
-          naverPlaceId={naverPlaceId}
-          initialData={initialMenus}
-        />
+        <MenuSection naverPlaceId={naverPlaceId} initialData={initialMenus} />
       </TabsContent>
 
       <TabsContent value="review" className="mt-4">
