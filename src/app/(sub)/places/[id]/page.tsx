@@ -1,38 +1,25 @@
-import { notFound } from "next/navigation";
+import { ImageGallery } from "@/components/image-gallery";
+import { SubHeader } from "@/components/sub-header";
+import { Button } from "@/components/ui/button";
+import { COMPANY_LOCATION } from "@/lib/constants";
+import { formatDistance, formatWalkingDuration } from "@/lib/geo";
+import { optimizeNaverImageUrls } from "@/lib/image";
 import {
-  Dot,
-  ExternalLink,
-  Footprints,
-  Home,
-  Map,
-  MapPin,
-  Phone,
-  Route,
-  Star,
-  Tag,
-} from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import {
-  buildNaverPlaceLink,
-  buildNaverWalkingRouteLink,
-  fetchPlaceDetail,
   fetchPlaceBySearch,
+  fetchPlaceDetail,
   fetchWalkingRoutes,
 } from "@/lib/naver";
-import { formatDistance, formatWalkingDuration } from "@/lib/geo";
-import { COMPANY_LOCATION } from "@/lib/constants";
-import { optimizeNaverImageUrls } from "@/lib/image";
+import { createClient } from "@/lib/supabase/server";
+import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
+import { Dot, Footprints, Home, MapPin, Star, Tag } from "lucide-react";
 import Link from "next/link";
-import { ImageGallery } from "@/components/image-gallery";
-import { UnregisteredBadge } from "./unregistered-badge";
-import { Button } from "@/components/ui/button";
-import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group";
-import { SubHeader } from "@/components/sub-header";
-import { PlaceDetailTabs } from "./place-detail-tabs";
+import { notFound } from "next/navigation";
 import { KonaVoteSection } from "./kona-vote";
 import { PlaceActionBar } from "./place-action-bar";
-import { StaticMap } from "./static-map";
-import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
+import { PlaceDetailTabs } from "./place-detail-tabs";
+import { PlaceMap } from "./place-map";
+import { PlaceShortcuts } from "./place-shortcuts";
+import { UnregisteredBadge } from "./unregistered-badge";
 
 export default async function PlaceDetailPage({
   params,
@@ -111,8 +98,7 @@ export default async function PlaceDetailPage({
     (konaVoteData?.data?.vote as KonaVote) ?? null;
 
   const address = detail.roadAddress || detail.address;
-  const naverLink = buildNaverPlaceLink(naverPlaceId);
-
+  console.log(detail.address, detail.roadAddress);
   return (
     <>
       <SubHeader
@@ -185,53 +171,15 @@ export default async function PlaceDetailPage({
             )}
           </section>
 
+          {/* 장소 맵 */}
+          <PlaceMap lat={detail.y} lng={detail.x} name={detail.name} />
+
           {/* 바로가기 버튼 */}
-          <ButtonGroup className="w-full">
-            <Button variant="ghost" size="xl" className="flex-1 flex-col gap-1 h-auto py-3" asChild>
-              <a href={naverLink} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="size-5" />
-                <span className="text-xs text-muted-foreground">장소보기</span>
-              </a>
-            </Button>
-            <ButtonGroupSeparator />
-            <Button variant="ghost" size="xl" className="flex-1 flex-col gap-1 h-auto py-3" asChild>
-              <a href={`https://map.naver.com/p/entry/place/${naverPlaceId}`} target="_blank" rel="noopener noreferrer">
-                <Map className="size-5" />
-                <span className="text-xs text-muted-foreground">지도보기</span>
-              </a>
-            </Button>
-            {walkingRoute && (
-              <>
-                <ButtonGroupSeparator />
-                <Button variant="ghost" size="xl" className="flex-1 flex-col gap-1 h-auto py-3" asChild>
-                  <a
-                    href={buildNaverWalkingRouteLink(COMPANY_LOCATION, {
-                      lng: Number(detail.x),
-                      lat: Number(detail.y),
-                      name: detail.name,
-                      placeId: naverPlaceId,
-                    })}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Route className="size-5" />
-                    <span className="text-xs text-muted-foreground">경로보기</span>
-                  </a>
-                </Button>
-              </>
-            )}
-            {detail.phone && (
-              <>
-                <ButtonGroupSeparator />
-                <Button variant="ghost" size="xl" className="flex-1 flex-col gap-1 h-auto py-3" asChild>
-                  <a href={`tel:${detail.phone}`}>
-                    <Phone className="size-5" />
-                    <span className="text-xs text-muted-foreground">전화걸기</span>
-                  </a>
-                </Button>
-              </>
-            )}
-          </ButtonGroup>
+          <PlaceShortcuts
+            naverPlaceId={naverPlaceId}
+            detail={detail}
+            walkingRoute={walkingRoute}
+          />
 
           {/* 코나카드 섹션 */}
           {isRegistered && (
@@ -242,13 +190,6 @@ export default async function PlaceDetailPage({
               isLoggedIn={!!user}
             />
           )}
-
-          {/* 스태틱 맵 */}
-          <StaticMap
-            lat={detail.y}
-            lng={detail.x}
-            naverPlaceId={naverPlaceId}
-          />
 
           {/* 메뉴 / 리뷰 탭 */}
           <PlaceDetailTabs
