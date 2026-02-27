@@ -141,10 +141,22 @@ export default async function PlaceDetailPage({
                 {detail.category}
               </div>
             )}
-            <p className="flex items-start gap-2 text-sm font-medium text-muted-foreground">
-              <MapPin className="size-4 shrink-0 mt-0.5" />
-              {address}
-            </p>
+            {(() => {
+              const match = address?.match(
+                /^(.*(?:로|길|대로)\s+\d+(?:-\d+)?)\s*(.*)/,
+              );
+              const baseAddress = match ? match[1] : address;
+              const detailAddress = match ? match[2] : "";
+              return (
+                <div className="flex items-start gap-2 text-sm font-medium text-muted-foreground">
+                  <MapPin className="size-4 shrink-0 mt-0.5" />
+                  <div>
+                    <address className="not-italic">{baseAddress}</address>
+                    {detailAddress && <span>{detailAddress}</span>}
+                  </div>
+                </div>
+              );
+            })()}
             {walkingRoute && (
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Footprints className="size-4 shrink-0" />
