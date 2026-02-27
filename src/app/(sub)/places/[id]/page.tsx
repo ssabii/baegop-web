@@ -73,8 +73,8 @@ export default async function PlaceDetailPage({
   if (!detail) notFound();
 
   // Step 3: 나머지 데이터 병렬 페칭
-  const REVIEW_LIMIT = 10;
-  const [walkingRoutes, initialReviewsData, konaVoteData] = await Promise.all([
+  const PAGE_SIZE = 10;
+  const [walkingRoutes, reviewsResult, konaVoteResult] = await Promise.all([
     fetchWalkingRoutes(
       {
         lng: String(COMPANY_LOCATION.lng),
@@ -91,7 +91,7 @@ export default async function PlaceDetailPage({
           )
           .eq("place_id", place.id)
           .order("created_at", { ascending: false })
-          .range(0, REVIEW_LIMIT - 1)
+          .range(0, PAGE_SIZE - 1)
       : Promise.resolve({ data: null, count: null }),
     isRegistered && user
       ? supabase
@@ -103,9 +103,22 @@ export default async function PlaceDetailPage({
       : Promise.resolve({ data: null }),
   ]);
 
-  const initialReviews = initialReviewsData?.data
+  // Step 4: 데이터 가공
+  const walkingRoute = walkingRoutes?.[0] ?? null;
+  const userKonaVote = (konaVoteResult?.data?.vote as KonaVote) ?? null;
+  const address = detail.roadAddress || detail.address;
+  const naverLink = buildNaverPlaceLink(naverPlaceId);
+
+  const reviews = reviewsResult?.data ?? [];
+  const reviewCount = reviewsResult?.count ?? 0;
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : null;
+
+  const initialReviews = reviews.length > 0
     ? {
-        items: initialReviewsData.data.map((review) => ({
+        items: reviews.map((review) => ({
           ...review,
           review_images:
             review.review_images?.map((img) => ({
@@ -113,23 +126,14 @@ export default async function PlaceDetailPage({
               url: optimizeSupabaseImageUrl(img.url),
             })) ?? [],
         })),
-        nextCursor:
-          initialReviewsData.data.length === REVIEW_LIMIT ? REVIEW_LIMIT : null,
+        nextCursor: reviews.length === PAGE_SIZE ? PAGE_SIZE : null,
       }
     : undefined;
 
-  const walkingRoute = walkingRoutes?.[0] ?? null;
-  const reviewCount = initialReviewsData?.count ?? 0;
-  const avgRating =
-    reviewCount > 0 && initialReviewsData?.data
-      ? initialReviewsData.data.reduce((sum, r) => sum + r.rating, 0) /
-        initialReviewsData.data.length
-      : null;
-  const userKonaVote: KonaVote | null =
-    (konaVoteData?.data?.vote as KonaVote) ?? null;
-
-  const address = detail.roadAddress || detail.address;
-  const naverLink = buildNaverPlaceLink(naverPlaceId);
+  const initialMenus = {
+    items: detail.menus.slice(0, PAGE_SIZE),
+    nextCursor: detail.menus.length > PAGE_SIZE ? PAGE_SIZE : null,
+  };
 
   return (
     <>
@@ -239,11 +243,7 @@ export default async function PlaceDetailPage({
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}
             currentUserId={user?.id ?? null}
-            initialMenus={{
-              items: detail.menus.slice(0, REVIEW_LIMIT),
-              nextCursor:
-                detail.menus.length > REVIEW_LIMIT ? REVIEW_LIMIT : null,
-            }}
+            initialMenus={initialMenus}
             initialReviews={initialReviews}
           />
         </div>
