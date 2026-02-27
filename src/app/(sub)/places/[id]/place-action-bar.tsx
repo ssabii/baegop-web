@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,19 +31,6 @@ export function PlaceActionBar({
   >(null);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogDescription, setLoginDialogDescription] = useState("");
-  const [showTooltip, setShowTooltip] = useState(false);
-
-  useEffect(() => {
-    if (!isRegistered && !localStorage.getItem("hideRegisterTooltip")) {
-      setShowTooltip(true);
-    }
-  }, [isRegistered]);
-
-  function dismissTooltip() {
-    setShowTooltip(false);
-    localStorage.setItem("hideRegisterTooltip", "true");
-  }
-
   function handleRegister() {
     if (!isLoggedIn) {
       setLoginDialogDescription(
@@ -99,21 +86,7 @@ export function PlaceActionBar({
           })}
         >
           {!isRegistered && (
-            <div className="relative">
-              {showTooltip && (
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background shadow-lg">
-                  배곱에 장소를 등록해보세요
-                  <button
-                    type="button"
-                    onClick={dismissTooltip}
-                    className="ml-1.5 cursor-pointer text-background/70"
-                    aria-label="닫기"
-                  >
-                    ✕
-                  </button>
-                  <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-foreground" />
-                </div>
-              )}
+            <div>
               <Button
                 variant="outline"
                 size="xl"

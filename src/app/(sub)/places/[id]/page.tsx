@@ -24,8 +24,9 @@ import { COMPANY_LOCATION } from "@/lib/constants";
 import { optimizeNaverImageUrls } from "@/lib/image";
 import Link from "next/link";
 import { ImageGallery } from "@/components/image-gallery";
-import { Badge } from "@/components/ui/badge";
+import { UnregisteredBadge } from "./unregistered-badge";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group";
 import { SubHeader } from "@/components/sub-header";
 import { PlaceDetailTabs } from "./place-detail-tabs";
 import { KonaVoteSection } from "./kona-vote";
@@ -131,7 +132,7 @@ export default async function PlaceDetailPage({
         <div className="space-y-8 p-4">
           {/* 기본 정보 */}
           <section className="space-y-2">
-            {!isRegistered && <Badge variant="secondary">미등록 장소</Badge>}
+            {!isRegistered && <UnregisteredBadge />}
             <h1 className="text-2xl font-bold">{detail.name}</h1>
 
             {detail.category && (
@@ -173,66 +174,52 @@ export default async function PlaceDetailPage({
           </section>
 
           {/* 바로가기 버튼 */}
-          <section className="flex items-center">
-            <a
-              href={naverLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-1 flex-col items-center gap-1.5 py-3 text-foreground active:bg-accent"
-            >
-              <ExternalLink className="size-5" />
-              <span className="text-xs font-medium text-muted-foreground">
-                장소보기
-              </span>
-            </a>
-            <div className="h-[42px] w-px shrink-0 bg-border" />
-            <a
-              href={`https://map.naver.com/p/entry/place/${naverPlaceId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-1 flex-col items-center gap-1.5 py-3 text-foreground active:bg-accent"
-            >
-              <Map className="size-5" />
-              <span className="text-xs font-medium text-muted-foreground">
-                지도보기
-              </span>
-            </a>
+          <ButtonGroup className="w-full">
+            <Button variant="ghost" size="xl" className="flex-1 flex-col gap-1 h-auto py-3" asChild>
+              <a href={naverLink} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="size-5" />
+                <span className="text-xs text-muted-foreground">장소보기</span>
+              </a>
+            </Button>
+            <ButtonGroupSeparator />
+            <Button variant="ghost" size="xl" className="flex-1 flex-col gap-1 h-auto py-3" asChild>
+              <a href={`https://map.naver.com/p/entry/place/${naverPlaceId}`} target="_blank" rel="noopener noreferrer">
+                <Map className="size-5" />
+                <span className="text-xs text-muted-foreground">지도보기</span>
+              </a>
+            </Button>
             {walkingRoute && (
               <>
-                <div className="h-[42px] w-px shrink-0 bg-border" />
-                <a
-                  href={buildNaverWalkingRouteLink(COMPANY_LOCATION, {
-                    lng: Number(detail.x),
-                    lat: Number(detail.y),
-                    name: detail.name,
-                    placeId: naverPlaceId,
-                  })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-1 flex-col items-center gap-1.5 py-3 text-foreground active:bg-accent"
-                >
-                  <Route className="size-5" />
-                  <span className="text-xs font-medium text-muted-foreground">
-                    경로보기
-                  </span>
-                </a>
+                <ButtonGroupSeparator />
+                <Button variant="ghost" size="xl" className="flex-1 flex-col gap-1 h-auto py-3" asChild>
+                  <a
+                    href={buildNaverWalkingRouteLink(COMPANY_LOCATION, {
+                      lng: Number(detail.x),
+                      lat: Number(detail.y),
+                      name: detail.name,
+                      placeId: naverPlaceId,
+                    })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Route className="size-5" />
+                    <span className="text-xs text-muted-foreground">경로보기</span>
+                  </a>
+                </Button>
               </>
             )}
             {detail.phone && (
               <>
-                <div className="h-[42px] w-px shrink-0 bg-border" />
-                <a
-                  href={`tel:${detail.phone}`}
-                  className="flex flex-1 flex-col items-center gap-1.5 py-3 text-foreground active:bg-accent"
-                >
-                  <Phone className="size-5" />
-                  <span className="text-xs font-medium text-muted-foreground">
-                    전화걸기
-                  </span>
-                </a>
+                <ButtonGroupSeparator />
+                <Button variant="ghost" size="xl" className="flex-1 flex-col gap-1 h-auto py-3" asChild>
+                  <a href={`tel:${detail.phone}`}>
+                    <Phone className="size-5" />
+                    <span className="text-xs text-muted-foreground">전화걸기</span>
+                  </a>
+                </Button>
               </>
             )}
-          </section>
+          </ButtonGroup>
 
           {/* 코나카드 섹션 */}
           {isRegistered && (
