@@ -20,9 +20,10 @@ interface ReviewCardProps {
     } | null;
     review_images?: ReviewImageItem[];
   };
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export function ReviewCard({ review }: ReviewCardProps) {
+export function ReviewCard({ review, onClick }: ReviewCardProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
@@ -99,6 +100,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         <Link
           href={`/places/${review.place.id}`}
           className="block rounded-xl p-3 -m-3 transition-colors hover:bg-accent"
+          onClick={(e) => onClick?.(e)}
         >
           {content}
         </Link>

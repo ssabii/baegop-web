@@ -27,7 +27,7 @@ interface ReviewCardProps {
     id: number;
     rating: number;
     content: string | null;
-    created_at: string;
+    created_at: string | null;
     user_id: string | null;
     profiles: {
       nickname: string | null;
@@ -130,9 +130,11 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
           </div>
           <div className="flex items-center gap-1.5">
             <StarRating rating={review.rating} />
-            <span className="text-xs text-muted-foreground/60">
-              {formatRelativeDate(review.created_at)}
-            </span>
+            {review.created_at && (
+              <span className="text-xs text-muted-foreground/60">
+                {formatRelativeDate(review.created_at)}
+              </span>
+            )}
           </div>
         </div>
       </div>
