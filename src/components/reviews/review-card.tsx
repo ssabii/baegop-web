@@ -21,10 +21,10 @@ interface ReviewCardProps {
       display_order: number;
     }[];
   };
-  onBeforeNavigate?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export function ReviewCard({ review, onBeforeNavigate }: ReviewCardProps) {
+export function ReviewCard({ review, onClick }: ReviewCardProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
@@ -101,7 +101,7 @@ export function ReviewCard({ review, onBeforeNavigate }: ReviewCardProps) {
         <Link
           href={`/places/${review.place.id}`}
           className="block rounded-xl p-3 -m-3 transition-colors hover:bg-accent"
-          onClick={() => onBeforeNavigate?.()}
+          onClick={(e) => onClick?.(e)}
         >
           {content}
         </Link>

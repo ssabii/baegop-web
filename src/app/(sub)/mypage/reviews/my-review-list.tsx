@@ -69,7 +69,7 @@ export function MyReviewList({ userId }: MyReviewListProps) {
               {index > 0 && <Separator className="my-4" />}
               <ReviewCard
                 review={{ ...review, place }}
-                onBeforeNavigate={() =>
+                onClick={() =>
                   sessionStorage.setItem("scrollToReview", "true")
                 }
               />
