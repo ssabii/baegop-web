@@ -20,6 +20,7 @@ const MENU_PAGE_SIZE = 10;
 
 interface PlaceDetailTabsProps {
   menus: NaverPlaceMenu[];
+  reviewCount: number;
   isRegistered: boolean;
   placeId: string | null;
   naverPlaceId: string;
@@ -28,6 +29,7 @@ interface PlaceDetailTabsProps {
 
 export function PlaceDetailTabs({
   menus,
+  reviewCount,
   isRegistered,
   placeId,
   naverPlaceId,
@@ -54,13 +56,13 @@ export function PlaceDetailTabs({
   }, []);
 
   return (
-    <Tabs ref={tabsRef} defaultValue="review">
+    <Tabs ref={tabsRef} defaultValue="menu">
       <TabsList className="w-full">
-        <TabsTrigger value="review" className="flex-1 cursor-pointer">
-          리뷰
-        </TabsTrigger>
         <TabsTrigger value="menu" className="flex-1 cursor-pointer">
-          메뉴
+          메뉴{menus.length > 0 ? ` (${menus.length})` : ""}
+        </TabsTrigger>
+        <TabsTrigger value="review" className="flex-1 cursor-pointer">
+          리뷰{reviewCount > 0 ? ` (${reviewCount})` : ""}
         </TabsTrigger>
       </TabsList>
 
@@ -139,7 +141,7 @@ export function PlaceDetailTabs({
             currentUserId={currentUserId}
           />
         ) : (
-          <Empty className="border-none py-12">
+          <Empty className="h-[50dvh] border-none">
             <EmptyHeader className="gap-1">
               <EmptyMedia
                 variant="icon"
