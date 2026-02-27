@@ -6,6 +6,7 @@ import { MessageCircle, UtensilsCrossed } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Spinner } from "@/components/ui/spinner";
 import { ImagePreviewDialog } from "@/components/image-preview-dialog";
+import { optimizeNaverImageUrl } from "@/lib/image";
 import {
   Empty,
   EmptyDescription,
@@ -107,9 +108,9 @@ export function PlaceDetailTabs({
                     )}
                   </div>
                   {menu.images.length > 0 ? (
-                    <ImagePreviewDialog src={menu.images[0]} alt={menu.name}>
+                    <ImagePreviewDialog src={optimizeNaverImageUrl(menu.images[0])} alt={menu.name}>
                       <img
-                        src={menu.images[0]}
+                        src={optimizeNaverImageUrl(menu.images[0])}
                         alt={menu.name}
                         className="size-20 shrink-0 rounded-lg object-cover"
                       />
