@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,18 @@ export function PlaceActionBar({
   >(null);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogDescription, setLoginDialogDescription] = useState("");
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  useEffect(() => {
+    if (!isRegistered && !localStorage.getItem("hideRegisterTooltip")) {
+      setShowTooltip(true);
+    }
+  }, [isRegistered]);
+
+  function dismissTooltip() {
+    setShowTooltip(false);
+    localStorage.setItem("hideRegisterTooltip", "true");
+  }
 
   function handleRegister() {
     if (!isLoggedIn) {
@@ -87,16 +99,32 @@ export function PlaceActionBar({
           })}
         >
           {!isRegistered && (
-            <Button
-              variant="outline"
-              size="xl"
-              className="transition-none has-[>svg]:px-8"
-              onClick={handleRegister}
-              disabled={isPending}
-            >
-              {isPending && pendingAction === "register" && <Spinner />}
-              장소 등록
-            </Button>
+            <div className="relative">
+              {showTooltip && (
+                <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background shadow-lg">
+                  배곱에 장소를 등록해보세요
+                  <button
+                    type="button"
+                    onClick={dismissTooltip}
+                    className="ml-1.5 cursor-pointer text-background/70"
+                    aria-label="닫기"
+                  >
+                    ✕
+                  </button>
+                  <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-foreground" />
+                </div>
+              )}
+              <Button
+                variant="outline"
+                size="xl"
+                className="w-full bg-orange-100 text-orange-700 transition-none hover:bg-orange-200 has-[>svg]:px-8 dark:bg-orange-900/50 dark:text-orange-300 dark:hover:bg-orange-900/70"
+                onClick={handleRegister}
+                disabled={isPending}
+              >
+                {isPending && pendingAction === "register" && <Spinner />}
+                장소 등록
+              </Button>
+            </div>
           )}
           <Button
             onClick={handleWriteReview}
