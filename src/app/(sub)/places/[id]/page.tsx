@@ -40,12 +40,16 @@ export default async function PlaceDetailPage({
   const supabase = await createClient();
 
   // Step 1: 독립적인 요청 병렬 실행
+  const placeQuery = supabase
+    .from("places")
+    .select("*")
+    .eq("id", naverPlaceId)
+    .single();
+  const authQuery = supabase.auth.getUser();
+  const naverDetailQuery = fetchPlaceDetail(naverPlaceId);
+
   const [{ data: place }, { data: { user: authUser } }, naverDetail] =
-    await Promise.all([
-      supabase.from("places").select("*").eq("id", naverPlaceId).single(),
-      supabase.auth.getUser(),
-      fetchPlaceDetail(naverPlaceId),
-    ]);
+    await Promise.all([placeQuery, authQuery, naverDetailQuery]);
 
   const isRegistered = !!place;
   const user = authUser ? { id: authUser.id } : null;
@@ -74,25 +78,22 @@ export default async function PlaceDetailPage({
 
   // Step 3: 나머지 데이터 병렬 페칭
   const PAGE_SIZE = 10;
-  const [walkingRoutes, reviewsResult, konaVoteResult] = await Promise.all([
-    fetchWalkingRoutes(
-      {
-        lng: String(COMPANY_LOCATION.lng),
-        lat: String(COMPANY_LOCATION.lat),
-      },
-      { lng: detail.x, lat: detail.y },
-    ),
-    isRegistered
-      ? supabase
-          .from("reviews")
-          .select(
-            "*, profiles(nickname, avatar_url), review_images(url, display_order)",
-            { count: "exact" },
-          )
-          .eq("place_id", place.id)
-          .order("created_at", { ascending: false })
-          .range(0, PAGE_SIZE - 1)
-      : Promise.resolve({ data: null, count: null }),
+  const walkingRouteQuery = fetchWalkingRoutes(
+    { lng: String(COMPANY_LOCATION.lng), lat: String(COMPANY_LOCATION.lat) },
+    { lng: detail.x, lat: detail.y },
+  );
+  const reviewsQuery = isRegistered
+    ? supabase
+        .from("reviews")
+        .select(
+          "*, profiles(nickname, avatar_url), review_images(url, display_order)",
+          { count: "exact" },
+        )
+        .eq("place_id", place.id)
+        .order("created_at", { ascending: false })
+        .range(0, PAGE_SIZE - 1)
+    : Promise.resolve({ data: null, count: null });
+  const konaVoteQuery =
     isRegistered && user
       ? supabase
           .from("kona_card_votes")
@@ -100,7 +101,12 @@ export default async function PlaceDetailPage({
           .eq("place_id", place.id)
           .eq("user_id", user.id)
           .single()
-      : Promise.resolve({ data: null }),
+      : Promise.resolve({ data: null });
+
+  const [walkingRoutes, reviewsResult, konaVoteResult] = await Promise.all([
+    walkingRouteQuery,
+    reviewsQuery,
+    konaVoteQuery,
   ]);
 
   // Step 4: 데이터 가공
