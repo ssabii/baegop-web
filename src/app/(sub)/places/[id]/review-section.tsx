@@ -14,16 +14,51 @@ import { ReviewCard } from "./review-card";
 import { useReviews } from "./use-reviews";
 
 interface ReviewSectionProps {
-  placeId: string;
+  placeId: string | null;
   naverPlaceId: string;
   currentUserId: string | null;
+  isRegistered: boolean;
 }
 
 export function ReviewSection({
   placeId,
   naverPlaceId,
   currentUserId,
+  isRegistered,
 }: ReviewSectionProps) {
+  if (!isRegistered || !placeId) {
+    return <ReviewEmpty />;
+  }
+
+  return <ReviewSectionContent placeId={placeId} naverPlaceId={naverPlaceId} currentUserId={currentUserId} />;
+}
+
+function ReviewEmpty() {
+  return (
+    <Empty className="h-[40vh]">
+      <EmptyHeader className="gap-1">
+        <EmptyMedia
+          variant="icon"
+          className="size-12 rounded-none bg-transparent"
+        >
+          <MessageCircle className="size-12 text-primary" />
+        </EmptyMedia>
+        <EmptyTitle className="font-bold">작성된 리뷰가 없어요</EmptyTitle>
+        <EmptyDescription>첫 번째 리뷰를 작성해보세요!</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
+
+function ReviewSectionContent({
+  placeId,
+  naverPlaceId,
+  currentUserId,
+}: {
+  placeId: string;
+  naverPlaceId: string;
+  currentUserId: string | null;
+}) {
   const { reviews, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useReviews(placeId);
 
@@ -44,24 +79,11 @@ export function ReviewSection({
   }
 
   if (reviews.length === 0) {
-    return (
-      <Empty className="h-[calc(100dvh*0.5)]">
-        <EmptyHeader className="gap-1">
-          <EmptyMedia
-            variant="icon"
-            className="size-12 rounded-none bg-transparent"
-          >
-            <MessageCircle className="size-12 text-primary" />
-          </EmptyMedia>
-          <EmptyTitle className="font-bold">작성된 리뷰가 없어요</EmptyTitle>
-          <EmptyDescription>첫 번째 리뷰를 작성해보세요!</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    );
+    return <ReviewEmpty />;
   }
 
   return (
-    <div className="min-h-[calc(100dvh*0.5)]">
+    <div className="min-h-[40vh]">
       <div className="divide-y">
         {reviews.map((review) => (
           <ReviewCard
@@ -72,7 +94,7 @@ export function ReviewSection({
           />
         ))}
       </div>
-      <div ref={sentinelRef} className="flex justify-center">
+      <div ref={sentinelRef} className="flex items-center justify-center">
         {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
       </div>
     </div>

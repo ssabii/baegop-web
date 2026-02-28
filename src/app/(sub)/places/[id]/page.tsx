@@ -16,7 +16,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { KonaVoteSection } from "./kona-vote";
 import { PlaceActionBar } from "./place-action-bar";
-import { PlaceDetailTabs } from "./place-detail-tabs";
+import { PlaceTabs } from "./place-tabs";
 import { PlaceMap } from "./place-map";
 import { PlaceShortcuts } from "./place-shortcuts";
 import { UnregisteredBadge } from "./unregistered-badge";
@@ -186,7 +186,7 @@ export default async function PlaceDetailPage({
           )}
 
           {/* 메뉴 / 리뷰 탭 */}
-          <PlaceDetailTabs
+          <PlaceTabs
             menus={detail.menus}
             reviewCount={reviewCount}
             isRegistered={isRegistered}

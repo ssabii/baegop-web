@@ -80,7 +80,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
 
   return (
     <div className="py-4 space-y-2">
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-2">
         <Avatar className="size-10 shrink-0">
           <AvatarImage src={review.profiles?.avatar_url ?? undefined} />
           <AvatarFallback>
