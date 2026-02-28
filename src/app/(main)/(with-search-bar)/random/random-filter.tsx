@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { X } from "lucide-react";
 import { CATEGORY_FILTERS, type CategoryFilter } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,12 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface RandomFilterProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   categories: CategoryFilter[];
   konaOnly: boolean;
   onApply: (categories: CategoryFilter[], konaOnly: boolean) => void;
@@ -25,23 +26,24 @@ interface RandomFilterProps {
 }
 
 export function RandomFilter({
+  open,
+  onOpenChange,
   categories,
   konaOnly,
   onApply,
   onRemoveCategory,
   onRemoveKona,
 }: RandomFilterProps) {
-  const [open, setOpen] = useState(false);
   const [tempCategories, setTempCategories] =
     useState<CategoryFilter[]>(categories);
   const [tempKonaOnly, setTempKonaOnly] = useState(konaOnly);
 
-  function handleOpen(nextOpen: boolean) {
+  function handleOpenChange(nextOpen: boolean) {
     if (nextOpen) {
       setTempCategories(categories);
       setTempKonaOnly(konaOnly);
     }
-    setOpen(nextOpen);
+    onOpenChange(nextOpen);
   }
 
   function handleReset() {
@@ -51,13 +53,15 @@ export function RandomFilter({
 
   function handleApply() {
     onApply(tempCategories, tempKonaOnly);
-    setOpen(false);
+    onOpenChange(false);
   }
 
+  const hasChips = categories.length > 0 || konaOnly;
+
   return (
-    <Drawer open={open} onOpenChange={handleOpen}>
-      <div className="flex items-center gap-2 px-4">
-        <div className="flex-1 overflow-x-auto scrollbar-none">
+    <Drawer open={open} onOpenChange={handleOpenChange}>
+      {hasChips && (
+        <div className="overflow-x-auto px-4 scrollbar-none">
           <div className="flex gap-1.5">
             {categories.map((cat) => (
               <Badge
@@ -86,13 +90,7 @@ export function RandomFilter({
             )}
           </div>
         </div>
-
-        <DrawerTrigger asChild>
-          <Button variant="ghost" size="icon" className="shrink-0">
-            <SlidersHorizontal className="size-5" />
-          </Button>
-        </DrawerTrigger>
-      </div>
+      )}
 
       <DrawerContent>
         <DrawerHeader className="text-left">
