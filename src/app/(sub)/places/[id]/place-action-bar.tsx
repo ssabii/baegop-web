@@ -31,7 +31,6 @@ export function PlaceActionBar({
   >(null);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogDescription, setLoginDialogDescription] = useState("");
-
   function handleRegister() {
     if (!isLoggedIn) {
       setLoginDialogDescription(
@@ -87,16 +86,18 @@ export function PlaceActionBar({
           })}
         >
           {!isRegistered && (
-            <Button
-              variant="outline"
-              size="xl"
-              className="transition-none has-[>svg]:px-8"
-              onClick={handleRegister}
-              disabled={isPending}
-            >
-              {isPending && pendingAction === "register" && <Spinner />}
-              장소 등록
-            </Button>
+            <div>
+              <Button
+                variant="outline"
+                size="xl"
+                className="w-full transition-none has-[>svg]:px-8"
+                onClick={handleRegister}
+                disabled={isPending}
+              >
+                {isPending && pendingAction === "register" && <Spinner />}
+                장소 등록
+              </Button>
+            </div>
           )}
           <Button
             onClick={handleWriteReview}

@@ -1,41 +1,37 @@
-import { notFound } from "next/navigation";
+import { ImageGallery } from "@/components/image-gallery";
+import { SubHeader } from "@/components/sub-header";
+import { Button } from "@/components/ui/button";
+import { COMPANY_LOCATION } from "@/lib/constants";
+import { formatDistance, formatWalkingDuration } from "@/lib/geo";
+import { optimizeNaverImageUrls, optimizeSupabaseImageUrl } from "@/lib/image";
 import {
-  Dot,
-  ExternalLink,
-  Footprints,
-  Home,
-  MapPin,
-  Phone,
-  Star,
-  Tag,
-} from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import {
-  buildNaverPlaceLink,
-  buildNaverWalkingRouteLink,
-  fetchPlaceDetail,
   fetchPlaceBySearch,
+  fetchPlaceDetail,
   fetchWalkingRoutes,
 } from "@/lib/naver";
-import { formatDistance, formatWalkingDuration } from "@/lib/geo";
-import { COMPANY_LOCATION } from "@/lib/constants";
-import { optimizeNaverImageUrls, optimizeSupabaseImageUrl } from "@/lib/image";
+import { createClient } from "@/lib/supabase/server";
+import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
+import { Dot, Footprints, Home, Phone, Star, Tag } from "lucide-react";
 import Link from "next/link";
-import { ImageGallery } from "@/components/image-gallery";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { SubHeader } from "@/components/sub-header";
-import { PlaceDetailTabs } from "./place-detail-tabs";
+import { notFound } from "next/navigation";
 import { KonaVoteSection } from "./kona-vote";
 import { PlaceActionBar } from "./place-action-bar";
-import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
+import { PlaceTabs } from "./place-tabs";
+import { PlaceMap } from "./place-map";
+import { PlaceShortcuts } from "./place-shortcuts";
+import { UnregisteredBadge } from "./unregistered-badge";
 
 export default async function PlaceDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
-  const { id: naverPlaceId } = await params;
+  const [{ id: naverPlaceId }, { tab }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
 
   const supabase = await createClient();
 
@@ -113,7 +109,6 @@ export default async function PlaceDetailPage({
   const walkingRoute = walkingRoutes?.[0] ?? null;
   const userKonaVote = (konaVoteResult?.data?.vote as KonaVote) ?? null;
   const address = detail.roadAddress || detail.address;
-  const naverLink = buildNaverPlaceLink(naverPlaceId);
 
   const reviews = reviewsResult?.data ?? [];
   const reviewCount = reviewsResult?.count ?? 0;
@@ -160,7 +155,7 @@ export default async function PlaceDetailPage({
         <div className="space-y-8 p-4">
           {/* 기본 정보 */}
           <section className="space-y-2">
-            {!isRegistered && <Badge variant="secondary">미등록 장소</Badge>}
+            {!isRegistered && <UnregisteredBadge />}
             <h1 className="text-2xl font-bold">{detail.name}</h1>
 
             {detail.category && (
@@ -169,21 +164,12 @@ export default async function PlaceDetailPage({
                 {detail.category}
               </div>
             )}
-            <p className="flex items-start gap-2 text-sm font-medium text-muted-foreground">
-              <MapPin className="size-4 shrink-0 mt-0.5" />
-              <span>
-                {address}{" "}
-                <a
-                  href={naverLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="네이버 플레이스에서 보기"
-                  className="inline-flex align-text-bottom"
-                >
-                  <ExternalLink className="size-4 text-muted-foreground hover:text-accent-foreground" />
-                </a>
-              </span>
-            </p>
+            {detail.phone && (
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Phone className="size-4 shrink-0" />
+                <a href={`tel:${detail.phone}`}>{detail.phone}</a>
+              </div>
+            )}
             {walkingRoute && (
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Footprints className="size-4 shrink-0" />
@@ -196,28 +182,7 @@ export default async function PlaceDetailPage({
                   <Dot className="size-4 shrink-0" />
                   <div>{formatDistance(walkingRoute.summary.distance)}</div>
                 </div>
-                <a
-                  href={buildNaverWalkingRouteLink(COMPANY_LOCATION, {
-                    lng: Number(detail.x),
-                    lat: Number(detail.y),
-                    name: detail.name,
-                    placeId: naverPlaceId,
-                  })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 flex items-center justify-center"
-                >
-                  <ExternalLink className="size-4 text-muted-foreground hover:text-accent-foreground" />
-                </a>
               </div>
-            )}
-            {detail.phone && (
-              <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <Phone className="size-4 shrink-0" />
-                <a href={`tel:${detail.phone}`} className="underline">
-                  {detail.phone}
-                </a>
-              </p>
             )}
             {/* 별점 */}
             {isRegistered && avgRating !== null && (
@@ -233,6 +198,21 @@ export default async function PlaceDetailPage({
             )}
           </section>
 
+          {/* 장소 맵 */}
+          <PlaceMap
+            lat={detail.y}
+            lng={detail.x}
+            name={detail.name}
+            address={address}
+          />
+
+          {/* 바로가기 버튼 */}
+          <PlaceShortcuts
+            naverPlaceId={naverPlaceId}
+            detail={detail}
+            walkingRoute={walkingRoute}
+          />
+
           {/* 코나카드 섹션 */}
           {isRegistered && (
             <KonaVoteSection
@@ -244,11 +224,12 @@ export default async function PlaceDetailPage({
           )}
 
           {/* 메뉴 / 리뷰 탭 */}
-          <PlaceDetailTabs
+          <PlaceTabs
             isRegistered={isRegistered}
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}
             currentUserId={user?.id ?? null}
+            defaultTab={tab === "review" ? "review" : "menu"}
             initialMenus={initialMenus}
             initialReviews={initialReviews}
           />

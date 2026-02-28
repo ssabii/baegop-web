@@ -30,6 +30,14 @@ export function ImageCarouselDialog({
 
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
 
+  // open 시 initialIndex로 리셋
+  useEffect(() => {
+    if (open) {
+      setCurrent(initialIndex);
+      api?.scrollTo(initialIndex, false);
+    }
+  }, [open, initialIndex, api]);
+
   // Track current slide
   useEffect(() => {
     if (!api) return;

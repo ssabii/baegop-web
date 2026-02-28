@@ -40,7 +40,7 @@ export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
 
   if (menus.length === 0) {
     return (
-      <Empty className="h-[calc(100dvh*0.5)]">
+      <Empty className="h-[40vh]">
         <EmptyHeader className="gap-1">
           <EmptyMedia
             variant="icon"
@@ -55,26 +55,29 @@ export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
   }
 
   return (
-    <div className="min-h-[calc(100dvh*0.5)]">
+    <div className="min-h-[40vh]">
       <ul className="divide-y">
         {menus.map((menu) => (
-          <li key={menu.name} className="flex items-start gap-2 py-3">
-            <div className="flex min-w-0 flex-1 flex-col justify-between">
-              <div className="space-y-1">
-                {menu.recommend && (
+          <li
+            key={menu.name}
+            className="flex items-start gap-2 py-4 first:pt-0"
+          >
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              {menu.recommend && (
+                <div>
                   <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
-                    추천
+                    대표
                   </span>
-                )}
-                <div className="truncate text-sm font-bold">{menu.name}</div>
-                {menu.description && (
-                  <div className="line-clamp-2 text-sm text-muted-foreground">
-                    {menu.description}
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
+              <div className="truncate text-sm font-bold">{menu.name}</div>
+              {menu.description && (
+                <div className="line-clamp-2 text-sm text-muted-foreground">
+                  {menu.description}
+                </div>
+              )}
               {menu.price && (
-                <div className="text-sm font-bold">
+                <div className="text-sm font-bold text-accent-foreground">
                   {Number(menu.price).toLocaleString()}원
                 </div>
               )}
@@ -84,18 +87,18 @@ export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
                 <img
                   src={optimizeNaverImageUrl(menu.images[0])}
                   alt={menu.name}
-                  className="size-20 shrink-0 rounded-lg object-cover"
+                  className="size-22 shrink-0 rounded-lg object-cover"
                 />
               </ImagePreviewDialog>
             ) : (
-              <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <div className="flex size-22 shrink-0 items-center justify-center rounded-lg bg-muted">
                 <UtensilsCrossed className="size-5 text-muted-foreground" />
               </div>
             )}
           </li>
         ))}
       </ul>
-      <div ref={sentinelRef} className="flex justify-center">
+      <div ref={sentinelRef} className="flex items-center justify-center">
         {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
       </div>
     </div>

@@ -49,5 +49,6 @@ export function useKonaVote({
     userVote,
     vote: mutation.mutate,
     isPending: mutation.isPending,
+    pendingVote: mutation.isPending ? mutation.variables : null,
   };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Building2, ImagePlus, Loader2, Star, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -37,6 +37,7 @@ interface ReviewFormPageProps {
 
 export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
   const router = useRouter();
+  const { id: naverPlaceId } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
   const confirm = useConfirmDialog();
   const [rating, setRating] = useState(0);
@@ -146,8 +147,7 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
       await createReview(placeId, { rating, content }, imageUrls);
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
       toast.success("리뷰가 등록되었어요.", { position: "top-center" });
-      sessionStorage.setItem("scrollToReview", "true");
-      router.back();
+      router.replace(`/places/${naverPlaceId}?tab=review`);
       router.refresh();
     } catch {
       toast.error("리뷰 등록에 실패했어요. 다시 시도해주세요.", {

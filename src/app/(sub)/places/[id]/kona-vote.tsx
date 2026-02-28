@@ -1,7 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Info } from "lucide-react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Spinner } from "@/components/ui/spinner";
+import { Toggle } from "@/components/ui/toggle";
+import { cn } from "@/lib/utils";
 import { useKonaVote } from "./use-kona-vote";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
@@ -37,16 +48,12 @@ export function KonaVoteSection({
   isLoggedIn,
 }: KonaVoteProps) {
   const router = useRouter();
-  const { status, userVote, vote } = useKonaVote({
+  const { status, userVote, vote, isPending, pendingVote } = useKonaVote({
     placeId,
     initialStatus,
     initialUserVote,
     onSuccess: () => router.refresh(),
   });
-
-  function handleVote(v: KonaVote) {
-    vote(v);
-  }
 
   const config = STATUS_CONFIG[status];
 
@@ -56,8 +63,30 @@ export function KonaVoteSection({
         <div className="flex items-center gap-2">
           <img src="/icons/kona.png" alt="코나카드" className="size-4" />
           <span className="text-sm font-bold">코나카드</span>
+          <Drawer>
+            <DrawerTrigger asChild>
+              <button
+                type="button"
+                className="text-muted-foreground/60 cursor-pointer"
+                aria-label="코나카드 결제 안내"
+              >
+                <Info className="size-3.5" />
+              </button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <div className="max-w-4xl mx-auto w-full p-4">
+                <DrawerHeader>
+                  <DrawerTitle className="text-left">코나카드</DrawerTitle>
+                  <DrawerDescription className="text-left">
+                    결제 가능 여부를 투표해주세요. <br />
+                    투표 결과에 따라 가능 여부가 표시돼요.
+                  </DrawerDescription>
+                </DrawerHeader>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
-        <span className={`text-sm font-semibold ${config.className}`}>
+        <span className={cn("text-sm font-semibold", config.className)}>
           {config.label}
         </span>
       </div>
@@ -67,21 +96,35 @@ export function KonaVoteSection({
           <span className="text-sm text-muted-foreground">
             코나카드 결제가 가능한가요?
           </span>
-          <div className="flex items-center gap-1.5">
-            <Button
-              variant={userVote === "available" ? "default" : "outline"}
-              size="xs"
-              onClick={() => handleVote("available")}
+          <div className="flex items-center gap-1">
+            <Toggle
+              size="sm"
+              variant="outline"
+              pressed={userVote === "available"}
+              onPressedChange={() => vote("available")}
+              disabled={isPending}
+              className={cn("px-1.5 py-0.5 cursor-pointer rounded-lg", {
+                "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
+                  userVote === "available",
+              })}
             >
+              {isPending && pendingVote === "available" && <Spinner />}
               가능
-            </Button>
-            <Button
-              variant={userVote === "unavailable" ? "default" : "outline"}
-              size="xs"
-              onClick={() => handleVote("unavailable")}
+            </Toggle>
+            <Toggle
+              size="sm"
+              variant="outline"
+              pressed={userVote === "unavailable"}
+              onPressedChange={() => vote("unavailable")}
+              disabled={isPending}
+              className={cn("px-1.5 py-0.5 cursor-pointer rounded-lg", {
+                "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
+                  userVote === "unavailable",
+              })}
             >
+              {isPending && pendingVote === "unavailable" && <Spinner />}
               불가
-            </Button>
+            </Toggle>
           </div>
         </div>
       )}

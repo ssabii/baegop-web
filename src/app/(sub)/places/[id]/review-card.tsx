@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Ellipsis, Pencil, Trash2, UserRound } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -78,8 +79,8 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
   const nickname = review.profiles?.nickname ?? "탈퇴한 사용자";
 
   return (
-    <div className="py-3 space-y-2">
-      <div className="flex items-start gap-3">
+    <div className={cn("py-4 space-y-2 transition-opacity", { "opacity-50": isPending })}>
+      <div className="flex items-start gap-2">
         <Avatar className="size-10 shrink-0">
           <AvatarImage src={review.profiles?.avatar_url ? optimizeSupabaseImageUrl(review.profiles.avatar_url) : undefined} />
           <AvatarFallback>
@@ -109,7 +110,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   <div className="mx-auto flex w-full max-w-4xl flex-col py-2">
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-3 text-base font-bold cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-4 text-base font-bold cursor-pointer"
                       onClick={handleEdit}
                     >
                       <Pencil className="size-4" />
@@ -117,7 +118,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-3 text-base font-bold text-destructive cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-4 text-base font-bold text-destructive cursor-pointer"
                       onClick={handleDelete}
                     >
                       <Trash2 className="size-4" />
