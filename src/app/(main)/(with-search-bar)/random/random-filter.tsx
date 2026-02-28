@@ -54,33 +54,39 @@ export function RandomFilter({
   return (
     <>
       <div
-        className="absolute inset-x-0 top-0 z-10 h-[38px] overflow-x-auto bg-background px-4 pb-3 scrollbar-none"
+        className="absolute inset-x-0 top-0 z-10 h-[38px] bg-background pb-3"
         onClick={() => onOpenChange(true)}
       >
-        <div className="flex gap-2">
-          {categories.map((cat) => (
-            <Badge key={cat} variant="secondary" className="shrink-0">
-              {cat}
+        <div className="flex gap-2 px-4 overflow-x-auto scrollbar-none">
+          {categories.length === 0 && !konaOnly ? (
+            <Badge variant="secondary" className="shrink-0">
+              전체
             </Badge>
-          ))}
-          {konaOnly && (
-            <Badge className="shrink-0 bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
-              <img
-                src="/icons/kona.png"
-                alt="코나카드"
-                className="size-3 rounded-full"
-              />
-              결제가능
-            </Badge>
+          ) : (
+            <>
+              {categories.map((cat) => (
+                <Badge key={cat} variant="secondary" className="shrink-0">
+                  {cat}
+                </Badge>
+              ))}
+              {konaOnly && (
+                <Badge className="shrink-0 bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                  <img
+                    src="/icons/kona.png"
+                    alt="코나카드"
+                    className="size-3 rounded-full"
+                  />
+                  결제가능
+                </Badge>
+              )}
+            </>
           )}
         </div>
       </div>
 
       <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerContent>
-          <div>
-            
-          </div>
+          <div></div>
           <DrawerHeader className="text-left">
             <DrawerTitle className="text-left">필터</DrawerTitle>
           </DrawerHeader>

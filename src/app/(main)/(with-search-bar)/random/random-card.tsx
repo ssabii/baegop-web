@@ -15,10 +15,7 @@ export function RandomCard({ place }: RandomCardProps) {
   const thumbnail = place.image_urls?.[0];
 
   return (
-    <Link
-      href={`/places/${place.id}`}
-      className="block overflow-hidden rounded-xl"
-    >
+    <Link href={`/places/${place.id}`} className="block overflow-hidden">
       {thumbnail ? (
         <img
           src={thumbnail}

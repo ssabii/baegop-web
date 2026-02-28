@@ -113,18 +113,6 @@ export function useRoulette(places: RandomPlace[]) {
     }
   }
 
-  function handleRemoveCategory(category: CategoryFilter) {
-    const newCategories = categories.filter((c) => c !== category);
-    setCategories(newCategories);
-    setKonaOnly(konaOnly);
-    syncUrl(newCategories, konaOnly);
-  }
-
-  function handleRemoveKona() {
-    setKonaOnly(false);
-    syncUrl(categories, false);
-  }
-
   return {
     result,
     isSpinning,
@@ -133,7 +121,5 @@ export function useRoulette(places: RandomPlace[]) {
     filteredPlaces,
     spin,
     handleFilterApply,
-    handleRemoveCategory,
-    handleRemoveKona,
   };
 }
