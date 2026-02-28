@@ -1,34 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { Footprints, MapPin, Star, Tag } from "lucide-react";
+import { Building2, MapPin, Star, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatWalkingDuration } from "@/lib/geo";
 import type { KonaCardStatus } from "@/types";
-import { ImageGallery } from "@/components/image-gallery";
+import type { RandomPlace } from "./types";
 
 interface RandomCardProps {
-  place: {
-    id: string;
-    name: string;
-    address: string;
-    category: string | null;
-    kona_card_status: string | null;
-    image_urls: string[] | null;
-    avg_rating: number | null;
-    review_count: number;
-    walking_minutes: number | null;
-  };
+  place: RandomPlace;
 }
 
 export function RandomCard({ place }: RandomCardProps) {
   const status = (place.kona_card_status ?? "unknown") as KonaCardStatus;
+  const thumbnail = place.image_urls?.[0];
 
   return (
-    <div className="overflow-hidden rounded-xl">
-      <ImageGallery images={place.image_urls ?? []} alt={place.name} />
+    <Link
+      href={`/places/${place.id}`}
+      className="block overflow-hidden rounded-xl"
+    >
+      {thumbnail ? (
+        <img
+          src={thumbnail}
+          alt={place.name}
+          className="h-48 w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-48 w-full items-center justify-center bg-muted">
+          <Building2 className="size-12 text-muted-foreground" />
+        </div>
+      )}
 
-      <Link href={`/places/${place.id}`} className="block space-y-2 p-4">
+      <div className="space-y-2 p-4">
         {status !== "unknown" && (
           <span
             className={cn(
@@ -58,13 +61,6 @@ export function RandomCard({ place }: RandomCardProps) {
           </p>
         )}
 
-        {place.walking_minutes != null && (
-          <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <Footprints className="size-4 shrink-0" />
-            {formatWalkingDuration(place.walking_minutes)}
-          </p>
-        )}
-
         <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <MapPin className="size-4 shrink-0" />
           <span className="truncate">{place.address}</span>
@@ -81,7 +77,7 @@ export function RandomCard({ place }: RandomCardProps) {
             </span>
           </div>
         )}
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 }

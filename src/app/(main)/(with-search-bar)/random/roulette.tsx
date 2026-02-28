@@ -1,10 +1,7 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
 import { Shuffle, CircleQuestionMarkIcon, SearchX } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { matchesCategory } from "@/lib/category";
-import { type CategoryFilter } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -16,99 +13,25 @@ import {
 } from "@/components/ui/empty";
 import { RandomCard } from "./random-card";
 import { RandomFilter } from "./random-filter";
-
-interface PlaceData {
-  id: string;
-  name: string;
-  address: string;
-  category: string | null;
-  kona_card_status: string | null;
-  image_urls: string[] | null;
-  avg_rating: number | null;
-  review_count: number;
-  walking_minutes: number | null;
-}
+import { useRoulette } from "./use-roulette";
+import type { RandomPlace } from "./types";
 
 interface RouletteProps {
-  places: PlaceData[];
+  places: RandomPlace[];
 }
 
 export function Roulette({ places }: RouletteProps) {
-  const [result, setResult] = useState<PlaceData | null>(null);
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [categories, setCategories] = useState<CategoryFilter[]>([]);
-  const [konaOnly, setKonaOnly] = useState(false);
-
-  const filteredPlaces = useMemo(() => {
-    return places.filter((place) => {
-      // 카테고리 필터 (0개 선택 시 전체)
-      if (categories.length > 0) {
-        const matchesAny = categories.some((cat) =>
-          matchesCategory(place.category, cat),
-        );
-        if (!matchesAny) return false;
-      }
-
-      // 코나카드 필터
-      if (konaOnly && place.kona_card_status !== "available") {
-        return false;
-      }
-
-      return true;
-    });
-  }, [places, categories, konaOnly]);
-
-  const spin = useCallback(() => {
-    if (filteredPlaces.length === 0) return;
-
-    setIsSpinning(true);
-
-    // Fisher-Yates 셔플로 애니메이션 순서 결정
-    const shuffled = [...filteredPlaces];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-
-    // 최종 결과가 이전 결과와 같으면 다른 장소로 교체
-    const finalIndex = shuffled.length - 1;
-    if (shuffled[finalIndex].id === result?.id && shuffled.length > 1) {
-      [shuffled[finalIndex], shuffled[0]] = [shuffled[0], shuffled[finalIndex]];
-    }
-
-    const totalTicks = Math.min(shuffled.length, 15);
-    let count = 0;
-    const interval = setInterval(() => {
-      setResult(shuffled[count % shuffled.length]);
-      count++;
-
-      if (count >= totalTicks) {
-        clearInterval(interval);
-        setResult(shuffled[finalIndex]);
-        setIsSpinning(false);
-      }
-    }, 100);
-  }, [filteredPlaces, result]);
-
-  function handleFilterApply(
-    newCategories: CategoryFilter[],
-    newKonaOnly: boolean,
-  ) {
-    setCategories(newCategories);
-    setKonaOnly(newKonaOnly);
-    setResult(null);
-  }
-
-  function handleRemoveCategory(category: CategoryFilter) {
-    const newCategories = categories.filter((c) => c !== category);
-    setCategories(newCategories);
-    setResult(null);
-  }
-
-  function handleRemoveKona() {
-    setKonaOnly(false);
-    setResult(null);
-  }
+  const {
+    result,
+    isSpinning,
+    categories,
+    konaOnly,
+    filteredPlaces,
+    spin,
+    handleFilterApply,
+    handleRemoveCategory,
+    handleRemoveKona,
+  } = useRoulette(places);
 
   return (
     <div className="relative mx-auto flex h-full w-full max-w-4xl flex-col px-4">
@@ -143,9 +66,7 @@ export function Roulette({ places }: RouletteProps) {
                 <EmptyTitle className="font-bold">
                   조건에 맞는 장소가 없어요
                 </EmptyTitle>
-                <EmptyDescription>
-                  필터를 변경해 보세요
-                </EmptyDescription>
+                <EmptyDescription>필터를 변경해 보세요</EmptyDescription>
               </EmptyHeader>
             </Empty>
           </div>

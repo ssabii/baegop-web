@@ -36,8 +36,6 @@ export function RandomFilter({
     useState<CategoryFilter[]>(categories);
   const [tempKonaOnly, setTempKonaOnly] = useState(konaOnly);
 
-  const hasFilters = categories.length > 0 || konaOnly;
-
   function handleOpen(nextOpen: boolean) {
     if (nextOpen) {
       setTempCategories(categories);
