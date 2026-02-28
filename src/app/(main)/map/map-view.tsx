@@ -166,7 +166,7 @@ export function MapView({
     if (!markerInstance || !data) return;
 
     openInfoWindow(map, markerInstance, data);
-    map.panTo(markerInstance.getPosition());
+    map.morph(markerInstance.getPosition(), 17);
   }, [openInfoWindowId, openInfoWindow]);
 
   return <NaverMap onReady={handleReady} className={className} />;

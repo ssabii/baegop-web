@@ -3,14 +3,26 @@ import type { NaverSearchResult } from "@/types";
 
 const DISPLAY = 10;
 
-export function useSearchPlaces(query: string) {
+interface Coords {
+  lat: number;
+  lng: number;
+}
+
+export function useSearchPlaces(query: string, coords?: Coords) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["search-places", query],
+      queryKey: ["search-places", query, coords?.lat, coords?.lng],
       queryFn: async ({ pageParam = 1 }) => {
-        const res = await fetch(
-          `/api/naver-search?query=${encodeURIComponent(query)}&display=${DISPLAY}&start=${pageParam}`,
-        );
+        const params = new URLSearchParams({
+          query,
+          display: String(DISPLAY),
+          start: String(pageParam),
+        });
+        if (coords) {
+          params.set("x", String(coords.lng));
+          params.set("y", String(coords.lat));
+        }
+        const res = await fetch(`/api/naver-search?${params}`);
         if (!res.ok) throw new Error("Search failed");
         return res.json() as Promise<NaverSearchResult[]>;
       },
