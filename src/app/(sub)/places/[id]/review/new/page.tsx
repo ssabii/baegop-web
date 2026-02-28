@@ -30,7 +30,8 @@ export default async function ReviewWritePage({
 
   return (
     <ReviewFormPage
-      placeId={place.id}
+      mode="create"
+      naverPlaceId={place.id}
       place={{
         name: place.name,
         category: place.category,
