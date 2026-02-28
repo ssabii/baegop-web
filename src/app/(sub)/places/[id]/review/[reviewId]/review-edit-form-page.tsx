@@ -179,8 +179,7 @@ export function ReviewEditFormPage({
       );
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
       toast.success("리뷰가 수정되었어요.", { position: "top-center" });
-      sessionStorage.setItem("scrollToReview", "true");
-      router.back();
+      router.replace(`/places/${naverPlaceId}?tab=review`);
       router.refresh();
     } catch {
       toast.error("리뷰 수정에 실패했어요. 다시 시도해주세요.", {

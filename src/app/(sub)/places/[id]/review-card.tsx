@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Ellipsis, Pencil, Trash2, UserRound } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -79,7 +80,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
   const nickname = review.profiles?.nickname ?? "탈퇴한 사용자";
 
   return (
-    <div className="py-4 space-y-2">
+    <div className={cn("py-4 space-y-2 transition-opacity", { "opacity-50": isPending })}>
       <div className="flex items-start gap-2">
         <Avatar className="size-10 shrink-0">
           <AvatarImage src={review.profiles?.avatar_url ?? undefined} />

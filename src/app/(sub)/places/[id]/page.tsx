@@ -23,10 +23,15 @@ import { UnregisteredBadge } from "./unregistered-badge";
 
 export default async function PlaceDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
-  const { id: naverPlaceId } = await params;
+  const [{ id: naverPlaceId }, { tab }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
 
   const supabase = await createClient();
 
@@ -193,6 +198,7 @@ export default async function PlaceDetailPage({
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}
             currentUserId={user?.id ?? null}
+            defaultTab={tab === "review" ? "review" : "menu"}
           />
         </div>
       </main>
