@@ -17,7 +17,7 @@ export function RandomActions({
 }: RandomActionsProps) {
   return (
     <div className="fixed inset-x-0 bottom-20">
-      <div className="relative flex justify-center max-w-4xl mx-auto">
+      <div className="w-full max-w-4xl mx-auto relative flex justify-center">
         <Button
           size="xl"
           className="rounded-full"
@@ -29,8 +29,8 @@ export function RandomActions({
         </Button>
         <Button
           variant="outline"
-          size="xl"
-          className="rounded-full bottom-0 right-4 absolute p-4"
+          size="icon"
+          className="absolute bottom-0 right-4 size-12 rounded-full"
           onClick={onFilterOpen}
         >
           <SlidersHorizontal />
