@@ -86,74 +86,75 @@ export function RandomFilter({
 
       <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerContent>
-          <div></div>
-          <DrawerHeader className="text-left">
-            <DrawerTitle className="text-left">필터</DrawerTitle>
-          </DrawerHeader>
+          <div className="max-w-4xl mx-auto w-full">
+            <DrawerHeader className="text-left">
+              <DrawerTitle className="text-left">필터</DrawerTitle>
+            </DrawerHeader>
 
-          <div className="space-y-4 px-4 pb-4">
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-secondary-foreground">
-                카테고리
-              </p>
-              <ToggleGroup
-                type="multiple"
-                variant="outline"
-                spacing={2}
-                className="flex-wrap"
-                value={tempCategories}
-                onValueChange={(value) =>
-                  setTempCategories(value as CategoryFilter[])
-                }
-              >
-                {CATEGORY_FILTERS.map((cat) => (
-                  <ToggleGroupItem
-                    key={cat}
-                    value={cat}
-                    className="rounded-full"
-                  >
-                    {cat}
+            <div className="space-y-4 px-4 pb-4">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-accent-foreground">
+                  카테고리
+                </p>
+                <ToggleGroup
+                  type="multiple"
+                  variant="outline"
+                  spacing={2}
+                  className="flex-wrap"
+                  value={tempCategories}
+                  onValueChange={(value) =>
+                    setTempCategories(value as CategoryFilter[])
+                  }
+                >
+                  {CATEGORY_FILTERS.map((cat) => (
+                    <ToggleGroupItem
+                      key={cat}
+                      value={cat}
+                      className="rounded-full"
+                    >
+                      {cat}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-accent-foreground">
+                  결제
+                </p>
+                <ToggleGroup
+                  type="multiple"
+                  variant="outline"
+                  spacing={2}
+                  className="flex-wrap"
+                  value={tempKonaOnly ? ["kona"] : []}
+                  onValueChange={(value) =>
+                    setTempKonaOnly(value.includes("kona"))
+                  }
+                >
+                  <ToggleGroupItem value="kona" className="rounded-full">
+                    코나카드 가능
                   </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
+                </ToggleGroup>
+              </div>
             </div>
 
-            <Separator />
-
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-secondary-foreground">
-                결제
-              </p>
-              <ToggleGroup
-                type="multiple"
+            <DrawerFooter className="flex-row">
+              <Button
                 variant="outline"
-                spacing={2}
-                className="flex-wrap"
-                value={tempKonaOnly ? ["kona"] : []}
-                onValueChange={(value) =>
-                  setTempKonaOnly(value.includes("kona"))
-                }
+                size="xl"
+                className="flex-1"
+                onClick={handleReset}
               >
-                <ToggleGroupItem value="kona" className="rounded-full">
-                  코나카드 가능
-                </ToggleGroupItem>
-              </ToggleGroup>
-            </div>
+                초기화
+              </Button>
+              <Button size="xl" className="flex-3" onClick={handleApply}>
+                적용
+              </Button>
+            </DrawerFooter>
           </div>
-
-          <DrawerFooter className="flex-row">
-            <Button
-              variant="outline"
-              size="xl"
-              className="flex-1"
-              onClick={handleReset}
-            >
-              초기화
-            </Button>
-            <Button size="xl" className="flex-3" onClick={handleApply}>
-              적용
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
     </>
