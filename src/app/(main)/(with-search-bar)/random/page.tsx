@@ -24,14 +24,14 @@ export default async function RandomPage() {
 
   if (!places || places.length === 0) {
     return (
-      <main className="h-[calc(100dvh-4rem)] flex pt-17">
+      <main className="h-[calc(100dvh-4rem)] flex pt-21">
         <EmptyPlace />
       </main>
     );
   }
 
   return (
-    <main className="h-[calc(100dvh-4rem)] flex pt-17">
+    <main className="h-[calc(100dvh-4rem)] flex pt-21">
       <Roulette places={places} />
     </main>
   );

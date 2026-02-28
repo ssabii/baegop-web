@@ -42,10 +42,7 @@ export function useRoulette(places: RandomPlace[]) {
   const [result, setResult] = useState<RandomPlace | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
 
-  function syncUrl(
-    newCategories: CategoryFilter[],
-    newKonaOnly: boolean,
-  ) {
+  function syncUrl(newCategories: CategoryFilter[], newKonaOnly: boolean) {
     router.replace(`/random${buildQueryString(newCategories, newKonaOnly)}`, {
       scroll: false,
     });
@@ -113,7 +110,6 @@ export function useRoulette(places: RandomPlace[]) {
       setCategories(newCategories);
       setKonaOnly(newKonaOnly);
       syncUrl(newCategories, newKonaOnly);
-      setResult(null);
     }
   }
 
@@ -122,13 +118,11 @@ export function useRoulette(places: RandomPlace[]) {
     setCategories(newCategories);
     setKonaOnly(konaOnly);
     syncUrl(newCategories, konaOnly);
-    setResult(null);
   }
 
   function handleRemoveKona() {
     setKonaOnly(false);
     syncUrl(categories, false);
-    setResult(null);
   }
 
   return {

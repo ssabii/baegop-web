@@ -56,7 +56,7 @@ export function RandomFilter({
 
   return (
     <Drawer open={open} onOpenChange={handleOpen}>
-      <div className="flex items-center gap-2 py-3">
+      <div className="flex items-center gap-2 px-4">
         <div className="flex-1 overflow-x-auto scrollbar-none">
           <div className="flex gap-1.5">
             {categories.map((cat) => (
@@ -115,11 +115,7 @@ export function RandomFilter({
               }
             >
               {CATEGORY_FILTERS.map((cat) => (
-                <ToggleGroupItem
-                  key={cat}
-                  value={cat}
-                  className="rounded-full"
-                >
+                <ToggleGroupItem key={cat} value={cat} className="rounded-full">
                   {cat}
                 </ToggleGroupItem>
               ))}
@@ -154,7 +150,7 @@ export function RandomFilter({
           >
             초기화
           </Button>
-          <Button size="xl" className="flex-[3]" onClick={handleApply}>
+          <Button size="xl" className="flex-3" onClick={handleApply}>
             적용
           </Button>
         </DrawerFooter>
