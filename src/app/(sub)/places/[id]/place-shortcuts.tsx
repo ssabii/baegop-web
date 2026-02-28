@@ -20,9 +20,9 @@ interface ShortcutItem {
 function ShortcutButton({ href, icon: Icon, label, external }: ShortcutItem) {
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="lg"
-      className="flex-1 flex-col gap-1 h-auto px-0 has-[>svg]:px-0 py-3"
+      className="flex-1 flex-col gap-1 h-auto px-0 has-[>svg]:px-0 py-3 rounded-xl"
       asChild
     >
       <a
@@ -94,11 +94,8 @@ export function PlaceShortcuts({
   return (
     <section>
       <ButtonGroup className="w-full rounded-xl">
-        {items.map((item, i) => (
-          <Fragment key={item.label}>
-            {i > 0 && <ButtonGroupSeparator />}
-            <ShortcutButton {...item} />
-          </Fragment>
+        {items.map((item) => (
+          <ShortcutButton key={item.label} {...item} />
         ))}
       </ButtonGroup>
     </section>

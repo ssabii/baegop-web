@@ -11,7 +11,7 @@ import {
 } from "@/lib/naver";
 import { createClient } from "@/lib/supabase/server";
 import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
-import { Dot, Footprints, Home, MapPin, Phone, Star, Tag } from "lucide-react";
+import { Dot, Footprints, Home, Phone, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { KonaVoteSection } from "./kona-vote";
@@ -147,12 +147,6 @@ export default async function PlaceDetailPage({
                 </div>
               </div>
             )}
-            {address && (
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                <MapPin className="size-4 shrink-0" />
-                {address}
-              </div>
-            )}
             {/* 별점 */}
             {isRegistered && avgRating !== null && (
               <div className="flex items-center gap-1">
@@ -175,7 +169,7 @@ export default async function PlaceDetailPage({
           />
 
           {/* 장소 맵 */}
-          <PlaceMap lat={detail.y} lng={detail.x} name={detail.name} />
+          <PlaceMap lat={detail.y} lng={detail.x} name={detail.name} address={address} />
 
           {/* 코나카드 섹션 */}
           {isRegistered && (
