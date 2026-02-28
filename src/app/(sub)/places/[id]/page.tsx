@@ -3,7 +3,7 @@ import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { formatDistance, formatWalkingDuration } from "@/lib/geo";
-import { optimizeNaverImageUrls } from "@/lib/image";
+import { optimizeNaverImageUrls, optimizeSupabaseImageUrl } from "@/lib/image";
 import {
   fetchPlaceBySearch,
   fetchPlaceDetail,
@@ -36,17 +36,16 @@ export default async function PlaceDetailPage({
   const supabase = await createClient();
 
   // Step 1: 독립적인 요청 병렬 실행
-  const [
-    { data: place },
-    {
-      data: { user: authUser },
-    },
-    naverDetail,
-  ] = await Promise.all([
-    supabase.from("places").select("*").eq("id", naverPlaceId).single(),
-    supabase.auth.getUser(),
-    fetchPlaceDetail(naverPlaceId),
-  ]);
+  const placeQuery = supabase
+    .from("places")
+    .select("*")
+    .eq("id", naverPlaceId)
+    .single();
+  const authQuery = supabase.auth.getUser();
+  const naverDetailQuery = fetchPlaceDetail(naverPlaceId);
+
+  const [{ data: place }, { data: { user: authUser } }, naverDetail] =
+    await Promise.all([placeQuery, authQuery, naverDetailQuery]);
 
   const isRegistered = !!place;
   const user = authUser ? { id: authUser.id } : null;
@@ -74,14 +73,23 @@ export default async function PlaceDetailPage({
   if (!detail) notFound();
 
   // Step 3: 나머지 데이터 병렬 페칭
-  const [walkingRoutes, reviewData, konaVoteData] = await Promise.all([
-    fetchWalkingRoutes(
-      { lng: String(COMPANY_LOCATION.lng), lat: String(COMPANY_LOCATION.lat) },
-      { lng: detail.x, lat: detail.y },
-    ),
-    isRegistered
-      ? supabase.from("reviews").select("rating").eq("place_id", place.id)
-      : Promise.resolve({ data: null }),
+  const PAGE_SIZE = 10;
+  const walkingRouteQuery = fetchWalkingRoutes(
+    { lng: String(COMPANY_LOCATION.lng), lat: String(COMPANY_LOCATION.lat) },
+    { lng: detail.x, lat: detail.y },
+  );
+  const reviewsQuery = isRegistered
+    ? supabase
+        .from("reviews")
+        .select(
+          "*, profiles(nickname, avatar_url), review_images(url, display_order)",
+          { count: "exact" },
+        )
+        .eq("place_id", place.id)
+        .order("created_at", { ascending: false })
+        .range(0, PAGE_SIZE - 1)
+    : Promise.resolve({ data: null, count: null });
+  const konaVoteQuery =
     isRegistered && user
       ? supabase
           .from("kona_card_votes")
@@ -89,20 +97,45 @@ export default async function PlaceDetailPage({
           .eq("place_id", place.id)
           .eq("user_id", user.id)
           .single()
-      : Promise.resolve({ data: null }),
+      : Promise.resolve({ data: null });
+
+  const [walkingRoutes, reviewsResult, konaVoteResult] = await Promise.all([
+    walkingRouteQuery,
+    reviewsQuery,
+    konaVoteQuery,
   ]);
 
+  // Step 4: 데이터 가공
   const walkingRoute = walkingRoutes?.[0] ?? null;
-  const ratings = reviewData?.data ?? [];
-  const reviewCount = ratings.length;
-  const avgRating =
-    reviewCount > 0
-      ? ratings.reduce((sum, r) => sum + r.rating, 0) / reviewCount
-      : null;
-  const userKonaVote: KonaVote | null =
-    (konaVoteData?.data?.vote as KonaVote) ?? null;
-
+  const userKonaVote = (konaVoteResult?.data?.vote as KonaVote) ?? null;
   const address = detail.roadAddress || detail.address;
+
+  const reviews = reviewsResult?.data ?? [];
+  const reviewCount = reviewsResult?.count ?? 0;
+  const avgRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : null;
+
+  const initialReviews = reviews.length > 0
+    ? {
+        items: reviews.map((review) => ({
+          ...review,
+          review_images:
+            review.review_images?.map((img) => ({
+              ...img,
+              url: optimizeSupabaseImageUrl(img.url),
+            })) ?? [],
+        })),
+        nextCursor: reviews.length === PAGE_SIZE ? PAGE_SIZE : null,
+      }
+    : undefined;
+
+  const initialMenus = {
+    items: detail.menus.slice(0, PAGE_SIZE),
+    nextCursor: detail.menus.length > PAGE_SIZE ? PAGE_SIZE : null,
+  };
+
   return (
     <>
       <SubHeader
@@ -192,13 +225,13 @@ export default async function PlaceDetailPage({
 
           {/* 메뉴 / 리뷰 탭 */}
           <PlaceTabs
-            menus={detail.menus}
-            reviewCount={reviewCount}
             isRegistered={isRegistered}
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}
             currentUserId={user?.id ?? null}
             defaultTab={tab === "review" ? "review" : "menu"}
+            initialMenus={initialMenus}
+            initialReviews={initialReviews}
           />
         </div>
       </main>

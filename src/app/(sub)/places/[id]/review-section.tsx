@@ -11,13 +11,14 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { ReviewCard } from "./review-card";
-import { useReviews } from "./use-reviews";
+import { useReviews, type ReviewsResponse } from "./use-reviews";
 
 interface ReviewSectionProps {
   placeId: string | null;
   naverPlaceId: string;
   currentUserId: string | null;
   isRegistered: boolean;
+  initialData?: ReviewsResponse;
 }
 
 export function ReviewSection({
@@ -25,12 +26,20 @@ export function ReviewSection({
   naverPlaceId,
   currentUserId,
   isRegistered,
+  initialData,
 }: ReviewSectionProps) {
   if (!isRegistered || !placeId) {
     return <ReviewEmpty />;
   }
 
-  return <ReviewSectionContent placeId={placeId} naverPlaceId={naverPlaceId} currentUserId={currentUserId} />;
+  return (
+    <ReviewSectionContent
+      placeId={placeId}
+      naverPlaceId={naverPlaceId}
+      currentUserId={currentUserId}
+      initialData={initialData}
+    />
+  );
 }
 
 function ReviewEmpty() {
@@ -54,13 +63,15 @@ function ReviewSectionContent({
   placeId,
   naverPlaceId,
   currentUserId,
+  initialData,
 }: {
   placeId: string;
   naverPlaceId: string;
   currentUserId: string | null;
+  initialData?: ReviewsResponse;
 }) {
   const { reviews, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useReviews(placeId);
+    useReviews(placeId, initialData);
 
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {

@@ -17,6 +17,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { toast } from "sonner";
 import { formatRelativeDate } from "@/lib/date";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
+import type { ReviewImageItem } from "@/types";
 import { StarRating } from "./star-rating";
 import { ReviewImages } from "./review-images";
 import { deleteReview } from "./actions";
@@ -26,16 +28,13 @@ interface ReviewCardProps {
     id: number;
     rating: number;
     content: string | null;
-    created_at: string;
+    created_at: string | null;
     user_id: string | null;
     profiles: {
       nickname: string | null;
       avatar_url: string | null;
     } | null;
-    review_images: {
-      url: string;
-      display_order: number;
-    }[];
+    review_images: ReviewImageItem[];
   };
   isOwner: boolean;
   naverPlaceId: string;
@@ -83,7 +82,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     <div className={cn("py-4 space-y-2 transition-opacity", { "opacity-50": isPending })}>
       <div className="flex items-start gap-2">
         <Avatar className="size-10 shrink-0">
-          <AvatarImage src={review.profiles?.avatar_url ?? undefined} />
+          <AvatarImage src={review.profiles?.avatar_url ? optimizeSupabaseImageUrl(review.profiles.avatar_url) : undefined} />
           <AvatarFallback>
             <UserRound className="size-10 text-muted-foreground" />
           </AvatarFallback>
@@ -132,9 +131,11 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
           </div>
           <div className="flex items-center gap-1.5">
             <StarRating rating={review.rating} />
-            <span className="text-xs text-muted-foreground/60">
-              {formatRelativeDate(review.created_at)}
-            </span>
+            {review.created_at && (
+              <span className="text-xs text-muted-foreground/60">
+                {formatRelativeDate(review.created_at)}
+              </span>
+            )}
           </div>
         </div>
       </div>

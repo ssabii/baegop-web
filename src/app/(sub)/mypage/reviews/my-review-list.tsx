@@ -67,7 +67,12 @@ export function MyReviewList({ userId }: MyReviewListProps) {
           return (
             <Fragment key={review.id}>
               {index > 0 && <Separator className="my-4" />}
-              <ReviewCard review={{ ...review, place }} />
+              <ReviewCard
+                review={{ ...review, place }}
+                onClick={() =>
+                  sessionStorage.setItem("scrollToReview", "true")
+                }
+              />
             </Fragment>
           );
         })}

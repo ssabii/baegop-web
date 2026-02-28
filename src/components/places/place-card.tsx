@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { optimizeNaverImageUrl } from "@/lib/image";
 import type { KonaCardStatus } from "@/types";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
 import Link from "next/link";
@@ -71,7 +72,7 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
 
       {place.image_urls?.[0] ? (
         <img
-          src={place.image_urls[0]}
+          src={optimizeNaverImageUrl(place.image_urls[0])}
           alt={place.name}
           className="aspect-square size-28 shrink-0 rounded-lg object-cover"
         />

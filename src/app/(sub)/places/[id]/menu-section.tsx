@@ -1,36 +1,42 @@
 "use client";
 
-import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { UtensilsCrossed } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
-import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 import {
   Empty,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import type { NaverPlaceMenu } from "@/types";
-
-const MENU_PAGE_SIZE = 10;
+import { ImagePreviewDialog } from "@/components/image-preview-dialog";
+import { optimizeNaverImageUrl } from "@/lib/image";
+import { useMenus, type MenusResponse } from "./use-menus";
 
 interface MenuSectionProps {
-  menus: NaverPlaceMenu[];
+  naverPlaceId: string;
+  initialData?: MenusResponse;
 }
 
-export function MenuSection({ menus }: MenuSectionProps) {
-  const [visibleCount, setVisibleCount] = useState(MENU_PAGE_SIZE);
-  const visibleMenus = menus.slice(0, visibleCount);
-  const hasMore = menus.length > visibleCount;
+export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
+  const { menus, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useMenus(naverPlaceId, initialData);
 
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
-      if (inView && hasMore) {
-        setVisibleCount((prev) => prev + MENU_PAGE_SIZE);
+      if (inView && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
       }
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Spinner className="size-8 text-primary" />
+      </div>
+    );
+  }
 
   if (menus.length === 0) {
     return (
@@ -51,7 +57,7 @@ export function MenuSection({ menus }: MenuSectionProps) {
   return (
     <div className="min-h-[40vh]">
       <ul className="divide-y">
-        {visibleMenus.map((menu) => (
+        {menus.map((menu) => (
           <li
             key={menu.name}
             className="flex items-start gap-2 py-4 first:pt-0"
@@ -77,9 +83,9 @@ export function MenuSection({ menus }: MenuSectionProps) {
               )}
             </div>
             {menu.images.length > 0 ? (
-              <ImagePreviewDialog src={menu.images[0]} alt={menu.name}>
+              <ImagePreviewDialog src={optimizeNaverImageUrl(menu.images[0])} alt={menu.name}>
                 <img
-                  src={menu.images[0]}
+                  src={optimizeNaverImageUrl(menu.images[0])}
                   alt={menu.name}
                   className="size-22 shrink-0 rounded-lg object-cover"
                 />
@@ -92,11 +98,9 @@ export function MenuSection({ menus }: MenuSectionProps) {
           </li>
         ))}
       </ul>
-      {hasMore && (
-        <div ref={sentinelRef} className="flex items-center justify-center">
-          <Spinner className="size-6 text-primary" />
-        </div>
-      )}
+      <div ref={sentinelRef} className="flex items-center justify-center">
+        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+      </div>
     </div>
   );
 }

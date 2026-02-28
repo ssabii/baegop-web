@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
+import type { ReviewImageItem } from "@/types";
 
 interface ReviewImagesProps {
-  images: {
-    url: string;
-    display_order: number;
-  }[];
+  images: ReviewImageItem[];
 }
 
 export function ReviewImages({ images }: ReviewImagesProps) {
@@ -17,7 +16,7 @@ export function ReviewImages({ images }: ReviewImagesProps) {
   const sorted = images
     .slice()
     .sort((a, b) => a.display_order - b.display_order);
-  const urls = sorted.map((img) => img.url);
+  const urls = sorted.map((img) => optimizeSupabaseImageUrl(img.url));
 
   return (
     <>
@@ -33,7 +32,7 @@ export function ReviewImages({ images }: ReviewImagesProps) {
             }}
           >
             <img
-              src={img.url}
+              src={optimizeSupabaseImageUrl(img.url)}
               alt={`리뷰 이미지 ${i + 1}`}
               className="aspect-square w-full object-cover"
             />
