@@ -26,12 +26,9 @@ export default async function PlaceDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [{ id: naverPlaceId }, { tab }] = await Promise.all([
-    params,
-    searchParams,
-  ]);
+  const [{ id: naverPlaceId }] = await Promise.all([params, searchParams]);
 
   const supabase = await createClient();
 
@@ -117,19 +114,17 @@ export default async function PlaceDetailPage({
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
       : null;
 
-  const initialReviews = reviews.length > 0
-    ? {
-        items: reviews.map((review) => ({
-          ...review,
-          review_images:
-            review.review_images?.map((img) => ({
-              ...img,
-              url: optimizeSupabaseImageUrl(img.url),
-            })) ?? [],
-        })),
-        nextCursor: reviews.length === PAGE_SIZE ? PAGE_SIZE : null,
-      }
-    : undefined;
+  const initialReviews = {
+    items: reviews.map((review) => ({
+      ...review,
+      review_images:
+        review.review_images?.map((img) => ({
+          ...img,
+          url: optimizeSupabaseImageUrl(img.url),
+        })) ?? [],
+    })),
+    nextCursor: reviews.length === PAGE_SIZE ? PAGE_SIZE : null,
+  };
 
   const initialMenus = {
     items: detail.menus.slice(0, PAGE_SIZE),
@@ -229,7 +224,6 @@ export default async function PlaceDetailPage({
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}
             currentUserId={user?.id ?? null}
-            defaultTab={tab === "review" ? "review" : "menu"}
             initialMenus={initialMenus}
             initialReviews={initialReviews}
           />

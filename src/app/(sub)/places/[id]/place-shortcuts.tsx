@@ -1,14 +1,11 @@
 import { Button } from "@/components/ui/button";
-import {
-  ButtonGroup,
-  ButtonGroupSeparator,
-} from "@/components/ui/button-group";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { buildNaverPlaceLink, buildNaverWalkingRouteLink } from "@/lib/naver";
 import type { NaverWalkingRoute } from "@/lib/naver";
 import type { LucideIcon } from "lucide-react";
 import { ExternalLink, MapPin, Phone, Route } from "lucide-react";
-import { Fragment } from "react";
+
 
 interface ShortcutItem {
   href: string;

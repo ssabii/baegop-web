@@ -98,7 +98,7 @@ export function ReviewCard({ review, onClick }: ReviewCardProps) {
     <>
       {review.place ? (
         <Link
-          href={`/places/${review.place.id}`}
+          href={`/places/${review.place.id}?tab=review`}
           className="block rounded-xl p-3 -m-3 transition-colors hover:bg-accent"
           onClick={(e) => onClick?.(e)}
         >

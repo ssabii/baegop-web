@@ -18,7 +18,7 @@ interface ReviewSectionProps {
   naverPlaceId: string;
   currentUserId: string | null;
   isRegistered: boolean;
-  initialData?: ReviewsResponse;
+  initialData: ReviewsResponse;
 }
 
 export function ReviewSection({
@@ -68,7 +68,7 @@ function ReviewSectionContent({
   placeId: string;
   naverPlaceId: string;
   currentUserId: string | null;
-  initialData?: ReviewsResponse;
+  initialData: ReviewsResponse;
 }) {
   const { reviews, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useReviews(placeId, initialData);
