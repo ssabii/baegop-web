@@ -16,28 +16,26 @@ export function RandomActions({
   isSpinning,
 }: RandomActionsProps) {
   return (
-    <>
-      <div className="fixed inset-x-0 bottom-20 flex justify-center">
+    <div className="fixed inset-x-0 bottom-20">
+      <div className="relative flex justify-center max-w-4xl mx-auto">
         <Button
-          className="rounded-full size-12"
+          size="xl"
+          className="rounded-full"
           onClick={onSpin}
           disabled={disabled}
         >
-          {isSpinning ? (
-            <Spinner className="size-6" aria-label="로딩 중" />
-          ) : (
-            <Shuffle className="size-6" />
-          )}
+          {isSpinning ? <Spinner aria-label="로딩 중" /> : <Shuffle />}
+          랜덤 뽑기
+        </Button>
+        <Button
+          variant="outline"
+          size="xl"
+          className="rounded-full bottom-0 right-4 absolute p-4"
+          onClick={onFilterOpen}
+        >
+          <SlidersHorizontal />
         </Button>
       </div>
-
-      <Button
-        variant="secondary"
-        className="fixed bottom-20 right-4 rounded-full size-12"
-        onClick={onFilterOpen}
-      >
-        <SlidersHorizontal className="size-5" />
-      </Button>
-    </>
+    </div>
   );
 }

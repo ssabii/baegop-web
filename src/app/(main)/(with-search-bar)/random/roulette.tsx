@@ -21,23 +21,19 @@ export function Roulette({ places }: RouletteProps) {
     filteredPlaces,
     spin,
     handleFilterApply,
-    handleRemoveCategory,
-    handleRemoveKona,
   } = useRoulette(places);
 
   return (
-    <div className="mx-auto h-full w-full max-w-4xl">
+    <div className="relative mx-auto h-full w-full max-w-4xl">
       <RandomFilter
         open={filterOpen}
         onOpenChange={setFilterOpen}
         categories={categories}
         konaOnly={konaOnly}
         onApply={handleFilterApply}
-        onRemoveCategory={handleRemoveCategory}
-        onRemoveKona={handleRemoveKona}
       />
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="h-full overflow-y-auto pt-[38px] pb-32">
         <RandomContent
           result={result}
           isSpinning={isSpinning}

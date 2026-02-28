@@ -18,7 +18,7 @@ export function RandomContent({
     return (
       <div
         className={cn("transition-all duration-300", {
-          "scale-95 opacity-50": isSpinning,
+          "scale-90 opacity-50": isSpinning,
           "scale-100 opacity-100": !isSpinning,
         })}
       >
@@ -28,8 +28,16 @@ export function RandomContent({
   }
 
   if (!hasPlaces) {
-    return <RandomEmptyNoResults />;
+    return (
+      <div className="absolute inset-0 flex w-full h-full items-center justify-center">
+        <RandomEmptyNoResults />
+      </div>
+    );
   }
 
-  return <RandomEmptyInitial />;
+  return (
+    <div className="absolute inset-0 flex w-full h-full items-center justify-center">
+      <RandomEmptyInitial />
+    </div>
+  );
 }
