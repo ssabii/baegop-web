@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { MapView } from "./map-view";
+import { MapContainer } from "./map-container";
 
 export default async function MapPage() {
   const supabase = await createClient();
@@ -21,7 +21,7 @@ export default async function MapPage() {
 
   return (
     <main className="fixed inset-x-0 top-0 bottom-15">
-      <MapView markers={markers} className="size-full" />
+      <MapContainer dbMarkers={markers} />
     </main>
   );
 }
