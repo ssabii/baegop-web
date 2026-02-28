@@ -161,15 +161,20 @@ export default async function PlaceDetailPage({
             )}
           </section>
 
+          {/* 장소 맵 */}
+          <PlaceMap
+            lat={detail.y}
+            lng={detail.x}
+            name={detail.name}
+            address={address}
+          />
+
           {/* 바로가기 버튼 */}
           <PlaceShortcuts
             naverPlaceId={naverPlaceId}
             detail={detail}
             walkingRoute={walkingRoute}
           />
-
-          {/* 장소 맵 */}
-          <PlaceMap lat={detail.y} lng={detail.x} name={detail.name} address={address} />
 
           {/* 코나카드 섹션 */}
           {isRegistered && (
