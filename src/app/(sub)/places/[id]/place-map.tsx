@@ -53,7 +53,7 @@ export function PlaceMap({ lat, lng, name, address }: PlaceMapProps) {
         center={{ lat: numLat, lng: numLng }}
         zoom={17}
         onReady={handleReady}
-        className="h-[30vh] rounded-xl overflow-hidden border"
+        className="isolate h-[30vh] rounded-xl overflow-hidden border"
       />
       {address && (
         <div className="flex items-start gap-2 text-sm text-muted-foreground">

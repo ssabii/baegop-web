@@ -98,7 +98,6 @@ export default async function PlaceDetailPage({
     (konaVoteData?.data?.vote as KonaVote) ?? null;
 
   const address = detail.roadAddress || detail.address;
-  console.log(detail.address, detail.roadAddress);
   return (
     <>
       <SubHeader

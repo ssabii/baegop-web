@@ -77,11 +77,11 @@ export function KonaVoteSection({
               <div className="max-w-4xl mx-auto w-full p-4">
                 <DrawerHeader>
                   <DrawerTitle className="text-left">
-                    코나카드 결제 여부
+                    코나카드 결제가 가능한가요?
                   </DrawerTitle>
                   <DrawerDescription className="text-left">
-                    코나카드 결제 가능 여부는 여러분의 투표로 결정돼요. <br />
-                    다른 사용자들이 참고할 수 있게 투표해주세요.
+                    결제 가능 여부를 투표해주세요. <br />
+                    투표 결과에 따라 가능 여부가 표시돼요.
                   </DrawerDescription>
                 </DrawerHeader>
               </div>

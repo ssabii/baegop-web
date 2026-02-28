@@ -74,6 +74,11 @@ export default function NaverMap({
         center: new naver.maps.LatLng(center.lat, center.lng),
         zoom,
         customStyleId: isDark ? DARK_STYLE_ID : undefined,
+        logoControl: false,
+        mapDataControl: false,
+        scaleControl: false,
+        zoomControl: false,
+        mapTypeControl: false,
       });
 
       cachedTheme = resolvedTheme;
