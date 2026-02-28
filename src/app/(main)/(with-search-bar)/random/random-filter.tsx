@@ -1,15 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { SlidersHorizontal } from "lucide-react";
-import {
-  CATEGORY_FILTERS,
-  DEFAULT_CATEGORY_FILTERS,
-  type CategoryFilter,
-} from "@/lib/constants";
+import { SlidersHorizontal, X } from "lucide-react";
+import { CATEGORY_FILTERS, type CategoryFilter } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import {
   Drawer,
   DrawerContent,
@@ -24,17 +20,23 @@ interface RandomFilterProps {
   categories: CategoryFilter[];
   konaOnly: boolean;
   onApply: (categories: CategoryFilter[], konaOnly: boolean) => void;
+  onRemoveCategory: (category: CategoryFilter) => void;
+  onRemoveKona: () => void;
 }
 
 export function RandomFilter({
   categories,
   konaOnly,
   onApply,
+  onRemoveCategory,
+  onRemoveKona,
 }: RandomFilterProps) {
   const [open, setOpen] = useState(false);
   const [tempCategories, setTempCategories] =
     useState<CategoryFilter[]>(categories);
   const [tempKonaOnly, setTempKonaOnly] = useState(konaOnly);
+
+  const hasFilters = categories.length > 0 || konaOnly;
 
   function handleOpen(nextOpen: boolean) {
     if (nextOpen) {
@@ -45,7 +47,7 @@ export function RandomFilter({
   }
 
   function handleReset() {
-    setTempCategories([...DEFAULT_CATEGORY_FILTERS]);
+    setTempCategories([]);
     setTempKonaOnly(false);
   }
 
@@ -60,28 +62,29 @@ export function RandomFilter({
         <div className="flex-1 overflow-x-auto scrollbar-none">
           <div className="flex gap-1.5">
             {categories.map((cat) => (
-              <DrawerTrigger key={cat} asChild>
-                <Badge
-                  variant="secondary"
-                  className="shrink-0 cursor-pointer"
-                >
-                  {cat}
-                </Badge>
-              </DrawerTrigger>
+              <Badge
+                key={cat}
+                variant="secondary"
+                className="shrink-0 cursor-pointer gap-0.5"
+                onClick={() => onRemoveCategory(cat)}
+              >
+                {cat}
+                <X className="size-3" />
+              </Badge>
             ))}
             {konaOnly && (
-              <DrawerTrigger asChild>
-                <Badge
-                  className="shrink-0 cursor-pointer bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                >
-                  <img
-                    src="/icons/kona.png"
-                    alt="코나카드"
-                    className="size-3 rounded-full"
-                  />
-                  결제가능
-                </Badge>
-              </DrawerTrigger>
+              <Badge
+                className="shrink-0 cursor-pointer gap-0.5 bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
+                onClick={onRemoveKona}
+              >
+                <img
+                  src="/icons/kona.png"
+                  alt="코나카드"
+                  className="size-3 rounded-full"
+                />
+                결제가능
+                <X className="size-3" />
+              </Badge>
             )}
           </div>
         </div>
@@ -95,41 +98,53 @@ export function RandomFilter({
 
       <DrawerContent>
         <DrawerHeader className="text-left">
-          <div className="flex items-center justify-between">
-            <DrawerTitle>카테고리 필터</DrawerTitle>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <Checkbox
-                checked={tempKonaOnly}
-                onCheckedChange={(checked) =>
-                  setTempKonaOnly(checked === true)
-                }
-              />
-              <span className="text-sm font-medium">코나카드 가능</span>
-            </label>
-          </div>
+          <DrawerTitle>필터</DrawerTitle>
         </DrawerHeader>
 
-        <div className="px-4 pb-4">
-          <ToggleGroup
-            type="multiple"
-            variant="outline"
-            spacing={2}
-            className="flex-wrap"
-            value={tempCategories}
-            onValueChange={(value) =>
-              setTempCategories(value as CategoryFilter[])
-            }
-          >
-            {CATEGORY_FILTERS.map((cat) => (
-              <ToggleGroupItem
-                key={cat}
-                value={cat}
-                className="rounded-full"
-              >
-                {cat}
+        <div className="space-y-4 px-4 pb-4">
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-muted-foreground">
+              카테고리
+            </p>
+            <ToggleGroup
+              type="multiple"
+              variant="outline"
+              spacing={2}
+              className="flex-wrap"
+              value={tempCategories}
+              onValueChange={(value) =>
+                setTempCategories(value as CategoryFilter[])
+              }
+            >
+              {CATEGORY_FILTERS.map((cat) => (
+                <ToggleGroupItem
+                  key={cat}
+                  value={cat}
+                  className="rounded-full"
+                >
+                  {cat}
+                </ToggleGroupItem>
+              ))}
+            </ToggleGroup>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-muted-foreground">결제</p>
+            <ToggleGroup
+              type="multiple"
+              variant="outline"
+              spacing={2}
+              className="flex-wrap"
+              value={tempKonaOnly ? ["kona"] : []}
+              onValueChange={(value) => setTempKonaOnly(value.includes("kona"))}
+            >
+              <ToggleGroupItem value="kona" className="rounded-full">
+                코나카드 가능
               </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+            </ToggleGroup>
+          </div>
         </div>
 
         <DrawerFooter className="flex-row">

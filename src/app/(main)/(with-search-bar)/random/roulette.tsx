@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import { RotateCcw, Shuffle, CircleQuestionMarkIcon, SearchX } from "lucide-react";
+import { Shuffle, CircleQuestionMarkIcon, SearchX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { matchesCategory } from "@/lib/category";
-import {
-  DEFAULT_CATEGORY_FILTERS,
-  type CategoryFilter,
-} from "@/lib/constants";
+import { type CategoryFilter } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -39,9 +36,7 @@ interface RouletteProps {
 export function Roulette({ places }: RouletteProps) {
   const [result, setResult] = useState<PlaceData | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [categories, setCategories] = useState<CategoryFilter[]>([
-    ...DEFAULT_CATEGORY_FILTERS,
-  ]);
+  const [categories, setCategories] = useState<CategoryFilter[]>([]);
   const [konaOnly, setKonaOnly] = useState(false);
 
   const filteredPlaces = useMemo(() => {
@@ -68,21 +63,32 @@ export function Roulette({ places }: RouletteProps) {
 
     setIsSpinning(true);
 
+    // Fisher-Yates 셔플로 애니메이션 순서 결정
+    const shuffled = [...filteredPlaces];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // 최종 결과가 이전 결과와 같으면 다른 장소로 교체
+    const finalIndex = shuffled.length - 1;
+    if (shuffled[finalIndex].id === result?.id && shuffled.length > 1) {
+      [shuffled[finalIndex], shuffled[0]] = [shuffled[0], shuffled[finalIndex]];
+    }
+
+    const totalTicks = Math.min(shuffled.length, 15);
     let count = 0;
-    const totalTicks = 15;
     const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * filteredPlaces.length);
-      setResult(filteredPlaces[randomIndex]);
+      setResult(shuffled[count % shuffled.length]);
       count++;
 
       if (count >= totalTicks) {
         clearInterval(interval);
-        const finalIndex = Math.floor(Math.random() * filteredPlaces.length);
-        setResult(filteredPlaces[finalIndex]);
+        setResult(shuffled[finalIndex]);
         setIsSpinning(false);
       }
     }, 100);
-  }, [filteredPlaces]);
+  }, [filteredPlaces, result]);
 
   function handleFilterApply(
     newCategories: CategoryFilter[],
@@ -93,12 +99,25 @@ export function Roulette({ places }: RouletteProps) {
     setResult(null);
   }
 
+  function handleRemoveCategory(category: CategoryFilter) {
+    const newCategories = categories.filter((c) => c !== category);
+    setCategories(newCategories);
+    setResult(null);
+  }
+
+  function handleRemoveKona() {
+    setKonaOnly(false);
+    setResult(null);
+  }
+
   return (
-    <div className="relative flex h-full w-full max-w-4xl flex-col px-4">
+    <div className="relative mx-auto flex h-full w-full max-w-4xl flex-col px-4">
       <RandomFilter
         categories={categories}
         konaOnly={konaOnly}
         onApply={handleFilterApply}
+        onRemoveCategory={handleRemoveCategory}
+        onRemoveKona={handleRemoveKona}
       />
 
       <div className="flex-1 overflow-y-auto">
@@ -150,17 +169,7 @@ export function Roulette({ places }: RouletteProps) {
         )}
       </div>
 
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-        {result && (
-          <Button
-            variant="secondary"
-            className="rounded-full size-12 bg-muted"
-            onClick={() => setResult(null)}
-            disabled={isSpinning}
-          >
-            <RotateCcw className="size-6" />
-          </Button>
-        )}
+      <div className="absolute bottom-4 right-4">
         <Button
           className="rounded-full size-12"
           onClick={spin}

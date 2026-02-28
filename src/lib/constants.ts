@@ -34,15 +34,6 @@ export const CATEGORY_FILTERS = [
 ] as const;
 export type CategoryFilter = (typeof CATEGORY_FILTERS)[number];
 
-// 기본 선택 필터 (카페 제외)
-export const DEFAULT_CATEGORY_FILTERS: CategoryFilter[] = [
-  "한식",
-  "중식",
-  "일식",
-  "양식",
-  "패스트푸드",
-];
-
 export const CATEGORY_KEYWORDS: Record<CategoryFilter, string[]> = {
   한식: [
     "한식", "한정식", "국밥", "소고기", "돼지고기", "삼겹살", "갈비",
@@ -100,7 +91,7 @@ export const CATEGORY_KEYWORDS: Record<CategoryFilter, string[]> = {
     "수제버거", "햄버거",
     "샐러드", "샌드위치",
     "프렌치", "비스트로",
-    "이탈리",
+    "이탈리아",
     "멕시칸", "타코", "부리또",
     "바베큐", "BBQ",
     "다이닝", "파인다이닝",
@@ -108,11 +99,10 @@ export const CATEGORY_KEYWORDS: Record<CategoryFilter, string[]> = {
   ],
   패스트푸드: [
     "패스트푸드",
-    "맥도날드", "버거킹", "롯데리아", "KFC", "맘스터치",
-    "서브웨이",
+    "햄버거",
+    "샌드위치",
     "핫도그",
     "치킨",
-    "도미노", "피자헛", "미스터피자",
   ],
   카페: [
     "카페", "커피", "디저트", "베이커리", "빵", "케이크",
