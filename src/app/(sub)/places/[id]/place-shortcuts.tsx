@@ -22,7 +22,7 @@ function ShortcutButton({ href, icon: Icon, label, external }: ShortcutItem) {
     <Button
       variant="outline"
       size="lg"
-      className="flex-1 flex-col gap-1 h-auto px-0 has-[>svg]:px-0 py-3 rounded-xl"
+      className="flex-1 flex-col min-[375px]:flex-row gap-1 min-[375px]:gap-1.5 h-auto px-0 has-[>svg]:px-0 py-3 rounded-xl"
       asChild
     >
       <a
