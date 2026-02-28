@@ -79,7 +79,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
   const nickname = review.profiles?.nickname ?? "탈퇴한 사용자";
 
   return (
-    <div className="py-3 space-y-2">
+    <div className="py-4 space-y-2">
       <div className="flex items-start gap-3">
         <Avatar className="size-10 shrink-0">
           <AvatarImage src={review.profiles?.avatar_url ?? undefined} />
@@ -110,7 +110,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   <div className="mx-auto flex w-full max-w-4xl flex-col py-2">
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-3 text-base font-bold cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-4 text-base font-bold cursor-pointer"
                       onClick={handleEdit}
                     >
                       <Pencil className="size-4" />
@@ -118,7 +118,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-3 text-base font-bold text-destructive cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-4 text-base font-bold text-destructive cursor-pointer"
                       onClick={handleDelete}
                     >
                       <Trash2 className="size-4" />

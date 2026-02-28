@@ -37,7 +37,7 @@ export function ReviewSection({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
+      <div className="flex h-[30vh] items-center justify-center">
         <Spinner className="size-8 text-primary" />
       </div>
     );

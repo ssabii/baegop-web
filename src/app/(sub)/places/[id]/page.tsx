@@ -11,7 +11,7 @@ import {
 } from "@/lib/naver";
 import { createClient } from "@/lib/supabase/server";
 import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
-import { Dot, Footprints, Home, MapPin, Star, Tag } from "lucide-react";
+import { Dot, Footprints, Home, MapPin, Phone, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { KonaVoteSection } from "./kona-vote";
@@ -127,22 +127,12 @@ export default async function PlaceDetailPage({
                 {detail.category}
               </div>
             )}
-            {(() => {
-              const match = address?.match(
-                /^(.*(?:로|길|대로)\s+\d+(?:-\d+)?)\s*(.*)/,
-              );
-              const baseAddress = match ? match[1] : address;
-              const detailAddress = match ? match[2] : "";
-              return (
-                <div className="flex items-start gap-2 text-sm font-medium text-muted-foreground">
-                  <MapPin className="size-4 shrink-0 mt-0.5" />
-                  <div>
-                    <address className="not-italic">{baseAddress}</address>
-                    {detailAddress && <span>{detailAddress}</span>}
-                  </div>
-                </div>
-              );
-            })()}
+            {detail.phone && (
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Phone className="size-4 shrink-0" />
+                <a href={`tel:${detail.phone}`}>{detail.phone}</a>
+              </div>
+            )}
             {walkingRoute && (
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Footprints className="size-4 shrink-0" />
@@ -155,6 +145,12 @@ export default async function PlaceDetailPage({
                   <Dot className="size-4 shrink-0" />
                   <div>{formatDistance(walkingRoute.summary.distance)}</div>
                 </div>
+              </div>
+            )}
+            {address && (
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <MapPin className="size-4 shrink-0" />
+                {address}
               </div>
             )}
             {/* 별점 */}
@@ -171,15 +167,15 @@ export default async function PlaceDetailPage({
             )}
           </section>
 
-          {/* 장소 맵 */}
-          <PlaceMap lat={detail.y} lng={detail.x} name={detail.name} />
-
           {/* 바로가기 버튼 */}
           <PlaceShortcuts
             naverPlaceId={naverPlaceId}
             detail={detail}
             walkingRoute={walkingRoute}
           />
+
+          {/* 장소 맵 */}
+          <PlaceMap lat={detail.y} lng={detail.x} name={detail.name} />
 
           {/* 코나카드 섹션 */}
           {isRegistered && (

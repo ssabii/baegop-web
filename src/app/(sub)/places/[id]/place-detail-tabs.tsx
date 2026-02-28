@@ -85,7 +85,7 @@ export function PlaceDetailTabs({
           <div className="min-h-[calc(100dvh*0.5)]">
             <ul className="divide-y">
               {visibleMenus.map((menu) => (
-                <li key={menu.name} className="flex items-start gap-2 py-3">
+                <li key={menu.name} className="flex items-start gap-2 py-4">
                   <div className="flex min-w-0 flex-1 flex-col justify-between">
                     <div className="space-y-1">
                       {menu.recommend && (
@@ -125,7 +125,7 @@ export function PlaceDetailTabs({
               ))}
             </ul>
             {hasMore && (
-              <div ref={menuSentinelRef} className="flex justify-center py-4">
+              <div ref={menuSentinelRef} className="flex h-[30vh] items-center justify-center">
                 <Spinner className="size-6 text-primary" />
               </div>
             )}

@@ -6,12 +6,16 @@
 
 1. **네이버 플레이스 GraphQL API** (비공식) — 장소 검색 및 상세 정보 조회
 2. **네이버 지도 JS API** (공식) — 클라이언트 지도 렌더링
+3. **네이버 Static Map API** (공식) — 정적 지도 이미지 (서버 프록시)
 
 ```
 클라이언트 (브라우저)
   │
   ├─ /api/naver-search ──→ lib/search.ts ──→ GraphQL (getPlaces)
   │   └─ 자동완성용 프록시
+  │
+  ├─ /api/naver-static-map ──→ NCP Static Map API (maps.apigw.ntruss.com)
+  │   └─ 정적 지도 이미지 프록시 (헤더 인증)
   │
   ├─ lib/naver.ts (서버 컴포넌트에서 직접 호출)
   │   ├─ fetchPlaceDetail() ──→ GraphQL (getPlaceDetail)  ← Tier 1
@@ -28,6 +32,8 @@
 | `src/lib/naver.ts` | 장소 상세 조회 + 폴백 로직, 링크 빌더 |
 | `src/app/api/naver-search/route.ts` | 클라이언트 자동완성용 프록시 (`search.ts` 재사용) |
 | `src/components/naver-map.tsx` | 네이버 지도 클라이언트 컴포넌트 |
+| `src/components/static-map.tsx` | 정적 지도 이미지 공통 컴포넌트 |
+| `src/app/api/naver-static-map/route.ts` | NCP Static Map API 서버 프록시 |
 
 ---
 
@@ -310,14 +316,78 @@ import NaverMap from "@/components/naver-map";
 
 ---
 
+## Static Map 프록시 (`/api/naver-static-map`)
+
+장소 상세 페이지에서 위치를 보여주는 정적 지도 이미지. 서버 프록시를 통해 NCP Static Map API를 호출한다.
+
+### 파일
+
+| 파일 | 용도 |
+|------|------|
+| `src/components/static-map.tsx` | 공통 Static Map 컴포넌트 |
+| `src/app/(sub)/places/[id]/static-map.tsx` | 장소 상세용 래퍼 (네이버 지도 링크 포함) |
+| `src/app/api/naver-static-map/route.ts` | NCP Static Map API 서버 프록시 |
+
+### 환경변수
+
+```env
+NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID=your_ncp_key_id    # X-NCP-APIGW-API-KEY-ID
+X_NCP_APIGW_API_KEY=your_ncp_secret                 # X-NCP-APIGW-API-KEY (서버 전용)
+```
+
+### 사용법
+
+```
+GET /api/naver-static-map?center=127.029,37.492&w=600&h=200&level=16&scale=2&markers=type:d|size:mid|pos:127.029 37.492
+```
+
+### NCP Static Map API 주의사항
+
+#### 엔드포인트
+
+| 엔드포인트 | 인증 방식 | 비고 |
+|-----------|---------|------|
+| `https://maps.apigw.ntruss.com/map-static/v2/raster` | 헤더 인증 (서버용) | **VPC 플랫폼용** |
+| `https://naveropenapi.apigw.ntruss.com/map-static/v2/raster` | 헤더 인증 (서버용) | **Classic 플랫폼용** — VPC 키로 호출 시 401 |
+| `https://naveropenapi.apigw.ntruss.com/map-static/v2/raster-cors` | Referer 인증 (클라이언트용) | `<img>` 태그 직접 사용 가능하나 Referer 미전송 시 실패 |
+
+> VPC와 Classic은 별도 플랫폼이다. Application이 VPC에 등록되어 있으면 반드시 `maps.apigw.ntruss.com`을 사용해야 한다.
+
+#### markers 파라미터 형식
+
+```
+markers=type:d|size:mid|pos:127.029 37.492
+```
+
+- `pos:` 좌표는 **공백 구분** (`pos:경도 위도`). 콤마 사용 시 403 에러.
+- `|` (파이프)는 반드시 **URL 인코딩** (`%7C`) 해야 한다. 인코딩하지 않으면 403 에러.
+- `URLSearchParams`를 사용하면 파이프가 자동 인코딩되므로 권장.
+
+#### 구독 설정
+
+NCP 콘솔에서 아래 두 가지를 모두 완료해야 한다:
+
+1. **Maps 상품 구독** — Maps > Subscription에서 "이용 신청" (VPC와 Classic 각각 별도)
+2. **Application에 Static Map 추가** — Maps > Application > 앱 수정 > "Static Map" 체크 후 저장
+
+#### 흔한 에러
+
+| 에러 | 원인 |
+|------|------|
+| 401 `Authentication information are missing` | 잘못된 엔드포인트 (VPC 키로 Classic 엔드포인트 호출) |
+| 401 `A subscription to the API is required` | Maps 상품 미구독 또는 Application에 Static Map 미추가 |
+| 403 (빈 응답) | markers의 `|`가 URL 인코딩되지 않음, 또는 `pos:` 좌표가 콤마 구분 |
+
+---
+
 ## API 키 발급
 
 ### 지도 API (네이버 클라우드 플랫폼)
 
 1. https://console.ncloud.com 접속 → 로그인
 2. **Services → AI·NAVER API** → **Application 등록**
-3. API 선택에서 **Dynamic Map** 체크
+3. API 선택에서 **Dynamic Map**, **Static Map** 체크
 4. 서비스 환경 → Web 서비스 URL에 `http://localhost:3000` 추가
-5. 등록 후 Client ID (= `ncpKeyId`) 확인
+5. 등록 후 Client ID (= `X-NCP-APIGW-API-KEY-ID`)와 Client Secret (= `X-NCP-APIGW-API-KEY`) 확인
 
 > 키 발급 후 반영까지 수 분 걸릴 수 있음

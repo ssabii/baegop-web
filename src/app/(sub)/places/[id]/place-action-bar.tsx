@@ -90,7 +90,7 @@ export function PlaceActionBar({
               <Button
                 variant="outline"
                 size="xl"
-                className="w-full bg-orange-100 text-orange-700 transition-none hover:bg-orange-200 has-[>svg]:px-8 dark:bg-orange-900/50 dark:text-orange-300 dark:hover:bg-orange-900/70"
+                className="w-full transition-none has-[>svg]:px-8"
                 onClick={handleRegister}
                 disabled={isPending}
               >

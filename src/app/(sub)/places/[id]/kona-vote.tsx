@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Check, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -48,7 +48,7 @@ export function KonaVoteSection({
   isLoggedIn,
 }: KonaVoteProps) {
   const router = useRouter();
-  const { status, userVote, vote, isPending } = useKonaVote({
+  const { status, userVote, vote, isPending, pendingVote } = useKonaVote({
     placeId,
     initialStatus,
     initialUserVote,
@@ -63,6 +63,30 @@ export function KonaVoteSection({
         <div className="flex items-center gap-2">
           <img src="/icons/kona.png" alt="코나카드" className="size-4" />
           <span className="text-sm font-bold">코나카드</span>
+          <Drawer>
+            <DrawerTrigger asChild>
+              <button
+                type="button"
+                className="text-muted-foreground/60 cursor-pointer"
+                aria-label="코나카드 결제 안내"
+              >
+                <Info className="size-3.5" />
+              </button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <div className="max-w-4xl mx-auto w-full p-4">
+                <DrawerHeader>
+                  <DrawerTitle className="text-left">
+                    코나카드 결제 여부
+                  </DrawerTitle>
+                  <DrawerDescription className="text-left">
+                    코나카드 결제 가능 여부는 여러분의 투표로 결정돼요. <br />
+                    다른 사용자들이 참고할 수 있게 투표해주세요.
+                  </DrawerDescription>
+                </DrawerHeader>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
         <span className={cn("text-sm font-semibold", config.className)}>
           {config.label}
@@ -71,63 +95,36 @@ export function KonaVoteSection({
 
       {isLoggedIn && (
         <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            코나카드 결제가 가능한가요?
+          </span>
           <div className="flex items-center gap-1">
-            <span className="text-sm text-muted-foreground">
-              코나카드 결제가 가능한가요?
-            </span>
-            <Drawer>
-              <DrawerTrigger asChild>
-                <button
-                  type="button"
-                  className="text-muted-foreground"
-                  aria-label="코나카드 결제 안내"
-                >
-                  <Info className="size-3.5" />
-                </button>
-              </DrawerTrigger>
-              <DrawerContent>
-                <DrawerHeader>
-                  <DrawerTitle>코나카드 결제 여부</DrawerTitle>
-                  <DrawerDescription>
-                    코나카드 결제가 가능하다면 동료가 알 수 있게 투표해주세요.
-                  </DrawerDescription>
-                </DrawerHeader>
-              </DrawerContent>
-            </Drawer>
-          </div>
-          <div className="flex items-center gap-1.5">
             <Toggle
-              variant="outline"
               size="sm"
+              variant="outline"
               pressed={userVote === "available"}
               onPressedChange={() => vote("available")}
               disabled={isPending}
+              className={cn("px-1.5 py-0.5 cursor-pointer rounded-lg", {
+                "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
+                  userVote === "available",
+              })}
             >
-              {isPending && userVote === "available" ? (
-                <Spinner />
-              ) : (
-                <Check
-                  className={cn({ "fill-foreground": userVote === "available" })}
-                />
-              )}
+              {isPending && pendingVote === "available" && <Spinner />}
               가능
             </Toggle>
             <Toggle
-              variant="outline"
               size="sm"
+              variant="outline"
               pressed={userVote === "unavailable"}
               onPressedChange={() => vote("unavailable")}
               disabled={isPending}
+              className={cn("px-1.5 py-0.5 cursor-pointer rounded-lg", {
+                "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
+                  userVote === "unavailable",
+              })}
             >
-              {isPending && userVote === "unavailable" ? (
-                <Spinner />
-              ) : (
-                <Check
-                  className={cn({
-                    "fill-foreground": userVote === "unavailable",
-                  })}
-                />
-              )}
+              {isPending && pendingVote === "unavailable" && <Spinner />}
               불가
             </Toggle>
           </div>
