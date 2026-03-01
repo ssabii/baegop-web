@@ -32,7 +32,7 @@ export function PlaceItem({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex w-full cursor-pointer items-center gap-3 text-left transition-colors",
+        "flex w-full cursor-pointer items-center gap-3 text-left transition-colors [-webkit-tap-highlight-color:transparent]",
         paddingClass,
         highlighted ? "bg-accent" : "hover:bg-accent",
       )}

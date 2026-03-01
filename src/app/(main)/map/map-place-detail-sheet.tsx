@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useInView } from "react-intersection-observer";
 import { Drawer } from "vaul";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { MapViewButton } from "./map-view-button";
 import { MapPlaceDetail } from "./map-place-detail";
 import type { NaverSearchResult } from "@/types";
 
@@ -43,11 +43,6 @@ export function MapPlaceDetailSheet({
     }
   }, [isFullSnap]);
 
-  // 시트 상단이 뷰포트 상단 ~8% 영역에 진입하면 isAtTop = true
-  const { ref: sentinelRef, inView: isAtTop } = useInView({
-    rootMargin: "0px 0px -92% 0px",
-  });
-
   // URL 동기화: expand 상태 변경 시 querystring 업데이트
   useEffect(() => {
     if (isFullSnap === prevIsFullRef.current) return;
@@ -79,20 +74,17 @@ export function MapPlaceDetailSheet({
       <Drawer.Portal>
         <Drawer.Content
           aria-describedby={undefined}
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] flex h-dvh flex-col"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] flex h-dvh flex-col outline-none"
         >
           <div
             className={cn(
-              "pointer-events-auto flex min-h-0 flex-1 flex-col border-t bg-background shadow-lg transition-[border-radius,border-color] duration-300",
+              "pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t bg-background shadow-lg transition-[border-radius,border-color] duration-300",
               {
-                "rounded-t-2xl": !isAtTop,
-                "rounded-none border-t-transparent": isAtTop,
+                "rounded-t-2xl": !isFullSnap,
+                "rounded-none border-t-transparent": isFullSnap,
               },
             )}
           >
-            {/* Sentinel: 시트 상단이 뷰포트 탑에 닿는지 감지 */}
-            <div ref={sentinelRef} />
-
             <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
 
             {/* Drag handle */}
@@ -122,6 +114,13 @@ export function MapPlaceDetailSheet({
             >
               <MapPlaceDetail item={item} />
             </div>
+
+            {isFullSnap && (
+              <MapViewButton
+                scrollRef={contentRef}
+                onClick={() => setActiveSnap(COMPACT_SNAP)}
+              />
+            )}
           </div>
         </Drawer.Content>
       </Drawer.Portal>

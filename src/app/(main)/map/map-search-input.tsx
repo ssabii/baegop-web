@@ -22,7 +22,7 @@ export function MapSearchInput({
   const isIdle = !showBack && !query;
 
   return (
-    <div className="absolute inset-x-0 top-0 z-50 px-4 py-3">
+    <div className="fixed inset-x-0 top-0 z-43 px-4 py-3 bg-transparent">
       <div className="mx-auto flex h-11 max-w-4xl items-center rounded-full border bg-background shadow-sm">
         {/* Idle: baegop icon + placeholder */}
         {isIdle && (

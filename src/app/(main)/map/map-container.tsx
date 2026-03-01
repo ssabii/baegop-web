@@ -22,13 +22,11 @@ export function MapContainer() {
 
   const [query, setQuery] = useState(queryParam);
   const [prevQueryParam, setPrevQueryParam] = useState(queryParam);
-  const [sheetTopProgress, setSheetTopProgress] = useState(0);
 
   // Sync URL → state when queryParam changes externally (render-time sync)
   if (queryParam !== prevQueryParam) {
     setPrevQueryParam(queryParam);
     setQuery(queryParam);
-    if (!queryParam) setSheetTopProgress(0);
   }
 
   const userCoords = useGeolocation();
@@ -120,7 +118,6 @@ export function MapContainer() {
 
   const handleClear = useCallback(() => {
     setQuery("");
-    setSheetTopProgress(0);
     router.replace("/map", { scroll: false });
   }, [router]);
 
@@ -148,18 +145,13 @@ export function MapContainer() {
   const showSheet = isSearching && sheetOpen && !isLoading;
 
   return (
-    <div className="relative size-full">
+    <>
       <MapView
         markers={showSheet && hasResults ? activeMarkers : []}
         fitBounds={showSheet && hasResults && !selectedItem}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
-        className="size-full"
-      />
-
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 z-40 h-[68px] bg-background"
-        style={{ opacity: sheetTopProgress }}
+        className="fixed inset-x-0 top-0 bottom-15"
       />
 
       <MapSearchInput
@@ -176,7 +168,7 @@ export function MapContainer() {
       />
 
       {showSheet && !selectedItem && (
-        <MapResultSheet onClose={handleClear} onTopProgress={setSheetTopProgress}>
+        <MapResultSheet onClose={handleClear}>
           {hasResults ? (
             <>
               <ul className="divide-y px-3">
@@ -206,6 +198,6 @@ export function MapContainer() {
       {selectedItem && (
         <MapPlaceDetailSheet item={selectedItem} onDismiss={dismissDetail} />
       )}
-    </div>
+    </>
   );
 }
