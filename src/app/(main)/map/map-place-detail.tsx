@@ -4,32 +4,20 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   Building2,
-  Dot,
   ExternalLink,
-  Footprints,
   MapPin,
   Phone,
-  Route,
   Star,
   Tag,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
+import { Skeleton } from "@/components/ui/skeleton";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import { KonaVoteSection } from "@/components/place-detail/kona-vote";
 import { PlaceTabs } from "@/components/place-detail/place-tabs";
 import { formatShortAddress } from "@/lib/address";
-import { COMPANY_LOCATION } from "@/lib/constants";
-import {
-  calculateDistance,
-  estimateWalkingMinutes,
-  formatDistance,
-  formatWalkingDuration,
-} from "@/lib/geo";
 import { optimizeNaverImageUrl } from "@/lib/image";
-import { buildNaverWalkingRouteLink } from "@/lib/naver";
 import { usePlaceData } from "@/hooks/use-place-data";
 import type { NaverSearchResult } from "@/types";
 
@@ -46,86 +34,20 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
   const category = item.category?.split(">").pop()?.trim();
   const isRegistered = !!data?.place;
 
-  // 도보 정보: API 데이터 우선, 없으면 Haversine 추정
-  const haversineDistance = calculateDistance(
-    { lat: COMPANY_LOCATION.lat, lng: COMPANY_LOCATION.lng },
-    { lat: Number(item.y), lng: Number(item.x) },
-  );
-  const walkingDistance = data?.walkingRoute?.distance ?? haversineDistance;
-  const walkingMinutes = data?.walkingRoute
-    ? Math.round(data.walkingRoute.duration / 60)
-    : estimateWalkingMinutes(haversineDistance);
-
-  const shortcuts = [
-    {
-      key: "map",
-      href: `https://map.naver.com/p/entry/place/${item.id}`,
-      icon: MapPin,
-      label: "지도보기",
-      external: true,
-    },
-    {
-      key: "route",
-      href: buildNaverWalkingRouteLink(COMPANY_LOCATION, {
-        lng: Number(item.x),
-        lat: Number(item.y),
-        name: item.name,
-        placeId: item.id,
-      }),
-      icon: Route,
-      label: "경로보기",
-      external: true,
-    },
-    ...(item.phone
-      ? [
-          {
-            key: "phone",
-            href: `tel:${item.phone}`,
-            icon: Phone,
-            label: "전화걸기",
-            external: false,
-          },
-        ]
-      : []),
-  ];
-
   return (
-    <div className="space-y-4 px-4 pb-8">
-      {/* 기본 정보 */}
+    <div className="space-y-3 px-4 pb-8">
+      {/* 제목 + 링크 */}
+      <Link
+        href={`/places/${item.id}`}
+        className="inline-flex max-w-full items-start gap-1 group"
+      >
+        <h3 className="min-w-0 shrink line-clamp-2 text-base font-bold leading-snug group-hover:underline">
+          {item.name}
+        </h3>
+        <ExternalLink className="size-4 shrink-0 text-foreground mt-0.5" />
+      </Link>
+
       <div className="space-y-1">
-        <div>
-          {/* 코나카드 뱃지 / 미등록 뱃지 — 최상단 */}
-          {!isLoading && isRegistered && (
-            <KonaCardBadge status={data.place!.kona_card_status} />
-          )}
-          {!isLoading && !isRegistered && (
-            <Badge variant="secondary">미등록 장소</Badge>
-          )}
-        </div>
-        {/* 제목 + 링크 */}
-        <Link
-          href={`/places/${item.id}`}
-          className="flex flex-wrap items-start gap-x-1.5 gap-y-0 group"
-        >
-          <h3 className="min-w-0 flex-1 line-clamp-2 text-base font-bold leading-snug group-hover:underline">
-            {item.name}
-          </h3>
-          <ExternalLink className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
-        </Link>
-
-        {/* 별점 */}
-        {!isLoading && isRegistered && data.avgRating !== null && (
-          <div className="flex items-center gap-1">
-            <Star className="size-3.5 fill-yellow-500 text-yellow-500" />
-            <span className="text-sm font-medium text-yellow-500">
-              {data.avgRating.toFixed(1)}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              ({data.reviewCount})
-            </span>
-          </div>
-        )}
-
         {/* 카테고리 */}
         {category && (
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -134,13 +56,15 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
           </div>
         )}
 
-        {/* 도보 정보 */}
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Footprints className="size-3 shrink-0" />
-          <span>{formatWalkingDuration(walkingMinutes)}</span>
-          <Dot className="size-3 shrink-0" />
-          <span>{formatDistance(walkingDistance)}</span>
-        </div>
+        {/* 전화번호 */}
+        {item.phone && (
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <Phone className="size-3 shrink-0" />
+            <a href={`tel:${item.phone}`} className="hover:underline">
+              {item.phone}
+            </a>
+          </div>
+        )}
 
         {/* 주소 */}
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -149,6 +73,31 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
             {formatShortAddress(item.roadAddress || item.address)}
           </span>
         </div>
+        {/* 별점 + 코나카드 뱃지 */}
+        {isLoading ? (
+          <Skeleton className="h-5 w-28" />
+        ) : (
+          <>
+            {isRegistered && data.avgRating !== null && (
+              <div className="flex items-center gap-1">
+                <Star className="size-3.5 fill-yellow-500 text-yellow-500" />
+                <span className="text-sm font-medium text-yellow-500">
+                  {data.avgRating.toFixed(1)}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  ({data.reviewCount})
+                </span>
+              </div>
+            )}
+            <div>
+              {isRegistered ? (
+                <KonaCardBadge status={data.place!.kona_card_status} />
+              ) : (
+                <Badge variant="secondary">미등록 장소</Badge>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* 썸네일 */}
@@ -166,30 +115,6 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
           <Building2 className="size-8 text-muted-foreground" />
         </div>
       )}
-
-      {/* 바로가기 버튼 */}
-      <ButtonGroup className="w-full rounded-xl">
-        {shortcuts.map(({ key, href, icon: Icon, label, external }) => (
-          <Button
-            key={key}
-            variant="outline"
-            size="lg"
-            className="flex-1 flex-col min-[375px]:flex-row gap-1 min-[375px]:gap-1.5 h-auto px-0 has-[>svg]:px-0 py-3 rounded-xl"
-            asChild
-          >
-            <a
-              href={href}
-              {...(external && {
-                target: "_blank",
-                rel: "noopener noreferrer",
-              })}
-            >
-              <Icon className="size-5" />
-              <span className="text-xs text-muted-foreground">{label}</span>
-            </a>
-          </Button>
-        ))}
-      </ButtonGroup>
 
       {/* 코나카드 투표 */}
       {isRegistered && data?.place && (

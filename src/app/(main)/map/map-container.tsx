@@ -6,7 +6,6 @@ import { useInView } from "react-intersection-observer";
 import { useSearchPlaces } from "@/components/place-search/use-search-places";
 import { SearchNoResults } from "@/components/place-search/search-no-results";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { usePrefetchPlaceData } from "@/hooks/use-place-data";
 import { Spinner } from "@/components/ui/spinner";
 import { MapView, type MapMarker } from "./map-view";
 import { MapSearchInput } from "./map-search-input";
@@ -41,9 +40,6 @@ export function MapContainer() {
     isFetchingNextPage,
     isLoading,
   } = useSearchPlaces(query, userCoords);
-
-  // 검색 결과 장소 데이터 prefetch (클릭 시 즉시 표시용)
-  usePrefetchPlaceData(results);
 
   // Derive UI state from URL params (single source of truth)
   const selectedItem = useMemo(() => {
@@ -94,18 +90,15 @@ export function MapContainer() {
     }));
   }, [results, selectedItem]);
 
-  const buildUrl = useCallback(
-    (q: string, placeId?: string) => {
-      const params = new URLSearchParams();
-      if (q) params.set("query", q);
-      if (placeId) params.set("place", placeId);
-      const pc = pageCountRef.current;
-      if (pc > 1) params.set("pages", String(pc));
-      const qs = params.toString();
-      return qs ? `/map?${qs}` : "/map";
-    },
-    [],
-  );
+  const buildUrl = useCallback((q: string, placeId?: string) => {
+    const params = new URLSearchParams();
+    if (q) params.set("query", q);
+    if (placeId) params.set("place", placeId);
+    const pc = pageCountRef.current;
+    if (pc > 1) params.set("pages", String(pc));
+    const qs = params.toString();
+    return qs ? `/map?${qs}` : "/map";
+  }, []);
 
   const pushDetail = useCallback(
     (item: NaverSearchResult) => {
