@@ -1,4 +1,5 @@
 import { optimizeNaverImageUrl } from "@/lib/image";
+import { cn } from "@/lib/utils";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import type { KonaCardStatus } from "@/types";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
@@ -15,11 +16,20 @@ interface PlaceCardProps {
   review_count: number;
 }
 
-export function PlaceCard({ place }: { place: PlaceCardProps }) {
+export function PlaceCard({
+  place,
+  className,
+}: {
+  place: PlaceCardProps;
+  className?: string;
+}) {
   const status = (place.kona_card_status ?? "unknown") as KonaCardStatus;
 
   return (
-    <Link href={`/places/${place.id}`} className="flex gap-3 rounded-xl p-3 -m-3 transition-colors hover:bg-accent">
+    <Link
+      href={`/places/${place.id}`}
+      className={cn("flex gap-3 transition-colors hover:bg-accent", className)}
+    >
       <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-1">
