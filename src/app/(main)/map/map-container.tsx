@@ -119,7 +119,11 @@ export function MapContainer() {
 
       <MapSearchInput
         query={query}
-        onTap={() => setSearchMode(true)}
+        onTap={() => {
+          setSearchMode(true);
+          setSheetOpen(false);
+          setSheetNearTop(false);
+        }}
         onClear={handleClear}
         showBack={currentView.type === "detail"}
         onBack={popView}
