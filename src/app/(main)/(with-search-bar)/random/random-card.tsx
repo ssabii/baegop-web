@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { KonaCardStatus } from "@/types";
 import type { RandomPlace } from "./types";
+import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 
 interface RandomCardProps {
   place: RandomPlace;
@@ -15,40 +15,20 @@ export function RandomCard({ place }: RandomCardProps) {
   const thumbnail = place.image_urls?.[0];
 
   return (
-    <Link href={`/places/${place.id}`} className="block overflow-hidden">
+    <Link href={`/places/${place.id}`} className="block overflow-hidden px-4">
       {thumbnail ? (
         <img
           src={thumbnail}
           alt={place.name}
-          className="h-48 w-full object-cover"
+          className="h-48 w-full object-cover rounded-xl"
         />
       ) : (
-        <div className="flex h-48 w-full items-center justify-center bg-muted">
+        <div className="flex h-48 w-full items-center justify-center bg-muted rounded-xl">
           <Building2 className="size-12 text-muted-foreground" />
         </div>
       )}
 
-      <div className="space-y-2 p-4">
-        {status !== "unknown" && (
-          <span
-            className={cn(
-              "inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-full px-1.5 py-1 text-xs font-medium",
-              {
-                "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300":
-                  status === "available",
-                "bg-muted text-muted-foreground": status !== "available",
-              },
-            )}
-          >
-            <img
-              src="/icons/kona.png"
-              alt="코나카드"
-              className="size-3 rounded-full"
-            />
-            {status === "available" ? "결제가능" : "결제불가"}
-          </span>
-        )}
-
+      <div className="space-y-2 py-4">
         <h2 className="text-xl font-bold">{place.name}</h2>
 
         {place.category && (
@@ -74,6 +54,8 @@ export function RandomCard({ place }: RandomCardProps) {
             </span>
           </div>
         )}
+
+        <KonaCardBadge status={status} />
       </div>
     </Link>
   );

@@ -7,6 +7,7 @@ import { formatRelativeDate } from "@/lib/date";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import type { ReviewImageItem } from "@/types";
+import { cn } from "@/lib/utils";
 
 interface ReviewCardProps {
   review: {
@@ -21,19 +22,22 @@ interface ReviewCardProps {
     review_images?: ReviewImageItem[];
   };
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  className?: string;
 }
 
-export function ReviewCard({ review, onClick }: ReviewCardProps) {
+export function ReviewCard({ review, onClick, className }: ReviewCardProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
   const sortedImages = (review.review_images ?? [])
     .slice()
     .sort((a, b) => a.display_order - b.display_order);
-  const imageUrls = sortedImages.map((img) => optimizeSupabaseImageUrl(img.url));
+  const imageUrls = sortedImages.map((img) =>
+    optimizeSupabaseImageUrl(img.url),
+  );
 
   const content = (
-    <div className="space-y-2 py-3">
+    <div className={"space-y-2"}>
       <div className="space-y-1">
         <div className="flex items-center gap-1">
           <span className="truncate text-sm font-semibold">
@@ -95,11 +99,11 @@ export function ReviewCard({ review, onClick }: ReviewCardProps) {
   );
 
   return (
-    <>
+    <div className={cn("transition-colors hover:bg-accent", className)}>
       {review.place ? (
         <Link
           href={`/places/${review.place.id}?tab=review`}
-          className="block rounded-xl p-3 -m-3 transition-colors hover:bg-accent"
+          className="block"
           onClick={(e) => onClick?.(e)}
         >
           {content}
@@ -116,6 +120,6 @@ export function ReviewCard({ review, onClick }: ReviewCardProps) {
           onOpenChange={setPreviewOpen}
         />
       )}
-    </>
+    </div>
   );
 }

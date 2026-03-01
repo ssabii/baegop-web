@@ -41,12 +41,9 @@ export function PlaceList() {
 
   return (
     <>
-      <div className="flex flex-col">
-        {places.map((place, index) => (
-          <Fragment key={place.id}>
-            {index > 0 && <Separator className="my-4" />}
-            <PlaceCard place={place} />
-          </Fragment>
+      <div className="flex flex-col divide-y">
+        {places.map((place) => (
+          <PlaceCard place={place} key={place.id} className="py-4" />
         ))}
       </div>
       <div ref={sentinelRef} className="flex justify-center">

@@ -1,18 +1,17 @@
 "use client";
 
-import { useInView } from "react-intersection-observer";
-import { MessageCircle } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
+import { ReviewCard } from "@/components/reviews";
 import {
   Empty,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { ReviewCard } from "@/components/reviews";
+import { Spinner } from "@/components/ui/spinner";
+import { MessageCircle } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import { useMyReviews } from "./use-my-reviews";
-import { Fragment } from "react/jsx-runtime";
-import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface MyReviewListProps {
   userId: string;
@@ -58,22 +57,19 @@ export function MyReviewList({ userId }: MyReviewListProps) {
 
   return (
     <>
-      <div className="px-4 py-8">
-        {reviews.map((review, index) => {
+      <div className="p-4 divide-y">
+        {reviews.map((review) => {
           const place = review.places
             ? { id: String(review.places.id), name: review.places.name }
             : null;
 
           return (
-            <Fragment key={review.id}>
-              {index > 0 && <Separator className="my-4" />}
-              <ReviewCard
-                review={{ ...review, place }}
-                onClick={() =>
-                  sessionStorage.setItem("scrollToReview", "true")
-                }
-              />
-            </Fragment>
+            <ReviewCard
+              key={review.id}
+              review={{ ...review, place }}
+              className="py-4"
+              onClick={() => sessionStorage.setItem("scrollToReview", "true")}
+            />
           );
         })}
       </div>
