@@ -3,8 +3,10 @@
 import { useCallback, useMemo, useState } from "react";
 import { useSearchPlaces } from "@/components/place-search/use-search-places";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import { MapView, type MapMarker } from "./map-view";
 import { MapSearchInput } from "./map-search-input";
+import { MapSearchOverlay } from "./map-search-overlay";
 import { PlaceItem } from "@/components/place-search/place-item";
 import { MapResultSheet } from "./map-result-sheet";
 import { MapPlaceDetail } from "./map-place-detail";
@@ -16,6 +18,7 @@ type SheetView =
 
 export function MapContainer() {
   const [query, setQuery] = useState("");
+  const [searchMode, setSearchMode] = useState(false);
   const [focusMarkerId, setFocusMarkerId] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetNearTop, setSheetNearTop] = useState(false);
@@ -26,16 +29,28 @@ export function MapContainer() {
 
   const currentView = viewStack[viewStack.length - 1];
 
+  // Sort results by distance from reference point (user location or company)
+  const sortedResults = useMemo(() => {
+    const ref = userCoords ?? COMPANY_LOCATION;
+    return [...results].sort((a, b) => {
+      const da =
+        (parseFloat(a.y) - ref.lat) ** 2 + (parseFloat(a.x) - ref.lng) ** 2;
+      const db =
+        (parseFloat(b.y) - ref.lat) ** 2 + (parseFloat(b.x) - ref.lng) ** 2;
+      return da - db;
+    });
+  }, [results, userCoords]);
+
   const searchMarkers = useMemo<MapMarker[]>(
     () =>
-      results.map((item) => ({
+      sortedResults.map((item) => ({
         id: item.id,
         lat: parseFloat(item.y),
         lng: parseFloat(item.x),
         title: item.name,
         category: item.category,
       })),
-    [results],
+    [sortedResults],
   );
 
   const pushDetail = useCallback((item: NaverSearchResult) => {
@@ -50,6 +65,7 @@ export function MapContainer() {
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
+    setSearchMode(false);
     setFocusMarkerId(null);
     setSheetOpen(true);
     setViewStack([{ type: "list" }]);
@@ -71,10 +87,10 @@ export function MapContainer() {
 
   const handleMarkerClick = useCallback(
     (id: string) => {
-      const item = results.find((r) => r.id === id);
+      const item = sortedResults.find((r) => r.id === id);
       if (item) pushDetail(item);
     },
-    [results, pushDetail],
+    [sortedResults, pushDetail],
   );
 
   const handleItemClick = useCallback(
@@ -85,7 +101,7 @@ export function MapContainer() {
   );
 
   const isSearching = query.length > 0;
-  const showSheet = isSearching && results.length > 0 && sheetOpen;
+  const showSheet = isSearching && sortedResults.length > 0 && sheetOpen;
 
   return (
     <div className="relative size-full">
@@ -101,7 +117,13 @@ export function MapContainer() {
         <div className="absolute inset-x-0 top-0 z-40 h-[68px] bg-background" />
       )}
 
-      <MapSearchInput onSearch={handleSearch} onClear={handleClear} />
+      <MapSearchInput
+        query={query}
+        onTap={() => setSearchMode(true)}
+        onClear={handleClear}
+        showBack={currentView.type === "detail"}
+        onBack={popView}
+      />
 
       {showSheet && (
         <MapResultSheet
@@ -111,13 +133,8 @@ export function MapContainer() {
         >
           {/* List view — use hidden to preserve scroll position */}
           <div className={currentView.type === "list" ? undefined : "hidden"}>
-            <div className="px-4 pb-3">
-              <p className="text-sm font-medium text-muted-foreground">
-                검색 결과 {results.length}건
-              </p>
-            </div>
             <div className="px-3">
-              {results.map((item) => (
+              {sortedResults.map((item) => (
                 <PlaceItem
                   key={item.id}
                   item={item}
@@ -130,9 +147,18 @@ export function MapContainer() {
 
           {/* Detail view */}
           {currentView.type === "detail" && (
-            <MapPlaceDetail item={currentView.item} onBack={popView} />
+            <MapPlaceDetail item={currentView.item} />
           )}
         </MapResultSheet>
+      )}
+
+      {/* Fullscreen search overlay */}
+      {searchMode && (
+        <MapSearchOverlay
+          initialQuery={query}
+          onSearch={handleSearch}
+          onClose={() => setSearchMode(false)}
+        />
       )}
     </div>
   );

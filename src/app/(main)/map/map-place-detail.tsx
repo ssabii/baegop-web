@@ -2,32 +2,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Building2, ExternalLink, MapPin, Phone, Tag } from "lucide-react";
+import { Building2, ExternalLink, MapPin, Phone, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import type { NaverSearchResult } from "@/types";
 
 interface MapPlaceDetailProps {
   item: NaverSearchResult;
-  onBack: () => void;
 }
 
-export function MapPlaceDetail({ item, onBack }: MapPlaceDetailProps) {
+export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
   const [imgError, setImgError] = useState(false);
   const category = item.category?.split(">").pop()?.trim();
 
   return (
     <div className="px-4 pb-4">
-      {/* Back button */}
-      <button
-        type="button"
-        onClick={onBack}
-        className="mb-3 flex cursor-pointer items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" />
-        검색 결과로
-      </button>
-
       {/* Card */}
       <div className="flex gap-3">
         {/* Thumbnail */}

@@ -121,7 +121,7 @@ export function MapView({
     renderMarkers(map);
   }, [renderMarkers]);
 
-  // Focus marker: morph to position
+  // Focus marker: teleport + idle-based zoom for far distances
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !focusMarkerId) return;
@@ -132,7 +132,26 @@ export function MapView({
     const markerInstance = markerInstancesRef.current[idx];
     if (!markerInstance) return;
 
-    map.morph(markerInstance.getPosition(), 17);
+    const target = markerInstance.getPosition();
+    const center = map.getCenter();
+    const dx = (center as naver.maps.LatLng).lng() - (target as naver.maps.LatLng).lng();
+    const dy = (center as naver.maps.LatLng).lat() - (target as naver.maps.LatLng).lat();
+    const isFar = Math.sqrt(dx * dx + dy * dy) > 0.01; // ~1km
+
+    map.stop();
+
+    if (isFar) {
+      // Teleport instantly (no intermediate tiles = no tile breaking)
+      map.setCenter(target);
+      map.setZoom(15);
+      // Wait for tiles to load, then smooth zoom-in
+      const listener = naver.maps.Event.addListener(map, "idle", () => {
+        naver.maps.Event.removeListener(listener);
+        map.morph(target, 17, { easing: "easeOutCubic", duration: 300 });
+      });
+    } else {
+      map.morph(target, 17, { easing: "easeOutCubic" });
+    }
   }, [focusMarkerId]);
 
   return <NaverMap onReady={handleReady} className={className} />;

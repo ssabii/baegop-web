@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useEffect, useMemo, useCallback } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Drawer } from "vaul";
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /** Search bar: py-3 (12px) + h-11 (44px) + py-3 (12px) */
 const SEARCH_BAR_HEIGHT = 68;
 const COMPACT_SNAP = "200px";
+const HALF_SNAP = 0.5;
 
 type SnapPoint = number | string;
 
@@ -25,55 +27,47 @@ export function MapResultSheet({
 }: MapResultSheetProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const wasNearTop = useRef(false);
+  const [activeSnap, setActiveSnap] = useState<SnapPoint | null>(null);
 
   const fullSnap = useMemo(() => {
     if (typeof window === "undefined") return 0.9;
     return (window.innerHeight - SEARCH_BAR_HEIGHT) / window.innerHeight;
   }, []);
 
-  const listSnaps = useMemo<SnapPoint[]>(
-    () => ["180px", 0.45, fullSnap],
+  const snapPoints = useMemo<SnapPoint[]>(
+    () => [COMPACT_SNAP, HALF_SNAP, fullSnap],
     [fullSnap],
   );
 
-  const compactSnaps = useMemo<SnapPoint[]>(() => [COMPACT_SNAP], []);
-
-  const snapPoints = compact ? compactSnaps : listSnaps;
-  const activeSnap = compact ? COMPACT_SNAP : 0.45;
-
-  const isFullSnap = !compact && activeSnap === fullSnap;
-
+  // Sync active snap when compact changes
   useEffect(() => {
-    if (!isFullSnap && contentRef.current) {
+    setActiveSnap(compact ? COMPACT_SNAP : HALF_SNAP);
+  }, [compact]);
+
+  const isCompact = activeSnap === COMPACT_SNAP;
+
+  // Notify nearTop changes
+  useEffect(() => {
+    const nearTop = activeSnap === fullSnap;
+    if (nearTop !== wasNearTop.current) {
+      wasNearTop.current = nearTop;
+      onNearTopChange?.(nearTop);
+    }
+  }, [activeSnap, fullSnap, onNearTopChange]);
+
+  // Scroll to top when entering compact snap
+  useEffect(() => {
+    if (isCompact && contentRef.current) {
       contentRef.current.scrollTop = 0;
     }
-  }, [isFullSnap]);
-
-  const handleSnapChange = useCallback(
-    (snap: SnapPoint | null) => {
-      const nearTop = snap === fullSnap;
-      if (nearTop !== wasNearTop.current) {
-        wasNearTop.current = nearTop;
-        onNearTopChange?.(nearTop);
-      }
-    },
-    [fullSnap, onNearTopChange],
-  );
-
-  // Reset nearTop when switching to compact
-  useEffect(() => {
-    if (compact && wasNearTop.current) {
-      wasNearTop.current = false;
-      onNearTopChange?.(false);
-    }
-  }, [compact, onNearTopChange]);
+  }, [isCompact]);
 
   return (
     <Drawer.Root
       open
       snapPoints={snapPoints}
       activeSnapPoint={activeSnap}
-      setActiveSnapPoint={handleSnapChange}
+      setActiveSnapPoint={setActiveSnap}
       modal={false}
       noBodyStyles
       dismissible={false}
@@ -81,8 +75,7 @@ export function MapResultSheet({
       <Drawer.Portal>
         <Drawer.Content
           aria-describedby={undefined}
-          className="fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-2xl border-t bg-background shadow-lg"
-          style={{ maxHeight: `calc(100dvh - ${SEARCH_BAR_HEIGHT}px)` }}
+          className="fixed inset-x-0 bottom-0 z-40 flex h-dvh flex-col rounded-t-2xl border-t bg-background shadow-lg"
         >
           <Drawer.Title className="sr-only">검색 결과</Drawer.Title>
 
@@ -101,10 +94,13 @@ export function MapResultSheet({
             </button>
           </div>
 
-          {/* Content */}
+          {/* Content — pb-17 compensates for 68px off-screen at fullSnap */}
           <div
             ref={contentRef}
-            className="flex-1 overflow-y-auto"
+            className={cn("flex-1 pb-17", {
+              "overflow-y-auto": !isCompact,
+              "overflow-hidden": isCompact,
+            })}
           >
             {children}
           </div>
