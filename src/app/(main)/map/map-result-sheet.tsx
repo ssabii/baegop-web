@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect, useMemo } from "react";
 import { Drawer } from "vaul";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Search bar: py-3 (12px) + h-11 (44px) + py-3 (12px) */
@@ -14,14 +13,12 @@ type SnapPoint = number | string;
 
 interface MapResultSheetProps {
   children: React.ReactNode;
-  onClose: () => void;
   onNearTopChange?: (nearTop: boolean) => void;
   compact?: boolean;
 }
 
 export function MapResultSheet({
   children,
-  onClose,
   onNearTopChange,
   compact,
 }: MapResultSheetProps) {
@@ -44,7 +41,7 @@ export function MapResultSheet({
     setActiveSnap(compact ? COMPACT_SNAP : HALF_SNAP);
   }, [compact]);
 
-  const isCompact = activeSnap === COMPACT_SNAP;
+  const isFullSnap = activeSnap === fullSnap;
 
   // Notify nearTop changes
   useEffect(() => {
@@ -55,12 +52,12 @@ export function MapResultSheet({
     }
   }, [activeSnap, fullSnap, onNearTopChange]);
 
-  // Scroll to top when entering compact snap
+  // Scroll to top when leaving full snap
   useEffect(() => {
-    if (isCompact && contentRef.current) {
+    if (!isFullSnap && contentRef.current) {
       contentRef.current.scrollTop = 0;
     }
-  }, [isCompact]);
+  }, [isFullSnap]);
 
   return (
     <Drawer.Root
@@ -79,27 +76,19 @@ export function MapResultSheet({
         >
           <Drawer.Title className="sr-only">검색 결과</Drawer.Title>
 
-          {/* Drag handle + close button */}
-          <div className="relative flex shrink-0 justify-center py-3">
+          {/* Drag handle */}
+          <div className="flex shrink-0 justify-center py-3">
             {!compact && (
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
             )}
-            <button
-              type="button"
-              onClick={onClose}
-              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              aria-label="닫기"
-            >
-              <X className="size-5" />
-            </button>
           </div>
 
-          {/* Content — pb-17 compensates for 68px off-screen at fullSnap */}
+          {/* Content — only scroll at fullSnap, drag to expand at other snaps */}
           <div
             ref={contentRef}
             className={cn("flex-1 pb-17", {
-              "overflow-y-auto": !isCompact,
-              "overflow-hidden": isCompact,
+              "overflow-y-auto": isFullSnap,
+              "overflow-hidden": !isFullSnap,
             })}
           >
             {children}
