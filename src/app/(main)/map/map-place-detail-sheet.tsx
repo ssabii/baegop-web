@@ -45,31 +45,33 @@ export function MapPlaceDetailSheet({
       <Drawer.Portal>
         <Drawer.Content
           aria-describedby={undefined}
-          className="fixed inset-x-0 bottom-0 z-[45] flex h-dvh flex-col rounded-t-2xl border-t bg-background shadow-lg"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] flex h-dvh flex-col"
         >
-          <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
+          <div className="pointer-events-auto flex flex-1 flex-col rounded-t-2xl border-t bg-background shadow-lg">
+            <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
 
-          {/* Drag handle + close button */}
-          <div className="relative flex shrink-0 justify-center py-3">
-            <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
-            <button
-              type="button"
-              onClick={onDismiss}
-              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            {/* Drag handle + close button */}
+            <div className="relative flex shrink-0 justify-center py-3">
+              <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+              <button
+                type="button"
+                onClick={onDismiss}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div
+              ref={contentRef}
+              className={cn("flex-1 overscroll-contain", {
+                "overflow-y-auto": isFullSnap,
+                "overflow-hidden": !isFullSnap,
+              })}
             >
-              <X className="size-5" />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div
-            ref={contentRef}
-            className={cn("flex-1 overscroll-contain", {
-              "overflow-y-auto": isFullSnap,
-              "overflow-hidden": !isFullSnap,
-            })}
-          >
-            <MapPlaceDetail item={item} />
+              <MapPlaceDetail item={item} />
+            </div>
           </div>
         </Drawer.Content>
       </Drawer.Portal>

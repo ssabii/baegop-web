@@ -9,7 +9,6 @@ import { useGeolocation } from "@/hooks/use-geolocation";
 import { Spinner } from "@/components/ui/spinner";
 import { MapView, type MapMarker } from "./map-view";
 import { MapSearchInput } from "./map-search-input";
-import { MapSearchOverlay } from "./map-search-overlay";
 import { PlaceItem } from "@/components/place-search/place-item";
 import { MapResultSheet } from "./map-result-sheet";
 import { MapPlaceDetailSheet } from "./map-place-detail-sheet";
@@ -23,20 +22,13 @@ export function MapContainer() {
 
   const [query, setQuery] = useState(queryParam);
   const [prevQueryParam, setPrevQueryParam] = useState(queryParam);
-  const [searchMode, setSearchMode] = useState(false);
-  const [focusMarkerId, setFocusMarkerId] = useState<string | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(!!queryParam);
   const [sheetNearTop, setSheetNearTop] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<NaverSearchResult | null>(
-    null,
-  );
-  const [restoredPlace, setRestoredPlace] = useState("");
 
   // Sync URL → state when queryParam changes externally (render-time sync)
   if (queryParam !== prevQueryParam) {
     setPrevQueryParam(queryParam);
     setQuery(queryParam);
-    if (queryParam) setSheetOpen(true);
+    if (!queryParam) setSheetNearTop(false);
   }
 
   const userCoords = useGeolocation();
@@ -49,20 +41,14 @@ export function MapContainer() {
     isLoading,
   } = useSearchPlaces(query, userCoords);
 
-  // Restore detail view from place query param (render-time sync)
-  if (
-    placeParam &&
-    placeParam !== restoredPlace &&
-    results.length > 0 &&
-    !selectedItem
-  ) {
-    const item = results.find((r) => r.id === placeParam);
-    if (item) {
-      setSelectedItem(item);
-      setFocusMarkerId(item.id);
-      setRestoredPlace(placeParam);
-    }
-  }
+  // Derive UI state from URL params (single source of truth)
+  const selectedItem = useMemo(() => {
+    if (!placeParam || results.length === 0) return null;
+    return results.find((r) => r.id === placeParam) ?? null;
+  }, [placeParam, results]);
+
+  const focusMarkerId = selectedItem?.id ?? null;
+  const sheetOpen = !!query;
 
   // Refs for URL sync without stale closures
   const pageCountRef = useRef(0);
@@ -119,57 +105,31 @@ export function MapContainer() {
 
   const pushDetail = useCallback(
     (item: NaverSearchResult) => {
-      setSelectedItem(item);
-      setFocusMarkerId(item.id);
-      router.replace(buildUrl(query, item.id), { scroll: false });
+      const url = buildUrl(query, item.id);
+      if (placeParam) {
+        // detail → detail (marker click): replace to avoid history bloat
+        router.replace(url, { scroll: false });
+      } else {
+        // list → detail: push to preserve list URL in history
+        router.push(url, { scroll: false });
+      }
     },
-    [router, buildUrl, query],
+    [router, buildUrl, query, placeParam],
   );
 
   const dismissDetail = useCallback(() => {
-    setSelectedItem(null);
-    setFocusMarkerId(null);
-    router.replace(buildUrl(query), { scroll: false });
-  }, [router, buildUrl, query]);
-
-  const handleSearch = useCallback(
-    (q: string) => {
-      setQuery(q);
-      setSearchMode(false);
-      setFocusMarkerId(null);
-      setSheetOpen(true);
-      setSelectedItem(null);
-      pageCountRef.current = 0;
-      router.replace(`/map?query=${encodeURIComponent(q)}`, { scroll: false });
-    },
-    [router],
-  );
+    router.back();
+  }, [router]);
 
   const handleClear = useCallback(() => {
     setQuery("");
-    setFocusMarkerId(null);
-    setSheetOpen(false);
-    setSelectedItem(null);
     setSheetNearTop(false);
-    pageCountRef.current = 0;
     router.replace("/map", { scroll: false });
   }, [router]);
 
   const handleBack = useCallback(() => {
-    if (selectedItem) {
-      // detail → list
-      dismissDetail();
-    } else {
-      // list → close
-      setQuery("");
-      setFocusMarkerId(null);
-      setSheetOpen(false);
-      setSheetNearTop(false);
-      setSelectedItem(null);
-      pageCountRef.current = 0;
-      router.replace("/map", { scroll: false });
-    }
-  }, [selectedItem, dismissDetail, router]);
+    router.back();
+  }, [router]);
 
   const handleMarkerClick = useCallback(
     (id: string) => {
@@ -207,11 +167,10 @@ export function MapContainer() {
       <MapSearchInput
         query={query}
         onTap={() => {
-          setSelectedItem(null);
-          setFocusMarkerId(null);
-          setSearchMode(true);
-          setSheetOpen(false);
-          setSheetNearTop(false);
+          const searchUrl = query
+            ? `/map/search?query=${encodeURIComponent(query)}`
+            : "/map/search";
+          router.push(searchUrl);
         }}
         onClear={handleClear}
         showBack={isSearching && sheetOpen}
@@ -247,15 +206,6 @@ export function MapContainer() {
 
       {selectedItem && (
         <MapPlaceDetailSheet item={selectedItem} onDismiss={dismissDetail} />
-      )}
-
-      {/* Fullscreen search overlay */}
-      {searchMode && (
-        <MapSearchOverlay
-          initialQuery={query}
-          onSearch={handleSearch}
-          onClose={() => setSearchMode(false)}
-        />
       )}
     </div>
   );
