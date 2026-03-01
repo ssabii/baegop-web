@@ -1,55 +1,47 @@
 "use client";
 
-import { useRef, useEffect, useMemo } from "react";
+import { useRef, useEffect, useMemo, useCallback } from "react";
 import { Drawer } from "vaul";
-import { cn } from "@/lib/utils";
-import { PlaceItem } from "@/components/place-search/place-item";
-import type { NaverSearchResult } from "@/types";
+import { X } from "lucide-react";
 
 /** Search bar: py-3 (12px) + h-11 (44px) + py-3 (12px) */
 const SEARCH_BAR_HEIGHT = 68;
+const COMPACT_SNAP = "200px";
 
-type SnapPoint = "peek" | "half" | "full";
+type SnapPoint = number | string;
 
 interface MapResultSheetProps {
-  results: NaverSearchResult[];
-  activeSnapPoint: SnapPoint;
-  onSnapPointChange: (snap: SnapPoint) => void;
-  onItemClick: (item: NaverSearchResult) => void;
+  children: React.ReactNode;
+  onClose: () => void;
+  onNearTopChange?: (nearTop: boolean) => void;
+  compact?: boolean;
 }
 
-export type { SnapPoint };
-
 export function MapResultSheet({
-  results,
-  activeSnapPoint,
-  onSnapPointChange,
-  onItemClick,
+  children,
+  onClose,
+  onNearTopChange,
+  compact,
 }: MapResultSheetProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const wasNearTop = useRef(false);
 
-  const [fullSnap] = useMemo(() => {
-    if (typeof window === "undefined") return [0.9];
-    return [(window.innerHeight - SEARCH_BAR_HEIGHT) / window.innerHeight];
+  const fullSnap = useMemo(() => {
+    if (typeof window === "undefined") return 0.9;
+    return (window.innerHeight - SEARCH_BAR_HEIGHT) / window.innerHeight;
   }, []);
 
-  const snapValues = useMemo(
-    () => ({ peek: "180px" as string | number, half: 0.45, full: fullSnap }),
+  const listSnaps = useMemo<SnapPoint[]>(
+    () => ["180px", 0.45, fullSnap],
     [fullSnap],
   );
 
-  const vaulSnaps = useMemo(
-    () => [snapValues.peek, snapValues.half, snapValues.full],
-    [snapValues],
-  );
+  const compactSnaps = useMemo<SnapPoint[]>(() => [COMPACT_SNAP], []);
 
-  const toSnapPoint = (value: number | string | null): SnapPoint => {
-    if (value === snapValues.peek) return "peek";
-    if (value === snapValues.half) return "half";
-    return "full";
-  };
+  const snapPoints = compact ? compactSnaps : listSnaps;
+  const activeSnap = compact ? COMPACT_SNAP : 0.45;
 
-  const isFullSnap = activeSnapPoint === "full";
+  const isFullSnap = !compact && activeSnap === fullSnap;
 
   useEffect(() => {
     if (!isFullSnap && contentRef.current) {
@@ -57,20 +49,36 @@ export function MapResultSheet({
     }
   }, [isFullSnap]);
 
+  const handleSnapChange = useCallback(
+    (snap: SnapPoint | null) => {
+      const nearTop = snap === fullSnap;
+      if (nearTop !== wasNearTop.current) {
+        wasNearTop.current = nearTop;
+        onNearTopChange?.(nearTop);
+      }
+    },
+    [fullSnap, onNearTopChange],
+  );
+
+  // Reset nearTop when switching to compact
+  useEffect(() => {
+    if (compact && wasNearTop.current) {
+      wasNearTop.current = false;
+      onNearTopChange?.(false);
+    }
+  }, [compact, onNearTopChange]);
+
   return (
     <Drawer.Root
       open
-      snapPoints={vaulSnaps}
-      activeSnapPoint={snapValues[activeSnapPoint]}
-      setActiveSnapPoint={(v) => onSnapPointChange(toSnapPoint(v))}
+      snapPoints={snapPoints}
+      activeSnapPoint={activeSnap}
+      setActiveSnapPoint={handleSnapChange}
       modal={false}
       noBodyStyles
       dismissible={false}
     >
       <Drawer.Portal>
-        {isFullSnap && (
-          <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40" />
-        )}
         <Drawer.Content
           aria-describedby={undefined}
           className="fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-2xl border-t bg-background shadow-lg"
@@ -78,33 +86,27 @@ export function MapResultSheet({
         >
           <Drawer.Title className="sr-only">검색 결과</Drawer.Title>
 
-          {/* Drag handle */}
-          <div className="flex justify-center py-3">
-            <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+          {/* Drag handle + close button */}
+          <div className="relative flex shrink-0 justify-center py-3">
+            {!compact && (
+              <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              aria-label="닫기"
+            >
+              <X className="size-5" />
+            </button>
           </div>
 
-          {/* Result count */}
-          <div className="px-4 pb-3">
-            <p className="text-sm font-medium text-muted-foreground">
-              검색 결과 {results.length}건
-            </p>
-          </div>
-
-          {/* Result list */}
+          {/* Content */}
           <div
             ref={contentRef}
-            className={cn("flex-1 overflow-y-auto px-3", {
-              "overflow-hidden": !isFullSnap,
-            })}
+            className="flex-1 overflow-y-auto"
           >
-            {results.map((item) => (
-              <PlaceItem
-                key={item.id}
-                item={item}
-                thumbnailSize="lg"
-                onClick={() => onItemClick(item)}
-              />
-            ))}
+            {children}
           </div>
         </Drawer.Content>
       </Drawer.Portal>
