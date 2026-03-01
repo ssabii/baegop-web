@@ -158,8 +158,8 @@ export function MapContainer() {
         query={query}
         onTap={() => {
           const searchUrl = query
-            ? `/map/search?query=${encodeURIComponent(query)}`
-            : "/map/search";
+            ? `/search?query=${encodeURIComponent(query)}`
+            : "/search";
           router.push(searchUrl);
         }}
         onClear={handleClear}

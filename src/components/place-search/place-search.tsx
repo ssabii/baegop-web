@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useInView } from "react-intersection-observer";
-import { ChevronLeft, X } from "lucide-react";
+import { ChevronLeft, Clock, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -17,17 +16,22 @@ import { usePlaceSuggestions } from "./use-place-suggestions";
 import { useSearchPlaces } from "./use-search-places";
 import { SearchEmpty } from "./search-empty";
 import { SearchNoResults } from "./search-no-results";
-import type { NaverSearchResult } from "@/types";
+import { useRecentSearches } from "@/hooks/use-recent-searches";
 
 export function PlaceSearch() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryParam = searchParams.get("query") ?? "";
+  const initialQuery = searchParams.get("query") ?? "";
 
-  const [input, setInput] = useState(queryParam);
+  const [input, setInput] = useState(initialQuery);
+  const [pendingSearch, setPendingSearch] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const isTyping = input !== queryParam;
+  const { searches, addSearch, removeSearch, clearAll } = useRecentSearches(
+    "map-recent-searches",
+  );
+
+  const isTyping = !pendingSearch && input !== initialQuery;
 
   const {
     suggestions,
@@ -37,7 +41,7 @@ export function PlaceSearch() {
     isSearching,
     listRef,
     handleKeyDown,
-    handleClear,
+    handleClear: suggestionsClear,
     handleFocus,
     dismissSuggestions,
   } = usePlaceSuggestions({
@@ -46,36 +50,41 @@ export function PlaceSearch() {
     setInput,
     isTyping,
     onSelect: (item) => {
-      router.push(`/places/${item.id}`);
+      addSearch(item.name);
+      router.push(
+        `/map?query=${encodeURIComponent(item.name)}&place=${item.id}`,
+      );
     },
   });
 
-  const { results, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useSearchPlaces(queryParam);
+  const { results, isLoading } = useSearchPlaces(pendingSearch ?? "");
 
-  const { ref: sentinelRef } = useInView({
-    onChange: (inView) => {
-      if (inView && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-  });
-
+  // 결과가 있으면 지도 페이지로 이동
   useEffect(() => {
-    setInput(queryParam);
-  }, [queryParam]);
+    if (pendingSearch && !isLoading && results.length > 0) {
+      router.replace(`/map?query=${encodeURIComponent(pendingSearch)}`);
+    }
+  }, [pendingSearch, isLoading, results.length, router]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
     if (trimmed.length < 2) return;
     dismissSuggestions();
-    router.replace(`/search?query=${encodeURIComponent(trimmed)}`);
+    addSearch(trimmed);
+    setPendingSearch(trimmed);
   }
 
-  function handleSelect(item: NaverSearchResult) {
+  function handleClear() {
+    suggestionsClear();
+    setPendingSearch(null);
+  }
+
+  function handleRecentClick(term: string) {
     dismissSuggestions();
-    router.push(`/places/${item.id}`);
+    setInput(term);
+    addSearch(term);
+    setPendingSearch(term);
   }
 
   const handleBack = () => {
@@ -83,10 +92,11 @@ export function PlaceSearch() {
     router.back();
   };
 
-  const hasResults = queryParam && !isLoading && results.length > 0;
+  const noResults = pendingSearch && !isLoading && results.length === 0;
+  const showRecent = !pendingSearch && searches.length > 0;
 
   return (
-    <div className={cn(!hasResults && "flex h-dvh flex-col")}>
+    <div className="flex h-dvh flex-col">
       <div className="pointer-events-auto fixed inset-x-0 top-0 z-50 px-4 py-3">
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen} modal>
           <form
@@ -117,7 +127,7 @@ export function PlaceSearch() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   onFocus={handleFocus}
-                  autoFocus={!queryParam}
+                  autoFocus={!initialQuery}
                   className={cn(
                     "h-11 bg-transparent dark:bg-transparent border-none rounded-xl pl-12 focus-visible:ring-0",
                     { "pr-12": input },
@@ -126,7 +136,7 @@ export function PlaceSearch() {
                 {input && (
                   <button
                     type="button"
-                    onClick={handleClear}
+                    onClick={() => handleClear()}
                     className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {isSearching ? (
@@ -153,7 +163,12 @@ export function PlaceSearch() {
                     item={item}
                     thumbnailSize="sm"
                     highlighted={index === highlightedIndex}
-                    onClick={() => handleSelect(item)}
+                    onClick={() => {
+                      addSearch(item.name);
+                      router.push(
+                        `/map?query=${encodeURIComponent(item.name)}&place=${item.id}`,
+                      );
+                    }}
                   />
                 </li>
               ))}
@@ -162,40 +177,61 @@ export function PlaceSearch() {
         </Popover>
       </div>
 
-      {!queryParam && (
+      {/* Empty state */}
+      {!pendingSearch && !showRecent && (
         <div className="flex flex-1 flex-col items-center justify-center px-4">
           <SearchEmpty />
         </div>
       )}
 
-      {queryParam && isLoading && (
+      {/* Recent searches */}
+      {showRecent && (
+        <div className="mx-auto w-full max-w-4xl px-4 pt-[68px]">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold">최근 검색어</h2>
+            <button
+              type="button"
+              onClick={clearAll}
+              className="cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              전체 삭제
+            </button>
+          </div>
+          <ul className="mt-2">
+            {searches.map((term) => (
+              <li key={term} className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => handleRecentClick(term)}
+                  className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 text-left transition-colors hover:bg-accent"
+                >
+                  <Clock className="size-4 shrink-0 text-muted-foreground" />
+                  <span className="truncate text-sm">{term}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeSearch(term)}
+                  className="shrink-0 cursor-pointer p-2 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <X className="size-4" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Loading */}
+      {pendingSearch && isLoading && (
         <div className="flex flex-1 flex-col items-center justify-center">
           <Spinner className="size-8 text-primary" />
         </div>
       )}
 
-      {queryParam && !isLoading && results.length === 0 && (
+      {/* No results */}
+      {noResults && (
         <div className="flex flex-1 flex-col items-center justify-center px-4">
           <SearchNoResults />
-        </div>
-      )}
-
-      {hasResults && (
-        <div className="px-4 pt-[68px] pb-8 max-w-4xl mx-auto w-full">
-          <ul className="divide-y">
-            {results.map((item) => (
-              <li key={item.id}>
-                <PlaceItem
-                  item={item}
-                  thumbnailSize="lg"
-                  onClick={() => handleSelect(item)}
-                />
-              </li>
-            ))}
-          </ul>
-          <div ref={sentinelRef} className="flex justify-center py-4">
-            {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
-          </div>
         </div>
       )}
     </div>
