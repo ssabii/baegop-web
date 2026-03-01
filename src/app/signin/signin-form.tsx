@@ -181,7 +181,7 @@ export function SignInForm({
               </Button>
             </Field>
             <FieldSeparator>또는</FieldSeparator> */}
-            <Field className="gap-2">
+            <Field className="gap-4">
               <Button
                 type="button"
                 size="xl"
