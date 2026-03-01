@@ -29,6 +29,42 @@ export type Database = {
         }
         Relationships: []
       }
+      favorites: {
+        Row: {
+          created_at: string
+          id: number
+          place_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          place_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          place_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kona_card_votes: {
         Row: {
           created_at: string | null

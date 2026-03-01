@@ -1,5 +1,6 @@
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
+import { FavoriteButton } from "@/components/favorite-button";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import type { KonaCardStatus } from "@/types";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
@@ -62,17 +63,23 @@ export function PlaceCard({
         </div>
       </div>
 
-      {place.image_urls?.[0] ? (
-        <img
-          src={optimizeNaverImageUrl(place.image_urls[0])}
-          alt={place.name}
-          className="aspect-square size-28 shrink-0 rounded-lg object-cover"
+      <div className="relative shrink-0">
+        {place.image_urls?.[0] ? (
+          <img
+            src={optimizeNaverImageUrl(place.image_urls[0])}
+            alt={place.name}
+            className="aspect-square size-28 rounded-lg object-cover"
+          />
+        ) : (
+          <div className="flex aspect-square size-28 items-center justify-center rounded-lg bg-muted">
+            <Building2 className="size-6 text-muted-foreground" />
+          </div>
+        )}
+        <FavoriteButton
+          placeId={place.id}
+          className="absolute top-1 right-1 size-8 text-white hover:bg-transparent active:bg-transparent fill-white"
         />
-      ) : (
-        <div className="flex aspect-square size-28 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <Building2 className="size-6 text-muted-foreground" />
-        </div>
-      )}
+      </div>
     </Link>
   );
 }

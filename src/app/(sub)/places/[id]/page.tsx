@@ -11,6 +11,7 @@ import {
 } from "@/lib/naver";
 import { createClient } from "@/lib/supabase/server";
 import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
+import { FavoriteButton } from "@/components/favorite-button";
 import { Dot, Footprints, Home, Phone, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -151,7 +152,10 @@ export default async function PlaceDetailPage({
           {/* 기본 정보 */}
           <section className="space-y-2">
             {!isRegistered && <UnregisteredBadge />}
-            <h1 className="text-2xl font-bold">{detail.name}</h1>
+            <div className="flex items-start justify-between gap-2">
+              <h1 className="text-2xl font-bold">{detail.name}</h1>
+              {isRegistered && <FavoriteButton placeId={naverPlaceId} />}
+            </div>
 
             {detail.category && (
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">

@@ -129,7 +129,7 @@ export function PlaceSearch() {
                   onFocus={handleFocus}
                   autoFocus={!initialQuery}
                   className={cn(
-                    "h-11 bg-transparent dark:bg-transparent border-none rounded-xl pl-12 focus-visible:ring-0",
+                    "h-11 bg-transparent dark:bg-transparent border-none rounded-xl pl-12 focus-visible:ring-0 text-base placeholder:text-base",
                     { "pr-12": input },
                   )}
                 />
