@@ -11,7 +11,6 @@ import {
   PopoverAnchor,
   PopoverContent,
 } from "@/components/ui/popover";
-import { SearchBarAvatar } from "@/components/search-bar-avatar";
 import { PlaceItem } from "@/components/place-search/place-item";
 import { usePlaceSuggestions } from "@/components/place-search/use-place-suggestions";
 import { useSearchPlaces } from "@/components/place-search/use-search-places";
@@ -32,7 +31,7 @@ export function MapSearch() {
     "map-recent-searches",
   );
 
-  const isTyping = pendingSearch ? false : input.length > 0;
+  const isTyping = !pendingSearch && input !== initialQuery;
 
   const {
     suggestions,

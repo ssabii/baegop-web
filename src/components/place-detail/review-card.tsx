@@ -20,8 +20,8 @@ import { formatRelativeDate } from "@/lib/date";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
 import type { ReviewImageItem } from "@/types";
 import { StarRating } from "./star-rating";
-import { ReviewImages } from "./review-images";
-import { deleteReview } from "./actions";
+import { ReviewImages } from "@/app/(sub)/places/[id]/review-images";
+import { deleteReview } from "@/app/(sub)/places/[id]/actions";
 
 interface ReviewCardProps {
   review: {

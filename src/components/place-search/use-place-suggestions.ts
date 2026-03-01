@@ -97,8 +97,9 @@ export function usePlaceSuggestions({
       skipFocusRef.current = false;
       return;
     }
-    if (input.trim().length >= 2) {
-      searchSuggestions(input);
+    // 이미 제안이 있으면 팝오버만 다시 열기 (재검색 방지)
+    if (suggestions.length > 0) {
+      setPopoverOpen(true);
     }
   }
 

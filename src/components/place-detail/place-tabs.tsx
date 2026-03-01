@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MenuSection } from "./menu-section";
 import { ReviewSection } from "./review-section";
@@ -13,8 +12,10 @@ interface PlaceTabsProps {
   placeId: string | null;
   naverPlaceId: string;
   currentUserId: string | null;
-  initialMenus: MenusResponse;
-  initialReviews: ReviewsResponse;
+  initialMenus?: MenusResponse;
+  initialReviews?: ReviewsResponse;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
 export function PlaceTabs({
@@ -24,30 +25,23 @@ export function PlaceTabs({
   currentUserId,
   initialMenus,
   initialReviews,
+  activeTab: controlledTab,
+  onTabChange,
 }: PlaceTabsProps) {
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [internalTab, setInternalTab] = useState("menu");
 
-  const tab = searchParams.get("tab");
-  const activeTab = tab === "review" ? "review" : "menu";
-
-  useEffect(() => {
-    const scrollToReview = sessionStorage.getItem("scrollToReview");
-    if (scrollToReview === "true") {
-      sessionStorage.removeItem("scrollToReview");
-      tabsRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, []);
+  const activeTab = controlledTab ?? internalTab;
 
   function handleTabChange(value: string) {
-    router.replace(`${pathname}?tab=${value}`, { scroll: false });
+    if (onTabChange) {
+      onTabChange(value);
+    } else {
+      setInternalTab(value);
+    }
   }
 
   return (
     <Tabs
-      ref={tabsRef}
       value={activeTab}
       onValueChange={handleTabChange}
       className="gap-4"
