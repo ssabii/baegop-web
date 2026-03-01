@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import type { NaverSearchResult } from "@/types";
 
-const DISPLAY = 10;
+export const SEARCH_DISPLAY = 10;
 
 interface Coords {
   lat: number;
@@ -15,7 +15,7 @@ export function useSearchPlaces(query: string, coords?: Coords) {
       queryFn: async ({ pageParam = 1 }) => {
         const params = new URLSearchParams({
           query,
-          display: String(DISPLAY),
+          display: String(SEARCH_DISPLAY),
           start: String(pageParam),
         });
         if (coords) {
@@ -28,16 +28,18 @@ export function useSearchPlaces(query: string, coords?: Coords) {
       },
       initialPageParam: 1,
       getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-        if (lastPage.length < DISPLAY) return undefined;
-        return lastPageParam + DISPLAY;
+        if (lastPage.length < SEARCH_DISPLAY) return undefined;
+        return lastPageParam + SEARCH_DISPLAY;
       },
       enabled: !!query,
     });
 
   const results = data?.pages.flat() ?? [];
+  const pageCount = data?.pages.length ?? 0;
 
   return {
     results,
+    pageCount,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,

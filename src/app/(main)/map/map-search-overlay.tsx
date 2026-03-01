@@ -134,6 +134,6 @@ export function MapSearchOverlay({
           </li>
         ))}
       </ul>
-    </div>
+    </div>  
   );
 }

@@ -1,70 +1,49 @@
 "use client";
 
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Drawer } from "vaul";
 import { cn } from "@/lib/utils";
+import { useSheetScrollLock } from "@/hooks/use-sheet-scroll-lock";
 
-/** Search bar: py-3 (12px) + h-11 (44px) + py-3 (12px) */
-const SEARCH_BAR_HEIGHT = 68;
-const COMPACT_SNAP = "200px";
 const HALF_SNAP = 0.5;
+const FULL_SNAP = 1;
 
 type SnapPoint = number | string;
 
 interface MapResultSheetProps {
   children: React.ReactNode;
   onNearTopChange?: (nearTop: boolean) => void;
-  compact?: boolean;
 }
 
 export function MapResultSheet({
   children,
   onNearTopChange,
-  compact,
 }: MapResultSheetProps) {
-  const contentRef = useRef<HTMLDivElement>(null);
   const wasNearTop = useRef(false);
-  const [activeSnap, setActiveSnap] = useState<SnapPoint | null>(null);
+  const [activeSnap, setActiveSnap] = useState<SnapPoint>(HALF_SNAP);
 
-  const fullSnap = useMemo(() => {
-    if (typeof window === "undefined") return 0.9;
-    return (window.innerHeight - SEARCH_BAR_HEIGHT) / window.innerHeight;
+  const isFullSnap = activeSnap === FULL_SNAP;
+  const contentRef = useSheetScrollLock(isFullSnap);
+
+  const handleSnapChange = useCallback((snap: SnapPoint | null) => {
+    if (snap !== null) setActiveSnap(snap);
   }, []);
-
-  const snapPoints = useMemo<SnapPoint[]>(
-    () => [COMPACT_SNAP, HALF_SNAP, fullSnap],
-    [fullSnap],
-  );
-
-  // Sync active snap when compact changes
-  useEffect(() => {
-    setActiveSnap(compact ? COMPACT_SNAP : HALF_SNAP);
-  }, [compact]);
-
-  const isFullSnap = activeSnap === fullSnap;
 
   // Notify nearTop changes
   useEffect(() => {
-    const nearTop = activeSnap === fullSnap;
+    const nearTop = activeSnap === FULL_SNAP;
     if (nearTop !== wasNearTop.current) {
       wasNearTop.current = nearTop;
       onNearTopChange?.(nearTop);
     }
-  }, [activeSnap, fullSnap, onNearTopChange]);
-
-  // Scroll to top when leaving full snap
-  useEffect(() => {
-    if (!isFullSnap && contentRef.current) {
-      contentRef.current.scrollTop = 0;
-    }
-  }, [isFullSnap]);
+  }, [activeSnap, onNearTopChange]);
 
   return (
     <Drawer.Root
       open
-      snapPoints={snapPoints}
+      snapPoints={[HALF_SNAP, FULL_SNAP]}
       activeSnapPoint={activeSnap}
-      setActiveSnapPoint={setActiveSnap}
+      setActiveSnapPoint={handleSnapChange}
       modal={false}
       noBodyStyles
       dismissible={false}
@@ -78,15 +57,13 @@ export function MapResultSheet({
 
           {/* Drag handle */}
           <div className="flex shrink-0 justify-center py-3">
-            {!compact && (
-              <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
-            )}
+            <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
           </div>
 
           {/* Content — only scroll at fullSnap, drag to expand at other snaps */}
           <div
             ref={contentRef}
-            className={cn("flex-1 pb-17", {
+            className={cn("flex-1 overscroll-contain", {
               "overflow-y-auto": isFullSnap,
               "overflow-hidden": !isFullSnap,
             })}

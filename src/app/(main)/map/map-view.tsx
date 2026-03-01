@@ -1,7 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { LocateFixed } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { COMPANY_LOCATION } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 
 const NaverMap = dynamic(() => import("@/components/naver-map"), {
@@ -47,12 +50,16 @@ export function MapView({
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markerInstancesRef = useRef<naver.maps.Marker[]>([]);
   const markersRef = useRef(markers);
+  const [mapReady, setMapReady] = useState(false);
   useEffect(() => {
     markersRef.current = markers;
   }, [markers]);
 
   const clearMarkers = useCallback(() => {
-    markerInstancesRef.current.forEach((m) => m.setMap(null));
+    markerInstancesRef.current.forEach((m) => {
+      naver.maps.Event.clearInstanceListeners(m);
+      m.setMap(null);
+    });
     markerInstancesRef.current = [];
   }, []);
 
@@ -101,25 +108,26 @@ export function MapView({
     [markers, fitBounds, onMarkerClick, clearMarkers],
   );
 
+  // Stable handleReady — only depends on clearMarkers (stable)
   const handleReady = useCallback(
     (map: naver.maps.Map) => {
       mapRef.current = map;
-      renderMarkers(map);
+      setMapReady(true);
 
       return () => {
         clearMarkers();
         mapRef.current = null;
       };
     },
-    [renderMarkers, clearMarkers],
+    [clearMarkers],
   );
 
-  // Re-render markers when they change (after initial mount)
+  // Render markers when they change or when map becomes ready
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
     renderMarkers(map);
-  }, [renderMarkers]);
+  }, [renderMarkers, mapReady]);
 
   // Focus marker: teleport + idle-based zoom for far distances
   useEffect(() => {
@@ -140,19 +148,59 @@ export function MapView({
 
     map.stop();
 
+    let idleListener: naver.maps.MapEventListener | undefined;
+
     if (isFar) {
-      // Teleport instantly (no intermediate tiles = no tile breaking)
       map.setCenter(target);
       map.setZoom(15);
-      // Wait for tiles to load, then smooth zoom-in
-      const listener = naver.maps.Event.addListener(map, "idle", () => {
-        naver.maps.Event.removeListener(listener);
+      idleListener = naver.maps.Event.addListener(map, "idle", () => {
+        naver.maps.Event.removeListener(idleListener!);
+        idleListener = undefined;
         map.morph(target, 17, { easing: "easeOutCubic", duration: 300 });
       });
     } else {
       map.morph(target, 17, { easing: "easeOutCubic" });
     }
-  }, [focusMarkerId]);
 
-  return <NaverMap onReady={handleReady} className={className} />;
+    return () => {
+      if (idleListener) naver.maps.Event.removeListener(idleListener);
+    };
+  }, [focusMarkerId, mapReady]);
+
+  function handleLocate() {
+    const map = mapRef.current;
+    if (!map) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const target = new naver.maps.LatLng(
+          pos.coords.latitude,
+          pos.coords.longitude,
+        );
+        map.morph(target, 16, { easing: "easeOutCubic" });
+      },
+      () => {
+        // Geolocation denied/failed → move to company
+        const target = new naver.maps.LatLng(
+          COMPANY_LOCATION.lat,
+          COMPANY_LOCATION.lng,
+        );
+        map.morph(target, 16, { easing: "easeOutCubic" });
+      },
+    );
+  }
+
+  return (
+    <div className={cn("relative", className)}>
+      <NaverMap onReady={handleReady} className="size-full" />
+      <button
+        type="button"
+        onClick={handleLocate}
+        className="absolute right-4 bottom-4 z-10 flex size-10 cursor-pointer items-center justify-center rounded-full border bg-background shadow-sm transition-colors hover:bg-accent"
+        aria-label="현재 위치"
+      >
+        <LocateFixed className="size-5 text-foreground" />
+      </button>
+    </div>
+  );
 }

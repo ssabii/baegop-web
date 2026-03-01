@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Building2, MapPin, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import type { NaverSearchResult } from "@/types";
 
@@ -41,7 +42,7 @@ export function PlaceItem({
         <span className={cn("flex items-center gap-1", metaClass)}>
           <MapPin className="size-3 shrink-0" />
           <span className="truncate">
-            {item.roadAddress || item.address}
+            {formatShortAddress(item.roadAddress || item.address)}
           </span>
         </span>
         {item.category && (
