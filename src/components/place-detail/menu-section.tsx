@@ -15,7 +15,7 @@ import { useMenus, type MenusResponse } from "./use-menus";
 
 interface MenuSectionProps {
   naverPlaceId: string;
-  initialData: MenusResponse;
+  initialData?: MenusResponse;
 }
 
 export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {

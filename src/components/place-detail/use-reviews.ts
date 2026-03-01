@@ -29,7 +29,7 @@ export type { ReviewsResponse };
 
 export function useReviews(
   placeId: string,
-  initialData: ReviewsResponse,
+  initialData?: ReviewsResponse,
 ) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
@@ -43,10 +43,12 @@ export function useReviews(
       },
       initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-      initialData: {
-        pages: [initialData],
-        pageParams: [0],
-      },
+      ...(initialData && {
+        initialData: {
+          pages: [initialData],
+          pageParams: [0],
+        },
+      }),
     });
 
   const reviews = data?.pages.flatMap((page) => page.items) ?? [];

@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import { optimizeNaverImageUrl } from "@/lib/image";
+import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import type { KonaCardStatus } from "@/types";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
 import Link from "next/link";
@@ -48,25 +48,7 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
               </span>
             )}
           </div>
-          {status !== "unknown" && (
-            <span
-              className={cn(
-                "inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-full px-1.5 py-1 text-xs font-medium",
-                {
-                  "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300":
-                    status === "available",
-                  "bg-muted text-muted-foreground": status !== "available",
-                },
-              )}
-            >
-              <img
-                src="/icons/kona.png"
-                alt="코나카드"
-                className="size-3 rounded-full"
-              />
-              {status === "available" ? "결제가능" : "결제불가"}
-            </span>
-          )}
+          <KonaCardBadge status={status} />
         </div>
       </div>
 

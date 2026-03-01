@@ -14,12 +14,12 @@ import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
 import { Dot, Footprints, Home, Phone, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { KonaVoteSection } from "./kona-vote";
+import { KonaVoteSection } from "@/components/place-detail/kona-vote";
+import { UnregisteredBadge } from "@/components/place-detail/unregistered-badge";
 import { PlaceActionBar } from "./place-action-bar";
-import { PlaceTabs } from "./place-tabs";
 import { PlaceMap } from "./place-map";
 import { PlaceShortcuts } from "./place-shortcuts";
-import { UnregisteredBadge } from "./unregistered-badge";
+import { PlaceTabsWithUrl } from "./place-tabs-with-url";
 
 export default async function PlaceDetailPage({
   params,
@@ -219,7 +219,7 @@ export default async function PlaceDetailPage({
           )}
 
           {/* 메뉴 / 리뷰 탭 */}
-          <PlaceTabs
+          <PlaceTabsWithUrl
             isRegistered={isRegistered}
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}

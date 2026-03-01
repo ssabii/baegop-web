@@ -21,6 +21,7 @@ interface KonaVoteProps {
   status: KonaCardStatus;
   userVote: KonaVote | null;
   isLoggedIn: boolean;
+  onLoginRequired?: () => void;
 }
 
 const STATUS_CONFIG: Record<
@@ -46,6 +47,7 @@ export function KonaVoteSection({
   status: initialStatus,
   userVote: initialUserVote,
   isLoggedIn,
+  onLoginRequired,
 }: KonaVoteProps) {
   const router = useRouter();
   const { status, userVote, vote, isPending, pendingVote } = useKonaVote({
@@ -56,6 +58,14 @@ export function KonaVoteSection({
   });
 
   const config = STATUS_CONFIG[status];
+
+  function handleVote(voteValue: KonaVote) {
+    if (!isLoggedIn) {
+      onLoginRequired?.();
+      return;
+    }
+    vote(voteValue);
+  }
 
   return (
     <section className="rounded-xl bg-muted p-4 space-y-3">
@@ -91,7 +101,7 @@ export function KonaVoteSection({
         </span>
       </div>
 
-      {isLoggedIn && (
+      {(isLoggedIn || onLoginRequired) && (
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">
             코나카드 결제가 가능한가요?
@@ -101,7 +111,7 @@ export function KonaVoteSection({
               size="sm"
               variant="outline"
               pressed={userVote === "available"}
-              onPressedChange={() => vote("available")}
+              onPressedChange={() => handleVote("available")}
               disabled={isPending}
               className={cn("px-1.5 py-0.5 cursor-pointer rounded-lg", {
                 "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
@@ -115,7 +125,7 @@ export function KonaVoteSection({
               size="sm"
               variant="outline"
               pressed={userVote === "unavailable"}
-              onPressedChange={() => vote("unavailable")}
+              onPressedChange={() => handleVote("unavailable")}
               disabled={isPending}
               className={cn("px-1.5 py-0.5 cursor-pointer rounded-lg", {
                 "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
