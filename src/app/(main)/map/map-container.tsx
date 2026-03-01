@@ -181,16 +181,17 @@ export function MapContainer() {
         <MapResultSheet onNearTopChange={setSheetNearTop}>
           {hasResults ? (
             <>
-              <div className="px-3">
+              <ul className="divide-y px-3">
                 {results.map((item) => (
-                  <PlaceItem
-                    key={item.id}
-                    item={item}
-                    thumbnailSize="lg"
-                    onClick={() => handleItemClick(item)}
-                  />
+                  <li key={item.id}>
+                    <PlaceItem
+                      item={item}
+                      thumbnailSize="lg"
+                      onClick={() => handleItemClick(item)}
+                    />
+                  </li>
                 ))}
-              </div>
+              </ul>
               {/* Infinite scroll sentinel */}
               <div ref={sentinelRef} className="flex justify-center py-4">
                 {isFetchingNextPage && (

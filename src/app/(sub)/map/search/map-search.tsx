@@ -130,7 +130,7 @@ export function MapSearch() {
                   onFocus={handleFocus}
                   autoFocus={!initialQuery}
                   className={cn(
-                    "h-11 rounded-xl border-none bg-transparent pl-12 focus-visible:ring-0 dark:bg-transparent",
+                    "h-11 bg-transparent dark:bg-transparent border-none rounded-xl pl-12 focus-visible:ring-0",
                     { "pr-12": input },
                   )}
                 />
