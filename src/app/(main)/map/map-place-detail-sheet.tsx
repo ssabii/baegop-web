@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useInView } from "react-intersection-observer";
 import { Drawer } from "vaul";
 import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSheetScrollLock } from "@/hooks/use-sheet-scroll-lock";
 import { MapPlaceDetail } from "./map-place-detail";
@@ -22,10 +25,36 @@ export function MapPlaceDetailSheet({
   item,
   onDismiss,
 }: MapPlaceDetailSheetProps) {
-  const [activeSnap, setActiveSnap] = useState<SnapPoint>(COMPACT_SNAP);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const expandParam = searchParams.get("expand");
+
+  const [activeSnap, setActiveSnap] = useState<SnapPoint>(
+    expandParam ? FULL_SNAP : COMPACT_SNAP,
+  );
+  const prevIsFullRef = useRef(activeSnap === FULL_SNAP);
 
   const isFullSnap = activeSnap === FULL_SNAP;
   const contentRef = useSheetScrollLock(isFullSnap);
+
+  // 시트 상단이 뷰포트 상단 ~8% 영역에 진입하면 isAtTop = true
+  const { ref: sentinelRef, inView: isAtTop } = useInView({
+    rootMargin: "0px 0px -92% 0px",
+  });
+
+  // URL 동기화: expand 상태 변경 시 querystring 업데이트
+  useEffect(() => {
+    if (isFullSnap === prevIsFullRef.current) return;
+    prevIsFullRef.current = isFullSnap;
+
+    const params = new URLSearchParams(searchParams);
+    if (isFullSnap) {
+      params.set("expand", "1");
+    } else {
+      params.delete("expand");
+    }
+    router.replace(`/map?${params}`, { scroll: false });
+  }, [isFullSnap, searchParams, router]);
 
   const handleSnapChange = useCallback((snap: SnapPoint | null) => {
     if (snap !== null) setActiveSnap(snap);
@@ -47,25 +76,37 @@ export function MapPlaceDetailSheet({
           aria-describedby={undefined}
           className="pointer-events-none fixed inset-x-0 bottom-0 z-[45] flex h-dvh flex-col"
         >
-          <div className="pointer-events-auto flex flex-1 flex-col rounded-t-2xl border-t bg-background shadow-lg">
+          <div
+            className={cn(
+              "pointer-events-auto flex min-h-0 flex-1 flex-col border-t bg-background shadow-lg transition-[border-radius,border-color] duration-300",
+              {
+                "rounded-t-2xl": !isAtTop,
+                "rounded-none border-t-transparent": isAtTop,
+              },
+            )}
+          >
+            {/* Sentinel: 시트 상단이 뷰포트 탑에 닿는지 감지 */}
+            <div ref={sentinelRef} />
+
             <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
 
             {/* Drag handle + close button */}
             <div className="relative flex shrink-0 justify-center py-3">
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="icon-sm"
                 onClick={onDismiss}
-                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="absolute right-4 top-6 rounded-full text-muted-foreground"
               >
                 <X className="size-5" />
-              </button>
+              </Button>
             </div>
 
             {/* Content */}
             <div
               ref={contentRef}
-              className={cn("flex-1 overscroll-contain", {
+              className={cn("min-h-0 flex-1 overscroll-contain", {
                 "overflow-y-auto": isFullSnap,
                 "overflow-hidden": !isFullSnap,
               })}

@@ -37,17 +37,17 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
   return (
     <div className="space-y-3 px-4 pb-8">
       {/* 제목 + 링크 */}
-      <Link
-        href={`/places/${item.id}`}
-        className="inline-flex max-w-full items-start gap-1 group"
-      >
-        <h3 className="min-w-0 shrink line-clamp-2 text-base font-bold leading-snug group-hover:underline">
-          {item.name}
-        </h3>
-        <ExternalLink className="size-4 shrink-0 text-foreground mt-0.5" />
-      </Link>
 
       <div className="space-y-1">
+        <Link
+          href={`/places/${item.id}`}
+          className="inline-flex max-w-full items-start gap-1 group pr-12"
+        >
+          <h3 className="min-w-0 shrink line-clamp-2 text-base font-bold leading-snug group-hover:underline">
+            {item.name}
+          </h3>
+          <ExternalLink className="size-4 shrink-0 text-foreground mt-0.5" />
+        </Link>
         {/* 카테고리 */}
         {category && (
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
