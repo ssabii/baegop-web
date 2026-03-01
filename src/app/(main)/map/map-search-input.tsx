@@ -1,7 +1,8 @@
 "use client";
 
-import { ChevronLeft, Search, X } from "lucide-react";
+import { ChevronLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SearchBarAvatar } from "@/components/search-bar-avatar";
 
 interface MapSearchInputProps {
   query: string;
@@ -18,47 +19,72 @@ export function MapSearchInput({
   showBack,
   onBack,
 }: MapSearchInputProps) {
+  const isIdle = !showBack && !query;
+
   return (
     <div className="absolute inset-x-0 top-0 z-50 px-4 py-3">
-      <div className="relative mx-auto h-11 max-w-4xl rounded-full border bg-background shadow-sm">
-        {/* Left icon: Back or Search */}
-        {showBack ? (
+      <div className="mx-auto flex h-11 max-w-4xl items-center rounded-full border bg-background shadow-sm">
+        {/* Idle: baegop icon + placeholder */}
+        {isIdle && (
+          <button
+            type="button"
+            onClick={onTap}
+            className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 px-4 py-2"
+          >
+            <img
+              src="/baegop.svg"
+              alt="배곱"
+              width={20}
+              height={20}
+              className="shrink-0"
+            />
+            <span className="truncate text-muted-foreground">
+              찾고 싶은 장소가 있나요?
+            </span>
+          </button>
+        )}
+
+        {/* Active: back button */}
+        {!isIdle && showBack && (
           <button
             type="button"
             onClick={onBack}
-            className="absolute left-4 top-1/2 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+            className="shrink-0 cursor-pointer pl-4 text-muted-foreground transition-colors hover:text-foreground"
           >
             <ChevronLeft className="size-5" />
           </button>
-        ) : (
-          <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         )}
 
-        {/* Tappable area */}
-        <button
-          type="button"
-          onClick={onTap}
-          className={cn(
-            "h-full w-full cursor-pointer rounded-full pl-12 text-left",
-            { "pr-12": query },
-          )}
-        >
-          {query ? (
+        {/* Active: query text */}
+        {!isIdle && (
+          <button
+            type="button"
+            onClick={onTap}
+            className={cn(
+              "h-full min-w-0 flex-1 cursor-pointer rounded-full text-left",
+              showBack ? "pl-3" : "pl-4",
+            )}
+          >
             <span className="block truncate">{query}</span>
-          ) : (
-            <span className="text-muted-foreground">장소 검색</span>
-          )}
-        </button>
+          </button>
+        )}
 
-        {/* Right icon: Clear */}
-        {query && (
+        {/* Idle: avatar */}
+        {isIdle && (
+          <div className="flex shrink-0 items-center pr-4">
+            <SearchBarAvatar />
+          </div>
+        )}
+
+        {/* Active: clear */}
+        {!isIdle && query && (
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               onClear();
             }}
-            className="absolute right-4 top-1/2 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+            className="shrink-0 cursor-pointer pr-4 text-muted-foreground transition-colors hover:text-foreground"
           >
             <X className="size-5" />
           </button>

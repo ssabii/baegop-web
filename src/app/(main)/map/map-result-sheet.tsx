@@ -5,6 +5,7 @@ import { Drawer } from "vaul";
 import { cn } from "@/lib/utils";
 import { useSheetScrollLock } from "@/hooks/use-sheet-scroll-lock";
 
+const COMPACT_SNAP = 0.3;
 const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 
@@ -20,7 +21,7 @@ export function MapResultSheet({
   onNearTopChange,
 }: MapResultSheetProps) {
   const wasNearTop = useRef(false);
-  const [activeSnap, setActiveSnap] = useState<SnapPoint>(HALF_SNAP);
+  const [activeSnap, setActiveSnap] = useState<SnapPoint>(COMPACT_SNAP);
 
   const isFullSnap = activeSnap === FULL_SNAP;
   const contentRef = useSheetScrollLock(isFullSnap);
@@ -41,7 +42,7 @@ export function MapResultSheet({
   return (
     <Drawer.Root
       open
-      snapPoints={[HALF_SNAP, FULL_SNAP]}
+      snapPoints={[COMPACT_SNAP, HALF_SNAP, FULL_SNAP]}
       activeSnapPoint={activeSnap}
       setActiveSnapPoint={handleSnapChange}
       modal={false}
