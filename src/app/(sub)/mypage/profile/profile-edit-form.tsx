@@ -176,7 +176,7 @@ function ProfileEditFormContent({ profile }: { profile: Profile }) {
       </div>
 
       {/* 닉네임 섹션 */}
-      <div className="flex flex-col gap-2 px-4">
+      <div className="flex flex-col gap-2">
         <label className="text-sm font-bold">닉네임</label>
         <Input
           readOnly
