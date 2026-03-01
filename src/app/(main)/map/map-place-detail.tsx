@@ -7,17 +7,21 @@ import {
   ExternalLink,
   MapPin,
   Phone,
+  Route,
   Star,
   Tag,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import { KonaVoteSection } from "@/components/place-detail/kona-vote";
 import { PlaceTabs } from "@/components/place-detail/place-tabs";
-import { formatShortAddress } from "@/lib/address";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import { optimizeNaverImageUrl } from "@/lib/image";
+import { buildNaverWalkingRouteLink } from "@/lib/naver";
 import { usePlaceData } from "@/hooks/use-place-data";
 import type { NaverSearchResult } from "@/types";
 
@@ -36,9 +40,8 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
 
   return (
     <div className="space-y-3 px-4 pb-8">
-      {/* 제목 + 링크 */}
-
       <div className="space-y-1">
+        {/* 제목 + 링크 */}
         <Link
           href={`/places/${item.id}`}
           className="inline-flex max-w-full items-start gap-1 group pr-12"
@@ -48,6 +51,7 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
           </h3>
           <ExternalLink className="size-4 shrink-0 text-foreground mt-0.5" />
         </Link>
+
         {/* 카테고리 */}
         {category && (
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -66,13 +70,12 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
           </div>
         )}
 
-        {/* 주소 */}
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <MapPin className="size-3 shrink-0" />
-          <span className="truncate">
-            {formatShortAddress(item.roadAddress || item.address)}
-          </span>
+        {/* 주소 (풀 주소) */}
+        <div className="flex items-start gap-1 text-sm text-muted-foreground">
+          <MapPin className="mt-0.5 size-3 shrink-0" />
+          <span>{item.roadAddress || item.address}</span>
         </div>
+
         {/* 별점 + 코나카드 뱃지 */}
         {isLoading ? (
           <Skeleton className="h-5 w-28" />
@@ -115,6 +118,43 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
           <Building2 className="size-8 text-muted-foreground" />
         </div>
       )}
+
+      {/* 경로보기 · 전화걸기 */}
+      <ButtonGroup className="w-full rounded-xl">
+        <Button
+          variant="outline"
+          size="lg"
+          className="flex-1 gap-1.5 rounded-xl"
+          asChild
+        >
+          <a
+            href={buildNaverWalkingRouteLink(COMPANY_LOCATION, {
+              lng: Number(item.x),
+              lat: Number(item.y),
+              name: item.name,
+              placeId: item.id,
+            })}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Route className="size-4" />
+            <span>경로보기</span>
+          </a>
+        </Button>
+        {item.phone && (
+          <Button
+            variant="outline"
+            size="lg"
+            className="flex-1 gap-1.5 rounded-xl"
+            asChild
+          >
+            <a href={`tel:${item.phone}`}>
+              <Phone className="size-4" />
+              <span>전화걸기</span>
+            </a>
+          </Button>
+        )}
+      </ButtonGroup>
 
       {/* 코나카드 투표 */}
       {isRegistered && data?.place && (

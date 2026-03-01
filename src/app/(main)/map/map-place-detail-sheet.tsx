@@ -7,7 +7,6 @@ import { Drawer } from "vaul";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useSheetScrollLock } from "@/hooks/use-sheet-scroll-lock";
 import { MapPlaceDetail } from "./map-place-detail";
 import type { NaverSearchResult } from "@/types";
 
@@ -35,7 +34,14 @@ export function MapPlaceDetailSheet({
   const prevIsFullRef = useRef(activeSnap === FULL_SNAP);
 
   const isFullSnap = activeSnap === FULL_SNAP;
-  const contentRef = useSheetScrollLock(isFullSnap);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // compact snap으로 돌아올 때 스크롤 위치 리셋
+  useEffect(() => {
+    if (!isFullSnap && contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [isFullSnap]);
 
   // 시트 상단이 뷰포트 상단 ~8% 영역에 진입하면 isAtTop = true
   const { ref: sentinelRef, inView: isAtTop } = useInView({
@@ -68,8 +74,7 @@ export function MapPlaceDetailSheet({
       setActiveSnapPoint={handleSnapChange}
       modal={false}
       noBodyStyles
-      dismissible
-      onClose={onDismiss}
+      dismissible={false}
     >
       <Drawer.Portal>
         <Drawer.Content
@@ -90,14 +95,18 @@ export function MapPlaceDetailSheet({
 
             <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
 
-            {/* Drag handle + close button */}
-            <div className="relative flex shrink-0 justify-center py-3">
+            {/* Drag handle */}
+            <div className="flex shrink-0 justify-center py-3">
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+            </div>
+
+            {/* Close button */}
+            <div className="flex shrink-0 justify-end px-4 pb-2">
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="icon-sm"
                 onClick={onDismiss}
-                className="absolute right-4 top-6 rounded-full text-muted-foreground"
+                className="rounded-full"
               >
                 <X className="size-5" />
               </Button>
