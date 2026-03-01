@@ -22,13 +22,13 @@ export function MapContainer() {
 
   const [query, setQuery] = useState(queryParam);
   const [prevQueryParam, setPrevQueryParam] = useState(queryParam);
-  const [sheetNearTop, setSheetNearTop] = useState(false);
+  const [sheetTopProgress, setSheetTopProgress] = useState(0);
 
   // Sync URL → state when queryParam changes externally (render-time sync)
   if (queryParam !== prevQueryParam) {
     setPrevQueryParam(queryParam);
     setQuery(queryParam);
-    if (!queryParam) setSheetNearTop(false);
+    if (!queryParam) setSheetTopProgress(0);
   }
 
   const userCoords = useGeolocation();
@@ -120,7 +120,7 @@ export function MapContainer() {
 
   const handleClear = useCallback(() => {
     setQuery("");
-    setSheetNearTop(false);
+    setSheetTopProgress(0);
     router.replace("/map", { scroll: false });
   }, [router]);
 
@@ -157,9 +157,10 @@ export function MapContainer() {
         className="size-full"
       />
 
-      {sheetNearTop && (
-        <div className="absolute inset-x-0 top-0 z-40 h-[68px] bg-background" />
-      )}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-40 h-[68px] bg-background"
+        style={{ opacity: sheetTopProgress }}
+      />
 
       <MapSearchInput
         query={query}
@@ -175,7 +176,7 @@ export function MapContainer() {
       />
 
       {showSheet && !selectedItem && (
-        <MapResultSheet onNearTopChange={setSheetNearTop}>
+        <MapResultSheet onClose={handleClear} onTopProgress={setSheetTopProgress}>
           {hasResults ? (
             <>
               <ul className="divide-y px-3">
