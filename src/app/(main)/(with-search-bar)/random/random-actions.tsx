@@ -25,7 +25,7 @@ export function RandomActions({
           disabled={disabled}
         >
           {isSpinning ? <Spinner aria-label="로딩 중" /> : <Shuffle />}
-          랜덤뽑기
+          랜덤 뽑기
         </Button>
         <Button
           variant="outline"
