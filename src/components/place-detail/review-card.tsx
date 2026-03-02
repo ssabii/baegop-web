@@ -18,7 +18,6 @@ import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { toast } from "sonner";
 import { formatRelativeDate } from "@/lib/date";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
-import type { ReviewImageItem } from "@/types";
 import { StarRating } from "./star-rating";
 import { ReviewImages } from "@/app/(sub)/places/[id]/review-images";
 import { deleteReview } from "@/app/(sub)/places/[id]/actions";
@@ -30,11 +29,11 @@ interface ReviewCardProps {
     content: string | null;
     created_at: string | null;
     user_id: string | null;
+    image_urls: string[] | null;
     profiles: {
       nickname: string | null;
       avatar_url: string | null;
     } | null;
-    review_images: ReviewImageItem[];
   };
   isOwner: boolean;
   naverPlaceId: string;
@@ -144,8 +143,8 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
       {review.content && (
         <p className="text-sm text-secondary-foreground">{review.content}</p>
       )}
-      {review.review_images.length > 0 && (
-        <ReviewImages images={review.review_images} />
+      {(review.image_urls?.length ?? 0) > 0 && (
+        <ReviewImages images={review.image_urls!} />
       )}
     </div>
   );

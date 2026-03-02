@@ -80,10 +80,7 @@ export default async function PlaceDetailPage({
   const reviewsQuery = isRegistered
     ? supabase
         .from("reviews")
-        .select(
-          "*, profiles(nickname, avatar_url), review_images(url, display_order)",
-          { count: "exact" },
-        )
+        .select("*, profiles(nickname, avatar_url)", { count: "exact" })
         .eq("place_id", place.id)
         .order("created_at", { ascending: false })
         .range(0, PAGE_SIZE - 1)
@@ -119,11 +116,7 @@ export default async function PlaceDetailPage({
   const initialReviews = {
     items: reviews.map((review) => ({
       ...review,
-      review_images:
-        review.review_images?.map((img) => ({
-          ...img,
-          url: optimizeSupabaseImageUrl(img.url),
-        })) ?? [],
+      image_urls: (review.image_urls ?? []).map((url) => optimizeSupabaseImageUrl(url)),
     })),
     nextCursor: reviews.length === PAGE_SIZE ? PAGE_SIZE : null,
   };

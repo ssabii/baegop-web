@@ -26,7 +26,7 @@ export default async function MyPage() {
   ]);
 
   return (
-    <main className="w-full h-dvh bg-muted">
+    <main className="w-full min-h-screen pb-17 bg-muted">
       <div className="mx-auto w-full max-w-4xl px-4 py-8">
         <nav className="flex flex-col gap-3" aria-labelledby="mypage-menu">
           {/* 메뉴 리스트 */}
@@ -60,6 +60,7 @@ export default async function MyPage() {
               inGroup
             />
           </ItemGroup>
+          <MypageMenuItem href="/mypage/feedback" title="피드백 보내기" />
           <ItemGroup className="rounded-xl bg-background">
             <LogoutMenuItem />
             {user.app_metadata.providers?.includes("email") && (

@@ -38,16 +38,22 @@ export async function deleteAccount() {
     .update({ user_id: null })
     .eq("user_id", user.id);
 
-  // 3. 장소 익명화 (created_by → null)
+  // 3. 피드백 익명화 (user_id → null)
+  await adminClient
+    .from("feedbacks")
+    .update({ user_id: null })
+    .eq("user_id", user.id);
+
+  // 4. 장소 익명화 (created_by → null)
   await adminClient
     .from("places")
     .update({ created_by: null })
     .eq("created_by", user.id);
 
-  // 4. 코나카드 투표 삭제
+  // 5. 코나카드 투표 삭제
   await adminClient.from("kona_card_votes").delete().eq("user_id", user.id);
 
-  // 5. auth user 삭제 (profile은 cascade 삭제)
+  // 6. auth user 삭제 (profile은 cascade 삭제)
   const { error } = await adminClient.auth.admin.deleteUser(user.id);
 
   if (error) {

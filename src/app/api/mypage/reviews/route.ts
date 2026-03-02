@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabase
     .from("reviews")
-    .select("id, rating, content, created_at, places(id, name), review_images(url, display_order)")
+    .select("id, rating, content, created_at, image_urls, places(id, name)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .range(cursor, cursor + limit - 1);
