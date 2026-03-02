@@ -41,7 +41,7 @@ export function RandomEmptyInitial() {
           </EmptyMedia>
           <EmptyTitle className="font-bold">오늘 뭐 먹지?</EmptyTitle>
           <EmptyDescription>
-            뽑기 버튼을 누르면 장소를 추천해 드려요!
+            랜덤 뽑기 버튼을 누르면 장소를 추천해 드려요!
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
