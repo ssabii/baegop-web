@@ -1,5 +1,6 @@
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
+import { FavoriteButton } from "@/components/favorite-button";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import type { KonaCardStatus } from "@/types";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
@@ -32,11 +33,9 @@ export function PlaceCard({
     >
       <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
-          <div className="flex flex-wrap items-center gap-1">
-            <h3 className="line-clamp-2 font-bold leading-snug text-left">
-              {place.name}
-            </h3>
-          </div>
+          <h3 className="line-clamp-2 font-bold leading-snug text-left">
+            {place.name}
+          </h3>
           {place.category && (
             <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
               <Tag className="size-3 shrink-0" />
@@ -62,17 +61,23 @@ export function PlaceCard({
         </div>
       </div>
 
-      {place.image_urls?.[0] ? (
-        <img
-          src={optimizeNaverImageUrl(place.image_urls[0])}
-          alt={place.name}
-          className="aspect-square size-28 shrink-0 rounded-lg object-cover"
+      <div className="relative shrink-0">
+        {place.image_urls?.[0] ? (
+          <img
+            src={optimizeNaverImageUrl(place.image_urls[0])}
+            alt={place.name}
+            className="aspect-square size-28 rounded-lg object-cover"
+          />
+        ) : (
+          <div className="flex aspect-square size-28 items-center justify-center rounded-lg bg-muted">
+            <Building2 className="size-6 text-muted-foreground" />
+          </div>
+        )}
+        <FavoriteButton
+          placeId={place.id}
+          className="absolute right-1 top-1 size-6 bg-transparent hover:bg-transparent active:bg-transparent [&_svg:not(.fill-rose-500)]:fill-muted [&_svg:not(.fill-rose-500)]:text-muted"
         />
-      ) : (
-        <div className="flex aspect-square size-28 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <Building2 className="size-6 text-muted-foreground" />
-        </div>
-      )}
+      </div>
     </Link>
   );
 }

@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Drawer } from "vaul";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FavoriteButton } from "@/components/favorite-button";
 import { cn } from "@/lib/utils";
+import { usePlaceData } from "@/hooks/use-place-data";
 import { MapViewButton } from "./map-view-button";
 import { MapPlaceDetail } from "./map-place-detail";
 import type { NaverSearchResult } from "@/types";
@@ -27,6 +29,9 @@ export function MapPlaceDetailSheet({
   const router = useRouter();
   const searchParams = useSearchParams();
   const expandParam = searchParams.get("expand");
+
+  const { data: placeData } = usePlaceData(item.id, { x: item.x, y: item.y });
+  const isRegistered = !!placeData?.place;
 
   const [activeSnap, setActiveSnap] = useState<SnapPoint>(
     expandParam ? FULL_SNAP : COMPACT_SNAP,
@@ -92,8 +97,14 @@ export function MapPlaceDetailSheet({
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
             </div>
 
-            {/* Close button */}
-            <div className="flex shrink-0 justify-end px-4 pb-2">
+            {/* Close button + Favorite */}
+            <div className="flex shrink-0 items-center justify-end gap-2 px-4 pb-2">
+              {isRegistered && (
+                <FavoriteButton
+                  placeId={item.id}
+                  className="size-8 bg-secondary"
+                />
+              )}
               <Button
                 variant="secondary"
                 size="icon-sm"
