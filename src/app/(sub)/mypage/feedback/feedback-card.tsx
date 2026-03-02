@@ -150,7 +150,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
               }}
             >
               <img
-                src={optimizeSupabaseImageUrl(img.url)}
+                src={optimizeSupabaseImageUrl(img.url, { width: 200 })}
                 alt={`피드백 이미지 ${i + 1}`}
                 className="aspect-square w-full object-cover"
               />

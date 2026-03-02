@@ -18,7 +18,7 @@ export type ReviewWithProfile = Review & {
 // 리터럴 타입 (DB에서 text로 저장되지만 앱에서는 좁은 타입으로 사용)
 export type KonaCardStatus = "available" | "unavailable" | "unknown";
 export type KonaVote = "available" | "unavailable";
-export type FeedbackCategory = "bug" | "feature" | "improvement" | "other";
+export type FeedbackCategory = "bug" | "feature" | "improvement" | "etc";
 
 /** 리뷰 이미지 (컴포넌트용 — DB 전체 컬럼이 아닌 필요 필드만) */
 export interface ReviewImageItem {
