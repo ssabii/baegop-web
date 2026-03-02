@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
-  DrawerFooter,
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
@@ -271,8 +270,8 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             onOpenChange={setContentDrawerOpen}
           >
             <DrawerContent>
-              <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
               <div className="max-w-4xl mx-auto w-full p-4">
+                <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
                 <Textarea
                   autoFocus
                   className="field-sizing-fixed resize-none"
@@ -293,21 +292,17 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                 <p className="mt-2 text-right text-sm text-muted-foreground">
                   {drawerContent.length}/{MAX_CONTENT_LENGTH}
                 </p>
+                <Button
+                  className="w-full mt-4"
+                  size="xl"
+                  onClick={() => {
+                    setContent(drawerContent);
+                    setContentDrawerOpen(false);
+                  }}
+                >
+                  확인
+                </Button>
               </div>
-              <DrawerFooter>
-                <div className="max-w-4xl mx-auto w-full">
-                  <Button
-                    className="w-full"
-                    size="xl"
-                    onClick={() => {
-                      setContent(drawerContent);
-                      setContentDrawerOpen(false);
-                    }}
-                  >
-                    확인
-                  </Button>
-                </div>
-              </DrawerFooter>
             </DrawerContent>
           </Drawer>
 

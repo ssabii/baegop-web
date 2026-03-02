@@ -67,6 +67,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - **UI와 로직 분리**: 커스텀 훅은 데이터 페칭/상태 관리 등 로직만 담당한다. IntersectionObserver, DOM 조작 등 UI 관심사는 훅에 포함하지 않고 사용하는 컴포넌트에서 처리한다.
 - **쿼리 훅 분리**: React Query(`useQuery`, `useInfiniteQuery` 등) 로직은 항상 `use-*.ts` 커스텀 훅으로 분리한다. 컴포넌트에 직접 작성하지 않는다.
 - **버튼 사이즈**: 모든 액션 버튼(BottomActionBar, 독립 액션 등)과 다이어로그 버튼은 `size="xl"`을 사용한다.
+- **Drawer 래퍼**: `DrawerContent` 바로 아래에 항상 `<div className="max-w-4xl mx-auto w-full p-4">` 래퍼를 둔다. 모든 내부 콘텐츠(DrawerHeader, DrawerTitle, DrawerFooter 포함)는 이 래퍼 안에 위치한다.
 - **Empty 컴포넌트 패턴**: 빈 상태 UI는 반드시 아래 형태를 따른다. 아이콘은 `variant="icon"` + `size-12 rounded-none bg-transparent`, 내부 아이콘은 `size-12 text-primary`, 타이틀은 `font-bold`. 텍스트에 마침표를 사용하지 않는다.
   ```tsx
   <Empty className="border-none">
