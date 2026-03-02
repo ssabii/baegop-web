@@ -131,7 +131,10 @@ export function PlaceSearch() {
                   autoFocus={!initialQuery}
                   className={cn(
                     "h-11 bg-transparent dark:bg-transparent border-none rounded-xl pl-12 focus-visible:ring-0 text-base placeholder:text-base",
-                    { "pr-12": input },
+                    {
+                      "pr-12": input,
+                      "rounded-b-none": popoverOpen,
+                    },
                   )}
                 />
                 {input && (
