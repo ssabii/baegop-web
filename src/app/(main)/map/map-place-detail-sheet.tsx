@@ -91,14 +91,13 @@ export function MapPlaceDetailSheet({
             )}
           >
             <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
-            <div className="max-w-4xl mx-auto w-full">
               {/* Drag handle */}
               <div className="flex shrink-0 justify-center py-3">
                 <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
               </div>
 
               {/* Close button + Favorite */}
-              <div className="flex shrink-0 items-center justify-end gap-2 px-4 pb-2">
+              <div className="max-w-4xl mx-auto w-full flex shrink-0 items-center justify-end gap-2 px-4 pb-2">
                 {isRegistered && (
                   <FavoriteButton
                     placeId={item.id}
@@ -118,7 +117,7 @@ export function MapPlaceDetailSheet({
               {/* Content */}
               <div
                 ref={contentRef}
-                className={cn("min-h-0 flex-1 overscroll-contain", {
+                className={cn("min-h-0 flex-1 overscroll-contain mx-auto max-w-4xl w-full", {
                   "overflow-y-auto": isFullSnap,
                   "overflow-hidden": !isFullSnap,
                 })}
@@ -133,7 +132,6 @@ export function MapPlaceDetailSheet({
                 />
               )}
             </div>
-          </div>
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>
