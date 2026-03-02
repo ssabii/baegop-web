@@ -106,24 +106,26 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent>
-                  <DrawerTitle className="sr-only">리뷰 관리</DrawerTitle>
-                  <div className="mx-auto flex w-full max-w-4xl flex-col py-2">
-                    <button
-                      type="button"
-                      className="flex items-center gap-3 px-4 py-4 text-base font-bold cursor-pointer"
-                      onClick={handleEdit}
-                    >
-                      <Pencil className="size-4" />
-                      수정
-                    </button>
-                    <button
-                      type="button"
-                      className="flex items-center gap-3 px-4 py-4 text-base font-bold text-destructive cursor-pointer"
-                      onClick={handleDelete}
-                    >
-                      <Trash2 className="size-4" />
-                      삭제
-                    </button>
+                  <div className="max-w-4xl mx-auto w-full p-4">
+                    <DrawerTitle className="sr-only">리뷰 관리</DrawerTitle>
+                    <div className="flex flex-col py-2">
+                      <button
+                        type="button"
+                        className="flex items-center gap-3 py-4 text-base font-bold cursor-pointer"
+                        onClick={handleEdit}
+                      >
+                        <Pencil className="size-4" />
+                        수정
+                      </button>
+                      <button
+                        type="button"
+                        className="flex items-center gap-3 py-4 text-base font-bold text-destructive cursor-pointer"
+                        onClick={handleDelete}
+                      >
+                        <Trash2 className="size-4" />
+                        삭제
+                      </button>
+                    </div>
                   </div>
                 </DrawerContent>
               </Drawer>
