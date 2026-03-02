@@ -233,7 +233,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                   {content}
                 </div>
               ) : (
-                <div className="w-full text-left text-muted-foreground">
+                <div className="w-full whitespace-pre-wrap text-left text-muted-foreground">
                   {FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
                 </div>
               )}
