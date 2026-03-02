@@ -19,7 +19,7 @@ const NaverMap = dynamic(() => import("@/components/naver-map"), {
 function createMarkerContent(title?: string): string {
   const pin = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="var(--primary)" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));cursor:pointer;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3" fill="var(--background)"/></svg>`;
   const label = title
-    ? `<div style="font-size:11px;font-weight:700;white-space:nowrap;text-align:center;color:var(--foreground);text-shadow:0 0 3px var(--background),0 0 3px var(--background),0 0 3px var(--background);max-width:80px;overflow:hidden;text-overflow:ellipsis;">${title}</div>`
+    ? `<div style="font-size:11px;font-weight:700;white-space:nowrap;text-align:center;color:var(--foreground);text-shadow:0 0 3px var(--background),0 0 3px var(--background),0 0 3px var(--background);max-width:120px;overflow:hidden;text-overflow:ellipsis;">${title}</div>`
     : "";
   return `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">${pin}${label}</div>`;
 }
@@ -32,9 +32,12 @@ export interface MapMarker {
   category?: string | null;
 }
 
+type Padding = { top?: number; bottom?: number; left?: number; right?: number };
+
 interface MapViewProps {
   markers: MapMarker[];
-  fitBounds?: boolean;
+  fitBoundsPadding?: Padding;
+  focusPadding?: Padding;
   focusMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
   className?: string;
@@ -42,7 +45,8 @@ interface MapViewProps {
 
 export function MapView({
   markers,
-  fitBounds,
+  fitBoundsPadding,
+  focusPadding,
   focusMarkerId,
   onMarkerClick,
   className,
@@ -86,7 +90,7 @@ export function MapView({
         markerInstancesRef.current.push(marker);
       });
 
-      if (fitBounds && markers.length > 0) {
+      if (fitBoundsPadding && markers.length > 0) {
         const bounds = new naver.maps.LatLngBounds(
           new naver.maps.LatLng(
             Math.min(...markers.map((m) => m.lat)),
@@ -97,15 +101,10 @@ export function MapView({
             Math.max(...markers.map((m) => m.lng)),
           ),
         );
-        map.fitBounds(bounds, {
-          top: 80,
-          bottom: Math.round(window.innerHeight * 0.5),
-          left: 40,
-          right: 40,
-        });
+        map.fitBounds(bounds, fitBoundsPadding);
       }
     },
-    [markers, fitBounds, onMarkerClick, clearMarkers],
+    [markers, fitBoundsPadding, onMarkerClick, clearMarkers],
   );
 
   // Stable handleReady — only depends on clearMarkers (stable)
@@ -129,7 +128,7 @@ export function MapView({
     renderMarkers(map);
   }, [renderMarkers, mapReady]);
 
-  // Focus marker: teleport + idle-based zoom for far distances
+  // Focus marker: fitBounds with padding, or morph fallback
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !focusMarkerId) return;
@@ -141,9 +140,50 @@ export function MapView({
     if (!markerInstance) return;
 
     const target = markerInstance.getPosition();
+
+    if (focusPadding) {
+      const topPad = focusPadding.top ?? 0;
+      const bottomPad = focusPadding.bottom ?? 0;
+      const offsetY = (bottomPad - topPad) / 2;
+
+      function calcAdjustedCenter(m: naver.maps.Map) {
+        const proj = m.getProjection();
+        const targetPoint = proj.fromCoordToOffset(target);
+        return proj.fromOffsetToCoord(
+          new naver.maps.Point(targetPoint.x, targetPoint.y + offsetY),
+        );
+      }
+
+      const center = map.getCenter();
+      const dx =
+        (center as naver.maps.LatLng).lng() -
+        (target as naver.maps.LatLng).lng();
+      const dy =
+        (center as naver.maps.LatLng).lat() -
+        (target as naver.maps.LatLng).lat();
+      const isFar = Math.sqrt(dx * dx + dy * dy) > 0.01; // ~1km
+
+      if (isFar) {
+        const latLng = target as naver.maps.LatLng;
+        const bounds = new naver.maps.LatLngBounds(latLng, latLng);
+        map.fitBounds(bounds, focusPadding);
+        console.log(map.getZoom());
+        if (map.getZoom() > 15) map.setZoom(15);
+        return;
+      }
+
+      map.morph(calcAdjustedCenter(map), map.getZoom(), {
+        easing: "easeOutCubic",
+      });
+      return;
+    }
+
+    // focusPadding 없으면 기존 morph 로직
     const center = map.getCenter();
-    const dx = (center as naver.maps.LatLng).lng() - (target as naver.maps.LatLng).lng();
-    const dy = (center as naver.maps.LatLng).lat() - (target as naver.maps.LatLng).lat();
+    const dx =
+      (center as naver.maps.LatLng).lng() - (target as naver.maps.LatLng).lng();
+    const dy =
+      (center as naver.maps.LatLng).lat() - (target as naver.maps.LatLng).lat();
     const isFar = Math.sqrt(dx * dx + dy * dy) > 0.01; // ~1km
 
     map.stop();
@@ -165,7 +205,7 @@ export function MapView({
     return () => {
       if (idleListener) naver.maps.Event.removeListener(idleListener);
     };
-  }, [focusMarkerId, mapReady]);
+  }, [focusMarkerId, focusPadding, mapReady]);
 
   function handleLocate() {
     const map = mapRef.current;

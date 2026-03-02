@@ -46,6 +46,19 @@ export function MapContainer() {
   }, [placeParam, results]);
 
   const focusMarkerId = selectedItem?.id ?? null;
+
+  const sheetPadding = useMemo(
+    () => ({
+      top: 80,
+      bottom:
+        typeof window !== "undefined"
+          ? Math.round(window.innerHeight * 0.5)
+          : 0,
+      left: 40,
+      right: 40,
+    }),
+    [],
+  );
   const sheetOpen = !!query;
 
   // Refs for URL sync without stale closures
@@ -148,7 +161,10 @@ export function MapContainer() {
     <>
       <MapView
         markers={showSheet && hasResults ? activeMarkers : []}
-        fitBounds={showSheet && hasResults && !selectedItem}
+        fitBoundsPadding={
+          showSheet && hasResults && !selectedItem ? sheetPadding : undefined
+        }
+        focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
         className="fixed inset-x-0 top-0 bottom-15"
