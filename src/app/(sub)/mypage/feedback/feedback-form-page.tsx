@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   FEEDBACK_CATEGORIES,
   FEEDBACK_CATEGORY_LABELS,
+  FEEDBACK_CATEGORY_PLACEHOLDERS,
   MAX_FEEDBACK_CONTENT_LENGTH,
   MAX_FEEDBACK_IMAGES,
   MIN_FEEDBACK_CONTENT_LENGTH,
@@ -233,7 +234,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                 </div>
               ) : (
                 <div className="w-full text-left text-muted-foreground">
-                  기능 제안, 개선, 버그 제보 등 자유롭게 피드백을 작성해주세요
+                  {FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
                 </div>
               )}
             </button>
@@ -252,7 +253,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                 <Textarea
                   autoFocus
                   className="field-sizing-fixed resize-none"
-                  placeholder="기능 제안, 개선, 버그 제보 등 자유롭게 피드백을 작성해주세요"
+                  placeholder={FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
                   value={drawerContent}
                   onChange={(e) =>
                     setDrawerContent(

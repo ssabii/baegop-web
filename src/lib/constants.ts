@@ -111,11 +111,23 @@ export const CATEGORY_KEYWORDS: Record<CategoryFilter, string[]> = {
 };
 
 // 피드백
-export const FEEDBACK_CATEGORIES: FeedbackCategory[] = ["bug", "feature", "other"];
+export const FEEDBACK_CATEGORIES: FeedbackCategory[] = [
+  "bug",
+  "feature",
+  "improvement",
+  "other",
+];
 export const FEEDBACK_CATEGORY_LABELS: Record<FeedbackCategory, string> = {
   bug: "버그 제보",
   feature: "기능 제안",
+  improvement: "개선 요청",
   other: "기타",
+};
+export const FEEDBACK_CATEGORY_PLACEHOLDERS: Record<FeedbackCategory, string> = {
+  bug: "어떤 화면에서, 어떤 동작을 했을 때 문제가 생겼는지 알려주세요 (예: 랜덤 추천 버튼을 눌렀는데 아무것도 안 떠요)",
+  feature: "배곱에 이런 기능이 있으면 좋겠다! 편하게 적어주세요",
+  improvement: "사용하면서 불편하거나 아쉬웠던 부분을 알려주세요",
+  other: "자유롭게 의견을 남겨주세요",
 };
 export const MAX_FEEDBACK_CONTENT_LENGTH = 3000;
 export const MIN_FEEDBACK_CONTENT_LENGTH = 10;
