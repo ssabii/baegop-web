@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MenuSection } from "./menu-section";
 import { ReviewSection } from "./review-section";
-import type { MenusResponse } from "./use-menus";
+import { useMenus, type MenusResponse } from "./use-menus";
 import type { ReviewsResponse } from "./use-reviews";
 
 interface PlaceTabsProps {
@@ -33,8 +33,10 @@ export function PlaceTabs({
   onTabChange,
 }: PlaceTabsProps) {
   const [internalTab, setInternalTab] = useState("menu");
+  const { menus } = useMenus(naverPlaceId, initialMenus);
 
   const activeTab = controlledTab ?? internalTab;
+  const resolvedMenuCount = (menuCount ?? menus.length) || undefined;
 
   function handleTabChange(value: string) {
     if (onTabChange) {
@@ -45,14 +47,10 @@ export function PlaceTabs({
   }
 
   return (
-    <Tabs
-      value={activeTab}
-      onValueChange={handleTabChange}
-      className="gap-4"
-    >
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-4">
       <TabsList className="w-full">
         <TabsTrigger value="menu" className="flex-1 cursor-pointer">
-          메뉴{menuCount ? ` (${menuCount})` : ""}
+          메뉴{resolvedMenuCount ? ` (${resolvedMenuCount})` : ""}
         </TabsTrigger>
         <TabsTrigger value="review" className="flex-1 cursor-pointer">
           리뷰{reviewCount ? ` (${reviewCount})` : ""}

@@ -34,22 +34,22 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
   const isRegistered = !!data?.place;
 
   return (
-    <div className="space-y-3 px-4 pb-8">
+    <div className="px-4 pb-8 space-y-4">
       <div className="space-y-1">
         {/* 제목 + 링크 */}
         <Link
           href={`/places/${item.id}`}
           className="inline-flex max-w-full items-start gap-1 group pr-12"
         >
-          <h3 className="min-w-0 shrink text-base font-bold leading-snug group-hover:underline">
+          <h3 className="min-w-0 shrink text-xl font-bold leading-snug group-hover:underline">
             {item.name}
           </h3>
-          <ExternalLink className="size-4 shrink-0 text-foreground mt-0.5" />
+          <ExternalLink className="size-4 shrink-0 text-foreground mt-1.5" />
         </Link>
 
         {/* 카테고리 */}
         {category && (
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
             <Tag className="size-3 shrink-0" />
             <span>{category}</span>
           </div>
@@ -57,7 +57,7 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
 
         {/* 전화번호 */}
         {item.phone && (
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
             <Phone className="size-3 shrink-0" />
             <a href={`tel:${item.phone}`} className="hover:underline">
               {item.phone}
@@ -66,7 +66,7 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
         )}
 
         {/* 주소 (풀 주소) */}
-        <div className="flex items-start gap-1 text-sm text-muted-foreground">
+        <div className="flex items-start gap-1 text-sm font-medium text-muted-foreground">
           <MapPin className="mt-0.5 size-3 shrink-0" />
           <span>{item.roadAddress || item.address}</span>
         </div>
@@ -78,11 +78,11 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
           <>
             {isRegistered && data.avgRating !== null && (
               <div className="flex items-center gap-1">
-                <Star className="size-3.5 fill-yellow-500 text-yellow-500" />
+                <Star className="size-4 fill-yellow-500 text-yellow-500" />
                 <span className="text-sm font-medium text-yellow-500">
                   {data.avgRating.toFixed(1)}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-sm text-muted-foreground">
                   ({data.reviewCount})
                 </span>
               </div>
@@ -97,22 +97,23 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
           </>
         )}
       </div>
-
       {/* 썸네일 */}
-      {item.imageUrl && !imgError ? (
-        <img
-          src={optimizeNaverImageUrl(
-            item.imageUrl.replace(/^http:\/\//, "https://"),
-          )}
-          alt=""
-          className="h-48 w-full rounded-lg object-cover"
-          onError={() => setImgError(true)}
-        />
-      ) : (
-        <div className="flex h-48 w-full items-center justify-center rounded-lg bg-muted">
-          <Building2 className="size-8 text-muted-foreground" />
-        </div>
-      )}
+      <Link href={`/places/${item.id}`} className="block">
+        {item.imageUrl && !imgError ? (
+          <img
+            src={optimizeNaverImageUrl(
+              item.imageUrl.replace(/^http:\/\//, "https://"),
+            )}
+            alt=""
+            className="h-48 w-full rounded-lg object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="flex h-48 w-full items-center justify-center rounded-lg bg-muted">
+            <Building2 className="size-8 text-muted-foreground" />
+          </div>
+        )}
+      </Link>
 
       {/* 코나카드 투표 */}
       {isRegistered && data?.place && (
@@ -131,6 +132,7 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
         placeId={data?.place?.id ?? null}
         naverPlaceId={item.id}
         currentUserId={null}
+        reviewCount={data?.reviewCount}
       />
 
       <LoginAlertDialog

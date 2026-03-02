@@ -39,11 +39,7 @@ export function MapViewButton({ scrollRef, onClick }: MapViewButtonProps) {
         },
       )}
     >
-      <Button
-        size="xl"
-        className="rounded-full shadow-lg"
-        onClick={onClick}
-      >
+      <Button className="rounded-full shadow-lg" onClick={onClick}>
         <MapPin className="size-4" />
         지도보기
       </Button>

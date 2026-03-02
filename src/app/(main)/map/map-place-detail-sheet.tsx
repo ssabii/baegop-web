@@ -13,6 +13,7 @@ import { MapPlaceDetail } from "./map-place-detail";
 import type { NaverSearchResult } from "@/types";
 
 const COMPACT_SNAP = "200px";
+const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 
 type SnapPoint = number | string;
@@ -34,11 +35,12 @@ export function MapPlaceDetailSheet({
   const isRegistered = !!placeData?.place;
 
   const [activeSnap, setActiveSnap] = useState<SnapPoint>(
-    expandParam ? FULL_SNAP : COMPACT_SNAP,
+    expandParam ? FULL_SNAP : HALF_SNAP,
   );
   const prevIsFullRef = useRef(activeSnap === FULL_SNAP);
 
   const isFullSnap = activeSnap === FULL_SNAP;
+  const isScrollable = activeSnap === HALF_SNAP || activeSnap === FULL_SNAP;
   const contentRef = useRef<HTMLDivElement>(null);
 
   // compact snap으로 돌아올 때 스크롤 위치 리셋
@@ -69,7 +71,7 @@ export function MapPlaceDetailSheet({
   return (
     <Drawer.Root
       open
-      snapPoints={[COMPACT_SNAP, FULL_SNAP]}
+      snapPoints={[COMPACT_SNAP, HALF_SNAP, FULL_SNAP]}
       activeSnapPoint={activeSnap}
       setActiveSnapPoint={handleSnapChange}
       modal={false}
@@ -125,7 +127,7 @@ export function MapPlaceDetailSheet({
                 <MapPlaceDetail item={item} />
               </div>
 
-              {isFullSnap && (
+              {isScrollable && (
                 <MapViewButton
                   scrollRef={contentRef}
                   onClick={() => setActiveSnap(COMPACT_SNAP)}

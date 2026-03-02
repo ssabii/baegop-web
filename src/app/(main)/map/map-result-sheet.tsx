@@ -24,7 +24,7 @@ export function MapResultSheet({ children, onClose }: MapResultSheetProps) {
   const expandParam = searchParams.get("expand");
 
   const [activeSnap, setActiveSnap] = useState<SnapPoint>(
-    expandParam ? FULL_SNAP : COMPACT_SNAP,
+    expandParam ? FULL_SNAP : HALF_SNAP,
   );
   const prevIsFullRef = useRef(activeSnap === FULL_SNAP);
 

@@ -39,18 +39,18 @@ export function PlaceItem({
     >
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className={nameClass}>{item.name}</span>
-        <span className={cn("flex items-center gap-1", metaClass)}>
-          <MapPin className="size-3 shrink-0" />
-          <span>
-            {formatShortAddress(item.roadAddress || item.address)}
-          </span>
-        </span>
         {item.category && (
           <span className={cn("flex items-center gap-1", metaClass)}>
             <Tag className="size-3 shrink-0" />
             <span>{item.category}</span>
           </span>
         )}
+        <span className={cn("flex items-center gap-1", metaClass)}>
+          <MapPin className="size-3 shrink-0" />
+          <span>
+            {formatShortAddress(item.roadAddress || item.address)}
+          </span>
+        </span>
       </div>
       {item.imageUrl && !imgError ? (
         <img
