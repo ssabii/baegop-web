@@ -102,7 +102,7 @@ export function MapPlaceDetailSheet({
               {isRegistered && (
                 <FavoriteButton
                   placeId={item.id}
-                  className="size-8 bg-secondary text-secondary-foreground"
+                  className="size-8 bg-secondary"
                 />
               )}
               <Button

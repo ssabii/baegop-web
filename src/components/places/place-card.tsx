@@ -33,11 +33,9 @@ export function PlaceCard({
     >
       <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
-          <div className="flex flex-wrap items-center gap-1">
-            <h3 className="line-clamp-2 font-bold leading-snug text-left">
-              {place.name}
-            </h3>
-          </div>
+          <h3 className="line-clamp-2 font-bold leading-snug text-left">
+            {place.name}
+          </h3>
           {place.category && (
             <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
               <Tag className="size-3 shrink-0" />
@@ -77,7 +75,7 @@ export function PlaceCard({
         )}
         <FavoriteButton
           placeId={place.id}
-          className="absolute top-1 right-1 size-8 text-white hover:bg-transparent active:bg-transparent fill-white"
+          className="absolute right-1 top-1 size-6 bg-transparent hover:bg-transparent active:bg-transparent [&_svg:not(.fill-rose-500)]:fill-muted [&_svg:not(.fill-rose-500)]:text-muted"
         />
       </div>
     </Link>
