@@ -8,14 +8,11 @@ interface ReviewData {
   updated_at: string | null;
   place_id: string;
   user_id: string | null;
+  image_urls: string[] | null;
   profiles: {
     nickname: string | null;
     avatar_url: string | null;
   } | null;
-  review_images: {
-    url: string;
-    display_order: number;
-  }[];
 }
 
 interface ReviewsResponse {

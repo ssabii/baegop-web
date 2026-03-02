@@ -39,7 +39,7 @@ type ReviewFormPageProps = {
         id: number;
         rating: number;
         content: string | null;
-        review_images: { url: string; display_order: number }[];
+        image_urls: string[];
       };
     }
 );
@@ -49,12 +49,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   const isEdit = props.mode === "edit";
   const review = isEdit ? props.review : null;
 
-  const existingUrls = review
-    ? review.review_images
-        .slice()
-        .sort((a, b) => a.display_order - b.display_order)
-        .map((img) => img.url)
-    : [];
+  const existingUrls = review ? review.image_urls : [];
 
   const router = useRouter();
   const confirm = useConfirmDialog();

@@ -3,25 +3,21 @@
 import { useState } from "react";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
-import type { ReviewImageItem } from "@/types";
 
 interface ReviewImagesProps {
-  images: ReviewImageItem[];
+  images: string[];
 }
 
 export function ReviewImages({ images }: ReviewImagesProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
-  const sorted = images
-    .slice()
-    .sort((a, b) => a.display_order - b.display_order);
-  const urls = sorted.map((img) => optimizeSupabaseImageUrl(img.url));
+  const urls = images.map((url) => optimizeSupabaseImageUrl(url));
 
   return (
     <>
       <div className="flex gap-2 overflow-x-auto scrollbar-none md:grid md:grid-cols-5">
-        {sorted.map((img, i) => (
+        {images.map((url, i) => (
           <button
             key={i}
             type="button"
@@ -32,7 +28,7 @@ export function ReviewImages({ images }: ReviewImagesProps) {
             }}
           >
             <img
-              src={optimizeSupabaseImageUrl(img.url)}
+              src={optimizeSupabaseImageUrl(url)}
               alt={`리뷰 이미지 ${i + 1}`}
               className="aspect-square w-full object-cover"
             />

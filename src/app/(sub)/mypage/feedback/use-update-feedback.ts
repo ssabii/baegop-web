@@ -23,7 +23,7 @@ export function useUpdateFeedback(feedbackId: number) {
     }) => {
       const newImageUrls =
         files.length > 0
-          ? await uploadFeedbackImages(files)
+          ? await uploadFeedbackImages(feedbackId, files)
           : undefined;
 
       await updateFeedback(feedbackId, { category, content }, keptImageUrls, newImageUrls);

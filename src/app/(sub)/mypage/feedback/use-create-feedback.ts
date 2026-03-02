@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { FeedbackCategory } from "@/types";
-import { createFeedback } from "./actions";
+import { createFeedback, updateFeedbackImageUrls } from "./actions";
 import { uploadFeedbackImages } from "./upload-feedback-images";
 
 export function useCreateFeedback() {
@@ -19,12 +19,12 @@ export function useCreateFeedback() {
       content: string;
       files: File[];
     }) => {
-      const imageUrls =
-        files.length > 0
-          ? await uploadFeedbackImages(files)
-          : undefined;
+      const { id: feedbackId } = await createFeedback({ category, content });
 
-      await createFeedback({ category, content }, imageUrls);
+      if (files.length > 0) {
+        const imageUrls = await uploadFeedbackImages(feedbackId, files);
+        await updateFeedbackImageUrls(feedbackId, imageUrls);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["mypage", "feedbacks"] });

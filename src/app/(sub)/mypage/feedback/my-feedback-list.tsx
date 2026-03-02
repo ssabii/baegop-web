@@ -83,9 +83,11 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
         {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
       </div>
       <BottomActionBar>
-        <Button size="xl" className="mx-auto w-full max-w-4xl" asChild>
-          <Link href="/mypage/feedback/new">피드백 작성</Link>
-        </Button>
+        <div className="mx-auto flex max-w-4xl">
+          <Button size="xl" className="w-full" asChild>
+            <Link href="/mypage/feedback/new">피드백 작성</Link>
+          </Button>
+        </div>
       </BottomActionBar>
     </>
   );

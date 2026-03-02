@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 
 export async function uploadFeedbackImages(
+  feedbackId: number,
   files: File[],
 ): Promise<string[]> {
   const supabase = createClient();
@@ -12,7 +13,7 @@ export async function uploadFeedbackImages(
   const results = await Promise.all(
     files.map(async (file) => {
       const ext = file.name.split(".").pop() ?? "jpg";
-      const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+      const path = `${feedbackId}/${user.id}/${crypto.randomUUID()}.${ext}`;
 
       const { error } = await supabase.storage
         .from("feedback-images")

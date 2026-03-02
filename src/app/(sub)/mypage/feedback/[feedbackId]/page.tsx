@@ -24,7 +24,7 @@ export default async function FeedbackEditPage({
 
   const { data: feedback } = await supabase
     .from("feedbacks")
-    .select("id, category, content, created_at, user_id, feedback_images(url, display_order)")
+    .select("id, category, content, created_at, image_urls, user_id")
     .eq("id", Number(feedbackId))
     .single();
 
@@ -35,7 +35,7 @@ export default async function FeedbackEditPage({
     category: feedback.category as FeedbackCategory,
     content: feedback.content,
     created_at: feedback.created_at,
-    feedback_images: feedback.feedback_images,
+    image_urls: feedback.image_urls,
   };
 
   return <FeedbackFormPage mode="edit" feedback={feedbackData} />;

@@ -37,12 +37,8 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
-  const sortedImages = feedback.feedback_images
-    .slice()
-    .sort((a, b) => a.display_order - b.display_order);
-  const imageUrls = sortedImages.map((img) =>
-    optimizeSupabaseImageUrl(img.url),
-  );
+  const images = feedback.image_urls ?? [];
+  const imageUrls = images.map((url) => optimizeSupabaseImageUrl(url));
 
   function handleEdit() {
     setDrawerOpen(false);
@@ -131,9 +127,9 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
       <p className="line-clamp-3 text-sm text-secondary-foreground">
         {feedback.content}
       </p>
-      {sortedImages.length > 0 && (
+      {images.length > 0 && (
         <div className="flex gap-2 overflow-x-auto scrollbar-none md:grid md:grid-cols-5">
-          {sortedImages.map((img, i) => (
+          {images.map((url, i) => (
             <button
               key={i}
               type="button"
@@ -144,7 +140,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
               }}
             >
               <img
-                src={optimizeSupabaseImageUrl(img.url, { width: 200 })}
+                src={optimizeSupabaseImageUrl(url, { width: 200 })}
                 alt={`피드백 이미지 ${i + 1}`}
                 className="aspect-square w-full object-cover"
               />
@@ -152,7 +148,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
           ))}
         </div>
       )}
-      {sortedImages.length > 0 && (
+      {images.length > 0 && (
         <ImageCarouselDialog
           images={imageUrls}
           initialIndex={previewIndex}

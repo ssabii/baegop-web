@@ -48,12 +48,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
   const isEdit = props.mode === "edit";
   const feedback = isEdit ? props.feedback : null;
 
-  const existingUrls = feedback
-    ? feedback.feedback_images
-        .slice()
-        .sort((a, b) => a.display_order - b.display_order)
-        .map((img) => img.url)
-    : [];
+  const existingUrls = feedback?.image_urls ?? [];
 
   const router = useRouter();
   const confirm = useConfirmDialog();
