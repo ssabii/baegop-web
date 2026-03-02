@@ -14,19 +14,19 @@ export default async function MyPage() {
 
   if (!user) redirect("/signin");
 
-  const [{ count: reviewCount }, { count: placeCount }] = await Promise.all([
+  const [{ count: reviewCount }, { count: favoriteCount }] = await Promise.all([
     supabase
       .from("reviews")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id),
     supabase
-      .from("places")
+      .from("favorites")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", user.id),
+      .eq("user_id", user.id),
   ]);
 
   return (
-    <main className="w-full h-dvh bg-muted">
+    <main className="w-full min-h-screen pb-17 bg-muted">
       <div className="mx-auto w-full max-w-4xl px-4 py-8">
         <nav className="flex flex-col gap-3" aria-labelledby="mypage-menu">
           {/* 메뉴 리스트 */}
@@ -54,11 +54,16 @@ export default async function MyPage() {
               title="내 장소"
               badge={
                 <span className="text-sm text-muted-foreground font-semibold">
-                  {placeCount ?? 0}
+                  {favoriteCount ?? 0}
                 </span>
               }
               inGroup
             />
+          </ItemGroup>
+          <ItemGroup className="rounded-xl bg-background">
+            <MypageMenuItem href="/mypage/feedback" title="피드백 보내기" inGroup />
+            <MypageMenuItem href="/terms" title="이용약관" inGroup />
+            <MypageMenuItem href="/privacy" title="개인정보처리방침" inGroup />
           </ItemGroup>
           <ItemGroup className="rounded-xl bg-background">
             <LogoutMenuItem />

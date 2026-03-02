@@ -2,7 +2,6 @@ import { createClient } from "@/lib/supabase/server";
 import { optimizeNaverImageUrls } from "@/lib/image";
 import { EmptyPlace } from "@/components/places";
 import { Roulette } from "./roulette";
-import { Spinner } from "@/components/ui/spinner";
 
 export default async function RandomPage() {
   const supabase = await createClient();
@@ -25,14 +24,14 @@ export default async function RandomPage() {
 
   if (!places || places.length === 0) {
     return (
-      <main className="flex h-[calc(100dvh-4rem)] items-center justify-center pt-17">
+      <main className="h-[calc(100dvh-4rem)] flex pt-17">
         <EmptyPlace />
       </main>
     );
   }
 
   return (
-    <main className="flex h-[calc(100dvh-4rem)] items-center justify-center pt-17">
+    <main className="h-[calc(100dvh-4rem)] flex pt-17">
       <Roulette places={places} />
     </main>
   );

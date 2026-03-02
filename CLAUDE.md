@@ -63,9 +63,11 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - **브랜딩**: 프라이머리 컬러 오렌지/코랄 계열. 라임 계열 사용 금지 (크몽 컬러와 구분)
 - **빈 상태 페이지**: 콘텐츠가 없는 화면(검색 전, 데이터 없음 등)은 `h-dvh` + `flex flex-col` + `flex-1`로 뷰포트 높이에 딱 맞춰 스크롤이 생기지 않게 한다.
 - **서버 액션 단일 책임**: 서버 액션(`"use server"`)은 데이터 변경만 담당한다. `revalidatePath`/`revalidateTag` 등 캐시 무효화는 서버 액션 내부에 넣지 않고 호출하는 쪽에서 결정한다. 같은 페이지 갱신은 `router.refresh()`, 다른 페이지로 이동은 `router.back()`을 사용한다. `startTransition` 내에서 서버 액션의 `revalidatePath`와 `router.back()`이 함께 실행되면 히스토리가 오염될 수 있다.
+- **컴포넌트 분리 원칙**: 컴포넌트가 길어지거나 여러 역할을 담당하면 적극적으로 분리한다. 하나의 컴포넌트는 하나의 명확한 책임만 갖는다. boolean prop이나 `hidden` 트릭으로 모드를 전환하는 대신 독립 컴포넌트로 분리하여 각각의 생명주기를 갖게 한다.
 - **UI와 로직 분리**: 커스텀 훅은 데이터 페칭/상태 관리 등 로직만 담당한다. IntersectionObserver, DOM 조작 등 UI 관심사는 훅에 포함하지 않고 사용하는 컴포넌트에서 처리한다.
 - **쿼리 훅 분리**: React Query(`useQuery`, `useInfiniteQuery` 등) 로직은 항상 `use-*.ts` 커스텀 훅으로 분리한다. 컴포넌트에 직접 작성하지 않는다.
 - **버튼 사이즈**: 모든 액션 버튼(BottomActionBar, 독립 액션 등)과 다이어로그 버튼은 `size="xl"`을 사용한다.
+- **Drawer 래퍼**: `DrawerContent` 바로 아래에 항상 `<div className="max-w-4xl mx-auto w-full p-4">` 래퍼를 둔다. 모든 내부 콘텐츠(DrawerHeader, DrawerTitle, DrawerFooter 포함)는 이 래퍼 안에 위치한다.
 - **Empty 컴포넌트 패턴**: 빈 상태 UI는 반드시 아래 형태를 따른다. 아이콘은 `variant="icon"` + `size-12 rounded-none bg-transparent`, 내부 아이콘은 `size-12 text-primary`, 타이틀은 `font-bold`. 텍스트에 마침표를 사용하지 않는다.
   ```tsx
   <Empty className="border-none">

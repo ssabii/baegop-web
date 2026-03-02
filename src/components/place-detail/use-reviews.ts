@@ -4,16 +4,15 @@ interface ReviewData {
   id: number;
   rating: number;
   content: string | null;
-  created_at: string;
-  user_id: string;
+  created_at: string | null;
+  updated_at: string | null;
+  place_id: string;
+  user_id: string | null;
+  image_urls: string[] | null;
   profiles: {
     nickname: string | null;
     avatar_url: string | null;
   } | null;
-  review_images: {
-    url: string;
-    display_order: number;
-  }[];
 }
 
 interface ReviewsResponse {
@@ -23,7 +22,12 @@ interface ReviewsResponse {
 
 const LIMIT = 10;
 
-export function useReviews(placeId: string) {
+export type { ReviewsResponse };
+
+export function useReviews(
+  placeId: string,
+  initialData?: ReviewsResponse,
+) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
       queryKey: ["reviews", placeId],
@@ -36,6 +40,12 @@ export function useReviews(placeId: string) {
       },
       initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      ...(initialData && {
+        initialData: {
+          pages: [initialData],
+          pageParams: [0],
+        },
+      }),
     });
 
   const reviews = data?.pages.flatMap((page) => page.items) ?? [];

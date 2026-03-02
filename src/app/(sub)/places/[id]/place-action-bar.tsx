@@ -31,12 +31,9 @@ export function PlaceActionBar({
   >(null);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogDescription, setLoginDialogDescription] = useState("");
-
   function handleRegister() {
     if (!isLoggedIn) {
-      setLoginDialogDescription(
-        "로그인 하시면 장소 등록을 할 수 있어요.",
-      );
+      setLoginDialogDescription("로그인 하시면 장소 등록을 할 수 있어요.");
       setLoginDialogOpen(true);
       return;
     }
@@ -48,16 +45,16 @@ export function PlaceActionBar({
         router.refresh();
         toast.success("장소가 등록되었어요.", { position: "top-center" });
       } catch {
-        toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+        toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", {
+          position: "top-center",
+        });
       }
     });
   }
 
   function handleWriteReview() {
     if (!isLoggedIn) {
-      setLoginDialogDescription(
-        "로그인 하시면 리뷰 작성을 할 수 있어요.",
-      );
+      setLoginDialogDescription("로그인 하시면 리뷰 작성을 할 수 있어요.");
       setLoginDialogOpen(true);
       return;
     }
@@ -68,7 +65,9 @@ export function PlaceActionBar({
         try {
           await registerPlace(placeDetail);
         } catch {
-          toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", { position: "top-center" });
+          toast.error("장소 등록에 실패했어요. 다시 시도해주세요.", {
+            position: "top-center",
+          });
           return;
         }
         router.push(`/places/${naverPlaceId}/review/new`);
@@ -87,28 +86,33 @@ export function PlaceActionBar({
           })}
         >
           {!isRegistered && (
-            <Button
-              variant="outline"
-              size="xl"
-              onClick={handleRegister}
-              disabled={isPending}
-            >
-              {isPending && pendingAction === "register" && (
-                <Spinner data-icon="inline-start" />
-              )}
-              장소 등록
-            </Button>
+            <div>
+              <Button
+                variant="outline"
+                size="xl"
+                className="w-full transition-none has-[>svg]:px-8"
+                onClick={handleRegister}
+                disabled={isPending}
+              >
+                {isPending && pendingAction === "register" && <Spinner />}
+                장소 등록
+              </Button>
+            </div>
           )}
           <Button
             onClick={handleWriteReview}
             disabled={isPending}
             size="xl"
+            className="transition-none has-[>svg]:px-8"
           >
-            {isPending && pendingAction === "review" && (
-              <Spinner data-icon="inline-start" />
-            )}
+            {isPending && pendingAction === "review" && <Spinner />}
             리뷰 작성
           </Button>
+          {!isRegistered && (
+            <p className="col-span-2 text-xs text-muted-foreground text-center">
+              리뷰를 작성하면 장소가 등록돼요!
+            </p>
+          )}
         </div>
       </BottomActionBar>
 

@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { ChevronRight, Star } from "lucide-react";
 import { formatRelativeDate } from "@/lib/date";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
+import { cn } from "@/lib/utils";
 
 interface ReviewCardProps {
   review: {
@@ -16,24 +18,21 @@ interface ReviewCardProps {
       id: string;
       name: string;
     } | null;
-    review_images?: {
-      url: string;
-      display_order: number;
-    }[];
+    image_urls?: string[] | null;
   };
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  className?: string;
 }
 
-export function ReviewCard({ review }: ReviewCardProps) {
+export function ReviewCard({ review, onClick, className }: ReviewCardProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
-  const sortedImages = (review.review_images ?? [])
-    .slice()
-    .sort((a, b) => a.display_order - b.display_order);
-  const imageUrls = sortedImages.map((img) => img.url);
+  const images = review.image_urls ?? [];
+  const imageUrls = images.map((url) => optimizeSupabaseImageUrl(url));
 
   const content = (
-    <div className="space-y-2 py-3">
+    <div className={"space-y-2"}>
       <div className="space-y-1">
         <div className="flex items-center gap-1">
           <span className="truncate text-sm font-semibold">
@@ -68,9 +67,9 @@ export function ReviewCard({ review }: ReviewCardProps) {
           </p>
         )}
       </div>
-      {sortedImages.length > 0 && (
+      {images.length > 0 && (
         <div className="flex gap-2 overflow-x-auto scrollbar-none md:grid md:grid-cols-5">
-          {sortedImages.map((img, i) => (
+          {images.map((url, i) => (
             <button
               key={i}
               type="button"
@@ -83,7 +82,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
               }}
             >
               <img
-                src={img.url}
+                src={optimizeSupabaseImageUrl(url)}
                 alt={`리뷰 이미지 ${i + 1}`}
                 className="aspect-square w-full object-cover"
               />
@@ -95,18 +94,19 @@ export function ReviewCard({ review }: ReviewCardProps) {
   );
 
   return (
-    <>
+    <div className={cn("transition-colors hover:bg-accent", className)}>
       {review.place ? (
         <Link
-          href={`/places/${review.place.id}`}
-          className="block rounded-xl p-3 -m-3 transition-colors hover:bg-accent"
+          href={`/places/${review.place.id}?tab=review`}
+          className="block"
+          onClick={(e) => onClick?.(e)}
         >
           {content}
         </Link>
       ) : (
         content
       )}
-      {sortedImages.length > 0 && (
+      {images.length > 0 && (
         <ImageCarouselDialog
           images={imageUrls}
           initialIndex={previewIndex}
@@ -115,6 +115,6 @@ export function ReviewCard({ review }: ReviewCardProps) {
           onOpenChange={setPreviewOpen}
         />
       )}
-    </>
+    </div>
   );
 }

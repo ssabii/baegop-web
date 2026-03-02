@@ -1,49 +1,68 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Building2, ImagePlus, Star, Tag, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { BottomActionBar } from "@/components/bottom-action-bar";
+import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { ImageCarouselDialog } from "@/components/image-preview-dialog";
+import { SubHeader } from "@/components/sub-header";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
-  DrawerFooter,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { ImageCarouselDialog } from "@/components/image-preview-dialog";
-import { useQueryClient } from "@tanstack/react-query";
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
-import { SubHeader } from "@/components/sub-header";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import { compressImage, optimizeSupabaseImageUrl } from "@/lib/image";
+import { Building2, ImagePlus, Loader2, Star, Tag, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { createReview } from "../actions";
+import { useCreateReview } from "./use-create-review";
+import { useUpdateReview } from "./use-update-review";
 
 const MAX_IMAGES = 5;
 const MAX_CONTENT_LENGTH = 300;
 
-interface ReviewFormPageProps {
-  placeId: string;
+type ReviewFormPageProps = {
+  naverPlaceId: string;
   place: {
     name: string;
     category: string | null;
     imageUrl: string | null;
   };
-}
+} & (
+  | { mode: "create" }
+  | {
+      mode: "edit";
+      review: {
+        id: number;
+        rating: number;
+        content: string | null;
+        image_urls: string[];
+      };
+    }
+);
 
-export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
+export function ReviewFormPage(props: ReviewFormPageProps) {
+  const { naverPlaceId, place } = props;
+  const isEdit = props.mode === "edit";
+  const review = isEdit ? props.review : null;
+
+  const existingUrls = review ? review.image_urls : [];
+
   const router = useRouter();
-  const queryClient = useQueryClient();
   const confirm = useConfirmDialog();
-  const [rating, setRating] = useState(0);
+
+  const [rating, setRating] = useState(review?.rating ?? 0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(review?.content ?? "");
+  const [keptImageUrls, setKeptImageUrls] = useState<string[]>(existingUrls);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [isPending, setIsPending] = useState(false);
+  const [compressingCount, setCompressingCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewsRef = useRef(previews);
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
   const [drawerContent, setDrawerContent] = useState("");
@@ -51,9 +70,31 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
-  const isDirty = rating > 0 || content.length > 0 || selectedFiles.length > 0;
+  const createReview = useCreateReview(naverPlaceId);
+  const updateReview = useUpdateReview(naverPlaceId, review?.id ?? -1);
+  const { mutate, isPending } = isEdit ? updateReview : createReview;
 
-  function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
+  const totalImageCount = keptImageUrls.length + selectedFiles.length;
+  const allImages = [...keptImageUrls, ...previews];
+
+  const isDirty = isEdit
+    ? rating !== review!.rating ||
+      content !== (review!.content ?? "") ||
+      keptImageUrls.length !== existingUrls.length ||
+      selectedFiles.length > 0
+    : rating > 0 || content.length > 0 || selectedFiles.length > 0;
+
+  useEffect(() => {
+    previewsRef.current = previews;
+  }, [previews]);
+
+  useEffect(() => {
+    return () => {
+      previewsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
+
+  async function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
 
@@ -64,7 +105,7 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
       toast.warning("10MB를 초과하는 이미지는 제외되었습니다.");
     }
 
-    const remaining = MAX_IMAGES - selectedFiles.length;
+    const remaining = MAX_IMAGES - totalImageCount;
     const allowed = valid.slice(0, remaining);
 
     if (allowed.length < valid.length) {
@@ -72,52 +113,60 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
     }
 
     if (allowed.length > 0) {
-      setSelectedFiles((prev) => [...prev, ...allowed]);
+      setCompressingCount(allowed.length);
+      const compressed = await Promise.all(
+        allowed.map(async (file) => {
+          const result = await compressImage(file);
+          setCompressingCount((prev) => prev - 1);
+          return result;
+        }),
+      );
+      setSelectedFiles((prev) => [...prev, ...compressed]);
       setPreviews((prev) => [
         ...prev,
-        ...allowed.map((f) => URL.createObjectURL(f)),
+        ...compressed.map((f) => URL.createObjectURL(f)),
       ]);
     }
 
     e.target.value = "";
   }
 
-  function removeFile(index: number) {
+  function removeExistingImage(url: string) {
+    setKeptImageUrls((prev) => prev.filter((u) => u !== url));
+  }
+
+  function removeNewFile(index: number) {
     URL.revokeObjectURL(previews[index]);
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   }
 
-  async function handleSubmit() {
+  function handleSubmit() {
     if (rating === 0) return;
 
-    setIsPending(true);
-    try {
-      let formData: FormData | undefined;
-      if (selectedFiles.length > 0) {
-        formData = new FormData();
-        selectedFiles.forEach((file) => formData!.append("images", file));
-      }
-
-      await createReview(placeId, { rating, content }, formData);
-      queryClient.invalidateQueries({ queryKey: ["reviews"] });
-      toast.success("리뷰가 등록되었어요.", { position: "top-center" });
-      sessionStorage.setItem("scrollToReview", "true");
-      router.back();
-      router.refresh();
-    } catch {
-      toast.error("리뷰 등록에 실패했어요. 다시 시도해주세요.", {
-        position: "top-center",
+    if (isEdit) {
+      (mutate as typeof updateReview.mutate)({
+        rating,
+        content,
+        keptImageUrls,
+        files: selectedFiles,
       });
-      setIsPending(false);
+    } else {
+      (mutate as typeof createReview.mutate)({
+        rating,
+        content,
+        files: selectedFiles,
+      });
     }
   }
 
   async function handleBack() {
     if (isDirty) {
       const ok = await confirm({
-        title: "리뷰 작성 취소",
-        description: "작성 중인 내용이 사라집니다.\n닫으시겠습니까?",
+        title: isEdit ? "리뷰 수정 취소" : "리뷰 작성 취소",
+        description: isEdit
+          ? "수정 중인 내용이 사라집니다.\n닫으시겠습니까?"
+          : "작성 중인 내용이 사라집니다.\n닫으시겠습니까?",
         confirmLabel: "닫기",
       });
       if (!ok) return;
@@ -127,7 +176,10 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
 
   return (
     <>
-      <SubHeader title="리뷰 작성" onBack={handleBack} />
+      <SubHeader
+        title={isEdit ? "리뷰 수정" : "리뷰 작성"}
+        onBack={handleBack}
+      />
 
       <main className="max-w-4xl mx-auto w-full px-4 pt-4 pb-32">
         <div className="space-y-6">
@@ -163,10 +215,11 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
                 <button
                   key={star}
                   type="button"
+                  disabled={isPending || compressingCount > 0}
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
-                  className="transition-colors"
+                  className="transition-colors disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Star
                     className={`size-7 ${
@@ -185,11 +238,12 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
             <Label className="text-base font-bold">어떤 점이 좋았나요?</Label>
             <button
               type="button"
+              disabled={isPending || compressingCount > 0}
               onClick={() => {
                 setDrawerContent(content);
                 setContentDrawerOpen(true);
               }}
-              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
             >
               {content ? (
                 <div className="w-full min-w-0 line-clamp-4 whitespace-pre-wrap text-left">
@@ -211,8 +265,8 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
             onOpenChange={setContentDrawerOpen}
           >
             <DrawerContent>
-              <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
               <div className="max-w-4xl mx-auto w-full p-4">
+                <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
                 <Textarea
                   autoFocus
                   className="field-sizing-fixed resize-none"
@@ -233,74 +287,111 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
                 <p className="mt-2 text-right text-sm text-muted-foreground">
                   {drawerContent.length}/{MAX_CONTENT_LENGTH}
                 </p>
+                <Button
+                  className="w-full mt-4"
+                  size="xl"
+                  onClick={() => {
+                    setContent(drawerContent);
+                    setContentDrawerOpen(false);
+                  }}
+                >
+                  확인
+                </Button>
               </div>
-              <DrawerFooter>
-                <div className="max-w-4xl mx-auto w-full">
-                  <Button
-                    className="w-full"
-                    size="xl"
-                    onClick={() => {
-                      setContent(drawerContent);
-                      setContentDrawerOpen(false);
-                    }}
-                  >
-                    확인
-                  </Button>
-                </div>
-              </DrawerFooter>
             </DrawerContent>
           </Drawer>
 
-          {/* 이미지 업로드 */}
+          {/* 이미지 */}
           <div>
             <div className="flex items-baseline gap-1.5">
               <Label className="text-base font-bold">사진</Label>
               <span className="text-sm text-muted-foreground">
-                {selectedFiles.length}/{MAX_IMAGES}
+                {totalImageCount}/{MAX_IMAGES}
               </span>
             </div>
-            {selectedFiles.length === 0 ? (
+            {totalImageCount === 0 ? (
               <button
                 type="button"
+                disabled={isPending || compressingCount > 0}
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
               >
-                <ImagePlus className="size-5" />
+                {compressingCount > 0 ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <ImagePlus className="size-5" />
+                )}
               </button>
             ) : (
               <div className="mt-2 grid grid-cols-5 gap-2">
-                {previews.map((src, i) => (
-                  <div key={src} className="relative">
+                {keptImageUrls.map((url, i) => (
+                  <div key={url} className="relative">
                     <button
                       type="button"
-                      className="w-full cursor-pointer overflow-hidden rounded-lg"
+                      disabled={isPending || compressingCount > 0}
+                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
                       onClick={() => {
                         setPreviewIndex(i);
                         setPreviewOpen(true);
                       }}
                     >
                       <img
+                        src={optimizeSupabaseImageUrl(url, { width: 200 })}
+                        decoding="async"
+                        alt="기존 이미지"
+                        className="aspect-square w-full object-cover"
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isPending || compressingCount > 0}
+                      onClick={() => removeExistingImage(url)}
+                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+                {previews.map((src, i) => (
+                  <div key={src} className="relative">
+                    <button
+                      type="button"
+                      disabled={isPending || compressingCount > 0}
+                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
+                      onClick={() => {
+                        setPreviewIndex(keptImageUrls.length + i);
+                        setPreviewOpen(true);
+                      }}
+                    >
+                      <img
                         src={src}
+                        decoding="async"
                         alt={`미리보기 ${i + 1}`}
                         className="aspect-square w-full object-cover"
                       />
                     </button>
                     <button
                       type="button"
-                      onClick={() => removeFile(i)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm"
+                      disabled={isPending || compressingCount > 0}
+                      onClick={() => removeNewFile(i)}
+                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
                   </div>
                 ))}
-                {selectedFiles.length < MAX_IMAGES && (
+                {totalImageCount + compressingCount < MAX_IMAGES && (
                   <button
                     type="button"
+                    disabled={isPending || compressingCount > 0}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
                   >
-                    <ImagePlus className="size-5" />
+                    {compressingCount > 0 ? (
+                      <Loader2 className="size-5 animate-spin" />
+                    ) : (
+                      <ImagePlus className="size-5" />
+                    )}
                   </button>
                 )}
               </div>
@@ -308,7 +399,7 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
             <input
               ref={fileInputRef}
               type="file"
-              multiple
+              multiple={MAX_IMAGES - totalImageCount > 1}
               accept="image/*"
               className="hidden"
               onChange={handleFilesChange}
@@ -324,25 +415,25 @@ export function ReviewFormPage({ placeId, place }: ReviewFormPageProps) {
             size="xl"
             className="flex-1"
             onClick={handleBack}
-            disabled={isPending}
+            disabled={isPending || compressingCount > 0}
           >
             취소
           </Button>
           <Button
             size="xl"
-            className="flex-1"
+            className="flex-1 transition-none has-[>svg]:px-8"
             onClick={handleSubmit}
-            disabled={rating === 0 || isPending}
+            disabled={rating === 0 || isPending || compressingCount > 0}
           >
-            {isPending && <Spinner data-icon="inline-start" />}
-            작성
+            {isPending && <Spinner />}
+            {isEdit ? "수정" : "작성"}
           </Button>
         </div>
       </BottomActionBar>
 
-      {previews.length > 0 && (
+      {allImages.length > 0 && (
         <ImageCarouselDialog
-          images={previews}
+          images={allImages}
           initialIndex={previewIndex}
           alt="이미지 미리보기"
           open={previewOpen}

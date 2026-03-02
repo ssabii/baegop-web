@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { optimizeNaverImageUrl, optimizeSupabaseImageUrl } from "@/lib/image";
-import { ReviewEditFormPage } from "./review-edit-form-page";
+import { ReviewFormPage } from "../review-form-page";
 
 export default async function ReviewEditPage({
   params,
@@ -21,7 +21,7 @@ export default async function ReviewEditPage({
 
   const { data: review } = await supabase
     .from("reviews")
-    .select("*, review_images(url, display_order)")
+    .select("*")
     .eq("id", Number(reviewId))
     .single();
 
@@ -38,17 +38,15 @@ export default async function ReviewEditPage({
   if (!place) notFound();
 
   return (
-    <ReviewEditFormPage
+    <ReviewFormPage
+      mode="edit"
+      naverPlaceId={naverPlaceId}
       review={{
         id: review.id,
         rating: review.rating,
         content: review.content,
-        review_images: (review.review_images ?? []).map((img) => ({
-          ...img,
-          url: optimizeSupabaseImageUrl(img.url),
-        })),
+        image_urls: (review.image_urls ?? []).map((url) => optimizeSupabaseImageUrl(url)),
       }}
-      naverPlaceId={naverPlaceId}
       place={{
         name: place.name,
         category: place.category,

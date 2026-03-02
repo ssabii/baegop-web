@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data: rawPlaces, error } = await supabase
-    .from("places")
+  const { data, error } = await supabase
+    .from("favorites")
     .select(
-      "id, name, address, category, kona_card_status, image_urls, reviews(rating)",
+      "id, created_at, places(id, name, address, category, kona_card_status, image_urls, reviews(rating))",
     )
-    .eq("created_by", user.id)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false })
     .range(cursor, cursor + limit - 1);
 
@@ -35,21 +35,27 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const items = (rawPlaces ?? []).map(({ reviews, image_urls, ...rest }) => {
-    const reviewCount = reviews.length;
-    const avgRating =
-      reviewCount > 0
-        ? reviews.reduce((s, r) => s + r.rating, 0) / reviewCount
-        : null;
-    return {
-      ...rest,
-      image_urls: image_urls ? optimizeNaverImageUrls(image_urls) : image_urls,
-      avg_rating: avgRating,
-      review_count: reviewCount,
-    };
-  });
+  const items =
+    data
+      ?.filter((row) => row.places !== null)
+      .map((row) => {
+        const { reviews, image_urls, ...rest } = row.places!;
+        const reviewCount = reviews.length;
+        const avgRating =
+          reviewCount > 0
+            ? reviews.reduce((s, r) => s + r.rating, 0) / reviewCount
+            : null;
+        return {
+          ...rest,
+          image_urls: image_urls
+            ? optimizeNaverImageUrls(image_urls)
+            : image_urls,
+          avg_rating: avgRating,
+          review_count: reviewCount,
+        };
+      }) ?? [];
 
-  const nextCursor = items.length === limit ? cursor + limit : null;
+  const nextCursor = (data?.length ?? 0) === limit ? cursor + limit : null;
 
   return NextResponse.json({ items, nextCursor });
 }

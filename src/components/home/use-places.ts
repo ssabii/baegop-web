@@ -31,6 +31,7 @@ export function usePlaces(tab: string) {
       },
       initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      staleTime: 5 * 60 * 1000,
     });
 
   const places = data?.pages.flatMap((page) => page.items) ?? [];
