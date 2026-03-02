@@ -1,13 +1,16 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Empty,
+  EmptyContent,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
-import { MessageSquareText } from "lucide-react";
+import Link from "next/link";
+import { Send } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { useMyFeedbacks } from "./use-my-feedbacks";
 import { FeedbackCard } from "./feedback-card";
@@ -50,12 +53,17 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
               variant="icon"
               className="size-12 rounded-none bg-transparent"
             >
-              <MessageSquareText className="size-12 text-primary" />
+              <Send className="size-12 text-primary" />
             </EmptyMedia>
             <EmptyTitle className="font-bold">
               작성한 피드백이 없어요
             </EmptyTitle>
           </EmptyHeader>
+          <EmptyContent>
+            <Button asChild>
+              <Link href="/mypage/feedback/new">피드백 작성</Link>
+            </Button>
+          </EmptyContent>
         </Empty>
       </div>
     );
