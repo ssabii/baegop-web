@@ -185,7 +185,7 @@ export function SignInForm({
               <Button
                 type="button"
                 size="xl"
-                className="w-full bg-[#FFEB00] text-black/85 hover:bg-[#FFEB00]/90"
+                className="w-full bg-[oklch(0.9_0.19_102.86)] text-black/85 hover:bg-[oklch(0.80_0.19_102.86)]"
                 onClick={handleKakaoLogin}
                 disabled={isLoading}
               >
@@ -226,6 +226,24 @@ export function SignInForm({
                 </Link>
               </FieldDescription> */}
             </Field>
+            <p className="text-sm text-muted-foreground text-center">
+              {`로그인 시 `}
+              <Link
+                href="/terms"
+                className="underline underline-offset-4 font-bold"
+              >
+                이용약관
+              </Link>
+              {` 및 `}
+              <Link
+                href="/privacy"
+                className="underline underline-offset-4 font-bold"
+              >
+                개인정보처리방침
+              </Link>
+              에<br />
+              동의한 것으로 간주합니다.
+            </p>
           </FieldGroup>
         </div>
       </div>

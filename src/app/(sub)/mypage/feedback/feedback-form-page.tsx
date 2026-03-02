@@ -11,52 +11,52 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  FEEDBACK_CATEGORIES,
+  FEEDBACK_CATEGORY_LABELS,
+  FEEDBACK_CATEGORY_PLACEHOLDERS,
+  MAX_FEEDBACK_CONTENT_LENGTH,
+  MAX_FEEDBACK_IMAGES,
+  MIN_FEEDBACK_CONTENT_LENGTH,
+} from "@/lib/constants";
 import { compressImage, optimizeSupabaseImageUrl } from "@/lib/image";
-import { Building2, ImagePlus, Loader2, Star, Tag, X } from "lucide-react";
+import type { FeedbackCategory, FeedbackWithImages } from "@/types";
+import { ImagePlus, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { useCreateReview } from "./use-create-review";
-import { useUpdateReview } from "./use-update-review";
+import { useCreateFeedback } from "./use-create-feedback";
+import { useUpdateFeedback } from "./use-update-feedback";
 
-const MAX_IMAGES = 5;
-const MAX_CONTENT_LENGTH = 300;
-
-type ReviewFormPageProps = {
-  naverPlaceId: string;
-  place: {
-    name: string;
-    category: string | null;
-    imageUrl: string | null;
-  };
-} & (
+type FeedbackFormPageProps =
   | { mode: "create" }
   | {
       mode: "edit";
-      review: {
-        id: number;
-        rating: number;
-        content: string | null;
-        image_urls: string[];
-      };
-    }
-);
+      feedback: FeedbackWithImages;
+    };
 
-export function ReviewFormPage(props: ReviewFormPageProps) {
-  const { naverPlaceId, place } = props;
+export function FeedbackFormPage(props: FeedbackFormPageProps) {
   const isEdit = props.mode === "edit";
-  const review = isEdit ? props.review : null;
+  const feedback = isEdit ? props.feedback : null;
 
-  const existingUrls = review ? review.image_urls : [];
+  const existingUrls = feedback?.image_urls ?? [];
 
   const router = useRouter();
   const confirm = useConfirmDialog();
 
-  const [rating, setRating] = useState(review?.rating ?? 0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [content, setContent] = useState(review?.content ?? "");
+  const [category, setCategory] = useState<FeedbackCategory>(
+    feedback?.category ?? "bug",
+  );
+  const [content, setContent] = useState(feedback?.content ?? "");
   const [keptImageUrls, setKeptImageUrls] = useState<string[]>(existingUrls);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -70,19 +70,19 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
-  const createReview = useCreateReview(naverPlaceId);
-  const updateReview = useUpdateReview(naverPlaceId, review?.id ?? -1);
-  const { mutate, isPending } = isEdit ? updateReview : createReview;
+  const createFeedback = useCreateFeedback();
+  const updateFeedback = useUpdateFeedback(feedback?.id ?? -1);
+  const { mutate, isPending } = isEdit ? updateFeedback : createFeedback;
 
   const totalImageCount = keptImageUrls.length + selectedFiles.length;
   const allImages = [...keptImageUrls, ...previews];
 
   const isDirty = isEdit
-    ? rating !== review!.rating ||
-      content !== (review!.content ?? "") ||
+    ? category !== feedback!.category ||
+      content !== feedback!.content ||
       keptImageUrls.length !== existingUrls.length ||
       selectedFiles.length > 0
-    : rating > 0 || content.length > 0 || selectedFiles.length > 0;
+    : content.length > 0 || selectedFiles.length > 0;
 
   useEffect(() => {
     previewsRef.current = previews;
@@ -98,18 +98,20 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
     const files = Array.from(e.target.files ?? []);
     if (files.length === 0) return;
 
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
     const valid = files.filter((f) => f.size <= maxSize);
 
     if (valid.length < files.length) {
       toast.warning("10MB를 초과하는 이미지는 제외되었습니다.");
     }
 
-    const remaining = MAX_IMAGES - totalImageCount;
+    const remaining = MAX_FEEDBACK_IMAGES - totalImageCount;
     const allowed = valid.slice(0, remaining);
 
     if (allowed.length < valid.length) {
-      toast.warning(`이미지는 최대 ${MAX_IMAGES}장까지 등록할 수 있습니다.`);
+      toast.warning(
+        `이미지는 최대 ${MAX_FEEDBACK_IMAGES}장까지 등록할 수 있습니다.`,
+      );
     }
 
     if (allowed.length > 0) {
@@ -142,18 +144,18 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   }
 
   function handleSubmit() {
-    if (rating === 0) return;
+    if (content.length < MIN_FEEDBACK_CONTENT_LENGTH) return;
 
     if (isEdit) {
-      (mutate as typeof updateReview.mutate)({
-        rating,
+      (mutate as typeof updateFeedback.mutate)({
+        category,
         content,
         keptImageUrls,
         files: selectedFiles,
       });
     } else {
-      (mutate as typeof createReview.mutate)({
-        rating,
+      (mutate as typeof createFeedback.mutate)({
+        category,
         content,
         files: selectedFiles,
       });
@@ -163,7 +165,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   async function handleBack() {
     if (isDirty) {
       const ok = await confirm({
-        title: isEdit ? "리뷰 수정 취소" : "리뷰 작성 취소",
+        title: isEdit ? "피드백 수정 취소" : "피드백 작성 취소",
         description: isEdit
           ? "수정 중인 내용이 사라집니다.\n닫으시겠습니까?"
           : "작성 중인 내용이 사라집니다.\n닫으시겠습니까?",
@@ -177,65 +179,36 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   return (
     <>
       <SubHeader
-        title={isEdit ? "리뷰 수정" : "리뷰 작성"}
+        title={isEdit ? "피드백 수정" : "피드백 작성"}
         onBack={handleBack}
       />
 
       <main className="max-w-4xl mx-auto w-full px-4 pt-4 pb-32">
         <div className="space-y-6">
-          {/* 가게 정보 */}
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <h2 className="line-clamp-2 font-bold">{place.name}</h2>
-              {place.category && (
-                <p className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
-                  <Tag className="size-3 shrink-0" />
-                  <span className="truncate">{place.category}</span>
-                </p>
-              )}
-            </div>
-            {place.imageUrl ? (
-              <img
-                src={place.imageUrl}
-                alt={place.name}
-                className="aspect-square size-17 shrink-0 rounded-lg object-cover"
-              />
-            ) : (
-              <div className="flex aspect-square size-17 shrink-0 items-center justify-center rounded-lg bg-muted">
-                <Building2 className="size-5 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-
-          {/* 별점 */}
+          {/* 카테고리 */}
           <div>
-            <Label className="text-base font-bold">얼마나 만족하시나요?</Label>
-            <div className="mt-2 flex gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  disabled={isPending || compressingCount > 0}
-                  onClick={() => setRating(star)}
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  className="transition-colors disabled:pointer-events-none disabled:opacity-50"
-                >
-                  <Star
-                    className={`size-7 ${
-                      star <= (hoverRating || rating)
-                        ? "fill-yellow-500 text-yellow-500"
-                        : "text-muted-foreground/30"
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
+            <Label className="text-base font-bold">카테고리</Label>
+            <Select
+              value={category}
+              onValueChange={(v) => setCategory(v as FeedbackCategory)}
+              disabled={isPending || compressingCount > 0}
+            >
+              <SelectTrigger className="mt-2 w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {FEEDBACK_CATEGORIES.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {FEEDBACK_CATEGORY_LABELS[cat]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* 내용 */}
           <div>
-            <Label className="text-base font-bold">어떤 점이 좋았나요?</Label>
+            <Label className="text-base font-bold">내용</Label>
             <button
               type="button"
               disabled={isPending || compressingCount > 0}
@@ -250,13 +223,14 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                   {content}
                 </div>
               ) : (
-                <div className="w-full text-left text-muted-foreground">
-                  장소에 대한 자세한 리뷰를 남겨주세요
+                <div className="w-full whitespace-pre-wrap text-left text-muted-foreground">
+                  {FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
                 </div>
               )}
             </button>
             <p className="mt-1 text-right text-sm text-muted-foreground">
-              {content.length}/{MAX_CONTENT_LENGTH}
+              (최소 {MIN_FEEDBACK_CONTENT_LENGTH}자) {content.length}/
+              {MAX_FEEDBACK_CONTENT_LENGTH}
             </p>
           </div>
           <Drawer
@@ -266,26 +240,26 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
           >
             <DrawerContent>
               <div className="max-w-4xl mx-auto w-full p-4">
-                <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
+                <DrawerTitle className="sr-only">피드백 내용 작성</DrawerTitle>
                 <Textarea
                   autoFocus
                   className="field-sizing-fixed resize-none"
-                  placeholder="장소에 대한 자세한 리뷰를 남겨주세요"
+                  placeholder={FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
                   value={drawerContent}
                   onChange={(e) =>
                     setDrawerContent(
-                      e.target.value.slice(0, MAX_CONTENT_LENGTH),
+                      e.target.value.slice(0, MAX_FEEDBACK_CONTENT_LENGTH),
                     )
                   }
                   onFocus={(e) => {
                     const el = e.currentTarget;
                     el.setSelectionRange(el.value.length, el.value.length);
                   }}
-                  maxLength={MAX_CONTENT_LENGTH}
-                  rows={5}
+                  maxLength={MAX_FEEDBACK_CONTENT_LENGTH}
+                  rows={8}
                 />
                 <p className="mt-2 text-right text-sm text-muted-foreground">
-                  {drawerContent.length}/{MAX_CONTENT_LENGTH}
+                  {drawerContent.length}/{MAX_FEEDBACK_CONTENT_LENGTH}
                 </p>
                 <Button
                   className="w-full mt-4"
@@ -306,7 +280,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             <div className="flex items-baseline gap-1.5">
               <Label className="text-base font-bold">사진</Label>
               <span className="text-sm text-muted-foreground">
-                {totalImageCount}/{MAX_IMAGES}
+                {totalImageCount}/{MAX_FEEDBACK_IMAGES}
               </span>
             </div>
             {totalImageCount === 0 ? (
@@ -380,7 +354,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                     </button>
                   </div>
                 ))}
-                {totalImageCount + compressingCount < MAX_IMAGES && (
+                {totalImageCount + compressingCount < MAX_FEEDBACK_IMAGES && (
                   <button
                     type="button"
                     disabled={isPending || compressingCount > 0}
@@ -399,7 +373,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             <input
               ref={fileInputRef}
               type="file"
-              multiple={MAX_IMAGES - totalImageCount > 1}
+              multiple={MAX_FEEDBACK_IMAGES - totalImageCount > 1}
               accept="image/*"
               className="hidden"
               onChange={handleFilesChange}
@@ -423,7 +397,11 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             size="xl"
             className="flex-1 transition-none has-[>svg]:px-8"
             onClick={handleSubmit}
-            disabled={rating === 0 || isPending || compressingCount > 0}
+            disabled={
+              content.length < MIN_FEEDBACK_CONTENT_LENGTH ||
+              isPending ||
+              compressingCount > 0
+            }
           >
             {isPending && <Spinner />}
             {isEdit ? "수정" : "작성"}

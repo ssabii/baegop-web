@@ -82,44 +82,47 @@ export function MapResultSheet({ children, onClose }: MapResultSheetProps) {
           >
             <Drawer.Title className="sr-only">검색 결과</Drawer.Title>
 
-            <div className="max-w-4xl mx-auto w-full">
-              {/* Drag handle & Close button — full snap에서는 검색바 back/clear와 중복이므로 숨김 */}
-              {!isFullSnap && (
-                <>
-                  <div className="flex shrink-0 justify-center py-3">
-                    <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
-                  </div>
-                  <div className="flex shrink-0 justify-end px-4 pb-2">
-                    <Button
-                      variant="secondary"
-                      size="icon-sm"
-                      onClick={onClose}
-                      className="rounded-full"
-                    >
-                      <X className="size-5" />
-                    </Button>
-                  </div>
-                </>
-              )}
+            {/* <div className="max-w-4xl mx-auto w-full"> */}
+            {/* Drag handle & Close button — full snap에서는 검색바 back/clear와 중복이므로 숨김 */}
+            {!isFullSnap && (
+              <div className="max-w-4xl mx-auto w-full">
+                <div className="flex shrink-0 justify-center py-3">
+                  <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+                </div>
+                <div className="flex shrink-0 justify-end px-4 pb-2">
+                  <Button
+                    variant="secondary"
+                    size="icon-sm"
+                    onClick={onClose}
+                    className="rounded-full"
+                  >
+                    <X className="size-5" />
+                  </Button>
+                </div>
+              </div>
+            )}
 
-              {/* Content */}
-              <div
-                ref={contentRef}
-                className={cn("min-h-0 flex-1 overscroll-contain", {
+            {/* Content */}
+            <div
+              ref={contentRef}
+              className={cn(
+                "min-h-0 flex-1 overscroll-contain mx-auto max-w-4xl w-full",
+                {
                   "overflow-y-auto pt-17": isFullSnap,
                   "overflow-hidden": !isFullSnap,
-                })}
-              >
-                {children}
-              </div>
-
-              {isFullSnap && (
-                <MapViewButton
-                  scrollRef={contentRef}
-                  onClick={() => setActiveSnap(COMPACT_SNAP)}
-                />
+                },
               )}
+            >
+              {children}
             </div>
+
+            {isFullSnap && (
+              <MapViewButton
+                scrollRef={contentRef}
+                onClick={() => setActiveSnap(COMPACT_SNAP)}
+              />
+            )}
+            {/* </div> */}
           </div>
         </Drawer.Content>
       </Drawer.Portal>

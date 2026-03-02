@@ -52,10 +52,10 @@ export function PlaceTabs({
     >
       <TabsList className="w-full">
         <TabsTrigger value="menu" className="flex-1 cursor-pointer">
-          메뉴{menuCount != null && ` (${menuCount})`}
+          메뉴{menuCount ? ` (${menuCount})` : ""}
         </TabsTrigger>
         <TabsTrigger value="review" className="flex-1 cursor-pointer">
-          리뷰{reviewCount != null && ` (${reviewCount})`}
+          리뷰{reviewCount ? ` (${reviewCount})` : ""}
         </TabsTrigger>
       </TabsList>
 
