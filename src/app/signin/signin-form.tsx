@@ -230,14 +230,14 @@ export function SignInForm({
               {`로그인 시 `}
               <Link
                 href="/terms"
-                className="underline underline-offset-4 font-bold"
+                className="underline underline-offset-4"
               >
                 이용약관
               </Link>
               {` 및 `}
               <Link
                 href="/privacy"
-                className="underline underline-offset-4 font-bold"
+                className="font-bold text-accent-foreground underline underline-offset-4"
               >
                 개인정보처리방침
               </Link>
