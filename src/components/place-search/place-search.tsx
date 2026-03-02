@@ -49,6 +49,7 @@ export function PlaceSearch() {
     input,
     setInput,
     isTyping,
+    initialQuery,
     onSelect: (item) => {
       addSearch(item.name);
       router.push(

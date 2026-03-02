@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback } from "react";
-import { MapPin } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import dynamic from "next/dynamic";
 
@@ -48,19 +47,13 @@ export function PlaceMap({ lat, lng, name, address }: PlaceMapProps) {
   );
 
   return (
-    <section className="space-y-2">
+    <section>
       <NaverMap
         center={{ lat: numLat, lng: numLng }}
         zoom={17}
         onReady={handleReady}
         className="isolate h-[30vh] rounded-xl overflow-hidden border"
       />
-      {address && (
-        <div className="flex items-start gap-2 text-sm text-muted-foreground">
-          <MapPin className="size-4 shrink-0 mt-0.5" />
-          {address}
-        </div>
-      )}
     </section>
   );
 }

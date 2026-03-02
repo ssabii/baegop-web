@@ -12,9 +12,10 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
 import { FavoriteButton } from "@/components/favorite-button";
-import { Dot, Footprints, Home, Phone, Star, Tag } from "lucide-react";
+import { Dot, Footprints, Home, MapPin, Phone, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import { KonaVoteSection } from "@/components/place-detail/kona-vote";
 import { UnregisteredBadge } from "@/components/place-detail/unregistered-badge";
 import { PlaceActionBar } from "./place-action-bar";
@@ -151,7 +152,6 @@ export default async function PlaceDetailPage({
         <div className="space-y-8 p-4">
           {/* 기본 정보 */}
           <section className="space-y-2">
-            {!isRegistered && <UnregisteredBadge />}
             <div className="flex items-start justify-between gap-2">
               <h1 className="text-2xl font-bold">{detail.name}</h1>
               {isRegistered && <FavoriteButton placeId={naverPlaceId} />}
@@ -183,6 +183,12 @@ export default async function PlaceDetailPage({
                 </div>
               </div>
             )}
+            {address && (
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <MapPin className="size-4 shrink-0" />
+                <span className="[text-decoration:none]">{address}</span>
+              </div>
+            )}
             {/* 별점 */}
             {isRegistered && avgRating !== null && (
               <div className="flex items-center gap-1">
@@ -195,6 +201,17 @@ export default async function PlaceDetailPage({
                 </span>
               </div>
             )}
+            {/* 뱃지 */}
+            <div className="flex items-center gap-2">
+              {!isRegistered && <UnregisteredBadge />}
+              {isRegistered && (
+                <KonaCardBadge
+                  status={
+                    (place.kona_card_status as KonaCardStatus) ?? "unknown"
+                  }
+                />
+              )}
+            </div>
           </section>
 
           {/* 장소 맵 */}
@@ -202,7 +219,6 @@ export default async function PlaceDetailPage({
             lat={detail.y}
             lng={detail.x}
             name={detail.name}
-            address={address}
           />
 
           {/* 바로가기 버튼 */}
@@ -219,6 +235,7 @@ export default async function PlaceDetailPage({
               status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
               userVote={userKonaVote}
               isLoggedIn={!!user}
+              showLoginAlert={!user}
             />
           )}
 
@@ -230,6 +247,8 @@ export default async function PlaceDetailPage({
             currentUserId={user?.id ?? null}
             initialMenus={initialMenus}
             initialReviews={initialReviews}
+            menuCount={detail.menus.length}
+            reviewCount={reviewCount}
           />
         </div>
       </main>

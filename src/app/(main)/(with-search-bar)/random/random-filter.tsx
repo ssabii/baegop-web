@@ -4,7 +4,6 @@ import { useState } from "react";
 import { CATEGORY_FILTERS, type CategoryFilter } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Drawer,
   DrawerContent,
@@ -102,9 +101,14 @@ export function RandomFilter({
                   spacing={2}
                   className="flex-wrap"
                   value={tempCategories}
-                  onValueChange={(value) =>
-                    setTempCategories(value as CategoryFilter[])
-                  }
+                  onValueChange={(value) => {
+                    const newValues = value as CategoryFilter[];
+                    setTempCategories((prev) => {
+                      const added = newValues.filter((v) => !prev.includes(v));
+                      const kept = prev.filter((v) => newValues.includes(v));
+                      return [...kept, ...added];
+                    });
+                  }}
                 >
                   {CATEGORY_FILTERS.map((cat) => (
                     <ToggleGroupItem
@@ -117,8 +121,6 @@ export function RandomFilter({
                   ))}
                 </ToggleGroup>
               </div>
-
-              <Separator />
 
               <div className="space-y-2">
                 <p className="text-sm font-medium text-accent-foreground">
@@ -150,7 +152,7 @@ export function RandomFilter({
               >
                 초기화
               </Button>
-              <Button size="xl" className="flex-3" onClick={handleApply}>
+              <Button size="xl" className="flex-4" onClick={handleApply}>
                 적용
               </Button>
             </DrawerFooter>

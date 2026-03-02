@@ -88,7 +88,6 @@ export const CATEGORY_KEYWORDS: Record<CategoryFilter, string[]> = {
     "피자", "화덕",
     "스테이크",
     "브런치",
-    "수제버거", "햄버거",
     "샐러드", "샌드위치",
     "프렌치", "비스트로",
     "이탈리아",
@@ -99,7 +98,7 @@ export const CATEGORY_KEYWORDS: Record<CategoryFilter, string[]> = {
   ],
   패스트푸드: [
     "패스트푸드",
-    "햄버거",
+    "수제버거", "햄버거",
     "샌드위치",
     "핫도그",
     "치킨",

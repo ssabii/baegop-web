@@ -108,6 +108,11 @@ export function PlaceActionBar({
             {isPending && pendingAction === "review" && <Spinner />}
             리뷰 작성
           </Button>
+          {!isRegistered && (
+            <p className="col-span-2 text-xs text-muted-foreground text-center mt-2">
+              리뷰를 작성하면 장소가 등록돼요!
+            </p>
+          )}
         </div>
       </BottomActionBar>
 

@@ -13,6 +13,8 @@ interface PlaceTabsWithUrlProps {
   currentUserId: string | null;
   initialMenus: MenusResponse;
   initialReviews: ReviewsResponse;
+  menuCount?: number;
+  reviewCount?: number;
 }
 
 export function PlaceTabsWithUrl({
@@ -22,6 +24,8 @@ export function PlaceTabsWithUrl({
   currentUserId,
   initialMenus,
   initialReviews,
+  menuCount,
+  reviewCount,
 }: PlaceTabsWithUrlProps) {
   const tabsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -52,6 +56,8 @@ export function PlaceTabsWithUrl({
         currentUserId={currentUserId}
         initialMenus={initialMenus}
         initialReviews={initialReviews}
+        menuCount={menuCount}
+        reviewCount={reviewCount}
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />

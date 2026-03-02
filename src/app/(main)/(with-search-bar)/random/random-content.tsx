@@ -18,7 +18,7 @@ export function RandomContent({
     return (
       <div
         className={cn("transition-all duration-300", {
-          "scale-90 opacity-50": isSpinning,
+          "scale-95 opacity-50": isSpinning,
           "scale-100 opacity-100": !isSpinning,
         })}
       >

@@ -181,11 +181,11 @@ export function SignInForm({
               </Button>
             </Field>
             <FieldSeparator>또는</FieldSeparator> */}
-            <Field className="gap-4">
+            <Field className="gap-4 max-w-xs mx-auto">
               <Button
                 type="button"
                 size="xl"
-                className="w-full bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90"
+                className="w-full bg-[#FFEB00] text-black/85 hover:bg-[#FFEB00]/90"
                 onClick={handleKakaoLogin}
                 disabled={isLoading}
               >

@@ -1,13 +1,14 @@
 "use client";
 
-import { Fragment } from "react";
 import { useInView } from "react-intersection-observer";
-import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
 import { PlaceCard, EmptyPlace } from "@/components/places";
 import { useAllPlaces } from "./use-all-places";
 
 export function AllPlaceList() {
+  useScrollRestoration();
+
   const { places, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useAllPlaces();
 

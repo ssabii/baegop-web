@@ -14,6 +14,8 @@ interface PlaceTabsProps {
   currentUserId: string | null;
   initialMenus?: MenusResponse;
   initialReviews?: ReviewsResponse;
+  menuCount?: number;
+  reviewCount?: number;
   activeTab?: string;
   onTabChange?: (tab: string) => void;
 }
@@ -25,6 +27,8 @@ export function PlaceTabs({
   currentUserId,
   initialMenus,
   initialReviews,
+  menuCount,
+  reviewCount,
   activeTab: controlledTab,
   onTabChange,
 }: PlaceTabsProps) {
@@ -48,10 +52,10 @@ export function PlaceTabs({
     >
       <TabsList className="w-full">
         <TabsTrigger value="menu" className="flex-1 cursor-pointer">
-          메뉴
+          메뉴{menuCount != null && ` (${menuCount})`}
         </TabsTrigger>
         <TabsTrigger value="review" className="flex-1 cursor-pointer">
-          리뷰
+          리뷰{reviewCount != null && ` (${reviewCount})`}
         </TabsTrigger>
       </TabsList>
 
