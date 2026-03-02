@@ -121,23 +121,6 @@ export function KonaVoteSection({
               <Toggle
                 size="sm"
                 variant="outline"
-                pressed={userVote === "available"}
-                onPressedChange={() => handleVote("available")}
-                disabled={isPending}
-                className={cn(
-                  "px-2 h-[30px] text-xs cursor-pointer rounded-lg",
-                  {
-                    "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
-                      userVote === "available",
-                  },
-                )}
-              >
-                {isPending && pendingVote === "available" && <Spinner />}
-                가능
-              </Toggle>
-              <Toggle
-                size="sm"
-                variant="outline"
                 pressed={userVote === "unavailable"}
                 onPressedChange={() => handleVote("unavailable")}
                 disabled={isPending}
@@ -151,6 +134,23 @@ export function KonaVoteSection({
               >
                 {isPending && pendingVote === "unavailable" && <Spinner />}
                 불가
+              </Toggle>
+              <Toggle
+                size="sm"
+                variant="outline"
+                pressed={userVote === "available"}
+                onPressedChange={() => handleVote("available")}
+                disabled={isPending}
+                className={cn(
+                  "px-2 h-[30px] text-xs cursor-pointer rounded-lg",
+                  {
+                    "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
+                      userVote === "available",
+                  },
+                )}
+              >
+                {isPending && pendingVote === "available" && <Spinner />}
+                가능
               </Toggle>
             </div>
           </div>
