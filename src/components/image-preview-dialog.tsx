@@ -30,11 +30,10 @@ export function ImageCarouselDialog({
 
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
 
-  // open 시 initialIndex로 리셋
+  // open 시 initialIndex로 리셋 (scrollTo → select 이벤트가 setCurrent 처리)
   useEffect(() => {
-    if (open) {
-      setCurrent(initialIndex);
-      api?.scrollTo(initialIndex, false);
+    if (open && api) {
+      api.scrollTo(initialIndex, false);
     }
   }, [open, initialIndex, api]);
 
