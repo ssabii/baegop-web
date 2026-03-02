@@ -14,15 +14,15 @@ export default async function MyPage() {
 
   if (!user) redirect("/signin");
 
-  const [{ count: reviewCount }, { count: placeCount }] = await Promise.all([
+  const [{ count: reviewCount }, { count: favoriteCount }] = await Promise.all([
     supabase
       .from("reviews")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id),
     supabase
-      .from("places")
+      .from("favorites")
       .select("*", { count: "exact", head: true })
-      .eq("created_by", user.id),
+      .eq("user_id", user.id),
   ]);
 
   return (
@@ -54,7 +54,7 @@ export default async function MyPage() {
               title="내 장소"
               badge={
                 <span className="text-sm text-muted-foreground font-semibold">
-                  {placeCount ?? 0}
+                  {favoriteCount ?? 0}
                 </span>
               }
               inGroup

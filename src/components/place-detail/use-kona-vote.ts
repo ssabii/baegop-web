@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { voteKonaCard } from "./actions";
+import { voteKonaCard } from "@/app/(sub)/places/[id]/actions";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface UseKonaVoteOptions {
@@ -49,5 +49,6 @@ export function useKonaVote({
     userVote,
     vote: mutation.mutate,
     isPending: mutation.isPending,
+    pendingVote: mutation.isPending ? mutation.variables : null,
   };
 }

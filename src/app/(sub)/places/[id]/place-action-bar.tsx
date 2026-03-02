@@ -31,7 +31,6 @@ export function PlaceActionBar({
   >(null);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogDescription, setLoginDialogDescription] = useState("");
-
   function handleRegister() {
     if (!isLoggedIn) {
       setLoginDialogDescription(
@@ -87,16 +86,18 @@ export function PlaceActionBar({
           })}
         >
           {!isRegistered && (
-            <Button
-              variant="outline"
-              size="xl"
-              className="transition-none has-[>svg]:px-8"
-              onClick={handleRegister}
-              disabled={isPending}
-            >
-              {isPending && pendingAction === "register" && <Spinner />}
-              장소 등록
-            </Button>
+            <div>
+              <Button
+                variant="outline"
+                size="xl"
+                className="w-full transition-none has-[>svg]:px-8"
+                onClick={handleRegister}
+                disabled={isPending}
+              >
+                {isPending && pendingAction === "register" && <Spinner />}
+                장소 등록
+              </Button>
+            </div>
           )}
           <Button
             onClick={handleWriteReview}
@@ -107,6 +108,11 @@ export function PlaceActionBar({
             {isPending && pendingAction === "review" && <Spinner />}
             리뷰 작성
           </Button>
+          {!isRegistered && (
+            <p className="col-span-2 text-xs text-muted-foreground text-center mt-2">
+              리뷰를 작성하면 장소가 등록돼요!
+            </p>
+          )}
         </div>
       </BottomActionBar>
 

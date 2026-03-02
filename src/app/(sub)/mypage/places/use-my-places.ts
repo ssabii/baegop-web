@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-interface PlaceCardData {
+interface MyPlace {
   id: string;
   name: string;
   address: string;
@@ -12,16 +12,16 @@ interface PlaceCardData {
 }
 
 interface MyPlacesResponse {
-  items: PlaceCardData[];
+  items: MyPlace[];
   nextCursor: number | null;
 }
 
 const LIMIT = 10;
 
-export function useMyPlaces(userId: string) {
+export function useMyPlaces() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["mypage", "places", userId],
+      queryKey: ["mypage", "places"],
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
           `/api/mypage/places?cursor=${pageParam}&limit=${LIMIT}`,

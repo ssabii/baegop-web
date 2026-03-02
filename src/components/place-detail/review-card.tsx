@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Ellipsis, Pencil, Trash2, UserRound } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,25 +17,24 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { toast } from "sonner";
 import { formatRelativeDate } from "@/lib/date";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
+import type { ReviewImageItem } from "@/types";
 import { StarRating } from "./star-rating";
-import { ReviewImages } from "./review-images";
-import { deleteReview } from "./actions";
+import { ReviewImages } from "@/app/(sub)/places/[id]/review-images";
+import { deleteReview } from "@/app/(sub)/places/[id]/actions";
 
 interface ReviewCardProps {
   review: {
     id: number;
     rating: number;
     content: string | null;
-    created_at: string;
+    created_at: string | null;
     user_id: string | null;
     profiles: {
       nickname: string | null;
       avatar_url: string | null;
     } | null;
-    review_images: {
-      url: string;
-      display_order: number;
-    }[];
+    review_images: ReviewImageItem[];
   };
   isOwner: boolean;
   naverPlaceId: string;
@@ -79,10 +79,10 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
   const nickname = review.profiles?.nickname ?? "탈퇴한 사용자";
 
   return (
-    <div className="py-3 space-y-2">
-      <div className="flex items-start gap-3">
+    <div className={cn("py-4 space-y-2 transition-opacity", { "opacity-50": isPending })}>
+      <div className="flex items-start gap-2">
         <Avatar className="size-10 shrink-0">
-          <AvatarImage src={review.profiles?.avatar_url ?? undefined} />
+          <AvatarImage src={review.profiles?.avatar_url ? optimizeSupabaseImageUrl(review.profiles.avatar_url) : undefined} />
           <AvatarFallback>
             <UserRound className="size-10 text-muted-foreground" />
           </AvatarFallback>
@@ -110,7 +110,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   <div className="mx-auto flex w-full max-w-4xl flex-col py-2">
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-3 text-base font-bold cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-4 text-base font-bold cursor-pointer"
                       onClick={handleEdit}
                     >
                       <Pencil className="size-4" />
@@ -118,7 +118,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                     </button>
                     <button
                       type="button"
-                      className="flex items-center gap-3 px-4 py-3 text-base font-bold text-destructive cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-4 text-base font-bold text-destructive cursor-pointer"
                       onClick={handleDelete}
                     >
                       <Trash2 className="size-4" />
@@ -131,9 +131,11 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
           </div>
           <div className="flex items-center gap-1.5">
             <StarRating rating={review.rating} />
-            <span className="text-xs text-muted-foreground/60">
-              {formatRelativeDate(review.created_at)}
-            </span>
+            {review.created_at && (
+              <span className="text-xs text-muted-foreground/60">
+                {formatRelativeDate(review.created_at)}
+              </span>
+            )}
           </div>
         </div>
       </div>

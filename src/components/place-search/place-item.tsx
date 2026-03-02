@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Building2, MapPin, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatShortAddress } from "@/lib/address";
+import { optimizeNaverImageUrl } from "@/lib/image";
 import type { NaverSearchResult } from "@/types";
 
 interface PlaceItemProps {
@@ -30,7 +32,7 @@ export function PlaceItem({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex w-full cursor-pointer items-center gap-3 text-left transition-colors",
+        "flex w-full cursor-pointer items-center gap-3 text-left transition-colors [-webkit-tap-highlight-color:transparent]",
         paddingClass,
         highlighted ? "bg-accent" : "hover:bg-accent",
       )}
@@ -39,20 +41,20 @@ export function PlaceItem({
         <span className={nameClass}>{item.name}</span>
         <span className={cn("flex items-center gap-1", metaClass)}>
           <MapPin className="size-3 shrink-0" />
-          <span className="truncate">
-            {item.roadAddress || item.address}
+          <span>
+            {formatShortAddress(item.roadAddress || item.address)}
           </span>
         </span>
         {item.category && (
           <span className={cn("flex items-center gap-1", metaClass)}>
             <Tag className="size-3 shrink-0" />
-            <span className="truncate">{item.category}</span>
+            <span>{item.category}</span>
           </span>
         )}
       </div>
       {item.imageUrl && !imgError ? (
         <img
-          src={item.imageUrl.replace(/^http:\/\//, "https://")}
+          src={optimizeNaverImageUrl(item.imageUrl.replace(/^http:\/\//, "https://"))}
           alt=""
           className={cn(thumbClass, "shrink-0 rounded-lg object-cover")}
           onError={() => setImgError(true)}

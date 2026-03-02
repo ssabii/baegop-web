@@ -120,6 +120,34 @@ export async function updateReview(
   }
 }
 
+export async function toggleFavorite(
+  placeId: string,
+): Promise<{ isFavorited: boolean }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("로그인이 필요합니다");
+
+  const { data: existing } = await supabase
+    .from("favorites")
+    .select("id")
+    .eq("place_id", placeId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase.from("favorites").delete().eq("id", existing.id);
+    return { isFavorited: false };
+  } else {
+    await supabase
+      .from("favorites")
+      .insert({ place_id: placeId, user_id: user.id });
+    return { isFavorited: true };
+  }
+}
+
 export async function voteKonaCard(placeId: string, vote: KonaVote) {
   const supabase = await createClient();
   const {

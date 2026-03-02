@@ -1,4 +1,7 @@
+import { optimizeNaverImageUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
+import { FavoriteButton } from "@/components/favorite-button";
+import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import type { KonaCardStatus } from "@/types";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
 import Link from "next/link";
@@ -14,18 +17,25 @@ interface PlaceCardProps {
   review_count: number;
 }
 
-export function PlaceCard({ place }: { place: PlaceCardProps }) {
+export function PlaceCard({
+  place,
+  className,
+}: {
+  place: PlaceCardProps;
+  className?: string;
+}) {
   const status = (place.kona_card_status ?? "unknown") as KonaCardStatus;
 
   return (
-    <Link href={`/places/${place.id}`} className="flex gap-3 rounded-xl p-3 -m-3 transition-colors hover:bg-accent">
+    <Link
+      href={`/places/${place.id}`}
+      className={cn("flex gap-3 transition-colors hover:bg-accent", className)}
+    >
       <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
-          <div className="flex flex-wrap items-center gap-1">
-            <h3 className="line-clamp-2 font-bold leading-snug text-left">
-              {place.name}
-            </h3>
-          </div>
+          <h3 className="line-clamp-2 font-bold leading-snug text-left">
+            {place.name}
+          </h3>
           {place.category && (
             <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
               <Tag className="size-3 shrink-0" />
@@ -47,39 +57,27 @@ export function PlaceCard({ place }: { place: PlaceCardProps }) {
               </span>
             )}
           </div>
-          {status !== "unknown" && (
-            <span
-              className={cn(
-                "inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-full px-1.5 py-1 text-xs font-medium",
-                {
-                  "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300":
-                    status === "available",
-                  "bg-muted text-muted-foreground": status !== "available",
-                },
-              )}
-            >
-              <img
-                src="/icons/kona.png"
-                alt="코나카드"
-                className="size-3 rounded-full"
-              />
-              {status === "available" ? "결제가능" : "결제불가"}
-            </span>
-          )}
+          <KonaCardBadge status={status} />
         </div>
       </div>
 
-      {place.image_urls?.[0] ? (
-        <img
-          src={place.image_urls[0]}
-          alt={place.name}
-          className="aspect-square size-28 shrink-0 rounded-lg object-cover"
+      <div className="relative shrink-0">
+        {place.image_urls?.[0] ? (
+          <img
+            src={optimizeNaverImageUrl(place.image_urls[0])}
+            alt={place.name}
+            className="aspect-square size-28 rounded-lg object-cover"
+          />
+        ) : (
+          <div className="flex aspect-square size-28 items-center justify-center rounded-lg bg-muted">
+            <Building2 className="size-6 text-muted-foreground" />
+          </div>
+        )}
+        <FavoriteButton
+          placeId={place.id}
+          className="absolute right-1 top-1 size-6 bg-transparent hover:bg-transparent active:bg-transparent [&_svg:not(.fill-rose-500)]:fill-muted [&_svg:not(.fill-rose-500)]:text-muted"
         />
-      ) : (
-        <div className="flex aspect-square size-28 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <Building2 className="size-6 text-muted-foreground" />
-        </div>
-      )}
+      </div>
     </Link>
   );
 }

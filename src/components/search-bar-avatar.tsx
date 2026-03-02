@@ -4,6 +4,7 @@ import Link from "next/link";
 import { User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { useProfile } from "@/hooks/use-profile";
 
 export function SearchBarAvatar() {
@@ -16,7 +17,7 @@ export function SearchBarAvatar() {
     <Link href="/mypage">
       <Avatar size="sm">
         {profile.avatarUrl && (
-          <AvatarImage src={profile.avatarUrl} alt={profile.nickname} />
+          <AvatarImage src={optimizeSupabaseImageUrl(profile.avatarUrl)} alt={profile.nickname} />
         )}
         <AvatarFallback>
           <User className="size-3.5" />

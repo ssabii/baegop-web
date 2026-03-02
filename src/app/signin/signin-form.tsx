@@ -85,6 +85,21 @@ export function SignInForm({
     router.refresh();
   };
 
+  const handleKakaoLogin = async () => {
+    const supabase = createClient();
+
+    const callbackParams = new URLSearchParams({
+      redirect: redirectTo || "/",
+    });
+
+    await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
+      },
+    });
+  };
+
   const handleGoogleLogin = async () => {
     const supabase = createClient();
 
@@ -111,7 +126,7 @@ export function SignInForm({
                 <h1 className="text-2xl font-bold">배곱</h1>
               </Link>
               <FieldDescription>
-                Google로 배곱을 시작해보세요
+                소셜 로그인으로 배곱을 시작해보세요
               </FieldDescription>
             </div>
             {/* <Field data-invalid={emailError ? true : undefined}>
@@ -166,7 +181,22 @@ export function SignInForm({
               </Button>
             </Field>
             <FieldSeparator>또는</FieldSeparator> */}
-            <Field>
+            <Field className="gap-4 max-w-xs mx-auto">
+              <Button
+                type="button"
+                size="xl"
+                className="w-full bg-[#FFEB00] text-black/85 hover:bg-[#FFEB00]/90"
+                onClick={handleKakaoLogin}
+                disabled={isLoading}
+              >
+                <Image
+                  src="/icons/kakao.svg"
+                  alt="Kakao"
+                  width={20}
+                  height={20}
+                />
+                카카오로 시작하기
+              </Button>
               <Button
                 type="button"
                 variant="outline"

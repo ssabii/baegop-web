@@ -17,7 +17,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
 
   if (images.length === 0) {
     return (
-      <div className="flex h-48 w-full items-center justify-center rounded-t-lg bg-muted">
+      <div className="flex h-48 w-full items-center justify-center bg-muted">
         <Building2 className="size-12 text-muted-foreground" />
       </div>
     );

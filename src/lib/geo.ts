@@ -31,6 +31,12 @@ export function formatDistance(meters: number): string {
 
 /** 도보 시간을 사람이 읽기 쉬운 문자열로 (ex: "5분", "1시간 10분") */
 export function formatWalkingDuration(minutes: number): string {
+  if (minutes === 0) {
+    return "근처";
+  }
+  if (minutes >= 30) {
+    return "30분 이상";
+  }
   if (minutes < 60) {
     return `${minutes}분`;
   }
