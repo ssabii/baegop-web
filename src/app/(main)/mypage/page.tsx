@@ -60,6 +60,10 @@ export default async function MyPage() {
               inGroup
             />
           </ItemGroup>
+          <MypageMenuItem
+            href="/mypage/feedback"
+            title="피드백 보내기"
+          />
           <ItemGroup className="rounded-xl bg-background">
             <LogoutMenuItem />
             {user.app_metadata.providers?.includes("email") && (

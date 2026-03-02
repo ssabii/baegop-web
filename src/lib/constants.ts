@@ -1,4 +1,4 @@
-import type { KonaCardStatus } from "@/types";
+import type { FeedbackCategory, KonaCardStatus } from "@/types";
 
 export const KONA_CARD_LABELS: Record<KonaCardStatus, string> = {
   available: "코나카드 가능",
@@ -109,6 +109,17 @@ export const CATEGORY_KEYWORDS: Record<CategoryFilter, string[]> = {
     "마카롱", "와플", "도넛",
   ],
 };
+
+// 피드백
+export const FEEDBACK_CATEGORIES: FeedbackCategory[] = ["bug", "feature", "other"];
+export const FEEDBACK_CATEGORY_LABELS: Record<FeedbackCategory, string> = {
+  bug: "버그 제보",
+  feature: "기능 제안",
+  other: "기타",
+};
+export const MAX_FEEDBACK_CONTENT_LENGTH = 3000;
+export const MIN_FEEDBACK_CONTENT_LENGTH = 10;
+export const MAX_FEEDBACK_IMAGES = 5;
 
 // 크몽 사무실 좌표
 export const COMPANY_LOCATION = {
