@@ -142,39 +142,10 @@ export function MapView({
     const target = markerInstance.getPosition();
 
     if (focusPadding) {
-      const topPad = focusPadding.top ?? 0;
-      const bottomPad = focusPadding.bottom ?? 0;
-      const offsetY = (bottomPad - topPad) / 2;
-
-      function calcAdjustedCenter(m: naver.maps.Map) {
-        const proj = m.getProjection();
-        const targetPoint = proj.fromCoordToOffset(target);
-        return proj.fromOffsetToCoord(
-          new naver.maps.Point(targetPoint.x, targetPoint.y + offsetY),
-        );
-      }
-
-      const center = map.getCenter();
-      const dx =
-        (center as naver.maps.LatLng).lng() -
-        (target as naver.maps.LatLng).lng();
-      const dy =
-        (center as naver.maps.LatLng).lat() -
-        (target as naver.maps.LatLng).lat();
-      const isFar = Math.sqrt(dx * dx + dy * dy) > 0.01; // ~1km
-
-      if (isFar) {
-        const latLng = target as naver.maps.LatLng;
-        const bounds = new naver.maps.LatLngBounds(latLng, latLng);
-        map.fitBounds(bounds, focusPadding);
-        console.log(map.getZoom());
-        if (map.getZoom() > 15) map.setZoom(15);
-        return;
-      }
-
-      map.morph(calcAdjustedCenter(map), map.getZoom(), {
-        easing: "easeOutCubic",
-      });
+      const latLng = target as naver.maps.LatLng;
+      const bounds = new naver.maps.LatLngBounds(latLng, latLng);
+      map.fitBounds(bounds, focusPadding);
+      if (map.getZoom() > 15) map.setZoom(15);
       return;
     }
 
