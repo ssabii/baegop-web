@@ -86,7 +86,7 @@ export function ImageCarouselDialog({
         zIndex: 9999,
         display: "flex",
         flexDirection: "column",
-        background: "rgba(0, 0, 0, 0.8)",
+        background: "#000000",
         height: "100dvh",
         pointerEvents: "auto",
       }}
@@ -123,7 +123,7 @@ export function ImageCarouselDialog({
                 <img
                   src={src}
                   alt={alt ? `${alt} ${i + 1}` : ""}
-                  className="max-h-[75dvh] max-w-full select-none object-contain"
+                  className="max-h-[80dvh] max-w-full select-none object-contain"
                   draggable={false}
                 />
               </CarouselItem>
