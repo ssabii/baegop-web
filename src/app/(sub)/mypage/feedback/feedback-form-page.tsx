@@ -29,7 +29,7 @@ import {
   MIN_FEEDBACK_CONTENT_LENGTH,
 } from "@/lib/constants";
 import { compressImage, optimizeSupabaseImageUrl } from "@/lib/image";
-import type { FeedbackCategory } from "@/types";
+import type { FeedbackCategory, FeedbackWithImages } from "@/types";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -41,12 +41,7 @@ type FeedbackFormPageProps =
   | { mode: "create" }
   | {
       mode: "edit";
-      feedback: {
-        id: number;
-        category: FeedbackCategory;
-        content: string;
-        feedback_images: { url: string; display_order: number }[];
-      };
+      feedback: FeedbackWithImages;
     };
 
 export function FeedbackFormPage(props: FeedbackFormPageProps) {
@@ -239,7 +234,8 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
               )}
             </button>
             <p className="mt-1 text-right text-sm text-muted-foreground">
-              {content.length}/{MAX_FEEDBACK_CONTENT_LENGTH}
+              (최소 {MIN_FEEDBACK_CONTENT_LENGTH}자) {content.length}/
+              {MAX_FEEDBACK_CONTENT_LENGTH}
             </p>
           </div>
           <Drawer

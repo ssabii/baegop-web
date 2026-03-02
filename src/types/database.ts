@@ -29,73 +29,6 @@ export type Database = {
         }
         Relationships: []
       }
-      feedback_images: {
-        Row: {
-          created_at: string | null
-          display_order: number
-          feedback_id: number
-          id: number
-          url: string
-        }
-        Insert: {
-          created_at?: string | null
-          display_order?: number
-          feedback_id: number
-          id?: never
-          url: string
-        }
-        Update: {
-          created_at?: string | null
-          display_order?: number
-          feedback_id?: number
-          id?: never
-          url?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "feedback_images_feedback_id_fkey"
-            columns: ["feedback_id"]
-            isOneToOne: false
-            referencedRelation: "feedbacks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      feedbacks: {
-        Row: {
-          category: string
-          content: string
-          created_at: string | null
-          id: number
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          category?: string
-          content: string
-          created_at?: string | null
-          id?: never
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          category?: string
-          content?: string
-          created_at?: string | null
-          id?: never
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "feedbacks_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       favorites: {
         Row: {
           created_at: string
@@ -123,14 +56,66 @@ export type Database = {
             referencedRelation: "places"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      feedback_images: {
+        Row: {
+          created_at: string
+          display_order: number
+          feedback_id: number
+          id: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          feedback_id: number
+          id?: never
+          url: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          feedback_id?: number
+          id?: never
+          url?: string
+        }
+        Relationships: [
           {
-            foreignKeyName: "favorites_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "feedback_images_feedback_id_fkey"
+            columns: ["feedback_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "feedbacks"
             referencedColumns: ["id"]
           },
         ]
+      }
+      feedbacks: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category?: string
+          content: string
+          created_at?: string
+          id?: never
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: never
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       kona_card_votes: {
         Row: {

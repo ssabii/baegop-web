@@ -1,21 +1,8 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import type { FeedbackCategory } from "@/types";
-
-interface FeedbackImage {
-  url: string;
-  display_order: number;
-}
-
-interface MyFeedback {
-  id: number;
-  category: FeedbackCategory;
-  content: string;
-  created_at: string | null;
-  feedback_images: FeedbackImage[];
-}
+import type { FeedbackWithImages } from "@/types";
 
 interface MyFeedbacksResponse {
-  items: MyFeedback[];
+  items: FeedbackWithImages[];
   nextCursor: number | null;
 }
 

@@ -5,6 +5,8 @@ export type Profile = Tables<"profiles">;
 export type Place = Tables<"places">;
 export type Review = Tables<"reviews">;
 export type ReviewImage = Tables<"review_images">;
+export type Feedback = Tables<"feedbacks">;
+export type FeedbackImage = Tables<"feedback_images">;
 // 릴레이션 포함 타입 (JOIN 조회용)
 export type PlaceWithProfile = Place & {
   profile?: Profile;
@@ -19,6 +21,15 @@ export type ReviewWithProfile = Review & {
 export type KonaCardStatus = "available" | "unavailable" | "unknown";
 export type KonaVote = "available" | "unavailable";
 export type FeedbackCategory = "bug" | "feature" | "improvement" | "etc";
+
+// 릴레이션 포함 타입 — 피드백 목록/카드/폼 공용
+export type FeedbackWithImages = Pick<
+  Feedback,
+  "id" | "content" | "created_at"
+> & {
+  category: FeedbackCategory;
+  feedback_images: Pick<FeedbackImage, "url" | "display_order">[];
+};
 
 /** 리뷰 이미지 (컴포넌트용 — DB 전체 컬럼이 아닌 필요 필드만) */
 export interface ReviewImageItem {

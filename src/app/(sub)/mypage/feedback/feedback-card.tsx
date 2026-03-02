@@ -18,19 +18,13 @@ import { FEEDBACK_CATEGORY_LABELS } from "@/lib/constants";
 import { formatRelativeDate } from "@/lib/date";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
-import type { FeedbackCategory } from "@/types";
+import type { FeedbackWithImages } from "@/types";
 import { Ellipsis, Pencil, Trash2 } from "lucide-react";
 import { deleteFeedback } from "./actions";
 import { toast } from "sonner";
 
 interface FeedbackCardProps {
-  feedback: {
-    id: number;
-    category: FeedbackCategory;
-    content: string;
-    created_at: string | null;
-    feedback_images: { url: string; display_order: number }[];
-  };
+  feedback: FeedbackWithImages;
 }
 
 export function FeedbackCard({ feedback }: FeedbackCardProps) {
