@@ -1,9 +1,11 @@
 "use client";
 
+import { BottomActionBar } from "@/components/bottom-action-bar";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
   EmptyContent,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
@@ -58,6 +60,7 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
             <EmptyTitle className="font-bold">
               작성한 피드백이 없어요
             </EmptyTitle>
+            <EmptyDescription>배곱에게 피드백을 보내보세요!</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button asChild>
@@ -71,7 +74,7 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
 
   return (
     <>
-      <div className="p-4 divide-y">
+      <div className="p-4 pb-23 divide-y">
         {feedbacks.map((feedback) => (
           <FeedbackCard key={feedback.id} feedback={feedback} />
         ))}
@@ -79,6 +82,11 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
       <div ref={sentinelRef} className="flex justify-center">
         {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
       </div>
+      <BottomActionBar>
+        <Button size="xl" className="mx-auto w-full max-w-4xl" asChild>
+          <Link href="/mypage/feedback/new">피드백 작성</Link>
+        </Button>
+      </BottomActionBar>
     </>
   );
 }
