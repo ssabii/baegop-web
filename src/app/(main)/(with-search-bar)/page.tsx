@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { HomeTabs } from "@/components/home/home-tabs";
 import { PlaceList } from "@/components/home/place-list";
@@ -9,6 +10,18 @@ export default function HomePage() {
         <HomeTabs />
         <PlaceList />
       </Suspense>
+      <footer className="mt-auto flex justify-center gap-3 text-sm text-muted-foreground">
+        <Link href="/terms" className="underline underline-offset-4">
+          이용약관
+        </Link>
+        <span>|</span>
+        <Link
+          href="/privacy"
+          className="font-bold text-accent-foreground underline underline-offset-4"
+        >
+          개인정보처리방침
+        </Link>
+      </footer>
     </main>
   );
 }
