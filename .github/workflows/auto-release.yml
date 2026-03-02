@@ -35,4 +35,6 @@ jobs:
         with:
           tag_name: ${{ steps.version.outputs.version }}
           name: ${{ steps.version.outputs.version }}
+          body: ${{ github.event.pull_request.body }}
           generate_release_notes: true
+          append_body: true
