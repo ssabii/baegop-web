@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Send } from "lucide-react";
 import { MyFeedbackList } from "./my-feedback-list";
 
 export default async function MyFeedbacksPage() {
@@ -20,9 +20,10 @@ export default async function MyFeedbacksPage() {
       <SubHeader
         title="피드백"
         rightElement={
-          <Button variant="ghost" size="icon" className="size-9" asChild>
+          <Button variant="ghost" size="sm" asChild>
             <Link href="/mypage/feedback/new">
-              <Plus className="size-5" />
+              <Send className="size-4" />
+              피드백 작성
             </Link>
           </Button>
         }
