@@ -132,6 +132,7 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
         placeId={data?.place?.id ?? null}
         naverPlaceId={item.id}
         currentUserId={null}
+        reviewCount={data?.reviewCount}
       />
 
       <LoginAlertDialog
