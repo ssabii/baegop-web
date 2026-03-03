@@ -68,7 +68,7 @@ export default async function MyPage() {
               inGroup
             />
             <Item asChild>
-              <Link href="/map/dubaicookie">
+              <Link href="/map/dubai-cookie">
                 <ItemContent>
                   <ItemTitle className="font-bold">
                     <span className="relative">

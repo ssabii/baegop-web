@@ -113,7 +113,7 @@ export function StoreListSheet({
     } else {
       params.delete("expand");
     }
-    router.replace(`/map/dubaicookie?${params}`, { scroll: false });
+    router.replace(`/map/dubai-cookie?${params}`, { scroll: false });
   }, [isFullSnap, searchParams, router]);
 
   const handleSnapChange = useCallback((snap: SnapPoint | null) => {

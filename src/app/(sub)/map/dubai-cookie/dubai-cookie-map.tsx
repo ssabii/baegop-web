@@ -124,7 +124,7 @@ export function DubaiCookieMap() {
       if (params.place) sp.set("place", params.place);
       if (params.expand) sp.set("expand", params.expand);
       const qs = sp.toString();
-      return qs ? `/map/dubaicookie?${qs}` : "/map/dubaicookie";
+      return qs ? `/map/dubai-cookie?${qs}` : "/map/dubai-cookie";
     },
     [],
   );
@@ -137,7 +137,7 @@ export function DubaiCookieMap() {
   );
 
   const handleSearchClear = useCallback(() => {
-    router.replace("/map/dubaicookie", { scroll: false });
+    router.replace("/map/dubai-cookie", { scroll: false });
   }, [router]);
 
   const handleBack = useCallback(() => {
@@ -174,7 +174,7 @@ export function DubaiCookieMap() {
   }, [router]);
 
   const handleCloseList = useCallback(() => {
-    router.replace("/map/dubaicookie", { scroll: false });
+    router.replace("/map/dubai-cookie", { scroll: false });
   }, [router]);
 
   // --- Marker management ---
