@@ -36,7 +36,7 @@ export function DubaiCookieSearchInput({
             <span className="truncate text-base">{initialQuery}</span>
           ) : (
             <span className="truncate text-base text-muted-foreground">
-              두쫀쿠 매장을 검색해보세요
+              매장을 검색해보세요
             </span>
           )}
         </Link>
