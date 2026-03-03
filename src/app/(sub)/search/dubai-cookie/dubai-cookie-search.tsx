@@ -18,7 +18,8 @@ import {
 } from "@/data/dubai-cookie-stores";
 import { useRecentSearches } from "@/hooks/use-recent-searches";
 import { optimizeNaverImageUrl } from "@/lib/image";
-import { Building2 } from "lucide-react";
+import { formatShortAddress } from "@/lib/address";
+import { Building2, MapPin, Tag } from "lucide-react";
 
 export function DubaiCookieSearch() {
   const router = useRouter();
@@ -157,7 +158,7 @@ export function DubaiCookieSearch() {
                   <button
                     type="button"
                     onClick={() => handleRecentClick(term)}
-                    className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 text-left transition-colors hover:bg-accent"
+                    className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 text-left [-webkit-tap-highlight-color:transparent]"
                   >
                     <Clock className="size-4 shrink-0 text-muted-foreground" />
                     <span className="truncate text-sm">{term}</span>
@@ -177,33 +178,40 @@ export function DubaiCookieSearch() {
 
         {/* Suggestions */}
         {showSuggestions && (
-          <ul className="mx-auto max-w-4xl divide-y">
+          <ul className="mx-auto max-w-4xl">
             {suggestions.map((store) => (
               <li key={store.placeId}>
                 <button
                   type="button"
                   onClick={() => handleSelectStore(store)}
-                  className="flex w-full cursor-pointer items-center gap-3 py-3 text-left transition-colors hover:bg-accent"
+                  className="flex w-full cursor-pointer items-center gap-3 px-1 py-3 text-left [-webkit-tap-highlight-color:transparent]"
                 >
-                  <div className="size-12 shrink-0 overflow-hidden rounded-lg">
-                    {store.imageUrl ? (
-                      <img
-                        src={optimizeNaverImageUrl(store.imageUrl)}
-                        alt={store.name}
-                        className="size-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex size-full items-center justify-center bg-muted">
-                        <Building2 className="size-4 text-muted-foreground" />
-                      </div>
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="text-base font-bold">{store.name}</span>
+                    {store.category && (
+                      <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+                        <Tag className="size-3 shrink-0" />
+                        <span>{store.category}</span>
+                      </span>
                     )}
+                    <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+                      <MapPin className="size-3 shrink-0" />
+                      <span>
+                        {formatShortAddress(store.roadAddress || store.address)}
+                      </span>
+                    </span>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold">{store.name}</p>
-                    <p className="truncate text-xs text-muted-foreground">
-                      {store.roadAddress}
-                    </p>
-                  </div>
+                  {store.imageUrl ? (
+                    <img
+                      src={optimizeNaverImageUrl(store.imageUrl)}
+                      alt=""
+                      className="size-20 shrink-0 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
+                      <Building2 className="size-5 text-muted-foreground" />
+                    </div>
+                  )}
                 </button>
               </li>
             ))}
