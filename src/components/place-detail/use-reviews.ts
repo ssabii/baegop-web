@@ -12,6 +12,7 @@ interface ReviewData {
   profiles: {
     nickname: string | null;
     avatar_url: string | null;
+    total_points: number;
   } | null;
 }
 
