@@ -22,7 +22,9 @@ export async function SearchBar() {
             height={20}
             className="shrink-0"
           />
-          <span className="truncate text-muted-foreground">장소 검색</span>
+          <span className="truncate text-muted-foreground">
+            찾고 싶은 장소가 있나요?
+          </span>
         </Link>
         <div className="flex shrink-0 items-center pr-4">
           {user && <SearchBarAvatar />}

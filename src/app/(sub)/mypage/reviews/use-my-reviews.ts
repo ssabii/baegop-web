@@ -10,6 +10,7 @@ interface MyReview {
   rating: number;
   content: string | null;
   created_at: string | null;
+  image_urls: string[] | null;
   places: ReviewPlace | null;
 }
 

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
-  DrawerFooter,
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
@@ -40,7 +39,7 @@ type ReviewFormPageProps = {
         id: number;
         rating: number;
         content: string | null;
-        review_images: { url: string; display_order: number }[];
+        image_urls: string[];
       };
     }
 );
@@ -50,12 +49,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   const isEdit = props.mode === "edit";
   const review = isEdit ? props.review : null;
 
-  const existingUrls = review
-    ? review.review_images
-        .slice()
-        .sort((a, b) => a.display_order - b.display_order)
-        .map((img) => img.url)
-    : [];
+  const existingUrls = review ? review.image_urls : [];
 
   const router = useRouter();
   const confirm = useConfirmDialog();
@@ -271,8 +265,8 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             onOpenChange={setContentDrawerOpen}
           >
             <DrawerContent>
-              <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
               <div className="max-w-4xl mx-auto w-full p-4">
+                <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
                 <Textarea
                   autoFocus
                   className="field-sizing-fixed resize-none"
@@ -293,21 +287,17 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                 <p className="mt-2 text-right text-sm text-muted-foreground">
                   {drawerContent.length}/{MAX_CONTENT_LENGTH}
                 </p>
+                <Button
+                  className="w-full mt-4"
+                  size="xl"
+                  onClick={() => {
+                    setContent(drawerContent);
+                    setContentDrawerOpen(false);
+                  }}
+                >
+                  확인
+                </Button>
               </div>
-              <DrawerFooter>
-                <div className="max-w-4xl mx-auto w-full">
-                  <Button
-                    className="w-full"
-                    size="xl"
-                    onClick={() => {
-                      setContent(drawerContent);
-                      setContentDrawerOpen(false);
-                    }}
-                  >
-                    확인
-                  </Button>
-                </div>
-              </DrawerFooter>
             </DrawerContent>
           </Drawer>
 

@@ -47,26 +47,10 @@ export async function createPlaceWithReview(
     }
   }
 
-  // 리뷰 저장
-  const { data: reviewData, error: reviewError } = await supabase
-    .from("reviews")
-    .insert({
-      place_id: place.id,
-      user_id: user.id,
-      rating: review.rating,
-      content: review.content || null,
-    })
-    .select("id")
-    .single();
-
-  if (reviewError || !reviewData) {
-    throw new Error("리뷰 작성에 실패했습니다");
-  }
-
   // 이미지 업로드
+  const imageUrls: string[] = [];
   if (images) {
     const files = images.getAll("images") as File[];
-    const imageUrls: string[] = [];
 
     for (const file of files) {
       if (!(file instanceof File) || file.size === 0) continue;
@@ -85,16 +69,19 @@ export async function createPlaceWithReview(
         imageUrls.push(publicUrl);
       }
     }
+  }
 
-    if (imageUrls.length > 0) {
-      await supabase.from("review_images").insert(
-        imageUrls.map((url, i) => ({
-          review_id: reviewData.id,
-          url,
-          display_order: i,
-        }))
-      );
-    }
+  // 리뷰 저장 (image_urls 포함)
+  const { error: reviewError } = await supabase.from("reviews").insert({
+    place_id: place.id,
+    user_id: user.id,
+    rating: review.rating,
+    content: review.content || null,
+    image_urls: imageUrls.length > 0 ? imageUrls : null,
+  });
+
+  if (reviewError) {
+    throw new Error("리뷰 작성에 실패했습니다");
   }
 
   redirect(`/places/${place.id}`);

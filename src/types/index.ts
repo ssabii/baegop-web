@@ -4,26 +4,25 @@ import type { Tables } from "./database";
 export type Profile = Tables<"profiles">;
 export type Place = Tables<"places">;
 export type Review = Tables<"reviews">;
-export type ReviewImage = Tables<"review_images">;
+export type Feedback = Tables<"feedbacks">;
+
 // 릴레이션 포함 타입 (JOIN 조회용)
 export type PlaceWithProfile = Place & {
   profile?: Profile;
 };
 
-export type ReviewWithProfile = Review & {
-  profile?: Profile;
-  images?: ReviewImage[];
-};
-
 // 리터럴 타입 (DB에서 text로 저장되지만 앱에서는 좁은 타입으로 사용)
 export type KonaCardStatus = "available" | "unavailable" | "unknown";
 export type KonaVote = "available" | "unavailable";
+export type FeedbackCategory = "bug" | "feature" | "improvement" | "etc";
 
-/** 리뷰 이미지 (컴포넌트용 — DB 전체 컬럼이 아닌 필요 필드만) */
-export interface ReviewImageItem {
-  url: string;
-  display_order: number;
-}
+// 릴레이션 포함 타입 — 피드백 목록/카드/폼 공용
+export type FeedbackWithImages = Pick<
+  Feedback,
+  "id" | "content" | "created_at" | "image_urls"
+> & {
+  category: FeedbackCategory;
+};
 
 // 비DB 타입 — 네이버 플레이스 GraphQL 검색 결과 (places 쿼리)
 export interface NaverSearchResult {

@@ -21,7 +21,7 @@ export default async function ReviewEditPage({
 
   const { data: review } = await supabase
     .from("reviews")
-    .select("*, review_images(url, display_order)")
+    .select("*")
     .eq("id", Number(reviewId))
     .single();
 
@@ -45,10 +45,7 @@ export default async function ReviewEditPage({
         id: review.id,
         rating: review.rating,
         content: review.content,
-        review_images: (review.review_images ?? []).map((img) => ({
-          ...img,
-          url: optimizeSupabaseImageUrl(img.url),
-        })),
+        image_urls: (review.image_urls ?? []).map((url) => optimizeSupabaseImageUrl(url)),
       }}
       place={{
         name: place.name,

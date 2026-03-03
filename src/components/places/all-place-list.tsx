@@ -1,13 +1,14 @@
 "use client";
 
-import { Fragment } from "react";
 import { useInView } from "react-intersection-observer";
-import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
 import { PlaceCard, EmptyPlace } from "@/components/places";
 import { useAllPlaces } from "./use-all-places";
 
 export function AllPlaceList() {
+  useScrollRestoration();
+
   const { places, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useAllPlaces();
 
@@ -37,12 +38,9 @@ export function AllPlaceList() {
 
   return (
     <>
-      <div className="flex flex-col">
-        {places.map((place, index) => (
-          <Fragment key={place.id}>
-            {index > 0 && <Separator className="my-4" />}
-            <PlaceCard place={place} />
-          </Fragment>
+      <div className="flex flex-col divide-y">
+        {places.map((place) => (
+          <PlaceCard place={place} key={place.id} className="py-4" />
         ))}
       </div>
       <div ref={sentinelRef} className="flex justify-center">

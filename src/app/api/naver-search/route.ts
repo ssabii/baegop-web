@@ -15,14 +15,11 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const x = request.nextUrl.searchParams.get("x") ?? String(COMPANY_LOCATION.lng);
+  const y = request.nextUrl.searchParams.get("y") ?? String(COMPANY_LOCATION.lat);
+
   try {
-    const items = await searchPlaces(
-      query,
-      display,
-      String(COMPANY_LOCATION.lng),
-      String(COMPANY_LOCATION.lat),
-      start,
-    );
+    const items = await searchPlaces(query, display, x, y, start);
     return NextResponse.json(items);
   } catch {
     return NextResponse.json(

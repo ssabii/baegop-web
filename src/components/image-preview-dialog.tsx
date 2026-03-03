@@ -32,15 +32,18 @@ export function ImageCarouselDialog({
 
   // open 시 initialIndex로 리셋
   useEffect(() => {
-    if (open) {
-      setCurrent(initialIndex);
-      api?.scrollTo(initialIndex, false);
-    }
+    if (!open || !api) return;
+    // rAF로 감싸서 useEffect 내 동기 setState cascading render 경고 방지
+    const raf = requestAnimationFrame(() => {
+      api.scrollTo(initialIndex, false);
+    });
+    return () => cancelAnimationFrame(raf);
   }, [open, initialIndex, api]);
 
   // Track current slide
   useEffect(() => {
     if (!api) return;
+    setCurrent(api.selectedScrollSnap());
     const onSelect = () => setCurrent(api.selectedScrollSnap());
     api.on("select", onSelect);
     return () => {
@@ -86,7 +89,7 @@ export function ImageCarouselDialog({
         zIndex: 9999,
         display: "flex",
         flexDirection: "column",
-        background: "rgba(0, 0, 0, 0.8)",
+        background: "#000000",
         height: "100dvh",
         pointerEvents: "auto",
       }}
@@ -123,7 +126,7 @@ export function ImageCarouselDialog({
                 <img
                   src={src}
                   alt={alt ? `${alt} ${i + 1}` : ""}
-                  className="max-h-[75dvh] max-w-full select-none object-contain"
+                  className="max-h-[80dvh] max-w-full select-none object-contain"
                   draggable={false}
                 />
               </CarouselItem>

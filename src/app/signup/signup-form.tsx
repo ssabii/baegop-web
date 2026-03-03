@@ -99,6 +99,21 @@ export function SignUpForm({
     router.push("/signup/confirm");
   };
 
+  const handleKakaoLogin = async () => {
+    const supabase = createClient();
+
+    const callbackParams = new URLSearchParams({
+      redirect: redirectTo || "/",
+    });
+
+    await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
+      },
+    });
+  };
+
   const handleGoogleLogin = async () => {
     const supabase = createClient();
 
@@ -197,7 +212,22 @@ export function SignUpForm({
             </Button>
           </Field>
           <FieldSeparator>또는</FieldSeparator>
-          <Field>
+          <Field className="gap-2">
+            <Button
+              type="button"
+              size="xl"
+              className="w-full bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90"
+              onClick={handleKakaoLogin}
+              disabled={isLoading}
+            >
+              <Image
+                src="/icons/kakao.svg"
+                alt="Kakao"
+                width={20}
+                height={20}
+              />
+              카카오로 시작하기
+            </Button>
             <Button
               type="button"
               variant="outline"

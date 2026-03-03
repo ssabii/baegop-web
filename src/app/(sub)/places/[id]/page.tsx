@@ -11,15 +11,17 @@ import {
 } from "@/lib/naver";
 import { createClient } from "@/lib/supabase/server";
 import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
-import { Dot, Footprints, Home, Phone, Star, Tag } from "lucide-react";
+import { FavoriteButton } from "@/components/favorite-button";
+import { Dot, Footprints, Home, MapPin, Phone, Star, Tag } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { KonaVoteSection } from "./kona-vote";
+import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
+import { KonaVoteSection } from "@/components/place-detail/kona-vote";
+import { UnregisteredBadge } from "@/components/place-detail/unregistered-badge";
 import { PlaceActionBar } from "./place-action-bar";
-import { PlaceTabs } from "./place-tabs";
 import { PlaceMap } from "./place-map";
 import { PlaceShortcuts } from "./place-shortcuts";
-import { UnregisteredBadge } from "./unregistered-badge";
+import { PlaceTabsWithUrl } from "./place-tabs-with-url";
 
 export default async function PlaceDetailPage({
   params,
@@ -78,10 +80,7 @@ export default async function PlaceDetailPage({
   const reviewsQuery = isRegistered
     ? supabase
         .from("reviews")
-        .select(
-          "*, profiles(nickname, avatar_url), review_images(url, display_order)",
-          { count: "exact" },
-        )
+        .select("*, profiles(nickname, avatar_url)", { count: "exact" })
         .eq("place_id", place.id)
         .order("created_at", { ascending: false })
         .range(0, PAGE_SIZE - 1)
@@ -117,11 +116,7 @@ export default async function PlaceDetailPage({
   const initialReviews = {
     items: reviews.map((review) => ({
       ...review,
-      review_images:
-        review.review_images?.map((img) => ({
-          ...img,
-          url: optimizeSupabaseImageUrl(img.url),
-        })) ?? [],
+      image_urls: (review.image_urls ?? []).map((url) => optimizeSupabaseImageUrl(url)),
     })),
     nextCursor: reviews.length === PAGE_SIZE ? PAGE_SIZE : null,
   };
@@ -150,8 +145,10 @@ export default async function PlaceDetailPage({
         <div className="space-y-8 p-4">
           {/* 기본 정보 */}
           <section className="space-y-2">
-            {!isRegistered && <UnregisteredBadge />}
-            <h1 className="text-2xl font-bold">{detail.name}</h1>
+            <div className="flex items-start justify-between gap-2">
+              <h1 className="text-2xl font-bold">{detail.name}</h1>
+              {isRegistered && <FavoriteButton placeId={naverPlaceId} />}
+            </div>
 
             {detail.category && (
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -179,6 +176,12 @@ export default async function PlaceDetailPage({
                 </div>
               </div>
             )}
+            {address && (
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <MapPin className="size-4 shrink-0" />
+                <span className="[text-decoration:none]">{address}</span>
+              </div>
+            )}
             {/* 별점 */}
             {isRegistered && avgRating !== null && (
               <div className="flex items-center gap-1">
@@ -191,6 +194,17 @@ export default async function PlaceDetailPage({
                 </span>
               </div>
             )}
+            {/* 뱃지 */}
+            <div className="flex items-center gap-2">
+              {!isRegistered && <UnregisteredBadge />}
+              {isRegistered && (
+                <KonaCardBadge
+                  status={
+                    (place.kona_card_status as KonaCardStatus) ?? "unknown"
+                  }
+                />
+              )}
+            </div>
           </section>
 
           {/* 장소 맵 */}
@@ -198,7 +212,6 @@ export default async function PlaceDetailPage({
             lat={detail.y}
             lng={detail.x}
             name={detail.name}
-            address={address}
           />
 
           {/* 바로가기 버튼 */}
@@ -215,17 +228,20 @@ export default async function PlaceDetailPage({
               status={(place.kona_card_status as KonaCardStatus) ?? "unknown"}
               userVote={userKonaVote}
               isLoggedIn={!!user}
+              showLoginAlert={!user}
             />
           )}
 
           {/* 메뉴 / 리뷰 탭 */}
-          <PlaceTabs
+          <PlaceTabsWithUrl
             isRegistered={isRegistered}
             placeId={place?.id ?? null}
             naverPlaceId={naverPlaceId}
             currentUserId={user?.id ?? null}
             initialMenus={initialMenus}
             initialReviews={initialReviews}
+            menuCount={detail.menus.length}
+            reviewCount={reviewCount}
           />
         </div>
       </main>

@@ -20,10 +20,14 @@ export function HomeTabs() {
   }
 
   return (
-    <Tabs value={tab} onValueChange={handleTabChange}>
+    <Tabs value={tab} onValueChange={handleTabChange} className="gap-4">
       <TabsList className="w-full">
-        <TabsTrigger value="recent" className="cursor-pointer">최근</TabsTrigger>
-        <TabsTrigger value="popular" className="cursor-pointer">인기</TabsTrigger>
+        <TabsTrigger value="recent" className="cursor-pointer">
+          최근
+        </TabsTrigger>
+        <TabsTrigger value="popular" className="cursor-pointer">
+          인기
+        </TabsTrigger>
       </TabsList>
     </Tabs>
   );

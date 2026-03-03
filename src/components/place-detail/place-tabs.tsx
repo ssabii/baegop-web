@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MenuSection } from "./menu-section";
 import { ReviewSection } from "./review-section";
-import type { MenusResponse } from "./use-menus";
+import { useMenus, type MenusResponse } from "./use-menus";
 import type { ReviewsResponse } from "./use-reviews";
 
 interface PlaceTabsProps {
@@ -13,8 +12,12 @@ interface PlaceTabsProps {
   placeId: string | null;
   naverPlaceId: string;
   currentUserId: string | null;
-  initialMenus: MenusResponse;
-  initialReviews: ReviewsResponse;
+  initialMenus?: MenusResponse;
+  initialReviews?: ReviewsResponse;
+  menuCount?: number;
+  reviewCount?: number;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
 export function PlaceTabs({
@@ -24,40 +27,33 @@ export function PlaceTabs({
   currentUserId,
   initialMenus,
   initialReviews,
+  menuCount,
+  reviewCount,
+  activeTab: controlledTab,
+  onTabChange,
 }: PlaceTabsProps) {
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [internalTab, setInternalTab] = useState("menu");
+  const { menus } = useMenus(naverPlaceId, initialMenus);
 
-  const tab = searchParams.get("tab");
-  const activeTab = tab === "review" ? "review" : "menu";
-
-  useEffect(() => {
-    const scrollToReview = sessionStorage.getItem("scrollToReview");
-    if (scrollToReview === "true") {
-      sessionStorage.removeItem("scrollToReview");
-      tabsRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, []);
+  const activeTab = controlledTab ?? internalTab;
+  const resolvedMenuCount = (menuCount ?? menus.length) || undefined;
 
   function handleTabChange(value: string) {
-    router.replace(`${pathname}?tab=${value}`, { scroll: false });
+    if (onTabChange) {
+      onTabChange(value);
+    } else {
+      setInternalTab(value);
+    }
   }
 
   return (
-    <Tabs
-      ref={tabsRef}
-      value={activeTab}
-      onValueChange={handleTabChange}
-      className="gap-4"
-    >
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="gap-4">
       <TabsList className="w-full">
         <TabsTrigger value="menu" className="flex-1 cursor-pointer">
-          메뉴
+          메뉴{resolvedMenuCount ? ` (${resolvedMenuCount})` : ""}
         </TabsTrigger>
         <TabsTrigger value="review" className="flex-1 cursor-pointer">
-          리뷰
+          리뷰{reviewCount ? ` (${reviewCount})` : ""}
         </TabsTrigger>
       </TabsList>
 

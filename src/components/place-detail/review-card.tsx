@@ -18,10 +18,9 @@ import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { toast } from "sonner";
 import { formatRelativeDate } from "@/lib/date";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
-import type { ReviewImageItem } from "@/types";
 import { StarRating } from "./star-rating";
-import { ReviewImages } from "./review-images";
-import { deleteReview } from "./actions";
+import { ReviewImages } from "@/app/(sub)/places/[id]/review-images";
+import { deleteReview } from "@/app/(sub)/places/[id]/actions";
 
 interface ReviewCardProps {
   review: {
@@ -30,11 +29,11 @@ interface ReviewCardProps {
     content: string | null;
     created_at: string | null;
     user_id: string | null;
+    image_urls: string[] | null;
     profiles: {
       nickname: string | null;
       avatar_url: string | null;
     } | null;
-    review_images: ReviewImageItem[];
   };
   isOwner: boolean;
   naverPlaceId: string;
@@ -106,24 +105,26 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent>
-                  <DrawerTitle className="sr-only">리뷰 관리</DrawerTitle>
-                  <div className="mx-auto flex w-full max-w-4xl flex-col py-2">
-                    <button
-                      type="button"
-                      className="flex items-center gap-3 px-4 py-4 text-base font-bold cursor-pointer"
-                      onClick={handleEdit}
-                    >
-                      <Pencil className="size-4" />
-                      수정
-                    </button>
-                    <button
-                      type="button"
-                      className="flex items-center gap-3 px-4 py-4 text-base font-bold text-destructive cursor-pointer"
-                      onClick={handleDelete}
-                    >
-                      <Trash2 className="size-4" />
-                      삭제
-                    </button>
+                  <div className="max-w-4xl mx-auto w-full p-4">
+                    <DrawerTitle className="sr-only">리뷰 관리</DrawerTitle>
+                    <div className="flex flex-col py-2">
+                      <button
+                        type="button"
+                        className="flex items-center gap-3 py-4 text-base font-bold cursor-pointer"
+                        onClick={handleEdit}
+                      >
+                        <Pencil className="size-4" />
+                        수정
+                      </button>
+                      <button
+                        type="button"
+                        className="flex items-center gap-3 py-4 text-base font-bold text-destructive cursor-pointer"
+                        onClick={handleDelete}
+                      >
+                        <Trash2 className="size-4" />
+                        삭제
+                      </button>
+                    </div>
                   </div>
                 </DrawerContent>
               </Drawer>
@@ -142,8 +143,8 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
       {review.content && (
         <p className="text-sm text-secondary-foreground">{review.content}</p>
       )}
-      {review.review_images.length > 0 && (
-        <ReviewImages images={review.review_images} />
+      {(review.image_urls?.length ?? 0) > 0 && (
+        <ReviewImages images={review.image_urls!} />
       )}
     </div>
   );

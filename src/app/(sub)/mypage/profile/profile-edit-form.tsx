@@ -176,7 +176,7 @@ function ProfileEditFormContent({ profile }: { profile: Profile }) {
       </div>
 
       {/* 닉네임 섹션 */}
-      <div className="flex flex-col gap-2 px-4">
+      <div className="flex flex-col gap-2">
         <label className="text-sm font-bold">닉네임</label>
         <Input
           readOnly
@@ -190,33 +190,35 @@ function ProfileEditFormContent({ profile }: { profile: Profile }) {
       {/* 닉네임 변경 Drawer */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
         <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle className="sr-only">닉네임 변경</DrawerTitle>
-          </DrawerHeader>
-          <div className="px-4 max-w-4xl mx-auto w-full">
-            <Input
-              autoFocus
-              value={drawerNickname}
-              placeholder="닉네임을 입력해주세요"
-              onChange={(e) => {
-                setDrawerNickname(e.target.value);
-                setNicknameError("");
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleDrawerConfirm();
-              }}
-              maxLength={12}
-              className="h-12 dark:bg-transparent"
-            />
-            {nicknameError && (
-              <p className="mt-2 text-sm text-destructive">{nicknameError}</p>
-            )}
+          <div className="max-w-4xl mx-auto w-full">
+            <DrawerHeader>
+              <DrawerTitle className="sr-only">닉네임 변경</DrawerTitle>
+            </DrawerHeader>
+            <div className="px-4">
+              <Input
+                autoFocus
+                value={drawerNickname}
+                placeholder="닉네임을 입력해주세요"
+                onChange={(e) => {
+                  setDrawerNickname(e.target.value);
+                  setNicknameError("");
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleDrawerConfirm();
+                }}
+                maxLength={12}
+                className="h-12 dark:bg-transparent"
+              />
+              {nicknameError && (
+                <p className="mt-2 text-sm text-destructive">{nicknameError}</p>
+              )}
+            </div>
+            <DrawerFooter>
+              <Button size="xl" onClick={handleDrawerConfirm}>
+                확인
+              </Button>
+            </DrawerFooter>
           </div>
-          <DrawerFooter className="max-w-4xl mx-auto w-full">
-            <Button size="xl" onClick={handleDrawerConfirm}>
-              확인
-            </Button>
-          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 

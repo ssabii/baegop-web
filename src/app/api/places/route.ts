@@ -9,6 +9,12 @@ import { optimizeNaverImageUrls } from "@/lib/image";
 
 const DEFAULT_LIMIT = 10;
 
+const KONA_ORDER: Record<string, number> = {
+  available: 0,
+  unavailable: 1,
+  unknown: 2,
+};
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const tab = searchParams.get("tab") ?? "popular";
@@ -53,15 +59,23 @@ export async function GET(request: NextRequest) {
         };
       })
       .sort((a, b) => {
-        if (a.avg_rating === null && b.avg_rating === null)
-          return a.id.localeCompare(b.id);
-        if (a.avg_rating === null) return 1;
-        if (b.avg_rating === null) return -1;
-        return (
-          b.avg_rating - a.avg_rating ||
-          b.review_count - a.review_count ||
-          a.id.localeCompare(b.id)
-        );
+        // 1. 별점 내림차순
+        if (a.avg_rating === null && b.avg_rating === null) {
+          // 둘 다 별점 없으면 코나카드 비교로
+        } else if (a.avg_rating === null) return 1;
+        else if (b.avg_rating === null) return -1;
+        else {
+          const ratingDiff = b.avg_rating - a.avg_rating;
+          if (ratingDiff !== 0) return ratingDiff;
+        }
+
+        // 2. 코나카드 available 우선
+        const konaA = KONA_ORDER[a.kona_card_status ?? "unknown"] ?? 2;
+        const konaB = KONA_ORDER[b.kona_card_status ?? "unknown"] ?? 2;
+        if (konaA !== konaB) return konaA - konaB;
+
+        // 3. 리뷰 수, ID
+        return b.review_count - a.review_count || a.id.localeCompare(b.id);
       });
 
     const items = places.slice(cursor, cursor + limit);
@@ -102,12 +116,16 @@ export async function GET(request: NextRequest) {
           p.avg_rating >= POPULAR_RATING_THRESHOLD &&
           p.review_count >= POPULAR_MIN_REVIEW_COUNT,
       )
-      .sort(
-        (a, b) =>
-          b.avg_rating! - a.avg_rating! ||
-          b.review_count - a.review_count ||
-          a.id.localeCompare(b.id),
-      );
+      .sort((a, b) => {
+        const ratingDiff = b.avg_rating! - a.avg_rating!;
+        if (ratingDiff !== 0) return ratingDiff;
+
+        const konaA = KONA_ORDER[a.kona_card_status ?? "unknown"] ?? 2;
+        const konaB = KONA_ORDER[b.kona_card_status ?? "unknown"] ?? 2;
+        if (konaA !== konaB) return konaA - konaB;
+
+        return b.review_count - a.review_count || a.id.localeCompare(b.id);
+      });
 
     const items = places.slice(cursor, cursor + limit);
     const nextCursor =

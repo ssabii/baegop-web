@@ -62,6 +62,18 @@ Supabase Auth 연동. `auth.users` 가입 시 트리거로 자동 생성.
 | vote | text | `available` / `unavailable` |
 | created_at | timestamptz | 생성일 |
 
+### favorites
+찜하기. 사용자가 장소를 저장. 등록된 장소만 찜 가능 (places FK).
+
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | bigint (PK, IDENTITY) | |
+| user_id | uuid (FK → auth.users, CASCADE) | 유저 |
+| place_id | text (FK → places, CASCADE) | 장소 |
+| created_at | timestamptz | 생성일 |
+
+UNIQUE(user_id, place_id) — 유저당 장소 1회 찜.
+
 ### app_config
 앱 설정 key-value 저장소. 코드 변경 없이 설정값 변경 가능.
 
@@ -120,6 +132,7 @@ update app_config set value = '5' where key = 'kona_vote_threshold';
 | reviews | 모두 | 인증 유저 (user_id = 본인) | 작성자만 | 작성자만 |
 | review_images | 모두 | 리뷰 작성자만 | - | 리뷰 작성자만 |
 | kona_card_votes | 모두 | 인증 유저 (user_id = 본인) | 본인만 | 본인만 |
+| favorites | 본인만 | 인증 유저 (user_id = 본인) | - | 본인만 |
 | app_config | 모두 | - | - | - |
 
 ---
@@ -150,3 +163,4 @@ profile-images/{user_id}/{파일명}
 | `supabase/004_storage.sql` | Storage 버킷 |
 | `supabase/005_seed.sql` | 시드 데이터 (개발 환경 전용) |
 | `supabase/012_drop_unused_columns.sql` | 미사용 컬럼/테이블 제거 마이그레이션 |
+| `supabase/014_favorites.sql` | 찜하기 테이블 + RLS |

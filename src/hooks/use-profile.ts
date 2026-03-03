@@ -9,16 +9,16 @@ export interface Profile {
 
 export const profileQueryKey = ["profile"];
 
-/** 이메일 @ 앞(로컬)만 마스킹. 앞 3자만 노출, 3자 이하는 전부 * */
+/** 이메일 @ 앞(로컬)만 마스킹. 앞 2자만 노출, 나머지는 각 글자 수에 맞게 * 처리 */
 export function getMaskedEmail(email: string): string {
   const [local, domain] = email.split("@");
 
   if (!local) return email;
 
   const maskedLocal =
-    local.length <= 3
-      ? local.replace(/./g, "*")
-      : local.replace(/^(.{3}).*$/, "$1***");
+    local.length <= 2
+      ? "*".repeat(local.length)
+      : local.slice(0, 2) + "*".repeat(local.length - 2);
   return domain ? `${maskedLocal}@${domain}` : maskedLocal;
 }
 

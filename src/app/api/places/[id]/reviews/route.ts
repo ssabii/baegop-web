@@ -20,9 +20,7 @@ export async function GET(
 
   const { data, error } = await supabase
     .from("reviews")
-    .select(
-      "*, profiles(nickname, avatar_url), review_images(url, display_order)",
-    )
+    .select("*, profiles(nickname, avatar_url)")
     .eq("place_id", placeId)
     .order("created_at", { ascending: false })
     .range(cursor, cursor + limit - 1);
@@ -33,10 +31,7 @@ export async function GET(
 
   const items = (data ?? []).map((review) => ({
     ...review,
-    review_images: review.review_images?.map((img) => ({
-      ...img,
-      url: optimizeSupabaseImageUrl(img.url),
-    })) ?? [],
+    image_urls: (review.image_urls ?? []).map((url) => optimizeSupabaseImageUrl(url)),
   }));
   const nextCursor = items.length === limit ? cursor + limit : null;
 

@@ -8,6 +8,7 @@ interface UsePlaceSuggestionsOptions {
   input: string;
   setInput: (value: string) => void;
   isTyping: boolean;
+  initialQuery?: string;
   onSelect: (item: NaverSearchResult) => void;
 }
 
@@ -29,6 +30,7 @@ export function usePlaceSuggestions({
   input,
   setInput,
   isTyping,
+  initialQuery,
   onSelect,
 }: UsePlaceSuggestionsOptions): UsePlaceSuggestionsReturn {
   const [suggestions, setSuggestions] = useState<NaverSearchResult[]>([]);
@@ -39,7 +41,7 @@ export function usePlaceSuggestions({
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
   const suggestControllerRef = useRef<AbortController>(null);
   const listRef = useRef<HTMLUListElement>(null);
-  const skipFocusRef = useRef(false);
+  const skipFocusRef = useRef(!!initialQuery);
 
   const searchSuggestions = useCallback(async (q: string) => {
     if (q.trim().length < 2) {
@@ -76,6 +78,16 @@ export function usePlaceSuggestions({
   useEffect(() => {
     if (!isTyping) return;
 
+    // 빈 입력이면 즉시 초기화 (디바운스 없이)
+    if (input.trim().length === 0) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      suggestControllerRef.current?.abort();
+      setSuggestions([]);
+      setPopoverOpen(false);
+      setIsSearching(false);
+      return;
+    }
+
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => searchSuggestions(input), 300);
 
@@ -97,8 +109,9 @@ export function usePlaceSuggestions({
       skipFocusRef.current = false;
       return;
     }
-    if (input.trim().length >= 2) {
-      searchSuggestions(input);
+    // 이미 제안이 있으면 팝오버만 다시 열기 (재검색 방지)
+    if (suggestions.length > 0) {
+      setPopoverOpen(true);
     }
   }
 
