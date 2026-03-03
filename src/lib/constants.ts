@@ -244,6 +244,14 @@ export const MAX_FEEDBACK_CONTENT_LENGTH = 3000;
 export const MIN_FEEDBACK_CONTENT_LENGTH = 10;
 export const MAX_FEEDBACK_IMAGES = 5;
 
+// 포인트 배분
+export const POINTS = {
+  PLACE_REGISTRATION: 2,
+  REVIEW: 5,
+  REVIEW_PHOTO: 3,
+  KONA_VOTE: 1,
+} as const;
+
 // 크몽 사무실 좌표
 export const COMPANY_LOCATION = {
   name: "크몽",

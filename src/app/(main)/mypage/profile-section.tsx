@@ -63,9 +63,14 @@ export function ProfileSection() {
             </Avatar>
           </ItemMedia>
           <ItemContent className="flex-1 gap-0">
-            <ItemTitle className="text-xl font-bold line-clamp-1">
-              {profile.nickname}
-            </ItemTitle>
+            <div className="flex items-center gap-1.5">
+              <ItemTitle className="text-xl font-bold line-clamp-1">
+                {profile.nickname}
+              </ItemTitle>
+              <span className="shrink-0 text-sm font-bold text-primary">
+                {profile.totalPoints}P
+              </span>
+            </div>
             <ItemDescription className="text-base line-clamp-1">
               {profile.email}
             </ItemDescription>
