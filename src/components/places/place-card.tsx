@@ -29,7 +29,7 @@ export function PlaceCard({
   return (
     <Link
       href={`/places/${place.id}`}
-      className={cn("flex gap-3 transition-colors hover:bg-accent", className)}
+      className={cn("flex gap-3", className)}
     >
       <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
