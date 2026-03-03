@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Drawer } from "vaul";
 import { Building2, MapPin, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 import { MapViewButton } from "./map-view-button";
@@ -21,12 +22,6 @@ interface StoreListSheetProps {
   onClose: () => void;
 }
 
-function getLastCategory(category: string): string {
-  if (!category) return "";
-  const parts = category.split(">");
-  return parts[parts.length - 1].trim();
-}
-
 function StoreListItem({
   store,
   isSelected,
@@ -36,6 +31,7 @@ function StoreListItem({
   isSelected: boolean;
   onSelect: () => void;
 }) {
+  const [imgError, setImgError] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -43,8 +39,6 @@ function StoreListItem({
       ref.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [isSelected]);
-
-  const category = getLastCategory(store.category);
 
   return (
     <button
@@ -58,24 +52,25 @@ function StoreListItem({
     >
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="text-base font-bold">{store.name}</span>
-        {category && (
+        {store.category && (
           <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
             <Tag className="size-3 shrink-0" />
-            <span className="truncate">{category}</span>
+            <span>{store.category}</span>
           </span>
         )}
         <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
           <MapPin className="size-3 shrink-0" />
-          <span className="truncate">
-            {store.roadAddress || store.address}
+          <span>
+            {formatShortAddress(store.roadAddress || store.address)}
           </span>
         </span>
       </div>
-      {store.imageUrl ? (
+      {store.imageUrl && !imgError ? (
         <img
           src={optimizeNaverImageUrl(store.imageUrl)}
           alt=""
           className="size-20 shrink-0 rounded-lg object-cover"
+          onError={() => setImgError(true)}
         />
       ) : (
         <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">

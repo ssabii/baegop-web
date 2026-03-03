@@ -26,8 +26,8 @@ const CLUSTER_MAX_ZOOM = 15;
 
 function createMarkerContent(name: string): string {
   return `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">
-  <img src="/dubai-cookie.svg" width="28" height="24" alt="" />
-  <span style="font-size:10px;font-weight:600;color:var(--foreground);background:var(--background);padding:1px 4px;border-radius:4px;margin-top:2px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.15);max-width:80px;overflow:hidden;text-overflow:ellipsis;">${name}</span>
+  <img src="/dubai-cookie.svg" width="32" height="32" alt="" />
+  <span style="font-size:12px;font-weight:600;color:var(--foreground);background:var(--background);padding:1px 4px;border-radius:4px;margin-top:2px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.15);max-width:120px;overflow:hidden;text-overflow:ellipsis;">${name}</span>
 </div>`;
 }
 

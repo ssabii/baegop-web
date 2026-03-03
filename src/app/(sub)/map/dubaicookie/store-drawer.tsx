@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FavoriteButton } from "@/components/favorite-button";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import { KonaVoteSection } from "@/components/place-detail/kona-vote";
@@ -149,6 +150,36 @@ function StoreDetail({ store }: { store: DubaiCookieStore }) {
   );
 }
 
+function StoreDrawerHeader({
+  store,
+  onClose,
+}: {
+  store: DubaiCookieStore;
+  onClose: () => void;
+}) {
+  const { data: placeData } = usePlaceData(store.placeId, {
+    x: String(store.lng),
+    y: String(store.lat),
+  });
+  const isRegistered = !!placeData?.place;
+
+  return (
+    <div className="mx-auto flex w-full max-w-4xl shrink-0 items-center justify-end gap-2 px-4 pb-2">
+      {isRegistered && (
+        <FavoriteButton placeId={store.placeId} className="size-8 bg-secondary" />
+      )}
+      <Button
+        variant="secondary"
+        size="icon-sm"
+        onClick={onClose}
+        className="rounded-full"
+      >
+        <X className="size-5" />
+      </Button>
+    </div>
+  );
+}
+
 export function StoreDrawer({ store, onClose }: StoreDrawerProps) {
   const [activeSnap, setActiveSnap] = useState<SnapPoint>(HALF_SNAP);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -203,16 +234,7 @@ export function StoreDrawer({ store, onClose }: StoreDrawerProps) {
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
             </div>
 
-            <div className="mx-auto flex w-full max-w-4xl shrink-0 items-center justify-end gap-2 px-4 pb-2">
-              <Button
-                variant="secondary"
-                size="icon-sm"
-                onClick={onClose}
-                className="rounded-full"
-              >
-                <X className="size-5" />
-              </Button>
-            </div>
+            <StoreDrawerHeader store={store} onClose={onClose} />
 
             <div
               ref={contentRef}
