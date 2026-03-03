@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useLayoutEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Drawer } from "vaul";
@@ -195,6 +195,11 @@ export function StoreDrawer({ store, onClose, onSnapChange }: StoreDrawerProps) 
 
   const isFullSnap = activeSnap === FULL_SNAP;
   const isScrollable = activeSnap === HALF_SNAP || activeSnap === FULL_SNAP;
+
+  useLayoutEffect(() => {
+    document.addEventListener('focusin', e => e.stopImmediatePropagation());
+    document.addEventListener('focusout', e => e.stopImmediatePropagation());
+  }, []);
 
   useEffect(() => {
     onSnapChange?.(activeSnap);
