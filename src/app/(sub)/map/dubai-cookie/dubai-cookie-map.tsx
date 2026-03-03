@@ -129,13 +129,6 @@ export function DubaiCookieMap() {
     [],
   );
 
-  const handleSearch = useCallback(
-    (query: string) => {
-      router.push(buildUrl({ query }), { scroll: false });
-    },
-    [router, buildUrl],
-  );
-
   const handleSearchClear = useCallback(() => {
     router.replace("/map/dubai-cookie", { scroll: false });
   }, [router]);
@@ -338,7 +331,6 @@ export function DubaiCookieMap() {
 
       <DubaiCookieSearchInput
         onBack={handleBack}
-        onSearch={handleSearch}
         onClear={handleSearchClear}
         initialQuery={queryParam}
       />
