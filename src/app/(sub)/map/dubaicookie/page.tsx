@@ -5,7 +5,7 @@ export default function DubaiCookiePage() {
   return (
     <div className="flex h-dvh flex-col">
       <SubHeader title="두쫀쿠 지도" />
-      <DubaiCookieMap className="flex-1" />
+      <DubaiCookieMap />
     </div>
   );
 }

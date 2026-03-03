@@ -34,7 +34,7 @@ export function PlaceItem({
       className={cn(
         "flex w-full cursor-pointer items-center gap-3 text-left transition-colors [-webkit-tap-highlight-color:transparent]",
         paddingClass,
-        highlighted ? "bg-accent" : "hover:bg-accent",
+        { "bg-accent": highlighted },
       )}
     >
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">

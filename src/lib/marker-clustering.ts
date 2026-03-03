@@ -9,7 +9,9 @@ declare global {
       icons: Array<{ content: string; size: naver.maps.Size; anchor: naver.maps.Point }>;
       indexGenerator: number[];
       stylingFunction: (clusterMarker: naver.maps.Marker, count: number) => void;
-    }) => { setMap: (map: naver.maps.Map | null) => void };
+    }) => {
+      setMap: (map: naver.maps.Map | null) => void;
+    };
   }
 }
 
@@ -19,16 +21,26 @@ interface MarkerClusteringOptions {
   gridSize?: number;
   maxZoom?: number;
   minClusterSize?: number;
+  clusterColors?: { light: string; dark: string };
+  onClusterClick?: (cluster: { getCenter: () => naver.maps.LatLng }) => void;
 }
 
-function createClusterIcon(size: number): {
+function isDarkMode(): boolean {
+  return document.documentElement.classList.contains("dark");
+}
+
+function createClusterIcon(size: number, colors?: { light: string; dark: string }): {
   content: string;
   size: naver.maps.Size;
   anchor: naver.maps.Point;
 } {
   const half = size / 2;
+  const bg = colors
+    ? (isDarkMode() ? colors.dark : colors.light)
+    : "oklch(var(--primary))";
+  const fg = colors ? "#fff" : "oklch(var(--primary-foreground))";
   return {
-    content: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:oklch(var(--primary));color:oklch(var(--primary-foreground));display:flex;align-items:center;justify-content:center;font-size:${size < 44 ? 12 : 14}px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.25);cursor:pointer;"></div>`,
+    content: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-size:${size < 44 ? 12 : 14}px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.25);cursor:pointer;"></div>`,
     size: new naver.maps.Size(size, size),
     anchor: new naver.maps.Point(half, half),
   };
@@ -45,6 +57,8 @@ export function createMarkerClustering({
   gridSize = 120,
   maxZoom = 15,
   minClusterSize = 2,
+  clusterColors,
+  onClusterClick,
 }: MarkerClusteringOptions): () => void {
   const clustering = new window.MarkerClustering({
     map,
@@ -52,12 +66,23 @@ export function createMarkerClustering({
     gridSize,
     maxZoom,
     minClusterSize,
-    icons: [createClusterIcon(36), createClusterIcon(44), createClusterIcon(54)],
+    icons: [
+      createClusterIcon(36, clusterColors),
+      createClusterIcon(44, clusterColors),
+      createClusterIcon(54, clusterColors),
+    ],
     indexGenerator: [10, 50, Infinity],
     stylingFunction: (clusterMarker, count) => {
       const el = clusterMarker.getElement();
       const div = el?.querySelector("div");
       if (div) div.textContent = String(count);
+
+      if (onClusterClick) {
+        el?.addEventListener("click", () => {
+          const pos = clusterMarker.getPosition() as naver.maps.LatLng;
+          onClusterClick({ getCenter: () => pos });
+        });
+      }
     },
   });
 

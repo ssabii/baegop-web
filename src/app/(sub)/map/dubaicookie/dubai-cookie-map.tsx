@@ -1,14 +1,17 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import {
   DUBAI_COOKIE_STORES,
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
 import { createMarkerClustering } from "@/lib/marker-clustering";
+import { useGeolocation } from "@/hooks/use-geolocation";
 import dynamic from "next/dynamic";
+import { LocationButton } from "./location-button";
 import { StoreDrawer } from "./store-drawer";
+import { StoreListSheet } from "./store-list-sheet";
 
 const NaverMap = dynamic(() => import("@/components/naver-map"), {
   ssr: false,
@@ -19,18 +22,36 @@ const NaverMap = dynamic(() => import("@/components/naver-map"), {
   ),
 });
 
-const MARKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#8B4513" stroke="#8B4513" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));cursor:pointer;"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3" fill="white"/></svg>`;
+const CLUSTER_MAX_ZOOM = 15;
 
-interface DubaiCookieMapProps {
-  className?: string;
+function createMarkerContent(name: string): string {
+  return `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">
+  <img src="/dubai-cookie.svg" width="28" height="24" alt="" />
+  <span style="font-size:10px;font-weight:600;color:var(--foreground);background:var(--background);padding:1px 4px;border-radius:4px;margin-top:2px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.15);max-width:80px;overflow:hidden;text-overflow:ellipsis;">${name}</span>
+</div>`;
 }
 
-export function DubaiCookieMap({ className }: DubaiCookieMapProps) {
+export function DubaiCookieMap() {
   const [selectedStore, setSelectedStore] = useState<DubaiCookieStore | null>(
     null,
   );
+  const [showList, setShowList] = useState(true);
+  const mapRef = useRef<naver.maps.Map | null>(null);
+  const locationMarkerRef = useRef<naver.maps.Marker | null>(null);
+  const userCoords = useGeolocation();
+  const initialCenteredRef = useRef(false);
+
+  // 현재 위치를 받으면 최초 1회 맵 센터 이동
+  useEffect(() => {
+    if (!userCoords || !mapRef.current || initialCenteredRef.current) return;
+    initialCenteredRef.current = true;
+    mapRef.current.setCenter(
+      new naver.maps.LatLng(userCoords.lat, userCoords.lng),
+    );
+  }, [userCoords]);
 
   const handleReady = useCallback((map: naver.maps.Map) => {
+    mapRef.current = map;
     const markers: naver.maps.Marker[] = [];
 
     naver.maps.Event.addListener(map, "click", () => {
@@ -42,20 +63,32 @@ export function DubaiCookieMap({ className }: DubaiCookieMapProps) {
         position: new naver.maps.LatLng(store.lat, store.lng),
         title: store.name,
         icon: {
-          content: MARKER_ICON,
-          size: new naver.maps.Size(24, 24),
-          anchor: new naver.maps.Point(12, 24),
+          content: createMarkerContent(store.name),
+          size: new naver.maps.Size(80, 48),
+          anchor: new naver.maps.Point(40, 24),
         },
       });
 
       naver.maps.Event.addListener(marker, "click", () => {
         setSelectedStore(store);
+        map.panTo(new naver.maps.LatLng(store.lat, store.lng));
       });
 
       markers.push(marker);
     });
 
-    const cleanupClustering = createMarkerClustering({ map, markers });
+    const cleanupClustering = createMarkerClustering({
+      map,
+      markers,
+      maxZoom: CLUSTER_MAX_ZOOM,
+      clusterColors: { light: "#B0CC50", dark: "#8EB035" },
+      onClusterClick: (cluster) => {
+        const currentZoom = map.getZoom();
+        const targetZoom = Math.min(currentZoom + 3, CLUSTER_MAX_ZOOM + 1);
+        map.setCenter(cluster.getCenter());
+        map.setZoom(targetZoom);
+      },
+    });
 
     return () => {
       cleanupClustering();
@@ -63,13 +96,63 @@ export function DubaiCookieMap({ className }: DubaiCookieMapProps) {
     };
   }, []);
 
+  const handleSelectStore = useCallback((store: DubaiCookieStore) => {
+    setSelectedStore(store);
+    mapRef.current?.panTo(new naver.maps.LatLng(store.lat, store.lng));
+  }, []);
+
+  const handleLocate = useCallback(
+    (position: { lat: number; lng: number }) => {
+      const map = mapRef.current;
+      if (!map) return;
+
+      const latlng = new naver.maps.LatLng(position.lat, position.lng);
+      map.morph(latlng, 16, { easing: "easeOutCubic" });
+
+      if (locationMarkerRef.current) {
+        locationMarkerRef.current.setPosition(latlng);
+      } else {
+        locationMarkerRef.current = new naver.maps.Marker({
+          position: latlng,
+          map,
+          icon: {
+            content: `<div style="width:16px;height:16px;border-radius:50%;background:#4285F4;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
+            size: new naver.maps.Size(16, 16),
+            anchor: new naver.maps.Point(8, 8),
+          },
+          zIndex: 100,
+        });
+      }
+    },
+    [],
+  );
+
+  const handleCloseList = useCallback(() => {
+    setShowList(false);
+    setSelectedStore(null);
+  }, []);
+
   return (
-    <>
-      <NaverMap onReady={handleReady} className={className} />
+    <div className="relative flex-1">
+      <NaverMap onReady={handleReady} className="size-full" />
+
+      <div className="absolute right-4 bottom-4 z-10">
+        <LocationButton onLocate={handleLocate} />
+      </div>
+
+      {showList && !selectedStore && (
+        <StoreListSheet
+          stores={DUBAI_COOKIE_STORES}
+          selectedStore={selectedStore}
+          onSelectStore={handleSelectStore}
+          onClose={handleCloseList}
+        />
+      )}
+
       <StoreDrawer
         store={selectedStore}
         onClose={() => setSelectedStore(null)}
       />
-    </>
+    </div>
   );
 }
