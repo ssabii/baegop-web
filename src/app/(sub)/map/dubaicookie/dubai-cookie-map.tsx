@@ -79,9 +79,11 @@ export function DubaiCookieMap() {
 
   // Refs for stable access in map event handlers (avoid stale closures)
   const queryParamRef = useRef(queryParam);
-  queryParamRef.current = queryParam;
   const placeParamRef = useRef(placeParam);
-  placeParamRef.current = placeParam;
+  useEffect(() => {
+    queryParamRef.current = queryParam;
+    placeParamRef.current = placeParam;
+  }, [queryParam, placeParam]);
 
   const userCoords = useGeolocation();
 
@@ -331,8 +333,8 @@ export function DubaiCookieMap() {
   const showList = !selectedStore;
 
   return (
-    <div className="relative flex-1">
-      <NaverMap onReady={handleReady} className="size-full" />
+    <>
+      <NaverMap onReady={handleReady} className="fixed inset-0" />
 
       <DubaiCookieSearchInput
         onBack={handleBack}
@@ -341,14 +343,14 @@ export function DubaiCookieMap() {
         initialQuery={queryParam}
       />
 
-      <div
+      {/* <div
         className={cn("absolute right-4 z-42 transition-all duration-300", {
           "pointer-events-none opacity-0": sheetSnap === 1,
         })}
         style={{ bottom: `calc(${getSheetBottom(sheetSnap)} + 16px)` }}
       >
         <LocationButton onLocate={handleLocate} />
-      </div>
+      </div> */}
 
       {showList && (
         <StoreListSheet
@@ -361,11 +363,12 @@ export function DubaiCookieMap() {
 
       {selectedStore && (
         <StoreDrawer
+          key={selectedStore.placeId}
           store={selectedStore}
           onClose={handleCloseDetail}
           onSnapChange={setSheetSnap}
         />
       )}
-    </div>
+    </>
   );
 }

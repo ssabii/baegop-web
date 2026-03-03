@@ -220,11 +220,6 @@ export function StoreDrawer({ store, onClose, onSnapChange }: StoreDrawerProps) 
     router.replace(`/map/dubaicookie?${params}`, { scroll: false });
   }, [isFullSnap, searchParams, router]);
 
-  // store 변경 시 snap 리셋
-  useEffect(() => {
-    if (store) setActiveSnap(HALF_SNAP);
-  }, [store]);
-
   const handleSnapChange = useCallback((snap: SnapPoint | null) => {
     if (snap !== null) setActiveSnap(snap);
   }, []);

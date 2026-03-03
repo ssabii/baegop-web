@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -18,14 +18,11 @@ export function DubaiCookieSearchInput({
   onClear,
   initialQuery = "",
 }: DubaiCookieSearchInputProps) {
-  const [value, setValue] = useState(initialQuery);
-  const [prevInitialQuery, setPrevInitialQuery] = useState(initialQuery);
+  const [value, setValue] = useState("");
 
-  // Sync URL → state when initialQuery changes externally (browser back/forward)
-  if (initialQuery !== prevInitialQuery) {
-    setPrevInitialQuery(initialQuery);
-    setValue(initialQuery);
-  }
+  useEffect(() => {
+      setValue(initialQuery);
+    },[initialQuery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
