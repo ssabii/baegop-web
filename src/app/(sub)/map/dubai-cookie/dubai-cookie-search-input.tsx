@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -18,16 +18,18 @@ export function DubaiCookieSearchInput({
   onClear,
   initialQuery = "",
 }: DubaiCookieSearchInputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
 
   useEffect(() => {
-      setValue(initialQuery);
-    },[initialQuery]);
+    setValue(initialQuery);
+  }, [initialQuery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = value.trim();
     if (trimmed) {
+      inputRef.current?.blur();
       onSearch(trimmed);
     }
   };
@@ -53,6 +55,7 @@ export function DubaiCookieSearchInput({
             <ChevronLeft className="size-5" />
           </button>
           <Input
+            ref={inputRef}
             placeholder="두쫀쿠 매장을 검색해보세요"
             value={value}
             onChange={(e) => setValue(e.target.value)}
