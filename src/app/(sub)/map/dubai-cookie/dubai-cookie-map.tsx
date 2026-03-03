@@ -343,14 +343,14 @@ export function DubaiCookieMap() {
         initialQuery={queryParam}
       />
 
-      {/* <div
+      <div
         className={cn("absolute right-4 z-42 transition-all duration-300", {
           "pointer-events-none opacity-0": sheetSnap === 1,
         })}
         style={{ bottom: `calc(${getSheetBottom(sheetSnap)} + 16px)` }}
       >
         <LocationButton onLocate={handleLocate} />
-      </div> */}
+      </div>
 
       {showList && (
         <StoreListSheet
