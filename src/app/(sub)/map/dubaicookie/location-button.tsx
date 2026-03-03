@@ -2,15 +2,16 @@
 
 import { useCallback, useState } from "react";
 import { LocateFixed } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface LocationButtonProps {
   onLocate: (position: { lat: number; lng: number }) => void;
@@ -50,33 +51,30 @@ export function LocationButton({ onLocate }: LocationButtonProps) {
         <LocateFixed className="size-5 text-foreground" />
       </button>
 
-      <AlertDialog open={errorOpen} onOpenChange={setErrorOpen}>
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle>위치 접근 불가</AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>
-                  현재 위치를 가져올 수 없습니다. 아래 설정을 확인해주세요
-                </p>
-                <ul className="list-disc space-y-1 pl-4">
-                  <li>
-                    <strong>iOS</strong>: 설정 &gt; 개인 정보 보호 및 보안 &gt;
-                    위치 서비스에서 브라우저의 위치 접근을 허용해주세요
-                  </li>
-                  <li>
-                    <strong>Android</strong>: 설정 &gt; 위치에서 위치 서비스를
-                    켜고, 브라우저의 위치 접근을 허용해주세요
-                  </li>
-                </ul>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-col">
-            <AlertDialogCancel className="w-full">확인</AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={errorOpen} onOpenChange={setErrorOpen}>
+        <DialogContent className="max-w-xs" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>위치 접근 불가</DialogTitle>
+            <DialogDescription>
+              현재 위치를 가져올 수 없습니다.
+              <br />
+              위치 서비스를 허용해주세요.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                size="xl"
+                className="w-full"
+                onClick={() => setErrorOpen(false)}
+              >
+                확인
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

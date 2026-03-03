@@ -22,7 +22,10 @@ interface MarkerClusteringOptions {
   maxZoom?: number;
   minClusterSize?: number;
   clusterColors?: { light: string; dark: string };
-  onClusterClick?: (cluster: { getCenter: () => naver.maps.LatLng }) => void;
+  onClusterClick?: (cluster: {
+    getCenter: () => naver.maps.LatLng;
+    getBounds: () => naver.maps.LatLngBounds;
+  }) => void;
 }
 
 function isDarkMode(): boolean {
@@ -74,14 +77,38 @@ export function createMarkerClustering({
     indexGenerator: [10, 50, Infinity],
     stylingFunction: (clusterMarker, count) => {
       const el = clusterMarker.getElement();
-      const div = el?.querySelector("div");
-      if (div) div.textContent = String(count);
+      const div = el?.querySelector("div") as HTMLDivElement | null;
+      if (div) {
+        div.textContent = String(count);
 
-      if (onClusterClick) {
-        el?.addEventListener("click", () => {
-          const pos = clusterMarker.getPosition() as naver.maps.LatLng;
-          onClusterClick({ getCenter: () => pos });
-        });
+        if (onClusterClick) {
+          div.onclick = (e) => {
+            e.stopPropagation();
+            const pos = clusterMarker.getPosition() as naver.maps.LatLng;
+
+            // Compute bounds from markers within the cluster's grid cell
+            const proj = map.getProjection();
+            const centerPt = proj.fromCoordToOffset(pos);
+            const half = gridSize / 2;
+            const bounds = new naver.maps.LatLngBounds(pos, pos);
+
+            for (const m of markers) {
+              const mPos = m.getPosition() as naver.maps.LatLng;
+              const mPt = proj.fromCoordToOffset(mPos);
+              if (
+                Math.abs(mPt.x - centerPt.x) <= half &&
+                Math.abs(mPt.y - centerPt.y) <= half
+              ) {
+                bounds.extend(mPos);
+              }
+            }
+
+            onClusterClick({
+              getCenter: () => pos,
+              getBounds: () => bounds,
+            });
+          };
+        }
       }
     },
   });

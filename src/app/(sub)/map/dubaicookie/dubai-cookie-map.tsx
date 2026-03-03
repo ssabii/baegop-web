@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 import {
   DUBAI_COOKIE_STORES,
   type DubaiCookieStore,
@@ -27,8 +28,17 @@ const NaverMap = dynamic(() => import("@/components/naver-map"), {
 
 const CLUSTER_MAX_ZOOM = 15;
 
-/** Pan so the marker sits in the upper portion of the visible map (above the half-height bottom sheet) */
-function panToAboveSheet(map: naver.maps.Map, lat: number, lng: number) {
+/** Pan (and optionally zoom) so the marker sits in the upper portion of the visible map */
+function panToAboveSheet(
+  map: naver.maps.Map,
+  lat: number,
+  lng: number,
+  targetZoom?: number,
+) {
+  // If zoom changes, set it first so projection calculates the correct offset
+  if (targetZoom !== undefined && map.getZoom() < targetZoom) {
+    map.setZoom(targetZoom, false);
+  }
   const proj = map.getProjection();
   const point = proj.fromCoordToOffset(new naver.maps.LatLng(lat, lng));
   // Bottom sheet covers ~50% of viewport. Shift pan target down by 10% so marker
@@ -43,8 +53,13 @@ function panToAboveSheet(map: naver.maps.Map, lat: number, lng: number) {
 function createMarkerContent(name: string): string {
   return `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">
   <img src="/dubai-cookie.svg" width="32" height="32" alt="" />
-  <span style="font-size:12px;font-weight:600;color:var(--marker-label-color);margin-top:2px;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;text-shadow:var(--marker-label-shadow);">${name}</span>
+  <span style="font-size:12px;font-weight:600;color:var(--foreground);background:var(--background);padding:1px 4px;border-radius:4px;margin-top:2px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.15);max-width:120px;overflow:hidden;text-overflow:ellipsis;">${name}</span>
 </div>`;
+}
+
+function getSheetBottom(snap: number | string): string {
+  if (typeof snap === "string") return snap; // "200px"
+  return `${snap * 100}%`; // 0.3 → "30%", 0.5 → "50%"
 }
 
 export function DubaiCookieMap() {
@@ -52,6 +67,8 @@ export function DubaiCookieMap() {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") ?? "";
   const placeParam = searchParams.get("place") ?? "";
+
+  const [sheetSnap, setSheetSnap] = useState<number | string>(0.5);
 
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
@@ -139,7 +156,12 @@ export function DubaiCookieMap() {
         router.push(url, { scroll: false });
       }
       if (mapRef.current) {
-        panToAboveSheet(mapRef.current, store.lat, store.lng);
+        panToAboveSheet(
+          mapRef.current,
+          store.lat,
+          store.lng,
+          CLUSTER_MAX_ZOOM + 1,
+        );
       }
     },
     [router, buildUrl, queryParam, placeParam],
@@ -199,13 +221,21 @@ export function DubaiCookieMap() {
       clusterCleanupRef.current = createMarkerClustering({
         map,
         markers,
+        gridSize: 120,
+        minClusterSize: 2,
         maxZoom: CLUSTER_MAX_ZOOM,
         clusterColors: { light: "#B0CC50", dark: "#8EB035" },
         onClusterClick: (cluster) => {
-          const currentZoom = map.getZoom();
-          const targetZoom = Math.min(currentZoom + 3, CLUSTER_MAX_ZOOM + 1);
-          map.setCenter(cluster.getCenter());
-          map.setZoom(targetZoom);
+          map.fitBounds(cluster.getBounds(), {
+            top: 80,
+            right: 40,
+            bottom: Math.round(window.innerHeight * 0.5) + 40,
+            left: 40,
+          });
+          // Cap zoom to prevent over-zooming when markers overlap
+          if (map.getZoom() > CLUSTER_MAX_ZOOM + 1) {
+            map.setZoom(CLUSTER_MAX_ZOOM + 1);
+          }
         },
       });
     },
@@ -217,6 +247,36 @@ export function DubaiCookieMap() {
     if (!mapReadyRef.current) return;
     createMarkers(mapStores);
   }, [mapStores, createMarkers]);
+
+  // Fit bounds to search results when query changes
+  const prevQueryRef = useRef(queryParam);
+  useEffect(() => {
+    if (prevQueryRef.current === queryParam) return;
+    prevQueryRef.current = queryParam;
+
+    const map = mapRef.current;
+    if (!map || !queryParam || filteredStores.length === 0) return;
+
+    if (filteredStores.length === 1) {
+      panToAboveSheet(map, filteredStores[0].lat, filteredStores[0].lng);
+      map.setZoom(CLUSTER_MAX_ZOOM + 1);
+      return;
+    }
+
+    const bounds = new naver.maps.LatLngBounds(
+      new naver.maps.LatLng(filteredStores[0].lat, filteredStores[0].lng),
+      new naver.maps.LatLng(filteredStores[0].lat, filteredStores[0].lng),
+    );
+    for (const s of filteredStores) {
+      bounds.extend(new naver.maps.LatLng(s.lat, s.lng));
+    }
+    map.fitBounds(bounds, {
+      top: 80,
+      right: 40,
+      bottom: Math.round(window.innerHeight * 0.5) + 40,
+      left: 40,
+    });
+  }, [queryParam, filteredStores]);
 
   // Center on user location once
   useEffect(() => {
@@ -282,8 +342,10 @@ export function DubaiCookieMap() {
       />
 
       <div
-        className="absolute right-4 z-42"
-        style={{ bottom: "calc(50% + 16px)" }}
+        className={cn("absolute right-4 z-42 transition-all duration-300", {
+          "pointer-events-none opacity-0": sheetSnap === 1,
+        })}
+        style={{ bottom: `calc(${getSheetBottom(sheetSnap)} + 16px)` }}
       >
         <LocationButton onLocate={handleLocate} />
       </div>
@@ -292,13 +354,17 @@ export function DubaiCookieMap() {
         <StoreListSheet
           stores={sortedStores}
           onSelectStore={handleSelectStore}
-          showClose={isSearching}
-          onClose={handleCloseList}
+          onClose={isSearching ? handleCloseList : handleBack}
+          onSnapChange={setSheetSnap}
         />
       )}
 
       {selectedStore && (
-        <StoreDrawer store={selectedStore} onClose={handleCloseDetail} />
+        <StoreDrawer
+          store={selectedStore}
+          onClose={handleCloseDetail}
+          onSnapChange={setSheetSnap}
+        />
       )}
     </div>
   );

@@ -35,6 +35,7 @@ type SnapPoint = number | string;
 interface StoreDrawerProps {
   store: DubaiCookieStore | null;
   onClose: () => void;
+  onSnapChange?: (snap: number | string) => void;
 }
 
 function StoreDetail({ store }: { store: DubaiCookieStore }) {
@@ -181,7 +182,7 @@ function StoreDrawerHeader({
   );
 }
 
-export function StoreDrawer({ store, onClose }: StoreDrawerProps) {
+export function StoreDrawer({ store, onClose, onSnapChange }: StoreDrawerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const expandParam = searchParams.get("expand");
@@ -194,6 +195,10 @@ export function StoreDrawer({ store, onClose }: StoreDrawerProps) {
 
   const isFullSnap = activeSnap === FULL_SNAP;
   const isScrollable = activeSnap === HALF_SNAP || activeSnap === FULL_SNAP;
+
+  useEffect(() => {
+    onSnapChange?.(activeSnap);
+  }, [activeSnap, onSnapChange]);
 
   useEffect(() => {
     if (!isFullSnap && contentRef.current) {
@@ -251,6 +256,7 @@ export function StoreDrawer({ store, onClose }: StoreDrawerProps) {
             )}
           >
             <Drawer.Title className="sr-only">매장 상세</Drawer.Title>
+
 
             <div className="flex shrink-0 justify-center py-3">
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />

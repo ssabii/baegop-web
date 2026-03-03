@@ -3,8 +3,15 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Drawer } from "vaul";
-import { Building2, MapPin, Tag, X } from "lucide-react";
+import { Building2, MapPin, PackageOpen, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { cn } from "@/lib/utils";
 import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
@@ -20,7 +27,7 @@ interface StoreListSheetProps {
   stores: DubaiCookieStore[];
   onSelectStore: (store: DubaiCookieStore) => void;
   onClose: () => void;
-  showClose?: boolean;
+  onSnapChange?: (snap: number | string) => void;
 }
 
 function StoreListItem({
@@ -48,9 +55,7 @@ function StoreListItem({
         )}
         <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
           <MapPin className="size-3 shrink-0" />
-          <span>
-            {formatShortAddress(store.roadAddress || store.address)}
-          </span>
+          <span>{formatShortAddress(store.roadAddress || store.address)}</span>
         </span>
       </div>
       {store.imageUrl && !imgError ? (
@@ -73,7 +78,7 @@ export function StoreListSheet({
   stores,
   onSelectStore,
   onClose,
-  showClose = false,
+  onSnapChange,
 }: StoreListSheetProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -86,6 +91,10 @@ export function StoreListSheet({
   const contentRef = useRef<HTMLDivElement>(null);
 
   const isFullSnap = activeSnap === FULL_SNAP;
+
+  useEffect(() => {
+    onSnapChange?.(activeSnap);
+  }, [activeSnap, onSnapChange]);
 
   useEffect(() => {
     if (!isFullSnap && contentRef.current) {
@@ -142,41 +151,67 @@ export function StoreListSheet({
                 <div className="flex shrink-0 justify-center py-3">
                   <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
                 </div>
-                {showClose && (
-                  <div className="flex shrink-0 justify-end px-4 pb-2">
-                    <Button
-                      variant="secondary"
-                      size="icon-sm"
-                      onClick={onClose}
-                      className="rounded-full"
-                    >
-                      <X className="size-5" />
-                    </Button>
-                  </div>
-                )}
+                <div className="flex shrink-0 justify-end px-4 pb-2">
+                  <Button
+                    variant="secondary"
+                    size="icon-sm"
+                    onClick={onClose}
+                    className="rounded-full"
+                  >
+                    <X className="size-5" />
+                  </Button>
+                </div>
               </div>
             )}
 
             <div
               ref={contentRef}
               className={cn(
-                "mx-auto min-h-0 w-full max-w-4xl flex-1 overscroll-contain",
+                "mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overscroll-contain",
                 {
-                  "overflow-y-auto pt-12": isFullSnap,
+                  "overflow-y-auto pt-17": isFullSnap,
                   "overflow-hidden": !isFullSnap,
                 },
               )}
             >
-              <ul className="divide-y px-3">
-                {stores.map((store) => (
-                  <li key={store.placeId}>
-                    <StoreListItem
-                      store={store}
-                      onSelect={() => onSelectStore(store)}
-                    />
-                  </li>
-                ))}
-              </ul>
+              {stores.length === 0 ? (
+                <div
+                  className="flex items-center justify-center"
+                  style={{
+                    height: isFullSnap
+                      ? "calc(100dvh - 68px)"
+                      : `calc(${(activeSnap as number) * 100}dvh - 70px)`,
+                  }}
+                >
+                  <Empty className="border-none py-0">
+                    <EmptyHeader className="gap-1">
+                      <EmptyMedia
+                        variant="icon"
+                        className="size-12 rounded-none bg-transparent"
+                      >
+                        <PackageOpen className="size-12 text-primary" />
+                      </EmptyMedia>
+                      <EmptyTitle className="font-bold">
+                        검색 결과가 없어요
+                      </EmptyTitle>
+                      <EmptyDescription>
+                        다른 검색어로 검색해보세요
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
+                </div>
+              ) : (
+                <ul className="divide-y px-3">
+                  {stores.map((store) => (
+                    <li key={store.placeId}>
+                      <StoreListItem
+                        store={store}
+                        onSelect={() => onSelectStore(store)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {isFullSnap && (
