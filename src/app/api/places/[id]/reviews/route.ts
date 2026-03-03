@@ -20,7 +20,7 @@ export async function GET(
 
   const { data, error } = await supabase
     .from("reviews")
-    .select("*, profiles(nickname, avatar_url)")
+    .select("*, profiles(nickname, avatar_url, total_points)")
     .eq("place_id", placeId)
     .order("created_at", { ascending: false })
     .range(cursor, cursor + limit - 1);
