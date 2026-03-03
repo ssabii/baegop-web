@@ -18,28 +18,35 @@ let cachedMapEl: HTMLDivElement | null = null;
 let cachedMapInstance: naver.maps.Map | null = null;
 let cachedTheme: string | undefined = undefined;
 
-function loadNaverMapsScript(): Promise<void> {
+function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (window.naver?.maps) {
-      resolve();
-      return;
-    }
-
-    const clientId = process.env.NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID;
-    if (!clientId) {
-      reject(
-        new Error("NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID가 설정되지 않았습니다"),
-      );
-      return;
-    }
-
     const script = document.createElement("script");
-    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}&submodules=gl`;
+    script.src = src;
     script.async = true;
     script.onload = () => resolve();
-    script.onerror = () => reject(new Error("네이버 지도 스크립트 로딩 실패"));
+    script.onerror = () => reject(new Error(`스크립트 로딩 실패: ${src}`));
     document.head.appendChild(script);
   });
+}
+
+async function loadNaverMapsScript(): Promise<void> {
+  if (window.naver?.maps) return;
+
+  const clientId = process.env.NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID;
+  if (!clientId) {
+    throw new Error("NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID가 설정되지 않았습니다");
+  }
+
+  await loadScript(
+    `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${clientId}&submodules=gl`,
+  );
+
+  // MarkerClustering은 naver.maps.OverlayView를 상속하므로 순차 로딩
+  if (!window.MarkerClustering) {
+    await loadScript(
+      "https://navermaps.github.io/maps.js.en/docs/js/MarkerClustering.js",
+    );
+  }
 }
 
 export default function NaverMap({

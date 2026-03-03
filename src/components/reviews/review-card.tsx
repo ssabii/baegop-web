@@ -94,7 +94,7 @@ export function ReviewCard({ review, onClick, className }: ReviewCardProps) {
   );
 
   return (
-    <div className={cn("transition-colors hover:bg-accent", className)}>
+    <div className={cn("transition-colors", className)}>
       {review.place ? (
         <Link
           href={`/places/${review.place.id}?tab=review`}
