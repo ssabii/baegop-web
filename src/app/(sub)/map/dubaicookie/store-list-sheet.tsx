@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
+import { MapViewButton } from "./map-view-button";
 
 const COMPACT_SNAP = 0.3;
 const HALF_SNAP = 0.5;
@@ -51,7 +52,7 @@ function StoreListItem({
       type="button"
       onClick={onSelect}
       className={cn(
-        "flex w-full items-center gap-3 px-1 py-3 text-left transition-colors [-webkit-tap-highlight-color:transparent]",
+        "flex w-full cursor-pointer items-center gap-3 px-1 py-3 text-left transition-colors [-webkit-tap-highlight-color:transparent]",
         { "bg-accent": isSelected },
       )}
     >
@@ -137,13 +138,7 @@ export function StoreListSheet({
                 <div className="flex shrink-0 justify-center py-3">
                   <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
                 </div>
-                <div className="flex shrink-0 items-center justify-between px-4 pb-2">
-                  <span className="text-sm font-bold">
-                    매장 목록{" "}
-                    <span className="font-normal text-muted-foreground">
-                      ({stores.length})
-                    </span>
-                  </span>
+                <div className="flex shrink-0 justify-end px-4 pb-2">
                   <Button
                     variant="secondary"
                     size="icon-sm"
@@ -161,7 +156,7 @@ export function StoreListSheet({
               className={cn(
                 "mx-auto min-h-0 w-full max-w-4xl flex-1 overscroll-contain",
                 {
-                  "overflow-y-auto": isFullSnap,
+                  "overflow-y-auto pt-12": isFullSnap,
                   "overflow-hidden": !isFullSnap,
                 },
               )}
@@ -178,6 +173,13 @@ export function StoreListSheet({
                 ))}
               </ul>
             </div>
+
+            {isFullSnap && (
+              <MapViewButton
+                scrollRef={contentRef}
+                onClick={() => setActiveSnap(COMPACT_SNAP)}
+              />
+            )}
           </div>
         </Drawer.Content>
       </Drawer.Portal>
