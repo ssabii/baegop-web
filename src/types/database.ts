@@ -184,6 +184,7 @@ export type Database = {
           email: string | null
           id: string
           nickname: string | null
+          total_points: number
         }
         Insert: {
           avatar_url?: string | null
@@ -191,6 +192,7 @@ export type Database = {
           email?: string | null
           id: string
           nickname?: string | null
+          total_points?: number
         }
         Update: {
           avatar_url?: string | null
@@ -198,6 +200,7 @@ export type Database = {
           email?: string | null
           id?: string
           nickname?: string | null
+          total_points?: number
         }
         Relationships: []
       }
@@ -255,6 +258,10 @@ export type Database = {
     }
     Functions: {
       nullify_storage_owner: {
+        Args: { target_user_id: string }
+        Returns: undefined
+      }
+      recalculate_user_points: {
         Args: { target_user_id: string }
         Returns: undefined
       }
