@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Drawer } from "vaul";
 import {
@@ -181,7 +182,14 @@ function StoreDrawerHeader({
 }
 
 export function StoreDrawer({ store, onClose }: StoreDrawerProps) {
-  const [activeSnap, setActiveSnap] = useState<SnapPoint>(HALF_SNAP);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const expandParam = searchParams.get("expand");
+
+  const [activeSnap, setActiveSnap] = useState<SnapPoint>(
+    expandParam ? FULL_SNAP : HALF_SNAP,
+  );
+  const prevIsFullRef = useRef(activeSnap === FULL_SNAP);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const isFullSnap = activeSnap === FULL_SNAP;
@@ -192,6 +200,20 @@ export function StoreDrawer({ store, onClose }: StoreDrawerProps) {
       contentRef.current.scrollTop = 0;
     }
   }, [isFullSnap]);
+
+  // URL sync: expand state
+  useEffect(() => {
+    if (isFullSnap === prevIsFullRef.current) return;
+    prevIsFullRef.current = isFullSnap;
+
+    const params = new URLSearchParams(searchParams);
+    if (isFullSnap) {
+      params.set("expand", "1");
+    } else {
+      params.delete("expand");
+    }
+    router.replace(`/map/dubaicookie?${params}`, { scroll: false });
+  }, [isFullSnap, searchParams, router]);
 
   // store 변경 시 snap 리셋
   useEffect(() => {

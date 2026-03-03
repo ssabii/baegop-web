@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Drawer } from "vaul";
 import { Building2, MapPin, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,38 +18,25 @@ type SnapPoint = number | string;
 
 interface StoreListSheetProps {
   stores: DubaiCookieStore[];
-  selectedStore: DubaiCookieStore | null;
   onSelectStore: (store: DubaiCookieStore) => void;
   onClose: () => void;
+  showClose?: boolean;
 }
 
 function StoreListItem({
   store,
-  isSelected,
   onSelect,
 }: {
   store: DubaiCookieStore;
-  isSelected: boolean;
   onSelect: () => void;
 }) {
   const [imgError, setImgError] = useState(false);
-  const ref = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (isSelected && ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  }, [isSelected]);
 
   return (
     <button
-      ref={ref}
       type="button"
       onClick={onSelect}
-      className={cn(
-        "flex w-full cursor-pointer items-center gap-3 px-1 py-3 text-left transition-colors [-webkit-tap-highlight-color:transparent]",
-        { "bg-accent": isSelected },
-      )}
+      className="flex w-full cursor-pointer items-center gap-3 px-1 py-3 text-left transition-colors [-webkit-tap-highlight-color:transparent]"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="text-base font-bold">{store.name}</span>
@@ -83,11 +71,18 @@ function StoreListItem({
 
 export function StoreListSheet({
   stores,
-  selectedStore,
   onSelectStore,
   onClose,
+  showClose = false,
 }: StoreListSheetProps) {
-  const [activeSnap, setActiveSnap] = useState<SnapPoint>(HALF_SNAP);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const expandParam = searchParams.get("expand");
+
+  const [activeSnap, setActiveSnap] = useState<SnapPoint>(
+    expandParam ? FULL_SNAP : HALF_SNAP,
+  );
+  const prevIsFullRef = useRef(activeSnap === FULL_SNAP);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const isFullSnap = activeSnap === FULL_SNAP;
@@ -97,6 +92,20 @@ export function StoreListSheet({
       contentRef.current.scrollTop = 0;
     }
   }, [isFullSnap]);
+
+  // URL sync: expand state
+  useEffect(() => {
+    if (isFullSnap === prevIsFullRef.current) return;
+    prevIsFullRef.current = isFullSnap;
+
+    const params = new URLSearchParams(searchParams);
+    if (isFullSnap) {
+      params.set("expand", "1");
+    } else {
+      params.delete("expand");
+    }
+    router.replace(`/map/dubaicookie?${params}`, { scroll: false });
+  }, [isFullSnap, searchParams, router]);
 
   const handleSnapChange = useCallback((snap: SnapPoint | null) => {
     if (snap !== null) setActiveSnap(snap);
@@ -133,16 +142,18 @@ export function StoreListSheet({
                 <div className="flex shrink-0 justify-center py-3">
                   <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
                 </div>
-                <div className="flex shrink-0 justify-end px-4 pb-2">
-                  <Button
-                    variant="secondary"
-                    size="icon-sm"
-                    onClick={onClose}
-                    className="rounded-full"
-                  >
-                    <X className="size-5" />
-                  </Button>
-                </div>
+                {showClose && (
+                  <div className="flex shrink-0 justify-end px-4 pb-2">
+                    <Button
+                      variant="secondary"
+                      size="icon-sm"
+                      onClick={onClose}
+                      className="rounded-full"
+                    >
+                      <X className="size-5" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -161,7 +172,6 @@ export function StoreListSheet({
                   <li key={store.placeId}>
                     <StoreListItem
                       store={store}
-                      isSelected={selectedStore?.placeId === store.placeId}
                       onSelect={() => onSelectStore(store)}
                     />
                   </li>
