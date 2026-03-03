@@ -8,16 +8,22 @@ import {
   ExternalLink,
   MapPin,
   Phone,
+  Star,
   Tag,
-  UtensilsCrossed,
   X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LoginAlertDialog } from "@/components/login-alert-dialog";
+import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
+import { KonaVoteSection } from "@/components/place-detail/kona-vote";
+import { PlaceTabs } from "@/components/place-detail/place-tabs";
 import { cn } from "@/lib/utils";
 import { optimizeNaverImageUrl } from "@/lib/image";
+import { usePlaceData } from "@/hooks/use-place-data";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
-import { useStoreMenus } from "./use-store-menus";
+import { MapViewButton } from "./map-view-button";
 
 const COMPACT_SNAP = "200px";
 const HALF_SNAP = 0.5;
@@ -29,63 +35,17 @@ interface StoreDrawerProps {
   onClose: () => void;
 }
 
-function getLastCategory(category: string): string {
-  if (!category) return "";
-  const parts = category.split(">");
-  return parts[parts.length - 1].trim();
-}
-
-function MenuSection({ placeId }: { placeId: string }) {
-  const { data, isLoading } = useStoreMenus(placeId);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        <div className="flex items-center gap-1.5 text-sm font-semibold">
-          <UtensilsCrossed className="size-4" />
-          <span>메뉴</span>
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-5 w-24" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!data?.items?.length) return null;
-
-  const menus = data.items;
-  const hasMore = data.nextCursor !== null;
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-1.5 text-sm font-semibold">
-        <UtensilsCrossed className="size-4" />
-        <span>메뉴</span>
-      </div>
-      <ul className="space-y-1 text-sm">
-        {menus.map((menu) => (
-          <li key={menu.name} className="flex justify-between">
-            <span className="truncate">{menu.name}</span>
-            {menu.price && (
-              <span className="shrink-0 text-muted-foreground">
-                {menu.price}
-              </span>
-            )}
-          </li>
-        ))}
-      </ul>
-      {hasMore && (
-        <p className="text-xs text-muted-foreground">+더 많은 메뉴</p>
-      )}
-    </div>
-  );
-}
-
 function StoreDetail({ store }: { store: DubaiCookieStore }) {
   const [imgError, setImgError] = useState(false);
-  const category = getLastCategory(store.category);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+
+  const { data, isLoading } = usePlaceData(store.placeId, {
+    x: String(store.lng),
+    y: String(store.lat),
+  });
+
+  const category = store.category?.split(">").pop()?.trim();
+  const isRegistered = !!data?.place;
 
   return (
     <div className="space-y-4 px-4 pb-8">
@@ -120,6 +80,31 @@ function StoreDetail({ store }: { store: DubaiCookieStore }) {
           <MapPin className="mt-0.5 size-3 shrink-0" />
           <span>{store.roadAddress || store.address}</span>
         </div>
+
+        {isLoading ? (
+          <Skeleton className="h-5 w-28" />
+        ) : (
+          <>
+            {isRegistered && data.avgRating !== null && (
+              <div className="flex items-center gap-1">
+                <Star className="size-4 fill-yellow-500 text-yellow-500" />
+                <span className="text-sm font-medium text-yellow-500">
+                  {data.avgRating.toFixed(1)}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  ({data.reviewCount})
+                </span>
+              </div>
+            )}
+            <div>
+              {isRegistered ? (
+                <KonaCardBadge status={data.place!.kona_card_status} />
+              ) : (
+                <Badge variant="secondary">미등록 장소</Badge>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <Link href={`/places/${store.placeId}`} className="block">
@@ -137,7 +122,29 @@ function StoreDetail({ store }: { store: DubaiCookieStore }) {
         )}
       </Link>
 
-      <MenuSection placeId={store.placeId} />
+      {isRegistered && data?.place && (
+        <KonaVoteSection
+          placeId={data.place.id}
+          status={data.place.kona_card_status}
+          userVote={data.userKonaVote}
+          isLoggedIn={data.isLoggedIn}
+          onLoginRequired={() => setLoginDialogOpen(true)}
+        />
+      )}
+
+      <PlaceTabs
+        isRegistered={isRegistered}
+        placeId={data?.place?.id ?? null}
+        naverPlaceId={store.placeId}
+        currentUserId={null}
+        reviewCount={data?.reviewCount}
+      />
+
+      <LoginAlertDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
+        description="코나카드 투표는 로그인이 필요해요"
+      />
     </div>
   );
 }
@@ -212,13 +219,20 @@ export function StoreDrawer({ store, onClose }: StoreDrawerProps) {
               className={cn(
                 "mx-auto min-h-0 w-full max-w-4xl flex-1 overscroll-contain",
                 {
-                  "overflow-y-auto": isScrollable,
-                  "overflow-hidden": !isScrollable,
+                  "overflow-y-auto": isFullSnap,
+                  "overflow-hidden": !isFullSnap,
                 },
               )}
             >
               <StoreDetail store={store} />
             </div>
+
+            {isScrollable && (
+              <MapViewButton
+                scrollRef={contentRef}
+                onClick={() => setActiveSnap(COMPACT_SNAP)}
+              />
+            )}
           </div>
         </Drawer.Content>
       </Drawer.Portal>
