@@ -80,7 +80,7 @@ export default async function PlaceDetailPage({
   const reviewsQuery = isRegistered
     ? supabase
         .from("reviews")
-        .select("*, profiles(nickname, avatar_url)", { count: "exact" })
+        .select("*, profiles(nickname, avatar_url, total_points)", { count: "exact" })
         .eq("place_id", place.id)
         .order("created_at", { ascending: false })
         .range(0, PAGE_SIZE - 1)

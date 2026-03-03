@@ -37,6 +37,7 @@ export default async function MyPage() {
           {/* 프로필 섹션 */}
           <ProfileSection />
 
+          <MypageMenuItem href="/mypage/ranking" title="랭킹" />
           <MypageMenuItem href="/mypage/theme" title="테마" />
           <ItemGroup className="rounded-xl bg-background">
             <MypageMenuItem
