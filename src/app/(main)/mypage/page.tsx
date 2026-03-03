@@ -1,4 +1,12 @@
-import { ItemGroup } from "@/components/ui/item";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemGroup,
+  ItemTitle,
+} from "@/components/ui/item";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { LogoutMenuItem } from "./logout-menu-item";
@@ -59,9 +67,28 @@ export default async function MyPage() {
               }
               inGroup
             />
+            <Item asChild>
+              <Link href="/map/dubaicookie">
+                <ItemContent>
+                  <ItemTitle className="font-bold">
+                    <span className="relative">
+                      두쫀쿠 지도
+                      <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-red-500" />
+                    </span>
+                  </ItemTitle>
+                </ItemContent>
+                <ItemActions>
+                  <ChevronRight className="size-4" />
+                </ItemActions>
+              </Link>
+            </Item>
           </ItemGroup>
           <ItemGroup className="rounded-xl bg-background">
-            <MypageMenuItem href="/mypage/feedback" title="피드백 보내기" inGroup />
+            <MypageMenuItem
+              href="/mypage/feedback"
+              title="피드백 보내기"
+              inGroup
+            />
             <MypageMenuItem href="/terms" title="이용약관" inGroup />
             <MypageMenuItem href="/privacy" title="개인정보처리방침" inGroup />
           </ItemGroup>
