@@ -56,9 +56,6 @@ export function MapOverlapPopover({
       style={position}
     >
       <div className="p-1">
-        <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-          {items.length}개의 장소가 겹쳐 있습니다
-        </p>
         <ul>
           {items.map((item) => (
             <li key={item.id}>

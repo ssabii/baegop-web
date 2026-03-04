@@ -57,6 +57,7 @@ interface MapViewProps {
   onOverlapClick?: (markers: MapMarker[], anchorPos: { x: number; y: number }) => void;
   onDragEnd?: () => void;
   onMapClick?: () => void;
+  showLabels?: boolean;
   className?: string;
 }
 
@@ -70,6 +71,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
     onOverlapClick,
     onDragEnd,
     onMapClick,
+    showLabels = true,
     className,
   },
   ref,
@@ -115,13 +117,14 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       clearMarkers();
 
       markers.forEach((data) => {
+        const label = showLabels ? data.title : undefined;
         const marker = new naver.maps.Marker({
           position: new naver.maps.LatLng(data.lat, data.lng),
           title: data.title,
           icon: {
-            content: createMarkerContent(data.title),
-            size: new naver.maps.Size(24, data.title ? 40 : 24),
-            anchor: new naver.maps.Point(12, data.title ? 24 : 24),
+            content: createMarkerContent(label),
+            size: new naver.maps.Size(24, label ? 40 : 24),
+            anchor: new naver.maps.Point(12, label ? 24 : 24),
           },
         });
 
@@ -200,7 +203,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         }
       }
     },
-    [markers, fitBoundsPadding, clearMarkers],
+    [markers, fitBoundsPadding, showLabels, clearMarkers],
   );
 
   // Stable handleReady — only depends on clearMarkers (stable)

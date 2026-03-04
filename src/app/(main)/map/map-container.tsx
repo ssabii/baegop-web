@@ -294,6 +294,7 @@ export function MapContainer() {
         onOverlapClick={handleOverlapClick}
         onMapClick={handleOverlapClose}
         onDragEnd={handleDragEnd}
+        showLabels={isSearching}
         className="fixed inset-x-0 top-0 bottom-15"
       />
 
