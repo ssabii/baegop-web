@@ -7,13 +7,14 @@ import { useSearchPlaces } from "@/components/place-search/use-search-places";
 import { SearchNoResults } from "@/components/place-search/search-no-results";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
 import { LocationButton } from "@/components/location-button";
 import { MapView, type MapMarker, type MapViewHandle } from "./map-view";
+import { useMapPlaces } from "./use-map-places";
 import { MapSearchInput } from "./map-search-input";
 import { PlaceItem } from "@/components/place-search/place-item";
 import { MapResultSheet } from "./map-result-sheet";
 import { MapPlaceDetailSheet } from "./map-place-detail-sheet";
+import { MapOverlapPopover } from "./map-overlap-popover";
 import type { NaverSearchResult } from "@/types";
 
 export function MapContainer() {
@@ -29,8 +30,14 @@ export function MapContainer() {
   const [searchCoords, setSearchCoords] = useState<
     { lat: number; lng: number } | undefined
   >();
-  // Hide map until first search completes to prevent 크몽 flash
-  const [initialSearchDone, setInitialSearchDone] = useState(!queryParam);
+  // Stores detail item from DB place click (not from search results)
+  const [dbDetailItem, setDbDetailItem] = useState<NaverSearchResult | null>(
+    null,
+  );
+  const [overlapState, setOverlapState] = useState<{
+    items: MapMarker[];
+    anchorPos: { x: number; y: number };
+  } | null>(null);
 
   // Sync URL → state when queryParam changes externally (render-time sync)
   if (queryParam !== prevQueryParam) {
@@ -50,6 +57,7 @@ export function MapContainer() {
   );
 
   const handleDragEnd = useCallback(() => {
+    setOverlapState(null);
     setMapMoved(true);
   }, []);
 
@@ -75,9 +83,13 @@ export function MapContainer() {
 
   // Derive UI state from URL params (single source of truth)
   const selectedItem = useMemo(() => {
-    if (!placeParam || results.length === 0) return null;
-    return results.find((r) => r.id === placeParam) ?? null;
-  }, [placeParam, results]);
+    if (!placeParam) return null;
+    // Search results first, then DB place detail
+    return (
+      results.find((r) => r.id === placeParam) ??
+      (dbDetailItem?.id === placeParam ? dbDetailItem : null)
+    );
+  }, [placeParam, results, dbDetailItem]);
 
   const focusMarkerId = selectedItem?.id ?? null;
 
@@ -119,6 +131,26 @@ export function MapContainer() {
     params.set("pages", String(pageCount));
     router.replace(`/map?${params}`, { scroll: false });
   }, [pageCount, query, searchParams, router]);
+
+  // DB places for initial state
+  const { data: mapPlaces = [] } = useMapPlaces();
+
+  const defaultMarkers = useMemo<MapMarker[]>(
+    () =>
+      mapPlaces.map((p) => ({
+        id: p.id,
+        lat: p.lat,
+        lng: p.lng,
+        title: p.name,
+        category: p.category,
+      })),
+    [mapPlaces],
+  );
+
+  const defaultPadding = useMemo(
+    () => ({ top: 80, bottom: 100, left: 40, right: 40 }),
+    [],
+  );
 
   // Detail view: show only focused marker. List view: show all.
   const activeMarkers = useMemo<MapMarker[]>(() => {
@@ -165,9 +197,11 @@ export function MapContainer() {
   }, [router]);
 
   const handleClear = useCallback(() => {
+    setOverlapState(null);
     setQuery("");
     setMapMoved(false);
     setSearchCoords(undefined);
+    setDbDetailItem(null);
     router.replace("/map", { scroll: false });
   }, [router]);
 
@@ -177,11 +211,53 @@ export function MapContainer() {
 
   const handleMarkerClick = useCallback(
     (id: string) => {
-      const item = results.find((r) => r.id === id);
-      if (item) pushDetail(item);
+      // Search results first
+      const searchItem = results.find((r) => r.id === id);
+      if (searchItem) {
+        pushDetail(searchItem);
+        return;
+      }
+
+      // DB places fallback
+      const dbPlace = mapPlaces.find((p) => p.id === id);
+      if (dbPlace) {
+        const item: NaverSearchResult = {
+          id: dbPlace.id,
+          name: dbPlace.name,
+          category: dbPlace.category ?? "",
+          address: dbPlace.address,
+          roadAddress: dbPlace.address,
+          phone: null,
+          x: String(dbPlace.lng),
+          y: String(dbPlace.lat),
+          imageUrl: dbPlace.image_urls?.[0] ?? null,
+          menus: [],
+        };
+        setDbDetailItem(item);
+        pushDetail(item);
+      }
     },
-    [results, pushDetail],
+    [results, mapPlaces, pushDetail],
   );
+
+  const handleOverlapClick = useCallback(
+    (items: MapMarker[], anchorPos: { x: number; y: number }) => {
+      setOverlapState({ items, anchorPos });
+    },
+    [],
+  );
+
+  const handleOverlapSelect = useCallback(
+    (id: string) => {
+      setOverlapState(null);
+      handleMarkerClick(id);
+    },
+    [handleMarkerClick],
+  );
+
+  const handleOverlapClose = useCallback(() => {
+    setOverlapState(null);
+  }, []);
 
   const handleItemClick = useCallback(
     (item: NaverSearchResult) => {
@@ -194,31 +270,41 @@ export function MapContainer() {
   const hasResults = results.length > 0;
   const showSheet = isSearching && sheetOpen && !isLoading && !geoLoading;
 
-  // Reveal map once first search results are displayed
-  useEffect(() => {
-    if (showSheet && !initialSearchDone) {
-      setInitialSearchDone(true);
-    }
-  }, [showSheet, initialSearchDone]);
+  const displayMarkers = isSearching
+    ? showSheet && hasResults
+      ? activeMarkers
+      : []
+    : defaultMarkers;
 
   return (
     <>
       <MapView
         ref={mapViewRef}
-        markers={showSheet && hasResults ? activeMarkers : []}
+        markers={displayMarkers}
         fitBoundsPadding={
           showSheet && hasResults && !selectedItem && !searchCoords
             ? sheetPadding
-            : undefined
+            : !isSearching && defaultMarkers.length > 0
+              ? defaultPadding
+              : undefined
         }
         focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
+        onOverlapClick={handleOverlapClick}
+        onMapClick={handleOverlapClose}
         onDragEnd={handleDragEnd}
-        className={cn("fixed inset-x-0 top-0 bottom-15", {
-          "opacity-0": !initialSearchDone,
-        })}
+        className="fixed inset-x-0 top-0 bottom-15"
       />
+
+      {overlapState && (
+        <MapOverlapPopover
+          items={overlapState.items}
+          anchorPos={overlapState.anchorPos}
+          onSelect={handleOverlapSelect}
+          onClose={handleOverlapClose}
+        />
+      )}
 
       <MapSearchInput
         query={query}
