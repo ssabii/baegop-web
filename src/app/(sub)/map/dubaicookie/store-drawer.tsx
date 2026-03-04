@@ -25,9 +25,10 @@ import { cn } from "@/lib/utils";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { usePlaceData } from "@/hooks/use-place-data";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
+import { LocationButton } from "./location-button";
 import { MapViewButton } from "./map-view-button";
 
-const COMPACT_SNAP = "200px";
+const COMPACT_SNAP = 0.1;
 const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 type SnapPoint = number | string;
@@ -35,6 +36,7 @@ type SnapPoint = number | string;
 interface StoreDrawerProps {
   store: DubaiCookieStore | null;
   onClose: () => void;
+  onLocate: (position: { lat: number; lng: number }) => void;
   onSnapChange?: (snap: number | string) => void;
 }
 
@@ -168,7 +170,10 @@ function StoreDrawerHeader({
   return (
     <div className="mx-auto flex w-full max-w-4xl shrink-0 items-center justify-end gap-2 px-4 pb-2">
       {isRegistered && (
-        <FavoriteButton placeId={store.placeId} className="size-8 bg-secondary" />
+        <FavoriteButton
+          placeId={store.placeId}
+          className="size-8 bg-secondary"
+        />
       )}
       <Button
         variant="secondary"
@@ -182,7 +187,12 @@ function StoreDrawerHeader({
   );
 }
 
-export function StoreDrawer({ store, onClose, onSnapChange }: StoreDrawerProps) {
+export function StoreDrawer({
+  store,
+  onClose,
+  onLocate,
+  onSnapChange,
+}: StoreDrawerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const expandParam = searchParams.get("expand");
@@ -257,9 +267,11 @@ export function StoreDrawer({ store, onClose, onSnapChange }: StoreDrawerProps) 
           >
             <Drawer.Title className="sr-only">매장 상세</Drawer.Title>
 
-
-            <div className="flex shrink-0 justify-center py-3">
+            <div className="relative w-full max-w-4xl mx-auto flex shrink-0 justify-center py-3">
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+              <div className="absolute -top-12 right-2">
+                <LocationButton onLocate={onLocate} />
+              </div>
             </div>
 
             <StoreDrawerHeader store={store} onClose={onClose} />

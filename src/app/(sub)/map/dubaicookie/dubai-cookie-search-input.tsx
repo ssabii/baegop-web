@@ -34,7 +34,7 @@ export function DubaiCookieSearchInput({
           <button
             type="button"
             onClick={onTap}
-            className="flex min-w-0 flex-1 cursor-pointer items-center py-2 pl-3"
+            className="flex min-w-0 flex-1 cursor-pointer items-center gap-1 py-2 pl-3"
           >
             <span className="truncate text-muted-foreground">
               두쫀쿠 매장을 검색해보세요

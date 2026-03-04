@@ -27,10 +27,7 @@ export function PlaceCard({
   const status = (place.kona_card_status ?? "unknown") as KonaCardStatus;
 
   return (
-    <Link
-      href={`/places/${place.id}`}
-      className={cn("flex gap-3", className)}
-    >
+    <Link href={`/places/${place.id}`} className={cn("flex gap-3", className)}>
       <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div className="space-y-1">
           <h3 className="line-clamp-2 font-bold leading-snug text-left">
@@ -75,7 +72,7 @@ export function PlaceCard({
         )}
         <FavoriteButton
           placeId={place.id}
-          className="absolute right-1 top-1 size-6 bg-transparent hover:bg-transparent active:bg-transparent [&_svg:not(.fill-rose-500)]:fill-muted [&_svg:not(.fill-rose-500)]:text-muted"
+          className="absolute right-1 top-1 size-6 bg-transparent hover:bg-transparent active:bg-transparent"
         />
       </div>
     </Link>

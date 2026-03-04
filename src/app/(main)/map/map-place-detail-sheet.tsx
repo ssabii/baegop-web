@@ -12,7 +12,7 @@ import { MapViewButton } from "./map-view-button";
 import { MapPlaceDetail } from "./map-place-detail";
 import type { NaverSearchResult } from "@/types";
 
-const COMPACT_SNAP = "200px";
+const COMPACT_SNAP = 0.2;
 const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 
@@ -93,47 +93,50 @@ export function MapPlaceDetailSheet({
             )}
           >
             <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
-              {/* Drag handle */}
-              <div className="flex shrink-0 justify-center py-3">
-                <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
-              </div>
+            {/* Drag handle */}
+            <div className="flex shrink-0 justify-center py-3">
+              <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+            </div>
 
-              {/* Close button + Favorite */}
-              <div className="max-w-4xl mx-auto w-full flex shrink-0 items-center justify-end gap-2 px-4 pb-2">
-                {isRegistered && (
-                  <FavoriteButton
-                    placeId={item.id}
-                    className="size-8 bg-secondary"
-                  />
-                )}
-                <Button
-                  variant="secondary"
-                  size="icon-sm"
-                  onClick={onDismiss}
-                  className="rounded-full"
-                >
-                  <X className="size-5" />
-                </Button>
-              </div>
-
-              {/* Content */}
-              <div
-                ref={contentRef}
-                className={cn("min-h-0 flex-1 overscroll-contain mx-auto max-w-4xl w-full", {
-                  "overflow-y-auto": isFullSnap,
-                  "overflow-hidden": !isFullSnap,
-                })}
-              >
-                <MapPlaceDetail item={item} />
-              </div>
-
-              {isScrollable && (
-                <MapViewButton
-                  scrollRef={contentRef}
-                  onClick={() => setActiveSnap(COMPACT_SNAP)}
+            {/* Close button + Favorite */}
+            <div className="max-w-4xl mx-auto w-full flex shrink-0 items-center justify-end gap-2 px-4 pb-2">
+              {isRegistered && (
+                <FavoriteButton
+                  placeId={item.id}
+                  className="size-8 bg-secondary"
                 />
               )}
+              <Button
+                variant="secondary"
+                size="icon-sm"
+                onClick={onDismiss}
+                className="rounded-full"
+              >
+                <X className="size-5" />
+              </Button>
             </div>
+
+            {/* Content */}
+            <div
+              ref={contentRef}
+              className={cn(
+                "min-h-0 flex-1 overscroll-contain mx-auto max-w-4xl w-full",
+                {
+                  "overflow-y-auto": isFullSnap,
+                  "overflow-hidden": !isFullSnap,
+                },
+              )}
+            >
+              <MapPlaceDetail item={item} />
+            </div>
+
+            {isScrollable && (
+              <MapViewButton
+                scrollRef={contentRef}
+                onClick={() => setActiveSnap(COMPACT_SNAP)}
+              />
+            )}
+          </div>
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

@@ -6,6 +6,7 @@ import { useInView } from "react-intersection-observer";
 import { useSearchPlaces } from "@/components/place-search/use-search-places";
 import { SearchNoResults } from "@/components/place-search/search-no-results";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { useIsBackNavigation } from "@/hooks/use-is-back-navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { MapView, type MapMarker } from "./map-view";
 import { MapSearchInput } from "./map-search-input";
@@ -28,6 +29,17 @@ export function MapContainer() {
     setPrevQueryParam(queryParam);
     setQuery(queryParam);
   }
+
+  const consumeIsBack = useIsBackNavigation();
+  const skipFitBoundsRef = useRef(false);
+
+  // Track query changes to detect back navigation
+  const prevQueryRef = useRef(queryParam);
+  useEffect(() => {
+    if (prevQueryRef.current === queryParam) return;
+    prevQueryRef.current = queryParam;
+    skipFitBoundsRef.current = consumeIsBack();
+  }, [queryParam, consumeIsBack]);
 
   const { coords: userCoords } = useGeolocation();
   const {
@@ -164,6 +176,7 @@ export function MapContainer() {
         fitBoundsPadding={
           showSheet && hasResults && !selectedItem ? sheetPadding : undefined
         }
+        skipFitBounds={skipFitBoundsRef.current}
         focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}

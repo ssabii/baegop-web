@@ -37,6 +37,7 @@ type Padding = { top?: number; bottom?: number; left?: number; right?: number };
 interface MapViewProps {
   markers: MapMarker[];
   fitBoundsPadding?: Padding;
+  skipFitBounds?: boolean;
   focusPadding?: Padding;
   focusMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
@@ -46,6 +47,7 @@ interface MapViewProps {
 export function MapView({
   markers,
   fitBoundsPadding,
+  skipFitBounds,
   focusPadding,
   focusMarkerId,
   onMarkerClick,
@@ -90,7 +92,7 @@ export function MapView({
         markerInstancesRef.current.push(marker);
       });
 
-      if (fitBoundsPadding && markers.length > 0) {
+      if (fitBoundsPadding && markers.length > 0 && !skipFitBounds) {
         const bounds = new naver.maps.LatLngBounds(
           new naver.maps.LatLng(
             Math.min(...markers.map((m) => m.lat)),
@@ -104,7 +106,7 @@ export function MapView({
         map.fitBounds(bounds, fitBoundsPadding);
       }
     },
-    [markers, fitBoundsPadding, onMarkerClick, clearMarkers],
+    [markers, fitBoundsPadding, skipFitBounds, onMarkerClick, clearMarkers],
   );
 
   // Stable handleReady — only depends on clearMarkers (stable)

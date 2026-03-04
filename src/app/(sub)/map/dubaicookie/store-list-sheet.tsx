@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
+import { LocationButton } from "./location-button";
 import { MapViewButton } from "./map-view-button";
 
-const COMPACT_SNAP = 0.3;
+const COMPACT_SNAP = 0.2;
 const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 type SnapPoint = number | string;
@@ -20,6 +21,7 @@ interface StoreListSheetProps {
   stores: DubaiCookieStore[];
   onSelectStore: (store: DubaiCookieStore) => void;
   onClose: () => void;
+  onLocate: (position: { lat: number; lng: number }) => void;
   onSnapChange?: (snap: number | string) => void;
 }
 
@@ -71,6 +73,7 @@ export function StoreListSheet({
   stores,
   onSelectStore,
   onClose,
+  onLocate,
   onSnapChange,
 }: StoreListSheetProps) {
   const router = useRouter();
@@ -140,7 +143,7 @@ export function StoreListSheet({
             <Drawer.Title className="sr-only">매장 목록</Drawer.Title>
 
             {!isFullSnap && (
-              <div className="mx-auto w-full max-w-4xl">
+              <div className="relative mx-auto w-full max-w-4xl">
                 <div className="flex shrink-0 justify-center py-3">
                   <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
                 </div>
@@ -153,6 +156,9 @@ export function StoreListSheet({
                   >
                     <X className="size-5" />
                   </Button>
+                </div>
+                <div className="absolute -top-12 right-2">
+                  <LocationButton onLocate={onLocate} />
                 </div>
               </div>
             )}

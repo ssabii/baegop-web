@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
 
-const COMPACT_SNAP = 0.3;
+const COMPACT_SNAP = 0.1;
 const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 type SnapPoint = number | string;
