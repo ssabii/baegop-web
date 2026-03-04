@@ -1,13 +1,16 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Drawer } from "vaul";
-import { X } from "lucide-react";
+import { Building2, MapPin, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { formatShortAddress } from "@/lib/address";
+import { optimizeNaverImageUrl } from "@/lib/image";
+import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 import { LocationButton } from "@/components/location-button";
 import { SearchInMapButton } from "@/components/search-in-map-button";
-import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
 
 const COMPACT_SNAP = 0.2;
@@ -15,21 +18,69 @@ const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 type SnapPoint = number | string;
 
-interface MapResultSheetProps {
-  children: React.ReactNode;
+interface StoreListSheetProps {
+  stores: DubaiCookieStore[];
+  onSelectStore: (store: DubaiCookieStore) => void;
   onClose: () => void;
   onLocate: (position: { lat: number; lng: number }) => void;
+  onSnapChange?: (snap: number | string) => void;
   showSearchInMap?: boolean;
   onSearchInMap?: () => void;
 }
 
-export function MapResultSheet({
-  children,
+function StoreListItem({
+  store,
+  onSelect,
+}: {
+  store: DubaiCookieStore;
+  onSelect: () => void;
+}) {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="flex w-full cursor-pointer items-center gap-3 px-1 py-3 text-left transition-colors [-webkit-tap-highlight-color:transparent]"
+    >
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="text-base font-bold">{store.name}</span>
+        {store.category && (
+          <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+            <Tag className="size-3 shrink-0" />
+            <span>{store.category}</span>
+          </span>
+        )}
+        <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+          <MapPin className="size-3 shrink-0" />
+          <span>{formatShortAddress(store.roadAddress || store.address)}</span>
+        </span>
+      </div>
+      {store.imageUrl && !imgError ? (
+        <img
+          src={optimizeNaverImageUrl(store.imageUrl)}
+          alt=""
+          className="size-20 shrink-0 rounded-lg object-cover"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
+          <Building2 className="size-5 text-muted-foreground" />
+        </div>
+      )}
+    </button>
+  );
+}
+
+export function StoreListSheet({
+  stores,
+  onSelectStore,
   onClose,
   onLocate,
+  onSnapChange,
   showSearchInMap = false,
   onSearchInMap,
-}: MapResultSheetProps) {
+}: StoreListSheetProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const expandParam = searchParams.get("expand");
@@ -38,18 +89,21 @@ export function MapResultSheet({
     expandParam ? FULL_SNAP : HALF_SNAP,
   );
   const prevIsFullRef = useRef(activeSnap === FULL_SNAP);
-
-  const isFullSnap = activeSnap === FULL_SNAP;
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // compact snap으로 돌아올 때 스크롤 위치 리셋
+  const isFullSnap = activeSnap === FULL_SNAP;
+
+  useEffect(() => {
+    onSnapChange?.(activeSnap);
+  }, [activeSnap, onSnapChange]);
+
   useEffect(() => {
     if (!isFullSnap && contentRef.current) {
       contentRef.current.scrollTop = 0;
     }
   }, [isFullSnap]);
 
-  // URL 동기화: expand 상태 변경 시 querystring 업데이트
+  // URL sync: expand state
   useEffect(() => {
     if (isFullSnap === prevIsFullRef.current) return;
     prevIsFullRef.current = isFullSnap;
@@ -60,7 +114,7 @@ export function MapResultSheet({
     } else {
       params.delete("expand");
     }
-    router.replace(`/map?${params}`, { scroll: false });
+    router.replace(`/map/dubaicookie?${params}`, { scroll: false });
   }, [isFullSnap, searchParams, router]);
 
   const handleSnapChange = useCallback((snap: SnapPoint | null) => {
@@ -80,7 +134,7 @@ export function MapResultSheet({
       <Drawer.Portal>
         <Drawer.Content
           aria-describedby={undefined}
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-41 flex h-dvh flex-col outline-none bg-transparent"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-41 flex h-dvh flex-col bg-transparent outline-none"
         >
           <div
             className={cn(
@@ -91,10 +145,8 @@ export function MapResultSheet({
               },
             )}
           >
-            <Drawer.Title className="sr-only">검색 결과</Drawer.Title>
+            <Drawer.Title className="sr-only">매장 목록</Drawer.Title>
 
-            {/* <div className="max-w-4xl mx-auto w-full"> */}
-            {/* Drag handle & Close button — full snap에서는 검색바 back/clear와 중복이므로 숨김 */}
             {!isFullSnap && (
               <div className="relative mx-auto w-full max-w-4xl">
                 <div className="flex shrink-0 justify-center py-3">
@@ -120,32 +172,41 @@ export function MapResultSheet({
                       setActiveSnap(HALF_SNAP);
                       onSearchInMap();
                     }}
+                    className="bg-[#B0CC50] text-white hover:bg-[#B0CC50]/90 dark:bg-[#8EB035] dark:hover:bg-[#8EB035]/90"
                   />
                 )}
               </div>
             )}
 
-            {/* Content */}
             <div
               ref={contentRef}
               className={cn(
-                "min-h-0 flex-1 overscroll-contain mx-auto max-w-4xl w-full",
+                "mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overscroll-contain",
                 {
                   "overflow-y-auto pt-17": isFullSnap,
                   "overflow-hidden": !isFullSnap,
                 },
               )}
             >
-              {children}
+              <ul className="divide-y px-3">
+                {stores.map((store) => (
+                  <li key={store.placeId}>
+                    <StoreListItem
+                      store={store}
+                      onSelect={() => onSelectStore(store)}
+                    />
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {isFullSnap && (
               <MapViewButton
                 scrollRef={contentRef}
                 onClick={() => setActiveSnap(COMPACT_SNAP)}
+                buttonClassName="bg-[#B0CC50] text-white hover:bg-[#B0CC50]/90 dark:bg-[#8EB035] dark:hover:bg-[#8EB035]/90"
               />
             )}
-            {/* </div> */}
           </div>
         </Drawer.Content>
       </Drawer.Portal>
