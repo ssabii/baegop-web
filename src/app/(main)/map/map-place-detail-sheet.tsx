@@ -6,6 +6,7 @@ import { Drawer } from "vaul";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FavoriteButton } from "@/components/favorite-button";
+import { LocationButton } from "@/components/location-button";
 import { cn } from "@/lib/utils";
 import { usePlaceData } from "@/hooks/use-place-data";
 import { MapViewButton } from "./map-view-button";
@@ -21,11 +22,13 @@ type SnapPoint = number | string;
 interface MapPlaceDetailSheetProps {
   item: NaverSearchResult;
   onDismiss: () => void;
+  onLocate: (position: { lat: number; lng: number }) => void;
 }
 
 export function MapPlaceDetailSheet({
   item,
   onDismiss,
+  onLocate,
 }: MapPlaceDetailSheetProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -94,8 +97,11 @@ export function MapPlaceDetailSheet({
           >
             <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
             {/* Drag handle */}
-            <div className="flex shrink-0 justify-center py-3">
+            <div className="relative mx-auto w-full max-w-4xl flex shrink-0 justify-center py-3">
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+              <div className="absolute -top-12 right-2">
+                <LocationButton onLocate={onLocate} />
+              </div>
             </div>
 
             {/* Close button + Favorite */}

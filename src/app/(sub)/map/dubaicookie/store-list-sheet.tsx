@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
-import { LocationButton } from "./location-button";
+import { LocationButton } from "@/components/location-button";
 import { MapViewButton } from "./map-view-button";
 
 const COMPACT_SNAP = 0.2;

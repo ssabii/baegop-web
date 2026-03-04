@@ -25,10 +25,10 @@ import { cn } from "@/lib/utils";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { usePlaceData } from "@/hooks/use-place-data";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
-import { LocationButton } from "./location-button";
+import { LocationButton } from "@/components/location-button";
 import { MapViewButton } from "./map-view-button";
 
-const COMPACT_SNAP = 0.1;
+const COMPACT_SNAP = 0.2;
 const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 type SnapPoint = number | string;

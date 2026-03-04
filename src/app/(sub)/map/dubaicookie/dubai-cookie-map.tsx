@@ -12,7 +12,6 @@ import { COMPANY_LOCATION } from "@/lib/constants";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { calculateDistance } from "@/lib/geo";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { useIsBackNavigation } from "@/hooks/use-is-back-navigation";
 import { DubaiCookieSearchInput } from "./dubai-cookie-search-input";
 import { StoreDrawer } from "./store-drawer";
 import { StoreListSheet } from "./store-list-sheet";
@@ -75,7 +74,6 @@ export function DubaiCookieMap() {
   const placeParamRef = useRef(placeParam);
   placeParamRef.current = placeParam;
 
-  const consumeIsBack = useIsBackNavigation();
   const { coords: userCoords, loading: geoLoading } = useGeolocation();
   const mapCenter = userCoords ?? COMPANY_LOCATION;
 
@@ -242,13 +240,11 @@ export function DubaiCookieMap() {
     createMarkers(mapStores);
   }, [mapStores, createMarkers]);
 
-  // Fit bounds to search results when query changes (skip on back navigation)
+  // Fit bounds to search results when query changes
   const prevQueryRef = useRef(queryParam);
   useEffect(() => {
     if (prevQueryRef.current === queryParam) return;
     prevQueryRef.current = queryParam;
-
-    if (consumeIsBack()) return;
 
     const map = mapRef.current;
     if (!map || !queryParam || filteredStores.length === 0) return;
@@ -272,7 +268,7 @@ export function DubaiCookieMap() {
       bottom: Math.round(window.innerHeight * 0.5) + 40,
       left: 40,
     });
-  }, [queryParam, filteredStores, consumeIsBack]);
+  }, [queryParam, filteredStores]);
 
   const handleReady = useCallback(
     (map: naver.maps.Map) => {

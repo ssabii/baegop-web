@@ -5,10 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Drawer } from "vaul";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LocationButton } from "@/components/location-button";
 import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
 
-const COMPACT_SNAP = 0.1;
+const COMPACT_SNAP = 0.2;
 const HALF_SNAP = 0.5;
 const FULL_SNAP = 1;
 type SnapPoint = number | string;
@@ -16,9 +17,14 @@ type SnapPoint = number | string;
 interface MapResultSheetProps {
   children: React.ReactNode;
   onClose: () => void;
+  onLocate: (position: { lat: number; lng: number }) => void;
 }
 
-export function MapResultSheet({ children, onClose }: MapResultSheetProps) {
+export function MapResultSheet({
+  children,
+  onClose,
+  onLocate,
+}: MapResultSheetProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const expandParam = searchParams.get("expand");
@@ -85,7 +91,7 @@ export function MapResultSheet({ children, onClose }: MapResultSheetProps) {
             {/* <div className="max-w-4xl mx-auto w-full"> */}
             {/* Drag handle & Close button — full snap에서는 검색바 back/clear와 중복이므로 숨김 */}
             {!isFullSnap && (
-              <div className="max-w-4xl mx-auto w-full">
+              <div className="relative mx-auto w-full max-w-4xl">
                 <div className="flex shrink-0 justify-center py-3">
                   <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
                 </div>
@@ -98,6 +104,9 @@ export function MapResultSheet({ children, onClose }: MapResultSheetProps) {
                   >
                     <X className="size-5" />
                   </Button>
+                </div>
+                <div className="absolute -top-12 right-2">
+                  <LocationButton onLocate={onLocate} />
                 </div>
               </div>
             )}

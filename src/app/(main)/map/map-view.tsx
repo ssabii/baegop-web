@@ -1,9 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { LocateFixed } from "lucide-react";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { Spinner } from "@/components/ui/spinner";
-import { COMPANY_LOCATION } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 
@@ -34,25 +39,23 @@ export interface MapMarker {
 
 type Padding = { top?: number; bottom?: number; left?: number; right?: number };
 
+export interface MapViewHandle {
+  morphTo: (lat: number, lng: number, zoom: number) => void;
+}
+
 interface MapViewProps {
   markers: MapMarker[];
   fitBoundsPadding?: Padding;
-  skipFitBounds?: boolean;
   focusPadding?: Padding;
   focusMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
   className?: string;
 }
 
-export function MapView({
-  markers,
-  fitBoundsPadding,
-  skipFitBounds,
-  focusPadding,
-  focusMarkerId,
-  onMarkerClick,
-  className,
-}: MapViewProps) {
+export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
+  { markers, fitBoundsPadding, focusPadding, focusMarkerId, onMarkerClick, className },
+  ref,
+) {
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markerInstancesRef = useRef<naver.maps.Marker[]>([]);
   const markersRef = useRef(markers);
@@ -92,7 +95,7 @@ export function MapView({
         markerInstancesRef.current.push(marker);
       });
 
-      if (fitBoundsPadding && markers.length > 0 && !skipFitBounds) {
+      if (fitBoundsPadding && markers.length > 0) {
         const bounds = new naver.maps.LatLngBounds(
           new naver.maps.LatLng(
             Math.min(...markers.map((m) => m.lat)),
@@ -106,7 +109,7 @@ export function MapView({
         map.fitBounds(bounds, fitBoundsPadding);
       }
     },
-    [markers, fitBoundsPadding, skipFitBounds, onMarkerClick, clearMarkers],
+    [markers, fitBoundsPadding, onMarkerClick, clearMarkers],
   );
 
   // Stable handleReady — only depends on clearMarkers (stable)
@@ -180,40 +183,19 @@ export function MapView({
     };
   }, [focusMarkerId, focusPadding, mapReady]);
 
-  function handleLocate() {
-    const map = mapRef.current;
-    if (!map) return;
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const target = new naver.maps.LatLng(
-          pos.coords.latitude,
-          pos.coords.longitude,
-        );
-        map.morph(target, 16, { easing: "easeOutCubic" });
-      },
-      () => {
-        // Geolocation denied/failed → move to company
-        const target = new naver.maps.LatLng(
-          COMPANY_LOCATION.lat,
-          COMPANY_LOCATION.lng,
-        );
-        map.morph(target, 16, { easing: "easeOutCubic" });
-      },
-    );
-  }
+  useImperativeHandle(ref, () => ({
+    morphTo(lat: number, lng: number, zoom: number) {
+      const map = mapRef.current;
+      if (!map) return;
+      map.morph(new naver.maps.LatLng(lat, lng), zoom, {
+        easing: "easeOutCubic",
+      });
+    },
+  }));
 
   return (
     <div className={cn("relative", className)}>
       <NaverMap onReady={handleReady} className="size-full" />
-      <button
-        type="button"
-        onClick={handleLocate}
-        className="absolute right-4 bottom-4 z-10 flex size-10 cursor-pointer items-center justify-center rounded-full border bg-background shadow-sm transition-colors hover:bg-accent"
-        aria-label="현재 위치"
-      >
-        <LocateFixed className="size-5 text-foreground" />
-      </button>
     </div>
   );
-}
+});

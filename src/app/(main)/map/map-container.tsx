@@ -6,9 +6,8 @@ import { useInView } from "react-intersection-observer";
 import { useSearchPlaces } from "@/components/place-search/use-search-places";
 import { SearchNoResults } from "@/components/place-search/search-no-results";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { useIsBackNavigation } from "@/hooks/use-is-back-navigation";
 import { Spinner } from "@/components/ui/spinner";
-import { MapView, type MapMarker } from "./map-view";
+import { MapView, type MapMarker, type MapViewHandle } from "./map-view";
 import { MapSearchInput } from "./map-search-input";
 import { PlaceItem } from "@/components/place-search/place-item";
 import { MapResultSheet } from "./map-result-sheet";
@@ -30,16 +29,14 @@ export function MapContainer() {
     setQuery(queryParam);
   }
 
-  const consumeIsBack = useIsBackNavigation();
-  const skipFitBoundsRef = useRef(false);
+  const mapViewRef = useRef<MapViewHandle>(null);
 
-  // Track query changes to detect back navigation
-  const prevQueryRef = useRef(queryParam);
-  useEffect(() => {
-    if (prevQueryRef.current === queryParam) return;
-    prevQueryRef.current = queryParam;
-    skipFitBoundsRef.current = consumeIsBack();
-  }, [queryParam, consumeIsBack]);
+  const handleLocate = useCallback(
+    (position: { lat: number; lng: number }) => {
+      mapViewRef.current?.morphTo(position.lat, position.lng, 16);
+    },
+    [],
+  );
 
   const { coords: userCoords } = useGeolocation();
   const {
@@ -172,11 +169,11 @@ export function MapContainer() {
   return (
     <>
       <MapView
+        ref={mapViewRef}
         markers={showSheet && hasResults ? activeMarkers : []}
         fitBoundsPadding={
           showSheet && hasResults && !selectedItem ? sheetPadding : undefined
         }
-        skipFitBounds={skipFitBoundsRef.current}
         focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
@@ -197,7 +194,7 @@ export function MapContainer() {
       />
 
       {showSheet && !selectedItem && (
-        <MapResultSheet onClose={handleClear}>
+        <MapResultSheet onClose={handleClear} onLocate={handleLocate}>
           {hasResults ? (
             <>
               <ul className="divide-y px-3">
@@ -225,7 +222,11 @@ export function MapContainer() {
       )}
 
       {selectedItem && (
-        <MapPlaceDetailSheet item={selectedItem} onDismiss={dismissDetail} />
+        <MapPlaceDetailSheet
+          item={selectedItem}
+          onDismiss={dismissDetail}
+          onLocate={handleLocate}
+        />
       )}
     </>
   );
