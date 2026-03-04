@@ -4,16 +4,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
 import {
   DUBAI_COOKIE_STORES,
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { calculateDistance } from "@/lib/geo";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { DubaiCookieSearchInput } from "./dubai-cookie-search-input";
-import { LocationButton } from "./location-button";
 import { StoreDrawer } from "./store-drawer";
 import { StoreListSheet } from "./store-list-sheet";
 
@@ -57,35 +56,31 @@ function createMarkerContent(name: string): string {
 </div>`;
 }
 
-function getSheetBottom(snap: number | string): string {
-  if (typeof snap === "string") return snap; // "200px"
-  return `${snap * 100}%`; // 0.3 → "30%", 0.5 → "50%"
-}
-
 export function DubaiCookieMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") ?? "";
   const placeParam = searchParams.get("place") ?? "";
 
-  const [sheetSnap, setSheetSnap] = useState<number | string>(0.5);
-
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
   const clusterCleanupRef = useRef<(() => void) | null>(null);
   const locationMarkerRef = useRef<naver.maps.Marker | null>(null);
-  const initialCenteredRef = useRef(false);
   const mapReadyRef = useRef(false);
+
+  const [mapMoved, setMapMoved] = useState(false);
+  const [sortCenter, setSortCenter] = useState<
+    { lat: number; lng: number } | undefined
+  >();
 
   // Refs for stable access in map event handlers (avoid stale closures)
   const queryParamRef = useRef(queryParam);
+  queryParamRef.current = queryParam;
   const placeParamRef = useRef(placeParam);
-  useEffect(() => {
-    queryParamRef.current = queryParam;
-    placeParamRef.current = placeParam;
-  }, [queryParam, placeParam]);
+  placeParamRef.current = placeParam;
 
-  const { coords: userCoords } = useGeolocation();
+  const { coords: userCoords, loading: geoLoading } = useGeolocation();
+  const mapCenter = userCoords ?? COMPANY_LOCATION;
 
   // Filter stores by query
   const filteredStores = useMemo(() => {
@@ -94,15 +89,16 @@ export function DubaiCookieMap() {
     return DUBAI_COOKIE_STORES.filter((s) => s.name.toLowerCase().includes(q));
   }, [queryParam]);
 
-  // Sort by distance if user coords available
+  // Sort by distance from effective center (sortCenter if user searched in map, else user coords)
+  const effectiveSortCenter = sortCenter ?? userCoords;
   const sortedStores = useMemo(() => {
-    if (!userCoords) return filteredStores;
+    if (!effectiveSortCenter) return filteredStores;
     return [...filteredStores].sort(
       (a, b) =>
-        calculateDistance(userCoords, { lat: a.lat, lng: a.lng }) -
-        calculateDistance(userCoords, { lat: b.lat, lng: b.lng }),
+        calculateDistance(effectiveSortCenter, { lat: a.lat, lng: a.lng }) -
+        calculateDistance(effectiveSortCenter, { lat: b.lat, lng: b.lng }),
     );
-  }, [filteredStores, userCoords]);
+  }, [filteredStores, effectiveSortCenter]);
 
   // If place param is set, find the selected store
   const selectedStore = useMemo(() => {
@@ -124,20 +120,22 @@ export function DubaiCookieMap() {
       if (params.place) sp.set("place", params.place);
       if (params.expand) sp.set("expand", params.expand);
       const qs = sp.toString();
-      return qs ? `/map/dubai-cookie?${qs}` : "/map/dubai-cookie";
+      return qs ? `/map/dubaicookie?${qs}` : "/map/dubaicookie";
     },
     [],
   );
 
-  const handleSearch = useCallback(
-    (query: string) => {
-      router.push(buildUrl({ query }), { scroll: false });
-    },
-    [router, buildUrl],
-  );
+  const handleSearchTap = useCallback(() => {
+    const url = queryParam
+      ? `/search/dubai-cookie?query=${encodeURIComponent(queryParam)}`
+      : "/search/dubai-cookie";
+    router.push(url);
+  }, [router, queryParam]);
 
   const handleSearchClear = useCallback(() => {
-    router.replace("/map/dubai-cookie", { scroll: false });
+    setMapMoved(false);
+    setSortCenter(undefined);
+    router.replace("/map/dubaicookie", { scroll: false });
   }, [router]);
 
   const handleBack = useCallback(() => {
@@ -146,6 +144,7 @@ export function DubaiCookieMap() {
 
   const handleSelectStore = useCallback(
     (store: DubaiCookieStore) => {
+      setMapMoved(false);
       const url = buildUrl({
         query: queryParam || undefined,
         place: store.placeId,
@@ -174,8 +173,16 @@ export function DubaiCookieMap() {
   }, [router]);
 
   const handleCloseList = useCallback(() => {
-    router.replace("/map/dubai-cookie", { scroll: false });
+    router.replace("/map/dubaicookie", { scroll: false });
   }, [router]);
+
+  const handleSearchInMap = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const center = map.getCenter() as naver.maps.LatLng;
+    setSortCenter({ lat: center.lat(), lng: center.lng() });
+    setMapMoved(false);
+  }, []);
 
   // --- Marker management ---
   const createMarkers = useCallback(
@@ -255,6 +262,8 @@ export function DubaiCookieMap() {
   useEffect(() => {
     if (prevQueryRef.current === queryParam) return;
     prevQueryRef.current = queryParam;
+    setMapMoved(false);
+    setSortCenter(undefined);
 
     const map = mapRef.current;
     if (!map || !queryParam || filteredStores.length === 0) return;
@@ -280,15 +289,6 @@ export function DubaiCookieMap() {
     });
   }, [queryParam, filteredStores]);
 
-  // Center on user location once
-  useEffect(() => {
-    if (!userCoords || !mapRef.current || initialCenteredRef.current) return;
-    initialCenteredRef.current = true;
-    mapRef.current.setCenter(
-      new naver.maps.LatLng(userCoords.lat, userCoords.lng),
-    );
-  }, [userCoords]);
-
   const handleReady = useCallback(
     (map: naver.maps.Map) => {
       mapRef.current = map;
@@ -300,22 +300,43 @@ export function DubaiCookieMap() {
         }
       });
 
+      let dragStartCenter: naver.maps.LatLng | null = null;
+
+      const dragStartListener = naver.maps.Event.addListener(
+        map,
+        "dragstart",
+        () => {
+          dragStartCenter = map.getCenter() as naver.maps.LatLng;
+        },
+      );
+
+      const dragEndListener = naver.maps.Event.addListener(
+        map,
+        "dragend",
+        () => {
+          const endCenter = map.getCenter() as naver.maps.LatLng;
+          if (
+            dragStartCenter &&
+            (dragStartCenter.lat() !== endCenter.lat() ||
+              dragStartCenter.lng() !== endCenter.lng())
+          ) {
+            setMapMoved(true);
+          }
+          dragStartCenter = null;
+        },
+      );
+
       createMarkers(mapStores);
 
+      // Cleanup on unmount — remove markers, clusters, listeners
       return () => {
         naver.maps.Event.removeListener(clickListener);
+        naver.maps.Event.removeListener(dragStartListener);
+        naver.maps.Event.removeListener(dragEndListener);
         clusterCleanupRef.current?.();
         clusterCleanupRef.current = null;
-        markersRef.current.forEach((m) => {
-          naver.maps.Event.clearInstanceListeners(m);
-          m.setMap(null);
-        });
+        markersRef.current.forEach((m) => m.setMap(null));
         markersRef.current = [];
-        if (locationMarkerRef.current) {
-          locationMarkerRef.current.setMap(null);
-          locationMarkerRef.current = null;
-        }
-        mapRef.current = null;
         mapReadyRef.current = false;
       };
     },
@@ -349,43 +370,49 @@ export function DubaiCookieMap() {
   const isSearching = !!queryParam;
   const showList = !selectedStore;
 
-  return (
-    <>
-      <NaverMap onReady={handleReady} className="fixed inset-0" />
+  if (geoLoading) {
+    return (
+      <div className="relative flex-1">
+        <div className="flex size-full items-center justify-center bg-muted text-sm text-muted-foreground">
+          <Spinner className="size-8 text-primary" aria-label="로딩 중" />
+        </div>
+      </div>
+    );
+  }
 
-      <DubaiCookieSearchInput
-        onBack={handleBack}
-        onSearch={handleSearch}
-        onClear={handleSearchClear}
-        initialQuery={queryParam}
+  return (
+    <div className="relative flex-1">
+      <NaverMap
+        center={mapCenter}
+        onReady={handleReady}
+        className="size-full"
       />
 
-      <div
-        className={cn("absolute right-4 z-42 transition-all duration-300", {
-          "pointer-events-none opacity-0": sheetSnap === 1,
-        })}
-        style={{ bottom: `calc(${getSheetBottom(sheetSnap)} + 16px)` }}
-      >
-        <LocationButton onLocate={handleLocate} />
-      </div>
+      <DubaiCookieSearchInput
+        query={queryParam}
+        onTap={handleSearchTap}
+        onClear={handleSearchClear}
+        onBack={handleBack}
+      />
 
       {showList && (
         <StoreListSheet
           stores={sortedStores}
           onSelectStore={handleSelectStore}
           onClose={isSearching ? handleCloseList : handleBack}
-          onSnapChange={setSheetSnap}
+          onLocate={handleLocate}
+          showSearchInMap={mapMoved}
+          onSearchInMap={handleSearchInMap}
         />
       )}
 
       {selectedStore && (
         <StoreDrawer
-          key={selectedStore.placeId}
           store={selectedStore}
           onClose={handleCloseDetail}
-          onSnapChange={setSheetSnap}
+          onLocate={handleLocate}
         />
       )}
-    </>
+    </div>
   );
 }
