@@ -8,6 +8,7 @@ import { SearchNoResults } from "@/components/place-search/search-no-results";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
+import { LocationButton } from "@/components/location-button";
 import { MapView, type MapMarker, type MapViewHandle } from "./map-view";
 import { MapSearchInput } from "./map-search-input";
 import { PlaceItem } from "@/components/place-search/place-item";
@@ -263,6 +264,14 @@ export function MapContainer() {
             <SearchNoResults />
           )}
         </MapResultSheet>
+      )}
+
+      {!showSheet && !selectedItem && (
+        <div className="fixed inset-x-0 bottom-19 z-10 mx-auto w-full max-w-4xl px-2">
+          <div className="flex justify-end">
+            <LocationButton onLocate={handleLocate} />
+          </div>
+        </div>
       )}
 
       {selectedItem && (

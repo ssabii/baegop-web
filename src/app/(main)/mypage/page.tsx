@@ -73,7 +73,7 @@ export default async function MyPage() {
                   <ItemTitle className="font-bold">
                     <span className="relative">
                       두쫀쿠 지도
-                      <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-red-500" />
+                      <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-primary" />
                     </span>
                   </ItemTitle>
                 </ItemContent>
