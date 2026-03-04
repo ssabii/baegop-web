@@ -5,7 +5,7 @@ export function DubaiCookieBanner() {
   return (
     <Link
       href="/map/dubai-cookie"
-      className="flex items-center justify-between rounded-xl bg-linear-to-r from-[#B8D050] to-[#6B9B2E] px-4 py-3 text-white transition-opacity active:opacity-80 dark:from-[#9BB83A] dark:to-[#5A7B26]"
+      className="flex items-center justify-between rounded-xl bg-linear-to-r from-[#6B9B2E] to-[#B8D050] px-4 py-3 text-white transition-opacity active:opacity-80 dark:from-[#5A7B26] dark:to-[#9BB83A]"
     >
       <div className="flex items-center gap-3">
         <span className="text-2xl" role="img" aria-label="쿠키">
