@@ -17,7 +17,7 @@ export function DubaiCookieBanner() {
         </span>
         <div>
           <p className="text-sm font-medium text-white">
-            유행이 끝나기 전에 준비해봤어요
+            유행의 막바지에 준비해 봤어요
           </p>
           <p className="font-bold text-white">두쫀쿠 지도</p>
         </div>
