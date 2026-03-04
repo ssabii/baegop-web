@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
 import type { MapMarker } from "./map-view";
 
@@ -18,6 +18,16 @@ export function MapOverlapPopover({
   onClose,
 }: MapOverlapPopoverProps) {
   const popoverRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<React.CSSProperties>({
+    left: 0,
+    top: 0,
+    opacity: 0,
+  });
+
+  // Compute position after mount (needs actual element height)
+  useLayoutEffect(() => {
+    setPosition(computePosition(anchorPos, popoverRef.current));
+  }, [anchorPos]);
 
   // Close on outside click
   useEffect(() => {
@@ -29,24 +39,21 @@ export function MapOverlapPopover({
         onClose();
       }
     }
-    // Delay to avoid closing from the same click that opened it
-    const timer = setTimeout(() => {
+    // Delay with rAF to avoid closing from the same click that opened it
+    let rafId = requestAnimationFrame(() => {
       document.addEventListener("pointerdown", handlePointerDown);
-    }, 0);
+    });
     return () => {
-      clearTimeout(timer);
+      cancelAnimationFrame(rafId);
       document.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [onClose]);
-
-  // Compute position: show above marker, adjust for viewport edges
-  const style = computePosition(anchorPos, popoverRef.current);
 
   return (
     <div
       ref={popoverRef}
       className="bg-popover text-popover-foreground animate-in fade-in-0 zoom-in-95 fixed z-50 max-h-60 w-56 overflow-y-auto rounded-lg border shadow-lg"
-      style={style}
+      style={position}
     >
       <div className="p-1">
         <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
@@ -90,7 +97,7 @@ function computePosition(
   let top = anchor.y - popoverHeight - margin;
 
   // Viewport edge adjustments
-  const vw = typeof window !== "undefined" ? window.innerWidth : 400;
+  const vw = window.innerWidth;
 
   if (left < margin) left = margin;
   if (left + popoverWidth > vw - margin) left = vw - popoverWidth - margin;
