@@ -9,6 +9,7 @@ import {
   DUBAI_COOKIE_STORES,
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { calculateDistance } from "@/lib/geo";
 import { useGeolocation } from "@/hooks/use-geolocation";
@@ -74,7 +75,6 @@ export function DubaiCookieMap() {
   const markersRef = useRef<naver.maps.Marker[]>([]);
   const clusterCleanupRef = useRef<(() => void) | null>(null);
   const locationMarkerRef = useRef<naver.maps.Marker | null>(null);
-  const initialCenteredRef = useRef(false);
   const mapReadyRef = useRef(false);
 
   // Refs for stable access in map event handlers (avoid stale closures)
@@ -83,7 +83,8 @@ export function DubaiCookieMap() {
   const placeParamRef = useRef(placeParam);
   placeParamRef.current = placeParam;
 
-  const userCoords = useGeolocation();
+  const { coords: userCoords, loading: geoLoading } = useGeolocation();
+  const mapCenter = userCoords ?? COMPANY_LOCATION;
 
   // Filter stores by query
   const filteredStores = useMemo(() => {
@@ -278,15 +279,6 @@ export function DubaiCookieMap() {
     });
   }, [queryParam, filteredStores]);
 
-  // Center on user location once
-  useEffect(() => {
-    if (!userCoords || !mapRef.current || initialCenteredRef.current) return;
-    initialCenteredRef.current = true;
-    mapRef.current.setCenter(
-      new naver.maps.LatLng(userCoords.lat, userCoords.lng),
-    );
-  }, [userCoords]);
-
   const handleReady = useCallback(
     (map: naver.maps.Map) => {
       mapRef.current = map;
@@ -330,9 +322,19 @@ export function DubaiCookieMap() {
   const isSearching = !!queryParam;
   const showList = !selectedStore;
 
+  if (geoLoading) {
+    return (
+      <div className="relative flex-1">
+        <div className="flex size-full items-center justify-center bg-muted text-sm text-muted-foreground">
+          <Spinner className="size-8 text-primary" aria-label="로딩 중" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex-1">
-      <NaverMap onReady={handleReady} className="size-full" />
+      <NaverMap center={mapCenter} onReady={handleReady} className="size-full" />
 
       <DubaiCookieSearchInput
         onBack={handleBack}

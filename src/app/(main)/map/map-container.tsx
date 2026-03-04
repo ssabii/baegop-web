@@ -29,7 +29,7 @@ export function MapContainer() {
     setQuery(queryParam);
   }
 
-  const userCoords = useGeolocation();
+  const { coords: userCoords } = useGeolocation();
   const {
     results,
     pageCount,
