@@ -116,7 +116,10 @@ export function MapResultSheet({
                 {onSearchInMap && (
                   <SearchInMapButton
                     visible={showSearchInMap}
-                    onClick={onSearchInMap}
+                    onClick={() => {
+                      setActiveSnap(HALF_SNAP);
+                      onSearchInMap();
+                    }}
                   />
                 )}
               </div>

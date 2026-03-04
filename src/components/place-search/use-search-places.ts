@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import type { NaverSearchResult } from "@/types";
 
@@ -34,7 +35,7 @@ export function useSearchPlaces(query: string, coords?: Coords) {
       enabled: !!query,
     });
 
-  const results = data?.pages.flat() ?? [];
+  const results = useMemo(() => data?.pages.flat() ?? [], [data]);
   const pageCount = data?.pages.length ?? 0;
 
   return {

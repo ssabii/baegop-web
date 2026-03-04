@@ -300,11 +300,29 @@ export function DubaiCookieMap() {
         }
       });
 
+      let dragStartCenter: naver.maps.LatLng | null = null;
+
+      const dragStartListener = naver.maps.Event.addListener(
+        map,
+        "dragstart",
+        () => {
+          dragStartCenter = map.getCenter() as naver.maps.LatLng;
+        },
+      );
+
       const dragEndListener = naver.maps.Event.addListener(
         map,
         "dragend",
         () => {
-          setMapMoved(true);
+          const endCenter = map.getCenter() as naver.maps.LatLng;
+          if (
+            dragStartCenter &&
+            (dragStartCenter.lat() !== endCenter.lat() ||
+              dragStartCenter.lng() !== endCenter.lng())
+          ) {
+            setMapMoved(true);
+          }
+          dragStartCenter = null;
         },
       );
 
@@ -313,6 +331,7 @@ export function DubaiCookieMap() {
       // Cleanup on unmount — remove markers, clusters, listeners
       return () => {
         naver.maps.Event.removeListener(clickListener);
+        naver.maps.Event.removeListener(dragStartListener);
         naver.maps.Event.removeListener(dragEndListener);
         clusterCleanupRef.current?.();
         clusterCleanupRef.current = null;

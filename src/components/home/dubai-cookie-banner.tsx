@@ -16,13 +16,13 @@ export function DubaiCookieBanner() {
           />
         </span>
         <div>
-          <p className="text-sm font-medium text-background">
-            많이 늦었지만 준비해봤어요
+          <p className="text-sm font-medium text-white">
+            유행이 끝나기 전에 준비해봤어요
           </p>
-          <p className="font-bold text-background">두쫀쿠 지도</p>
+          <p className="font-bold text-white">두쫀쿠 지도</p>
         </div>
       </div>
-      <ChevronRight className="size-6 text-background" />
+      <ChevronRight className="size-6 text-white" />
     </Link>
   );
 }

@@ -168,8 +168,11 @@ export function StoreListSheet({
                 {onSearchInMap && (
                   <SearchInMapButton
                     visible={showSearchInMap}
-                    onClick={onSearchInMap}
-                    className="bg-[#B0CC50] hover:bg-[#B0CC50]/90 dark:bg-[#8EB035] dark:hover:bg-[#8EB035]/90"
+                    onClick={() => {
+                      setActiveSnap(HALF_SNAP);
+                      onSearchInMap();
+                    }}
+                    className="bg-[#B0CC50] text-white hover:bg-[#B0CC50]/90 dark:bg-[#8EB035] dark:hover:bg-[#8EB035]/90"
                   />
                 )}
               </div>
@@ -201,6 +204,7 @@ export function StoreListSheet({
               <MapViewButton
                 scrollRef={contentRef}
                 onClick={() => setActiveSnap(COMPACT_SNAP)}
+                buttonClassName="bg-[#B0CC50] text-white hover:bg-[#B0CC50]/90 dark:bg-[#8EB035] dark:hover:bg-[#8EB035]/90"
               />
             )}
           </div>

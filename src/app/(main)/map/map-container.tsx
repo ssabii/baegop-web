@@ -7,6 +7,7 @@ import { useSearchPlaces } from "@/components/place-search/use-search-places";
 import { SearchNoResults } from "@/components/place-search/search-no-results";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 import { MapView, type MapMarker, type MapViewHandle } from "./map-view";
 import { MapSearchInput } from "./map-search-input";
 import { PlaceItem } from "@/components/place-search/place-item";
@@ -27,6 +28,8 @@ export function MapContainer() {
   const [searchCoords, setSearchCoords] = useState<
     { lat: number; lng: number } | undefined
   >();
+  // Hide map until first search completes to prevent 크몽 flash
+  const [initialSearchDone, setInitialSearchDone] = useState(!queryParam);
 
   // Sync URL → state when queryParam changes externally (render-time sync)
   if (queryParam !== prevQueryParam) {
@@ -56,8 +59,10 @@ export function MapContainer() {
     setMapMoved(false);
   }, []);
 
-  const { coords: userCoords } = useGeolocation();
+  const { coords: userCoords, loading: geoLoading } = useGeolocation();
   const effectiveCoords = searchCoords ?? userCoords;
+  // Delay search until geolocation resolves to prevent double fitBounds
+  const searchQuery = geoLoading ? "" : query;
   const {
     results,
     pageCount,
@@ -65,7 +70,7 @@ export function MapContainer() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useSearchPlaces(query, effectiveCoords);
+  } = useSearchPlaces(searchQuery, effectiveCoords);
 
   // Derive UI state from URL params (single source of truth)
   const selectedItem = useMemo(() => {
@@ -186,7 +191,14 @@ export function MapContainer() {
 
   const isSearching = query.length > 0;
   const hasResults = results.length > 0;
-  const showSheet = isSearching && sheetOpen && !isLoading;
+  const showSheet = isSearching && sheetOpen && !isLoading && !geoLoading;
+
+  // Reveal map once first search results are displayed
+  useEffect(() => {
+    if (showSheet && !initialSearchDone) {
+      setInitialSearchDone(true);
+    }
+  }, [showSheet, initialSearchDone]);
 
   return (
     <>
@@ -194,13 +206,17 @@ export function MapContainer() {
         ref={mapViewRef}
         markers={showSheet && hasResults ? activeMarkers : []}
         fitBoundsPadding={
-          showSheet && hasResults && !selectedItem ? sheetPadding : undefined
+          showSheet && hasResults && !selectedItem && !searchCoords
+            ? sheetPadding
+            : undefined
         }
         focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
         onDragEnd={handleDragEnd}
-        className="fixed inset-x-0 top-0 bottom-15"
+        className={cn("fixed inset-x-0 top-0 bottom-15", {
+          "opacity-0": !initialSearchDone,
+        })}
       />
 
       <MapSearchInput

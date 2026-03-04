@@ -74,6 +74,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   const clusterCleanupRef = useRef<(() => void) | null>(null);
   const markersRef = useRef(markers);
   const onDragEndRef = useRef(onDragEnd);
+  const lastFitBoundsKeyRef = useRef("");
   const [mapReady, setMapReady] = useState(false);
   useEffect(() => {
     markersRef.current = markers;
@@ -138,17 +139,21 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       });
 
       if (fitBoundsPadding && markers.length > 0) {
-        const bounds = new naver.maps.LatLngBounds(
-          new naver.maps.LatLng(
-            Math.min(...markers.map((m) => m.lat)),
-            Math.min(...markers.map((m) => m.lng)),
-          ),
-          new naver.maps.LatLng(
-            Math.max(...markers.map((m) => m.lat)),
-            Math.max(...markers.map((m) => m.lng)),
-          ),
-        );
-        map.fitBounds(bounds, fitBoundsPadding);
+        const key = markers.map((m) => m.id).join(",");
+        if (key !== lastFitBoundsKeyRef.current) {
+          lastFitBoundsKeyRef.current = key;
+          const bounds = new naver.maps.LatLngBounds(
+            new naver.maps.LatLng(
+              Math.min(...markers.map((m) => m.lat)),
+              Math.min(...markers.map((m) => m.lng)),
+            ),
+            new naver.maps.LatLng(
+              Math.max(...markers.map((m) => m.lat)),
+              Math.max(...markers.map((m) => m.lng)),
+            ),
+          );
+          map.fitBounds(bounds, fitBoundsPadding);
+        }
       }
     },
     [markers, fitBoundsPadding, onMarkerClick, clearMarkers],
@@ -160,15 +165,34 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       mapRef.current = map;
       setMapReady(true);
 
+      let dragStartCenter: naver.maps.LatLng | null = null;
+
+      const dragStartListener = naver.maps.Event.addListener(
+        map,
+        "dragstart",
+        () => {
+          dragStartCenter = map.getCenter() as naver.maps.LatLng;
+        },
+      );
+
       const dragEndListener = naver.maps.Event.addListener(
         map,
         "dragend",
         () => {
-          onDragEndRef.current?.();
+          const endCenter = map.getCenter() as naver.maps.LatLng;
+          if (
+            dragStartCenter &&
+            (dragStartCenter.lat() !== endCenter.lat() ||
+              dragStartCenter.lng() !== endCenter.lng())
+          ) {
+            onDragEndRef.current?.();
+          }
+          dragStartCenter = null;
         },
       );
 
       return () => {
+        naver.maps.Event.removeListener(dragStartListener);
         naver.maps.Event.removeListener(dragEndListener);
         clearMarkers();
         mapRef.current = null;

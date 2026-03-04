@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 interface MapViewButtonProps {
   scrollRef: React.RefObject<HTMLDivElement | null>;
   onClick: () => void;
+  buttonClassName?: string;
 }
 
-export function MapViewButton({ scrollRef, onClick }: MapViewButtonProps) {
+export function MapViewButton({ scrollRef, onClick, buttonClassName }: MapViewButtonProps) {
   const [visible, setVisible] = useState(true);
   const lastScrollTopRef = useRef(0);
 
@@ -39,7 +40,7 @@ export function MapViewButton({ scrollRef, onClick }: MapViewButtonProps) {
         },
       )}
     >
-      <Button className="rounded-full shadow-lg" onClick={onClick}>
+      <Button className={cn("rounded-full shadow-lg", buttonClassName)} onClick={onClick}>
         <MapPin className="size-4" />
         지도보기
       </Button>
