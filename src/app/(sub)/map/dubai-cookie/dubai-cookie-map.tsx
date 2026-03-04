@@ -294,13 +294,30 @@ export function DubaiCookieMap() {
       mapRef.current = map;
       mapReadyRef.current = true;
 
-      naver.maps.Event.addListener(map, "click", () => {
+      const clickListener = naver.maps.Event.addListener(map, "click", () => {
         if (placeParamRef.current) {
           router.back();
         }
       });
 
       createMarkers(mapStores);
+
+      return () => {
+        naver.maps.Event.removeListener(clickListener);
+        clusterCleanupRef.current?.();
+        clusterCleanupRef.current = null;
+        markersRef.current.forEach((m) => {
+          naver.maps.Event.clearInstanceListeners(m);
+          m.setMap(null);
+        });
+        markersRef.current = [];
+        if (locationMarkerRef.current) {
+          locationMarkerRef.current.setMap(null);
+          locationMarkerRef.current = null;
+        }
+        mapRef.current = null;
+        mapReadyRef.current = false;
+      };
     },
     [createMarkers, mapStores, router],
   );
