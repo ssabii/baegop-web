@@ -128,12 +128,12 @@ export function DubaiCookieMap() {
     [],
   );
 
-  const handleSearch = useCallback(
-    (query: string) => {
-      router.push(buildUrl({ query }), { scroll: false });
-    },
-    [router, buildUrl],
-  );
+  const handleSearchTap = useCallback(() => {
+    const url = queryParam
+      ? `/search/dubai-cookie?query=${encodeURIComponent(queryParam)}`
+      : "/search/dubai-cookie";
+    router.push(url);
+  }, [router, queryParam]);
 
   const handleSearchClear = useCallback(() => {
     router.replace("/map/dubaicookie", { scroll: false });
@@ -291,6 +291,26 @@ export function DubaiCookieMap() {
       });
 
       createMarkers(mapStores);
+
+      // 최초 진입 시 (검색/상세 없음) 전체 매장으로 fitBounds
+      if (!queryParamRef.current && !placeParamRef.current) {
+        const stores = DUBAI_COOKIE_STORES;
+        if (stores.length > 0) {
+          const bounds = new naver.maps.LatLngBounds(
+            new naver.maps.LatLng(stores[0].lat, stores[0].lng),
+            new naver.maps.LatLng(stores[0].lat, stores[0].lng),
+          );
+          for (const s of stores) {
+            bounds.extend(new naver.maps.LatLng(s.lat, s.lng));
+          }
+          map.fitBounds(bounds, {
+            top: 80,
+            right: 40,
+            bottom: Math.round(window.innerHeight * 0.5) + 40,
+            left: 40,
+          });
+        }
+      }
     },
     [createMarkers, mapStores, router],
   );
@@ -334,13 +354,17 @@ export function DubaiCookieMap() {
 
   return (
     <div className="relative flex-1">
-      <NaverMap center={mapCenter} onReady={handleReady} className="size-full" />
+      <NaverMap
+        center={mapCenter}
+        onReady={handleReady}
+        className="size-full"
+      />
 
       <DubaiCookieSearchInput
-        onBack={handleBack}
-        onSearch={handleSearch}
+        query={queryParam}
+        onTap={handleSearchTap}
         onClear={handleSearchClear}
-        initialQuery={queryParam}
+        onBack={handleBack}
       />
 
       <div
