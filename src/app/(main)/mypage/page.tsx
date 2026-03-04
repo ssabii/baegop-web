@@ -68,12 +68,12 @@ export default async function MyPage() {
               inGroup
             />
             <Item asChild>
-              <Link href="/map/dubaicookie">
+              <Link href="/map/dubai-cookie">
                 <ItemContent>
                   <ItemTitle className="font-bold">
                     <span className="relative">
                       두쫀쿠 지도
-                      <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-primary" />
+                      <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-red-500" />
                     </span>
                   </ItemTitle>
                 </ItemContent>
