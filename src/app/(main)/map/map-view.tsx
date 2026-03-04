@@ -10,6 +10,7 @@ import {
 } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
+import { createMarkerClustering } from "@/lib/marker-clustering";
 import dynamic from "next/dynamic";
 
 const NaverMap = dynamic(() => import("@/components/naver-map"), {
@@ -29,6 +30,8 @@ function createMarkerContent(title?: string): string {
   return `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">${pin}${label}</div>`;
 }
 
+const CLUSTER_MAX_ZOOM = 15;
+
 export interface MapMarker {
   id: string;
   lat: number;
@@ -41,6 +44,7 @@ type Padding = { top?: number; bottom?: number; left?: number; right?: number };
 
 export interface MapViewHandle {
   morphTo: (lat: number, lng: number, zoom: number) => void;
+  getCenter: () => { lat: number; lng: number } | null;
 }
 
 interface MapViewProps {
@@ -49,22 +53,38 @@ interface MapViewProps {
   focusPadding?: Padding;
   focusMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
+  onDragEnd?: () => void;
   className?: string;
 }
 
 export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
-  { markers, fitBoundsPadding, focusPadding, focusMarkerId, onMarkerClick, className },
+  {
+    markers,
+    fitBoundsPadding,
+    focusPadding,
+    focusMarkerId,
+    onMarkerClick,
+    onDragEnd,
+    className,
+  },
   ref,
 ) {
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markerInstancesRef = useRef<naver.maps.Marker[]>([]);
+  const clusterCleanupRef = useRef<(() => void) | null>(null);
   const markersRef = useRef(markers);
+  const onDragEndRef = useRef(onDragEnd);
   const [mapReady, setMapReady] = useState(false);
   useEffect(() => {
     markersRef.current = markers;
   }, [markers]);
+  useEffect(() => {
+    onDragEndRef.current = onDragEnd;
+  }, [onDragEnd]);
 
   const clearMarkers = useCallback(() => {
+    clusterCleanupRef.current?.();
+    clusterCleanupRef.current = null;
     markerInstancesRef.current.forEach((m) => {
       naver.maps.Event.clearInstanceListeners(m);
       m.setMap(null);
@@ -79,7 +99,6 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       markers.forEach((data) => {
         const marker = new naver.maps.Marker({
           position: new naver.maps.LatLng(data.lat, data.lng),
-          map,
           title: data.title,
           icon: {
             content: createMarkerContent(data.title),
@@ -93,6 +112,29 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         });
 
         markerInstancesRef.current.push(marker);
+      });
+
+      clusterCleanupRef.current = createMarkerClustering({
+        map,
+        markers: markerInstancesRef.current,
+        gridSize: 120,
+        minClusterSize: 2,
+        clusterColors: { light: "#ee560c", dark: "#ee560c" },
+        maxZoom: CLUSTER_MAX_ZOOM,
+        onClusterClick: (cluster) => {
+          map.fitBounds(
+            cluster.getBounds(),
+            fitBoundsPadding ?? {
+              top: 80,
+              right: 40,
+              bottom: 40,
+              left: 40,
+            },
+          );
+          if (map.getZoom() > CLUSTER_MAX_ZOOM + 1) {
+            map.setZoom(CLUSTER_MAX_ZOOM + 1);
+          }
+        },
       });
 
       if (fitBoundsPadding && markers.length > 0) {
@@ -118,7 +160,16 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       mapRef.current = map;
       setMapReady(true);
 
+      const dragEndListener = naver.maps.Event.addListener(
+        map,
+        "dragend",
+        () => {
+          onDragEndRef.current?.();
+        },
+      );
+
       return () => {
+        naver.maps.Event.removeListener(dragEndListener);
         clearMarkers();
         mapRef.current = null;
       };
@@ -190,6 +241,12 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       map.morph(new naver.maps.LatLng(lat, lng), zoom, {
         easing: "easeOutCubic",
       });
+    },
+    getCenter() {
+      const map = mapRef.current;
+      if (!map) return null;
+      const center = map.getCenter() as naver.maps.LatLng;
+      return { lat: center.lat(), lng: center.lng() };
     },
   }));
 

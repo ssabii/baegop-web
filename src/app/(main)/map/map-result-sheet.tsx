@@ -6,6 +6,7 @@ import { Drawer } from "vaul";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LocationButton } from "@/components/location-button";
+import { SearchInMapButton } from "@/components/search-in-map-button";
 import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
 
@@ -18,12 +19,16 @@ interface MapResultSheetProps {
   children: React.ReactNode;
   onClose: () => void;
   onLocate: (position: { lat: number; lng: number }) => void;
+  showSearchInMap?: boolean;
+  onSearchInMap?: () => void;
 }
 
 export function MapResultSheet({
   children,
   onClose,
   onLocate,
+  showSearchInMap = false,
+  onSearchInMap,
 }: MapResultSheetProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -108,6 +113,12 @@ export function MapResultSheet({
                 <div className="absolute -top-12 right-2">
                   <LocationButton onLocate={onLocate} />
                 </div>
+                {onSearchInMap && (
+                  <SearchInMapButton
+                    visible={showSearchInMap}
+                    onClick={onSearchInMap}
+                  />
+                )}
               </div>
             )}
 

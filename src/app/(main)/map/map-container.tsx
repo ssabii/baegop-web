@@ -23,10 +23,17 @@ export function MapContainer() {
   const [query, setQuery] = useState(queryParam);
   const [prevQueryParam, setPrevQueryParam] = useState(queryParam);
 
+  const [mapMoved, setMapMoved] = useState(false);
+  const [searchCoords, setSearchCoords] = useState<
+    { lat: number; lng: number } | undefined
+  >();
+
   // Sync URL → state when queryParam changes externally (render-time sync)
   if (queryParam !== prevQueryParam) {
     setPrevQueryParam(queryParam);
     setQuery(queryParam);
+    setMapMoved(false);
+    setSearchCoords(undefined);
   }
 
   const mapViewRef = useRef<MapViewHandle>(null);
@@ -38,7 +45,19 @@ export function MapContainer() {
     [],
   );
 
+  const handleDragEnd = useCallback(() => {
+    setMapMoved(true);
+  }, []);
+
+  const handleSearchInMap = useCallback(() => {
+    const center = mapViewRef.current?.getCenter();
+    if (!center) return;
+    setSearchCoords(center);
+    setMapMoved(false);
+  }, []);
+
   const { coords: userCoords } = useGeolocation();
+  const effectiveCoords = searchCoords ?? userCoords;
   const {
     results,
     pageCount,
@@ -46,7 +65,7 @@ export function MapContainer() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useSearchPlaces(query, userCoords);
+  } = useSearchPlaces(query, effectiveCoords);
 
   // Derive UI state from URL params (single source of truth)
   const selectedItem = useMemo(() => {
@@ -122,6 +141,7 @@ export function MapContainer() {
 
   const pushDetail = useCallback(
     (item: NaverSearchResult) => {
+      setMapMoved(false);
       const url = buildUrl(query, item.id);
       if (placeParam) {
         // detail → detail (marker click): replace to avoid history bloat
@@ -140,6 +160,8 @@ export function MapContainer() {
 
   const handleClear = useCallback(() => {
     setQuery("");
+    setMapMoved(false);
+    setSearchCoords(undefined);
     router.replace("/map", { scroll: false });
   }, [router]);
 
@@ -177,6 +199,7 @@ export function MapContainer() {
         focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
+        onDragEnd={handleDragEnd}
         className="fixed inset-x-0 top-0 bottom-15"
       />
 
@@ -194,7 +217,12 @@ export function MapContainer() {
       />
 
       {showSheet && !selectedItem && (
-        <MapResultSheet onClose={handleClear} onLocate={handleLocate}>
+        <MapResultSheet
+          onClose={handleClear}
+          onLocate={handleLocate}
+          showSearchInMap={mapMoved && !!query}
+          onSearchInMap={handleSearchInMap}
+        >
           {hasResults ? (
             <>
               <ul className="divide-y px-3">

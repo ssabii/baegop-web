@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Spinner } from "@/components/ui/spinner";
@@ -68,6 +68,11 @@ export function DubaiCookieMap() {
   const locationMarkerRef = useRef<naver.maps.Marker | null>(null);
   const mapReadyRef = useRef(false);
 
+  const [mapMoved, setMapMoved] = useState(false);
+  const [sortCenter, setSortCenter] = useState<
+    { lat: number; lng: number } | undefined
+  >();
+
   // Refs for stable access in map event handlers (avoid stale closures)
   const queryParamRef = useRef(queryParam);
   queryParamRef.current = queryParam;
@@ -84,15 +89,16 @@ export function DubaiCookieMap() {
     return DUBAI_COOKIE_STORES.filter((s) => s.name.toLowerCase().includes(q));
   }, [queryParam]);
 
-  // Sort by distance if user coords available
+  // Sort by distance from effective center (sortCenter if user searched in map, else user coords)
+  const effectiveSortCenter = sortCenter ?? userCoords;
   const sortedStores = useMemo(() => {
-    if (!userCoords) return filteredStores;
+    if (!effectiveSortCenter) return filteredStores;
     return [...filteredStores].sort(
       (a, b) =>
-        calculateDistance(userCoords, { lat: a.lat, lng: a.lng }) -
-        calculateDistance(userCoords, { lat: b.lat, lng: b.lng }),
+        calculateDistance(effectiveSortCenter, { lat: a.lat, lng: a.lng }) -
+        calculateDistance(effectiveSortCenter, { lat: b.lat, lng: b.lng }),
     );
-  }, [filteredStores, userCoords]);
+  }, [filteredStores, effectiveSortCenter]);
 
   // If place param is set, find the selected store
   const selectedStore = useMemo(() => {
@@ -127,6 +133,8 @@ export function DubaiCookieMap() {
   }, [router, queryParam]);
 
   const handleSearchClear = useCallback(() => {
+    setMapMoved(false);
+    setSortCenter(undefined);
     router.replace("/map/dubaicookie", { scroll: false });
   }, [router]);
 
@@ -136,6 +144,7 @@ export function DubaiCookieMap() {
 
   const handleSelectStore = useCallback(
     (store: DubaiCookieStore) => {
+      setMapMoved(false);
       const url = buildUrl({
         query: queryParam || undefined,
         place: store.placeId,
@@ -166,6 +175,14 @@ export function DubaiCookieMap() {
   const handleCloseList = useCallback(() => {
     router.replace("/map/dubaicookie", { scroll: false });
   }, [router]);
+
+  const handleSearchInMap = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const center = map.getCenter() as naver.maps.LatLng;
+    setSortCenter({ lat: center.lat(), lng: center.lng() });
+    setMapMoved(false);
+  }, []);
 
   // --- Marker management ---
   const createMarkers = useCallback(
@@ -245,6 +262,8 @@ export function DubaiCookieMap() {
   useEffect(() => {
     if (prevQueryRef.current === queryParam) return;
     prevQueryRef.current = queryParam;
+    setMapMoved(false);
+    setSortCenter(undefined);
 
     const map = mapRef.current;
     if (!map || !queryParam || filteredStores.length === 0) return;
@@ -281,11 +300,20 @@ export function DubaiCookieMap() {
         }
       });
 
+      const dragEndListener = naver.maps.Event.addListener(
+        map,
+        "dragend",
+        () => {
+          setMapMoved(true);
+        },
+      );
+
       createMarkers(mapStores);
 
       // Cleanup on unmount — remove markers, clusters, listeners
       return () => {
         naver.maps.Event.removeListener(clickListener);
+        naver.maps.Event.removeListener(dragEndListener);
         clusterCleanupRef.current?.();
         clusterCleanupRef.current = null;
         markersRef.current.forEach((m) => m.setMap(null));
@@ -354,6 +382,8 @@ export function DubaiCookieMap() {
           onSelectStore={handleSelectStore}
           onClose={isSearching ? handleCloseList : handleBack}
           onLocate={handleLocate}
+          showSearchInMap={mapMoved}
+          onSearchInMap={handleSearchInMap}
         />
       )}
 

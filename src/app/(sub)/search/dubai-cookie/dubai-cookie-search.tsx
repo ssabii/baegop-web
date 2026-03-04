@@ -1,10 +1,5 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Building2, ChevronLeft, Clock, MapPin, Tag, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import {
   Empty,
   EmptyDescription,
@@ -12,14 +7,18 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { SearchNoResults } from "@/components/place-search/search-no-results";
-import { useRecentSearches } from "@/hooks/use-recent-searches";
+import { Input } from "@/components/ui/input";
 import {
   DUBAI_COOKIE_STORES,
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
+import { useRecentSearches } from "@/hooks/use-recent-searches";
 import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
+import { cn } from "@/lib/utils";
+import { Building2, ChevronLeft, Clock, MapPin, Tag, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useRef, useState } from "react";
 
 function StoreListItem({
   store,
@@ -46,9 +45,7 @@ function StoreListItem({
         )}
         <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
           <MapPin className="size-3 shrink-0" />
-          <span>
-            {formatShortAddress(store.roadAddress || store.address)}
-          </span>
+          <span>{formatShortAddress(store.roadAddress || store.address)}</span>
         </span>
       </div>
       {store.imageUrl && !imgError ? (
@@ -82,9 +79,7 @@ export function DubaiCookieSearch() {
   const filtered = useMemo(() => {
     const q = input.trim().toLowerCase();
     if (!q) return [];
-    return DUBAI_COOKIE_STORES.filter((s) =>
-      s.name.toLowerCase().includes(q),
-    );
+    return DUBAI_COOKIE_STORES.filter((s) => s.name.toLowerCase().includes(q));
   }, [input]);
 
   const hasInput = input.trim().length > 0;
@@ -260,7 +255,18 @@ export function DubaiCookieSearch() {
       {/* No results */}
       {showNoResults && (
         <div className="flex flex-1 flex-col items-center justify-center px-4">
-          <SearchNoResults />
+          <Empty className="border-none">
+            <EmptyHeader className="gap-1">
+              <EmptyMedia
+                variant="icon"
+                className="size-12 rounded-none bg-transparent"
+              >
+                <img src="/dubai-cookie.svg" alt="두쫀쿠" className="size-12" />
+              </EmptyMedia>
+              <EmptyTitle className="font-bold">검색 결과가 없어요</EmptyTitle>
+              <EmptyDescription>다른 검색어로 검색해보세요</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         </div>
       )}
     </div>

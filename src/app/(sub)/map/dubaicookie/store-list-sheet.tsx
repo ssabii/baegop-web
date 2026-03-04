@@ -10,6 +10,7 @@ import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 import { LocationButton } from "@/components/location-button";
+import { SearchInMapButton } from "@/components/search-in-map-button";
 import { MapViewButton } from "./map-view-button";
 
 const COMPACT_SNAP = 0.2;
@@ -23,6 +24,8 @@ interface StoreListSheetProps {
   onClose: () => void;
   onLocate: (position: { lat: number; lng: number }) => void;
   onSnapChange?: (snap: number | string) => void;
+  showSearchInMap?: boolean;
+  onSearchInMap?: () => void;
 }
 
 function StoreListItem({
@@ -75,6 +78,8 @@ export function StoreListSheet({
   onClose,
   onLocate,
   onSnapChange,
+  showSearchInMap = false,
+  onSearchInMap,
 }: StoreListSheetProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -160,6 +165,13 @@ export function StoreListSheet({
                 <div className="absolute -top-12 right-2">
                   <LocationButton onLocate={onLocate} />
                 </div>
+                {onSearchInMap && (
+                  <SearchInMapButton
+                    visible={showSearchInMap}
+                    onClick={onSearchInMap}
+                    className="bg-[#B0CC50] hover:bg-[#B0CC50]/90 dark:bg-[#8EB035] dark:hover:bg-[#8EB035]/90"
+                  />
+                )}
               </div>
             )}
 
