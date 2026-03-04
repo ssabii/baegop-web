@@ -11,6 +11,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import { createMarkerClustering } from "@/lib/marker-clustering";
+import { getOverlappingMarkers } from "@/lib/marker-overlap";
 import dynamic from "next/dynamic";
 
 const NaverMap = dynamic(() => import("@/components/naver-map"), {
@@ -53,7 +54,9 @@ interface MapViewProps {
   focusPadding?: Padding;
   focusMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
+  onOverlapClick?: (markers: MapMarker[], anchorPos: { x: number; y: number }) => void;
   onDragEnd?: () => void;
+  onMapClick?: () => void;
   className?: string;
 }
 
@@ -64,7 +67,9 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
     focusPadding,
     focusMarkerId,
     onMarkerClick,
+    onOverlapClick,
     onDragEnd,
+    onMapClick,
     className,
   },
   ref,
@@ -74,6 +79,9 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   const clusterCleanupRef = useRef<(() => void) | null>(null);
   const markersRef = useRef(markers);
   const onDragEndRef = useRef(onDragEnd);
+  const onMarkerClickRef = useRef(onMarkerClick);
+  const onOverlapClickRef = useRef(onOverlapClick);
+  const onMapClickRef = useRef(onMapClick);
   const lastFitBoundsKeyRef = useRef("");
   const [mapReady, setMapReady] = useState(false);
   useEffect(() => {
@@ -82,6 +90,15 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   useEffect(() => {
     onDragEndRef.current = onDragEnd;
   }, [onDragEnd]);
+  useEffect(() => {
+    onMarkerClickRef.current = onMarkerClick;
+  }, [onMarkerClick]);
+  useEffect(() => {
+    onOverlapClickRef.current = onOverlapClick;
+  }, [onOverlapClick]);
+  useEffect(() => {
+    onMapClickRef.current = onMapClick;
+  }, [onMapClick]);
 
   const clearMarkers = useCallback(() => {
     clusterCleanupRef.current?.();
@@ -109,7 +126,34 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         });
 
         naver.maps.Event.addListener(marker, "click", () => {
-          onMarkerClick?.(data.id);
+          const map = mapRef.current;
+          if (!map) return;
+
+          const overlapping = getOverlappingMarkers(
+            map,
+            marker,
+            markerInstancesRef.current,
+          );
+
+          if (overlapping.length > 0 && onOverlapClickRef.current) {
+            const allOverlapping = [marker, ...overlapping];
+            const overlapItems = allOverlapping
+              .map((m) => {
+                const idx = markerInstancesRef.current.indexOf(m);
+                return idx >= 0 ? markersRef.current[idx] : null;
+              })
+              .filter((item): item is MapMarker => item !== null);
+
+            const el = marker.getElement();
+            const rect = el?.getBoundingClientRect();
+            const anchorPos = rect
+              ? { x: rect.left + rect.width / 2, y: rect.top }
+              : { x: 0, y: 0 };
+
+            onOverlapClickRef.current(overlapItems, anchorPos);
+          } else {
+            onMarkerClickRef.current?.(data.id);
+          }
         });
 
         markerInstancesRef.current.push(marker);
@@ -156,7 +200,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         }
       }
     },
-    [markers, fitBoundsPadding, onMarkerClick, clearMarkers],
+    [markers, fitBoundsPadding, clearMarkers],
   );
 
   // Stable handleReady — only depends on clearMarkers (stable)
@@ -191,9 +235,14 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         },
       );
 
+      const clickListener = naver.maps.Event.addListener(map, "click", () => {
+        onMapClickRef.current?.();
+      });
+
       return () => {
         naver.maps.Event.removeListener(dragStartListener);
         naver.maps.Event.removeListener(dragEndListener);
+        naver.maps.Event.removeListener(clickListener);
         clearMarkers();
         mapRef.current = null;
       };
