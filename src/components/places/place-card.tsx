@@ -6,7 +6,7 @@ import type { KonaCardStatus } from "@/types";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
 import Link from "next/link";
 
-interface PlaceCardProps {
+export interface PlaceCardProps {
   id: string;
   name: string;
   address: string;
