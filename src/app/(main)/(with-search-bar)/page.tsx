@@ -1,38 +1,68 @@
-import Link from "next/link";
 import { Suspense } from "react";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { DubaiCookieBanner } from "@/components/home/dubai-cookie-banner";
 import { HomeTabs } from "@/components/home/home-tabs";
+import { HomeFooter } from "@/components/home/home-footer";
 import { PlaceList } from "@/components/home/place-list";
+import { PlaceListSkeleton } from "@/components/home/place-list-skeleton";
+import { fetchPlaces } from "@/lib/queries/places";
+import {
+  POPULAR_RATING_THRESHOLD,
+  POPULAR_MIN_REVIEW_COUNT,
+  RECENT_DAYS,
+} from "@/lib/constants";
 
-export default function HomePage() {
+const STALE_TIME = 5 * 60 * 1000;
+
+function getRecentCreatedAfter() {
+  const since = new Date();
+  since.setDate(since.getDate() - RECENT_DAYS);
+  return since.toISOString();
+}
+
+export default async function HomePage() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { staleTime: STALE_TIME },
+    },
+  });
+
+  await Promise.all([
+    queryClient.prefetchInfiniteQuery({
+      queryKey: ["places", "recent"],
+      queryFn: () =>
+        fetchPlaces({
+          orderBy: "created_at",
+          ascending: false,
+          filter: { createdAfter: getRecentCreatedAfter() },
+        }),
+      initialPageParam: 0,
+    }),
+    queryClient.prefetchInfiniteQuery({
+      queryKey: ["places", "popular"],
+      queryFn: () =>
+        fetchPlaces({
+          orderBy: "rating",
+          ascending: false,
+          filter: {
+            minRating: POPULAR_RATING_THRESHOLD,
+            minReviewCount: POPULAR_MIN_REVIEW_COUNT,
+          },
+        }),
+      initialPageParam: 0,
+    }),
+  ]);
+
   return (
-    <main className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-4 px-4 pt-21 pb-40">
+    <main className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-4 px-4 pt-21 pb-23">
       <DubaiCookieBanner />
-      <Suspense>
+      <Suspense fallback={<PlaceListSkeleton />}>
         <HomeTabs />
-        <PlaceList />
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <PlaceList />
+        </HydrationBoundary>
       </Suspense>
-      <footer className="mt-auto flex flex-col items-center gap-2 text-sm text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <img src="/baegop.svg" alt="배곱" className="size-4" />
-          <span className="font-bold text-foreground">배곱</span>
-        </div>
-        <p className="text-center text-xs">
-          주변 맛집 장소 추천 서비스
-        </p>
-        <div className="flex justify-center gap-3 text-xs">
-          <Link href="/terms" className="underline underline-offset-4">
-            이용약관
-          </Link>
-          <span>|</span>
-          <Link
-            href="/privacy"
-            className="font-bold text-accent-foreground underline underline-offset-4"
-          >
-            개인정보처리방침
-          </Link>
-        </div>
-      </footer>
+      <HomeFooter />
     </main>
   );
 }

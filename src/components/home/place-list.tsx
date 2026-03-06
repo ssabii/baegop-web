@@ -13,19 +13,25 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
 import { PlaceCard } from "@/components/places";
+import type { PlaceCardProps } from "@/components/places/place-card";
+import type { PlacesResult } from "@/lib/queries/places";
 import { usePlaces } from "./use-places";
 
-export function PlaceList() {
+interface PlaceListProps {
+  initialData?: Record<string, PlacesResult>;
+}
+
+export function PlaceList({ initialData }: PlaceListProps) {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") || "recent";
 
   useScrollRestoration();
 
   const { places, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    usePlaces(tab);
+    usePlaces(tab, initialData?.[tab]);
 
   const { ref: sentinelRef } = useInView({
-    onChange: (inView) => {
+    onChange: (inView: boolean) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
@@ -81,7 +87,7 @@ export function PlaceList() {
   return (
     <>
       <div className="flex flex-col divide-y">
-        {places.map((place) => (
+        {places.map((place: PlaceCardProps) => (
           <PlaceCard place={place} key={place.id} className="py-4" />
         ))}
       </div>
