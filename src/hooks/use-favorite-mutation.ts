@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toggleFavorite } from "@/app/(sub)/places/[id]/actions";
 import { toast } from "sonner";
-import { favoritesQueryKey } from "./use-favorites";
+import { favoriteKeys } from "@/lib/query-keys";
 
 export function useFavoriteMutation() {
   const queryClient = useQueryClient();
@@ -9,13 +9,13 @@ export function useFavoriteMutation() {
   return useMutation({
     mutationFn: toggleFavorite,
     onMutate: async (placeId) => {
-      await queryClient.cancelQueries({ queryKey: favoritesQueryKey });
+      await queryClient.cancelQueries({ queryKey: favoriteKeys.all });
 
       const previous =
-        queryClient.getQueryData<string[]>(favoritesQueryKey) ?? [];
+        queryClient.getQueryData<string[]>(favoriteKeys.all) ?? [];
       const isFavorited = previous.includes(placeId);
 
-      queryClient.setQueryData<string[]>(favoritesQueryKey, (old = []) =>
+      queryClient.setQueryData<string[]>(favoriteKeys.all, (old = []) =>
         isFavorited ? old.filter((id) => id !== placeId) : [...old, placeId],
       );
 
@@ -30,7 +30,7 @@ export function useFavoriteMutation() {
     },
     onError: (_error, _placeId, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(favoritesQueryKey, context.previous);
+        queryClient.setQueryData(favoriteKeys.all, context.previous);
       }
       toast.error("오류가 발생했어요");
     },

@@ -6,13 +6,13 @@ import { HomeFooter } from "@/components/home/home-footer";
 import { PlaceList } from "@/components/home/place-list";
 import { PlaceListSkeleton } from "@/components/home/place-list-skeleton";
 import { fetchPlaces } from "@/lib/queries/places";
+import { placeKeys } from "@/lib/query-keys";
 import {
   POPULAR_RATING_THRESHOLD,
   POPULAR_MIN_REVIEW_COUNT,
+  QUERY_STALE_TIME,
   RECENT_DAYS,
 } from "@/lib/constants";
-
-const STALE_TIME = 5 * 60 * 1000;
 
 function getRecentCreatedAfter() {
   const since = new Date();
@@ -23,13 +23,13 @@ function getRecentCreatedAfter() {
 export default async function HomePage() {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { staleTime: STALE_TIME },
+      queries: { staleTime: QUERY_STALE_TIME },
     },
   });
 
   await Promise.all([
     queryClient.prefetchInfiniteQuery({
-      queryKey: ["places", "recent"],
+      queryKey: placeKeys.list("recent"),
       queryFn: () =>
         fetchPlaces({
           orderBy: "created_at",
@@ -39,7 +39,7 @@ export default async function HomePage() {
       initialPageParam: 0,
     }),
     queryClient.prefetchInfiniteQuery({
-      queryKey: ["places", "popular"],
+      queryKey: placeKeys.list("popular"),
       queryFn: () =>
         fetchPlaces({
           orderBy: "rating",

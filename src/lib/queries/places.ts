@@ -106,16 +106,14 @@ function sortByRating(places: PlaceRow[], ascending: boolean): PlaceRow[] {
 
     if (primary !== 0) return primary;
 
-    // Secondary: kona_card_status
+    // Secondary: review_count desc
+    const reviewDiff = b.review_count - a.review_count;
+    if (reviewDiff !== 0) return reviewDiff;
+
+    // Tertiary: kona_card_status, id asc
     const konaA = KONA_ORDER[String(a.kona_card_status ?? "unknown")] ?? 2;
     const konaB = KONA_ORDER[String(b.kona_card_status ?? "unknown")] ?? 2;
-    if (konaA !== konaB) return konaA - konaB;
-
-    // Tertiary: review_count desc, id asc
-    return (
-      b.review_count - a.review_count ||
-      String(a.id).localeCompare(String(b.id))
-    );
+    return konaA - konaB || String(a.id).localeCompare(String(b.id));
   });
 }
 
