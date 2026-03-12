@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { Profile, profileQueryKey } from "./use-profile";
+import { profileKeys } from "@/lib/query-keys";
+import { Profile } from "./use-profile";
 
 export function useUpdateProfileMutation() {
   const queryClient = useQueryClient();
@@ -26,7 +27,7 @@ export function useUpdateProfileMutation() {
       if (error) throw new Error("프로필 수정에 실패했습니다.");
     },
     onSuccess: (_, updates) => {
-      queryClient.setQueryData<Profile>(profileQueryKey, (old) =>
+      queryClient.setQueryData<Profile>(profileKeys.all, (old) =>
         old ? { ...old, ...updates } : old,
       );
     },

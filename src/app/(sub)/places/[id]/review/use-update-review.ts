@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { reviewKeys } from "@/lib/query-keys";
 import { updateReview } from "../actions";
 import { uploadReviewImages } from "./upload-review-images";
 
@@ -28,7 +29,7 @@ export function useUpdateReview(naverPlaceId: string, reviewId: number) {
       await updateReview(reviewId, { rating, content }, keptImageUrls, newImageUrls);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.all });
       sessionStorage.setItem("scrollToReview", "true");
       toast.success("리뷰가 수정되었어요.", { position: "top-center" });
       router.replace(`/places/${naverPlaceId}?tab=review`);

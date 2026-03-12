@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { mypageKeys } from "@/lib/query-keys";
 
 interface ReviewPlace {
   id: number;
@@ -24,7 +25,7 @@ const LIMIT = 10;
 export function useMyReviews(userId: string) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["mypage", "reviews", userId],
+      queryKey: mypageKeys.reviews(userId),
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
           `/api/mypage/reviews?cursor=${pageParam}&limit=${LIMIT}`,

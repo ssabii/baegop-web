@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_STALE_TIME } from "@/lib/constants";
+import { mapKeys } from "@/lib/query-keys";
 import { createClient } from "@/lib/supabase/client";
 
 interface MapPlace {
@@ -14,7 +15,7 @@ interface MapPlace {
 
 export function useMapPlaces() {
   return useQuery({
-    queryKey: ["map-places"],
+    queryKey: mapKeys.places,
     queryFn: async () => {
       const supabase = createClient();
       const { data, error } = await supabase

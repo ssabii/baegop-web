@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { QUERY_STALE_TIME } from "@/lib/constants";
-
-export const favoritesQueryKey = ["favorites"];
+import { favoriteKeys } from "@/lib/query-keys";
 
 export function useFavorites() {
   const { data, isLoading } = useQuery({
-    queryKey: favoritesQueryKey,
+    queryKey: favoriteKeys.all,
     queryFn: async () => {
       const res = await fetch("/api/favorites");
       if (!res.ok) return [];

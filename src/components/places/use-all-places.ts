@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { QUERY_STALE_TIME } from "@/lib/constants";
+import { placeKeys } from "@/lib/query-keys";
 
 interface PlaceCardData {
   id: string;
@@ -22,7 +23,7 @@ const LIMIT = 10;
 export function useAllPlaces() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["places", "all"],
+      queryKey: placeKeys.list("all"),
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
           `/api/places?orderBy=rating&ascending=false&cursor=${pageParam}&limit=${LIMIT}`,

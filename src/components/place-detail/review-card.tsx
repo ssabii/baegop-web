@@ -14,6 +14,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useQueryClient } from "@tanstack/react-query";
+import { reviewKeys } from "@/lib/query-keys";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { toast } from "sonner";
 import { formatRelativeDate } from "@/lib/date";
@@ -64,7 +65,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     startTransition(async () => {
       try {
         await deleteReview(review.id);
-        queryClient.invalidateQueries({ queryKey: ["reviews"] });
+        queryClient.invalidateQueries({ queryKey: reviewKeys.all });
         router.refresh();
         toast.success("리뷰가 삭제되었어요.", { position: "top-center" });
       } catch {

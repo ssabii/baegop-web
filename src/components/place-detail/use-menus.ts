@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { menuKeys } from "@/lib/query-keys";
 import type { NaverPlaceMenu } from "@/types";
 
 interface MenusResponse {
@@ -13,7 +14,7 @@ export type { MenusResponse };
 export function useMenus(naverPlaceId: string, initialData?: MenusResponse) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["menus", naverPlaceId],
+      queryKey: menuKeys.list(naverPlaceId),
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
           `/api/places/${naverPlaceId}/menus?cursor=${pageParam}&limit=${LIMIT}`,

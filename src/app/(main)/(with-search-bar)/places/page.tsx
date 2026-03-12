@@ -3,6 +3,7 @@ import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query
 import { AllPlaceList } from "@/components/places";
 import { QUERY_STALE_TIME } from "@/lib/constants";
 import { fetchPlaces } from "@/lib/queries/places";
+import { placeKeys } from "@/lib/query-keys";
 
 export default async function PlacesPage() {
   const queryClient = new QueryClient({
@@ -12,7 +13,7 @@ export default async function PlacesPage() {
   });
 
   await queryClient.prefetchInfiniteQuery({
-    queryKey: ["places", "all"],
+    queryKey: placeKeys.list("all"),
     queryFn: () =>
       fetchPlaces({
         orderBy: "rating",

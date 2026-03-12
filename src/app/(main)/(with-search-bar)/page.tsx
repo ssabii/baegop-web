@@ -6,6 +6,7 @@ import { HomeFooter } from "@/components/home/home-footer";
 import { PlaceList } from "@/components/home/place-list";
 import { PlaceListSkeleton } from "@/components/home/place-list-skeleton";
 import { fetchPlaces } from "@/lib/queries/places";
+import { placeKeys } from "@/lib/query-keys";
 import {
   POPULAR_RATING_THRESHOLD,
   POPULAR_MIN_REVIEW_COUNT,
@@ -28,7 +29,7 @@ export default async function HomePage() {
 
   await Promise.all([
     queryClient.prefetchInfiniteQuery({
-      queryKey: ["places", "recent"],
+      queryKey: placeKeys.list("recent"),
       queryFn: () =>
         fetchPlaces({
           orderBy: "created_at",
@@ -38,7 +39,7 @@ export default async function HomePage() {
       initialPageParam: 0,
     }),
     queryClient.prefetchInfiniteQuery({
-      queryKey: ["places", "popular"],
+      queryKey: placeKeys.list("popular"),
       queryFn: () =>
         fetchPlaces({
           orderBy: "rating",
