@@ -34,7 +34,7 @@ export const mapKeys = {
 export const mypageKeys = {
   all: ["mypage"] as const,
   reviews: (userId: string) => [...mypageKeys.all, "reviews", userId] as const,
-  places: () => [...mypageKeys.all, "places"] as const,
+  places: ["mypage", "places"] as const,
   feedbacks: (userId?: string) =>
     userId
       ? ([...mypageKeys.all, "feedbacks", userId] as const)

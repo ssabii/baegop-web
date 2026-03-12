@@ -22,7 +22,7 @@ const LIMIT = 10;
 export function useMyPlaces() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: mypageKeys.places(),
+      queryKey: mypageKeys.places,
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
           `/api/mypage/places?cursor=${pageParam}&limit=${LIMIT}`,
