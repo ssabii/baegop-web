@@ -2,6 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   POPULAR_RATING_THRESHOLD,
   POPULAR_MIN_REVIEW_COUNT,
+  QUERY_STALE_TIME,
   RECENT_DAYS,
 } from "@/lib/constants";
 import type { PlacesOrderBy, PlacesResult } from "@/lib/queries/places";
@@ -84,7 +85,7 @@ export function usePlaces(tab: string, initialData?: PlacesResult) {
         ? { pages: [initialData], pageParams: [0] }
         : undefined,
       initialDataUpdatedAt: initialData ? Date.now() : undefined,
-      staleTime: 5 * 60 * 1000,
+      staleTime: QUERY_STALE_TIME,
     });
 
   const places = data?.pages.flatMap((page: PlacesResponse) => page.items) ?? [];

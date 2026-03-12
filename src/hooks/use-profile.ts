@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { QUERY_STALE_TIME } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 
 export interface Profile {
@@ -46,7 +47,7 @@ export function useProfile() {
         email: maskedEmail,
       } as Profile;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: QUERY_STALE_TIME,
     gcTime: 30 * 60 * 1000,
   });
 

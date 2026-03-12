@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { QUERY_STALE_TIME } from "@/lib/constants";
 
 interface PlaceCardData {
   id: string;
@@ -31,7 +32,7 @@ export function useAllPlaces() {
       },
       initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-      staleTime: 5 * 60 * 1000,
+      staleTime: QUERY_STALE_TIME,
     });
 
   const places = data?.pages.flatMap((page) => page.items) ?? [];

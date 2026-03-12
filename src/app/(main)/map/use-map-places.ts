@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { QUERY_STALE_TIME } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 
 interface MapPlace {
@@ -25,6 +26,6 @@ export function useMapPlaces() {
       if (error) throw new Error(error.message);
       return (data ?? []) as MapPlace[];
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: QUERY_STALE_TIME,
   });
 }

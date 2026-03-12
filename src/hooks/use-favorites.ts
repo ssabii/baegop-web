@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { QUERY_STALE_TIME } from "@/lib/constants";
 
 export const favoritesQueryKey = ["favorites"];
 
@@ -11,7 +12,7 @@ export function useFavorites() {
       const { placeIds } = await res.json();
       return placeIds as string[];
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: QUERY_STALE_TIME,
   });
 
   return {

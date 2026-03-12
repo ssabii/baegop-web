@@ -1,14 +1,13 @@
 import { Suspense } from "react";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { AllPlaceList } from "@/components/places";
+import { QUERY_STALE_TIME } from "@/lib/constants";
 import { fetchPlaces } from "@/lib/queries/places";
-
-const STALE_TIME = 5 * 60 * 1000;
 
 export default async function PlacesPage() {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { staleTime: STALE_TIME },
+      queries: { staleTime: QUERY_STALE_TIME },
     },
   });
 

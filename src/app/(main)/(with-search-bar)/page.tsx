@@ -9,10 +9,9 @@ import { fetchPlaces } from "@/lib/queries/places";
 import {
   POPULAR_RATING_THRESHOLD,
   POPULAR_MIN_REVIEW_COUNT,
+  QUERY_STALE_TIME,
   RECENT_DAYS,
 } from "@/lib/constants";
-
-const STALE_TIME = 5 * 60 * 1000;
 
 function getRecentCreatedAfter() {
   const since = new Date();
@@ -23,7 +22,7 @@ function getRecentCreatedAfter() {
 export default async function HomePage() {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: { staleTime: STALE_TIME },
+      queries: { staleTime: QUERY_STALE_TIME },
     },
   });
 
