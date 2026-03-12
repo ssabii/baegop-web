@@ -1,4 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { QUERY_STALE_TIME } from "@/lib/constants";
+import { placeKeys } from "@/lib/query-keys";
 
 interface PlaceCardData {
   id: string;
@@ -21,17 +23,17 @@ const LIMIT = 10;
 export function useAllPlaces() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["places", "all"],
+      queryKey: placeKeys.list("all"),
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
-          `/api/places?tab=all&cursor=${pageParam}&limit=${LIMIT}`,
+          `/api/places?orderBy=rating&ascending=false&cursor=${pageParam}&limit=${LIMIT}`,
         );
         if (!res.ok) throw new Error("Failed to fetch places");
         return res.json() as Promise<PlacesResponse>;
       },
       initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-      staleTime: 5 * 60 * 1000,
+      staleTime: QUERY_STALE_TIME,
     });
 
   const places = data?.pages.flatMap((page) => page.items) ?? [];

@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { QUERY_STALE_TIME } from "@/lib/constants";
+import { profileKeys } from "@/lib/query-keys";
 import { createClient } from "@/lib/supabase/client";
 
 export interface Profile {
@@ -7,7 +9,6 @@ export interface Profile {
   email: string | null;
 }
 
-export const profileQueryKey = ["profile"];
 
 /** 이메일 @ 앞(로컬)만 마스킹. 앞 2자만 노출, 나머지는 각 글자 수에 맞게 * 처리 */
 export function getMaskedEmail(email: string): string {
@@ -24,7 +25,7 @@ export function getMaskedEmail(email: string): string {
 
 export function useProfile() {
   const { data, isLoading } = useQuery({
-    queryKey: profileQueryKey,
+    queryKey: profileKeys.all,
     queryFn: async () => {
       const supabase = createClient();
       const {
@@ -46,7 +47,7 @@ export function useProfile() {
         email: maskedEmail,
       } as Profile;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: QUERY_STALE_TIME,
     gcTime: 30 * 60 * 1000,
   });
 

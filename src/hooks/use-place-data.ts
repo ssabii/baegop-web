@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { placeKeys } from "@/lib/query-keys";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface PlaceDataResponse {
@@ -20,7 +21,7 @@ interface PlaceDataResponse {
 
 export function usePlaceData(naverPlaceId: string, coords: { x: string; y: string }) {
   return useQuery({
-    queryKey: ["place-data", naverPlaceId] as const,
+    queryKey: placeKeys.data(naverPlaceId),
     queryFn: async () => {
       const res = await fetch(
         `/api/places/${naverPlaceId}/detail?x=${coords.x}&y=${coords.y}`,

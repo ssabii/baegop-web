@@ -15,6 +15,9 @@ export const POPULAR_MIN_REVIEW_COUNT = 3;
 // 최근 장소 기준 일수
 export const RECENT_DAYS = 7;
 
+// React Query 기본 staleTime (5분)
+export const QUERY_STALE_TIME = 5 * 60 * 1000;
+
 // 비밀번호 유효성 규칙
 export const PASSWORD_MIN_LENGTH =
   process.env.NODE_ENV === "production" ? 8 : 6;

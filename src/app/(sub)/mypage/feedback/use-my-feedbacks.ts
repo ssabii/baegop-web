@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { mypageKeys } from "@/lib/query-keys";
 import type { FeedbackWithImages } from "@/types";
 
 interface MyFeedbacksResponse {
@@ -11,7 +12,7 @@ const LIMIT = 10;
 export function useMyFeedbacks(userId: string) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["mypage", "feedbacks", userId],
+      queryKey: mypageKeys.feedbacks(userId),
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
           `/api/mypage/feedbacks?cursor=${pageParam}&limit=${LIMIT}`,

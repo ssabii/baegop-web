@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { searchKeys } from "@/lib/query-keys";
 import type { NaverSearchResult } from "@/types";
 
 export const SEARCH_DISPLAY = 10;
@@ -12,7 +13,7 @@ interface Coords {
 export function useSearchPlaces(query: string, coords?: Coords) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["search-places", query, coords?.lat, coords?.lng],
+      queryKey: searchKeys.places(query, coords?.lat, coords?.lng),
       queryFn: async ({ pageParam = 1 }) => {
         const params = new URLSearchParams({
           query,
