@@ -85,6 +85,17 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
   </Empty>
   ```
 
+## Git Workflow
+
+- **브랜치 전략**: feature 브랜치 → `develop` → `main`. `main`은 완성된 기능만 머지.
+- **머지 전략**: 일반 merge (squash 아님). 개별 커밋 이력 보존.
+- **PR 생성**: assignee는 `ssabii`, 라벨은 기능(`enhancement`), 버그(`bug`), 릴리즈(`release`) 등 적절히 부여.
+- **버전 업 커밋**: `v{버전}` (예: `v0.4.3`)
+- **릴리즈 PR** (`develop` → `main`):
+  - 제목: `Release v{버전}`
+  - 라벨: `release`
+  - 내용: Changelog 형식 (`### Features`, `### Fix`, `### Refactor`, `### Chore`)
+
 ## Environment Variables
 
 ```
