@@ -24,7 +24,7 @@ export function useAllPlaces() {
       queryKey: ["places", "all"],
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
-          `/api/places?tab=all&cursor=${pageParam}&limit=${LIMIT}`,
+          `/api/places?orderBy=rating&ascending=false&cursor=${pageParam}&limit=${LIMIT}`,
         );
         if (!res.ok) throw new Error("Failed to fetch places");
         return res.json() as Promise<PlacesResponse>;
