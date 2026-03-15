@@ -90,11 +90,13 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - **브랜치 전략**: feature 브랜치 → `develop` → `main`. `main`은 완성된 기능만 머지.
 - **머지 전략**: 일반 merge (squash 아님). 개별 커밋 이력 보존.
 - **PR 생성**: assignee는 `ssabii`, 라벨은 기능(`enhancement`), 버그(`bug`), 릴리즈(`release`) 등 적절히 부여.
-- **버전 업 커밋**: `v{버전}` (예: `v0.4.3`)
-- **릴리즈 PR** (`develop` → `main`):
-  - 제목: `Release v{버전}`
-  - 라벨: `release`
-  - 내용: Changelog 형식 (`### Features`, `### Fix`, `### Refactor`, `### Chore`)
+- **릴리즈 플로우**:
+  1. `develop`에서 `package.json` version 필드 수정
+  2. `git commit -m "chore: release v{버전}"`
+  3. `git push`
+  4. `gh pr create --base main --title "Release v{버전}" --label release --assignee ssabii` (본문에 Changelog 작성)
+  5. PR 머지 → `auto-release.yml`이 GitHub Release + Tag 자동 생성
+- **릴리즈 PR 본문**: Changelog 형식 (`### Features`, `### Bug Fixes`, `### Refactor`, `### Chore`, `### Docs` — 해당 없는 카테고리는 생략)
 
 ## Environment Variables
 
