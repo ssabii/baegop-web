@@ -54,7 +54,8 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 
 ## Conventions
 
-- **언어**: 코드는 영어, UI 텍스트와 커밋 메시지는 한국어
+- **플랜 검토와 작업 검증은 반드시 사람이 한다**: 플랜은 사람이 검토하고 승인한 뒤에 작업을 시작한다. 작업 결과도 사람이 직접 검증한다.
+- **언어**: 코드는 영어, UI 텍스트는 한국어
 - **Import alias**: `@/*` → `src/*`
 - **컴포넌트**: 모든 UI 컴포넌트는 shadcn/ui를 우선 사용한다. shadcn/ui에 없는 경우에만 외부 라이브러리 또는 커스텀 컴포넌트를 사용한다. `src/components/ui/`에 위치.
 - **className**: 조건부 클래스가 포함되면 템플릿 리터럴 대신 `cn()`을 사용한다. 삼항 연산자 대신 객체 구문을 사용한다. (`cn("base", { "class-a": condition, "class-b": !condition })`)
@@ -85,17 +86,49 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
   </Empty>
   ```
 
+## Skills Reference
+
+코드 작성 시 아래 스킬을 참조하여 품질을 높인다.
+
+- **코드 작성**: `vercel-react-best-practices`, `vercel-composition-patterns`, `next-best-practices`, `next-cache-components`, `toss/frontend-fundamentals`
+- **디자인**: `frontend-design`, `web-design-guidelines`
+- **shadcn/ui**: `shadcn-ui`
+
 ## Git Workflow
 
 - **브랜치 전략**: feature 브랜치 → `develop` → `main`. `main`은 완성된 기능만 머지.
 - **머지 전략**: 일반 merge (squash 아님). 개별 커밋 이력 보존.
-- **PR 생성**: assignee는 `ssabii`, 라벨은 기능(`enhancement`), 버그(`bug`), 릴리즈(`release`) 등 적절히 부여.
-- **릴리즈 플로우**:
-  1. `develop`에서 `package.json` version 필드 수정
-  2. `git commit -m "chore: release v{버전}"`
-  3. `git push`
-  4. `gh pr create --base main --title "Release v{버전}" --label release --assignee ssabii` (본문에 Changelog 작성)
-  5. PR 머지 → `auto-release.yml`이 GitHub Release + Tag 자동 생성
+- **PR 생성**: assignee는 작업자. 변경사항에 맞는 적절한 레이블을 부여한다. 존재하지 않는 레이블은 사용하지 않는다.
+
+### 커밋 메시지
+- **형식**: `{label}: 한국어 설명` (예: `feat: 로그인 기능 추가`)
+- **레이블 목록**:
+  - `feat` — 새로운 기능 추가
+  - `fix` — 버그 수정
+  - `refactor` — 기능 변경 없는 코드 개선
+  - `chore` — 빌드, 설정, 패키지 변경
+  - `style` — UI/CSS 변경 (로직 없음)
+  - `docs` — 문서, 주석 변경
+  - `test` — 테스트 추가/수정
+  - `hotfix` — 긴급 수정
+  - `WIP` — 리뷰 요청 전 초안
+
+### PR 크기 기준
+- **그대로 올려도 되는 경우**: 단일 목적의 변경, 파일 10개 이하, 변경 400줄 이하
+- **분리 검토**: 목적이 2개 이상 섞여 있거나, 파일 10~20개, 변경 400~700줄
+- **반드시 분리**: 목적이 명확히 다른 변경이 섞여 있거나, 파일 20개 초과, 변경 700줄 초과
+
+### PR 쪼개는 방법
+1. **목적 분류**: 기능 추가 / 리팩토링 / 버그 수정 / 설정 변경 등으로 분류
+2. **의존 관계 파악**: 독립적으로 머지 가능한 단위로 분리
+3. **Draft PR + 체크리스트**: 큰 기능은 Draft PR을 먼저 만들고, 하위 PR을 체크리스트로 관리
+
+### 릴리즈 플로우
+1. `develop`에서 `package.json` version 필드 수정
+2. `git commit -m "chore: release v{버전}"`
+3. `git push`
+4. `gh pr create --base main --title "Release v{버전}" --label release --assignee ssabii` (본문에 Changelog 작성)
+5. PR 머지 → `auto-release.yml`이 GitHub Release + Tag 자동 생성
 - **릴리즈 PR 본문**: Changelog 형식 (`### Features`, `### Bug Fixes`, `### Refactor`, `### Chore`, `### Docs` — 해당 없는 카테고리는 생략)
 
 ## Environment Variables
