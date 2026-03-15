@@ -98,7 +98,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 
 - **브랜치 전략**: feature 브랜치 → `develop` → `main`. `main`은 완성된 기능만 머지.
 - **머지 전략**: 일반 merge (squash 아님). 개별 커밋 이력 보존.
-- **PR 생성**: assignee는 `ssabii`, 라벨은 기능(`enhancement`), 버그(`bug`), 릴리즈(`release`) 등 적절히 부여.
+- **PR 생성**: assignee는 작업자. 변경사항에 맞는 적절한 레이블을 부여한다. 존재하지 않는 레이블은 사용하지 않는다.
 
 ### 커밋 메시지
 - **형식**: `{label}: 한국어 설명` (예: `feat: 로그인 기능 추가`)
