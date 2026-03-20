@@ -250,7 +250,44 @@ export function DubaiCookieMap() {
     createMarkers(mapStores);
   }, [mapStores, createMarkers]);
 
+  // Fit bounds to nearby search results when query changes
+  const prevQueryRef = useRef(queryParam);
+  useEffect(() => {
+    if (prevQueryRef.current === queryParam) return;
+    prevQueryRef.current = queryParam;
 
+    const map = mapRef.current;
+    if (!map || !queryParam || filteredStores.length === 0) return;
+
+    const nearbyStores = userCoords
+      ? filteredStores.filter(
+          (s) =>
+            calculateDistance(userCoords, { lat: s.lat, lng: s.lng }) <= 3000,
+        )
+      : filteredStores;
+
+    if (nearbyStores.length === 0) return;
+
+    if (nearbyStores.length === 1) {
+      panToAboveSheet(map, nearbyStores[0].lat, nearbyStores[0].lng);
+      map.setZoom(CLUSTER_MAX_ZOOM + 1);
+      return;
+    }
+
+    const bounds = new naver.maps.LatLngBounds(
+      new naver.maps.LatLng(nearbyStores[0].lat, nearbyStores[0].lng),
+      new naver.maps.LatLng(nearbyStores[0].lat, nearbyStores[0].lng),
+    );
+    for (const s of nearbyStores) {
+      bounds.extend(new naver.maps.LatLng(s.lat, s.lng));
+    }
+    map.fitBounds(bounds, {
+      top: 80,
+      right: 40,
+      bottom: Math.round(window.innerHeight * 0.5) + 40,
+      left: 40,
+    });
+  }, [queryParam, filteredStores, userCoords]);
 
   // Center on user location once
   useEffect(() => {
