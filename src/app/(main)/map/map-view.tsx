@@ -31,7 +31,7 @@ function createMarkerContent(title?: string): string {
   return `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">${pin}${label}</div>`;
 }
 
-const CLUSTER_MAX_ZOOM = 15;
+const CLUSTER_MAX_ZOOM = 16;
 
 export interface MapMarker {
   id: string;

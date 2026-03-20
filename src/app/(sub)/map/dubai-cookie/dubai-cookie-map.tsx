@@ -26,7 +26,7 @@ const NaverMap = dynamic(() => import("@/components/naver-map"), {
   ),
 });
 
-const CLUSTER_MAX_ZOOM = 15;
+const CLUSTER_MAX_ZOOM = 16;
 
 /** Pan (and optionally zoom) so the marker sits in the upper portion of the visible map */
 function panToAboveSheet(
