@@ -287,6 +287,7 @@ export function DubaiCookieMap() {
     mapRef.current.setCenter(
       new naver.maps.LatLng(userCoords.lat, userCoords.lng),
     );
+    mapRef.current.setZoom(15);
   }, [userCoords]);
 
   const handleReady = useCallback(

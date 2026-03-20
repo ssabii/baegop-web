@@ -48,6 +48,7 @@ export function MapContainer() {
   }
 
   const mapViewRef = useRef<MapViewHandle>(null);
+  const initialCenteredRef = useRef(false);
 
   const handleLocate = useCallback(
     (position: { lat: number; lng: number }) => {
@@ -69,6 +70,16 @@ export function MapContainer() {
   }, []);
 
   const { coords: userCoords, loading: geoLoading } = useGeolocation();
+
+  // Center on user location once on initial load (skip if searching)
+  useEffect(() => {
+    if (!userCoords || initialCenteredRef.current) return;
+    initialCenteredRef.current = true;
+    if (!queryParam) {
+      mapViewRef.current?.morphTo(userCoords.lat, userCoords.lng, 15);
+    }
+  }, [userCoords, queryParam]);
+
   const effectiveCoords = searchCoords ?? userCoords;
   // Delay search until geolocation resolves to prevent double fitBounds
   const searchQuery = geoLoading ? "" : query;
@@ -145,11 +156,6 @@ export function MapContainer() {
         category: p.category,
       })),
     [mapPlaces],
-  );
-
-  const defaultPadding = useMemo(
-    () => ({ top: 80, bottom: 100, left: 40, right: 40 }),
-    [],
   );
 
   // Detail view: show only focused marker. List view: show all.
@@ -284,9 +290,7 @@ export function MapContainer() {
         fitBoundsPadding={
           showSheet && hasResults && !selectedItem && !searchCoords
             ? sheetPadding
-            : !isSearching && defaultMarkers.length > 0
-              ? defaultPadding
-              : undefined
+            : undefined
         }
         focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
