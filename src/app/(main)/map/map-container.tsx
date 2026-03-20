@@ -15,10 +15,7 @@ import { PlaceItem } from "@/components/place-search/place-item";
 import { MapResultSheet } from "./map-result-sheet";
 import { MapPlaceDetailSheet } from "./map-place-detail-sheet";
 import { MapOverlapPopover } from "./map-overlap-popover";
-import { calculateDistance } from "@/lib/geo";
 import type { NaverSearchResult } from "@/types";
-
-const NEARBY_RADIUS_M = 3000;
 
 export function MapContainer() {
   const router = useRouter();
@@ -176,17 +173,6 @@ export function MapContainer() {
     }));
   }, [results, selectedItem]);
 
-  // fitBounds only to nearby search results
-  const nearbySearchMarkers = useMemo(() => {
-    if (!userCoords || activeMarkers.length === 0) return undefined;
-    const nearby = activeMarkers.filter(
-      (m) =>
-        calculateDistance(userCoords, { lat: m.lat, lng: m.lng }) <=
-        NEARBY_RADIUS_M,
-    );
-    return nearby.length > 0 ? nearby : undefined;
-  }, [activeMarkers, userCoords]);
-
   const buildUrl = useCallback((q: string, placeId?: string) => {
     const params = new URLSearchParams();
     if (q) params.set("query", q);
@@ -301,12 +287,7 @@ export function MapContainer() {
       <MapView
         ref={mapViewRef}
         markers={displayMarkers}
-        fitBoundsMarkers={nearbySearchMarkers}
-        fitBoundsPadding={
-          showSheet && hasResults && !selectedItem && !searchCoords
-            ? sheetPadding
-            : undefined
-        }
+        fitBoundsPadding={undefined}
         focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}

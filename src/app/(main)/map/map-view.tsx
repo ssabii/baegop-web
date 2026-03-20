@@ -50,7 +50,6 @@ export interface MapViewHandle {
 
 interface MapViewProps {
   markers: MapMarker[];
-  fitBoundsMarkers?: MapMarker[];
   fitBoundsPadding?: Padding;
   focusPadding?: Padding;
   focusMarkerId?: string | null;
@@ -65,7 +64,6 @@ interface MapViewProps {
 export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   {
     markers,
-    fitBoundsMarkers,
     fitBoundsPadding,
     focusPadding,
     focusMarkerId,
@@ -187,26 +185,25 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         },
       });
 
-      const boundsTargets = fitBoundsMarkers ?? markers;
-      if (fitBoundsPadding && boundsTargets.length > 0) {
-        const key = boundsTargets.map((m) => m.id).join(",");
+      if (fitBoundsPadding && markers.length > 0) {
+        const key = markers.map((m) => m.id).join(",");
         if (key !== lastFitBoundsKeyRef.current) {
           lastFitBoundsKeyRef.current = key;
           const bounds = new naver.maps.LatLngBounds(
             new naver.maps.LatLng(
-              Math.min(...boundsTargets.map((m) => m.lat)),
-              Math.min(...boundsTargets.map((m) => m.lng)),
+              Math.min(...markers.map((m) => m.lat)),
+              Math.min(...markers.map((m) => m.lng)),
             ),
             new naver.maps.LatLng(
-              Math.max(...boundsTargets.map((m) => m.lat)),
-              Math.max(...boundsTargets.map((m) => m.lng)),
+              Math.max(...markers.map((m) => m.lat)),
+              Math.max(...markers.map((m) => m.lng)),
             ),
           );
           map.fitBounds(bounds, fitBoundsPadding);
         }
       }
     },
-    [markers, fitBoundsMarkers, fitBoundsPadding, showLabels, clearMarkers],
+    [markers, fitBoundsPadding, showLabels, clearMarkers],
   );
 
   // Stable handleReady — only depends on clearMarkers (stable)
