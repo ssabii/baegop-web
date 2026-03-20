@@ -287,11 +287,7 @@ export function MapContainer() {
       <MapView
         ref={mapViewRef}
         markers={displayMarkers}
-        fitBoundsPadding={
-          showSheet && hasResults && !selectedItem && !searchCoords
-            ? sheetPadding
-            : undefined
-        }
+        fitBoundsPadding={undefined}
         focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
