@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Drawer } from "vaul";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { LocationButton } from "@/components/location-button";
 import { SearchInMapButton } from "@/components/search-in-map-button";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Drawer } from "vaul";
 import { MapViewButton } from "./map-view-button";
 
 const COMPACT_SNAP = 0.2;

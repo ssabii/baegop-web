@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, useLayoutEffect } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Drawer } from "vaul";
@@ -26,6 +32,7 @@ import { optimizeNaverImageUrl } from "@/lib/image";
 import { usePlaceData } from "@/hooks/use-place-data";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 import { MapViewButton } from "./map-view-button";
+import { LocationButton } from "@/components/location-button";
 
 const COMPACT_SNAP = "200px";
 const HALF_SNAP = 0.5;
@@ -35,7 +42,7 @@ type SnapPoint = number | string;
 interface StoreDrawerProps {
   store: DubaiCookieStore | null;
   onClose: () => void;
-  onSnapChange?: (snap: number | string) => void;
+  onLocate: (position: { lat: number; lng: number }) => void;
 }
 
 function StoreDetail({ store }: { store: DubaiCookieStore }) {
@@ -168,7 +175,10 @@ function StoreDrawerHeader({
   return (
     <div className="mx-auto flex w-full max-w-4xl shrink-0 items-center justify-end gap-2 px-4 pb-2">
       {isRegistered && (
-        <FavoriteButton placeId={store.placeId} className="size-8 bg-secondary" />
+        <FavoriteButton
+          placeId={store.placeId}
+          className="size-8 bg-secondary"
+        />
       )}
       <Button
         variant="secondary"
@@ -182,7 +192,7 @@ function StoreDrawerHeader({
   );
 }
 
-export function StoreDrawer({ store, onClose, onSnapChange }: StoreDrawerProps) {
+export function StoreDrawer({ store, onClose, onLocate }: StoreDrawerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const expandParam = searchParams.get("expand");
@@ -197,13 +207,9 @@ export function StoreDrawer({ store, onClose, onSnapChange }: StoreDrawerProps) 
   const isScrollable = activeSnap === HALF_SNAP || activeSnap === FULL_SNAP;
 
   useLayoutEffect(() => {
-    document.addEventListener('focusin', e => e.stopImmediatePropagation());
-    document.addEventListener('focusout', e => e.stopImmediatePropagation());
+    document.addEventListener("focusin", (e) => e.stopImmediatePropagation());
+    document.addEventListener("focusout", (e) => e.stopImmediatePropagation());
   }, []);
-
-  useEffect(() => {
-    onSnapChange?.(activeSnap);
-  }, [activeSnap, onSnapChange]);
 
   useEffect(() => {
     if (!isFullSnap && contentRef.current) {
@@ -257,9 +263,11 @@ export function StoreDrawer({ store, onClose, onSnapChange }: StoreDrawerProps) 
           >
             <Drawer.Title className="sr-only">매장 상세</Drawer.Title>
 
-
-            <div className="flex shrink-0 justify-center py-3">
+            <div className="relative mx-auto w-full max-w-4xl flex shrink-0 justify-center py-3">
               <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+              <div className="absolute -top-12 right-2">
+                <LocationButton onLocate={onLocate} />
+              </div>
             </div>
 
             <StoreDrawerHeader store={store} onClose={onClose} />

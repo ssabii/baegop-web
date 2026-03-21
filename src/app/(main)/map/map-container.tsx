@@ -14,8 +14,12 @@ import { MapSearchInput } from "./map-search-input";
 import { PlaceItem } from "@/components/place-search/place-item";
 import { MapResultSheet } from "./map-result-sheet";
 import { MapPlaceDetailSheet } from "./map-place-detail-sheet";
-import { MapOverlapPopover } from "./map-overlap-popover";
+import { MapOverlapPopover } from "@/components/map-overlap-popover";
+import { calculateDistance } from "@/lib/geo";
 import type { NaverSearchResult } from "@/types";
+
+const NEARBY_COUNT = 5;
+const NEARBY_MAX_DISTANCE_M = 5000;
 
 export function MapContainer() {
   const router = useRouter();
@@ -48,13 +52,11 @@ export function MapContainer() {
   }
 
   const mapViewRef = useRef<MapViewHandle>(null);
+  const initialCenteredRef = useRef(false);
 
-  const handleLocate = useCallback(
-    (position: { lat: number; lng: number }) => {
-      mapViewRef.current?.morphTo(position.lat, position.lng, 16);
-    },
-    [],
-  );
+  const handleLocate = useCallback((position: { lat: number; lng: number }) => {
+    mapViewRef.current?.morphTo(position.lat, position.lng, 16);
+  }, []);
 
   const handleDragEnd = useCallback(() => {
     setOverlapState(null);
@@ -69,6 +71,16 @@ export function MapContainer() {
   }, []);
 
   const { coords: userCoords, loading: geoLoading } = useGeolocation();
+
+  // Center on user location once on initial load (skip if searching)
+  useEffect(() => {
+    if (!userCoords || initialCenteredRef.current) return;
+    initialCenteredRef.current = true;
+    if (!queryParam) {
+      mapViewRef.current?.morphTo(userCoords.lat, userCoords.lng, 15);
+    }
+  }, [userCoords, queryParam]);
+
   const effectiveCoords = searchCoords ?? userCoords;
   // Delay search until geolocation resolves to prevent double fitBounds
   const searchQuery = geoLoading ? "" : query;
@@ -80,7 +92,6 @@ export function MapContainer() {
     isFetchingNextPage,
     isLoading,
   } = useSearchPlaces(searchQuery, effectiveCoords);
-
   // Derive UI state from URL params (single source of truth)
   const selectedItem = useMemo(() => {
     if (!placeParam) return null;
@@ -92,19 +103,6 @@ export function MapContainer() {
   }, [placeParam, results, dbDetailItem]);
 
   const focusMarkerId = selectedItem?.id ?? null;
-
-  const sheetPadding = useMemo(
-    () => ({
-      top: 80,
-      bottom:
-        typeof window !== "undefined"
-          ? Math.round(window.innerHeight * 0.5)
-          : 0,
-      left: 40,
-      right: 40,
-    }),
-    [],
-  );
   const sheetOpen = !!query;
 
   // Refs for URL sync without stale closures
@@ -145,11 +143,6 @@ export function MapContainer() {
         category: p.category,
       })),
     [mapPlaces],
-  );
-
-  const defaultPadding = useMemo(
-    () => ({ top: 80, bottom: 100, left: 40, right: 40 }),
-    [],
   );
 
   // Detail view: show only focused marker. List view: show all.
@@ -270,6 +263,48 @@ export function MapContainer() {
   const hasResults = results.length > 0;
   const showSheet = isSearching && sheetOpen && !isLoading && !geoLoading;
 
+  // fitBounds to nearby search results (Naver Maps style)
+  const lastBoundsCheckKeyRef = useRef("");
+  useEffect(() => {
+    if (!showSheet || !hasResults) return;
+    const key = `${query}|${searchCoords?.lat}|${searchCoords?.lng}`;
+    if (lastBoundsCheckKeyRef.current === key) return;
+    lastBoundsCheckKeyRef.current = key;
+
+    // Use first search result as the origin (API returns relevance-sorted)
+    const first = results[0];
+    const origin = { lat: parseFloat(first.y), lng: parseFloat(first.x) };
+
+    const nearby = results
+      .map((r) => ({
+        lat: parseFloat(r.y),
+        lng: parseFloat(r.x),
+      }))
+      .filter(
+        (r) =>
+          calculateDistance(origin, r) <= NEARBY_MAX_DISTANCE_M,
+      )
+      .slice(0, NEARBY_COUNT);
+
+    const sheetOffset = Math.round(window.innerHeight * 0.5);
+    const allVisible = nearby.every((r) =>
+      mapViewRef.current?.isInBounds(r.lat, r.lng, sheetOffset),
+    );
+
+    if (!allVisible) {
+      mapViewRef.current?.fitBounds(
+        nearby,
+        {
+          top: 80,
+          bottom: Math.round(window.innerHeight * 0.5),
+          left: 40,
+          right: 40,
+        },
+        15,
+      );
+    }
+  }, [showSheet, hasResults, query, results, searchCoords]);
+
   const displayMarkers = isSearching
     ? showSheet && hasResults
       ? activeMarkers
@@ -281,14 +316,6 @@ export function MapContainer() {
       <MapView
         ref={mapViewRef}
         markers={displayMarkers}
-        fitBoundsPadding={
-          showSheet && hasResults && !selectedItem && !searchCoords
-            ? sheetPadding
-            : !isSearching && defaultMarkers.length > 0
-              ? defaultPadding
-              : undefined
-        }
-        focusPadding={selectedItem ? sheetPadding : undefined}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
         onOverlapClick={handleOverlapClick}

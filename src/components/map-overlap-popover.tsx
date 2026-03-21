@@ -2,10 +2,15 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
-import type { MapMarker } from "./map-view";
+
+export interface OverlapMarkerItem {
+  id: string;
+  title?: string;
+  category?: string | null;
+}
 
 interface MapOverlapPopoverProps {
-  items: MapMarker[];
+  items: OverlapMarkerItem[];
   anchorPos: { x: number; y: number };
   onSelect: (id: string) => void;
   onClose: () => void;
@@ -40,7 +45,7 @@ export function MapOverlapPopover({
       }
     }
     // Delay with rAF to avoid closing from the same click that opened it
-    let rafId = requestAnimationFrame(() => {
+    const rafId = requestAnimationFrame(() => {
       document.addEventListener("pointerdown", handlePointerDown);
     });
     return () => {
