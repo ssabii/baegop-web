@@ -45,13 +45,19 @@ type Padding = { top?: number; bottom?: number; left?: number; right?: number };
 
 export interface MapViewHandle {
   morphTo: (lat: number, lng: number, zoom: number) => void;
+  panTo: (lat: number, lng: number) => void;
+  fitBounds: (
+    points: { lat: number; lng: number }[],
+    padding: { top?: number; bottom?: number; left?: number; right?: number },
+    maxZoom?: number,
+  ) => void;
   getCenter: () => { lat: number; lng: number } | null;
+  isInBounds: (lat: number, lng: number, bottomOffset?: number) => boolean;
 }
 
 interface MapViewProps {
   markers: MapMarker[];
   fitBoundsPadding?: Padding;
-  focusPadding?: Padding;
   focusMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
   onOverlapClick?: (markers: MapMarker[], anchorPos: { x: number; y: number }) => void;
@@ -65,7 +71,6 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   {
     markers,
     fitBoundsPadding,
-    focusPadding,
     focusMarkerId,
     onMarkerClick,
     onOverlapClick,
@@ -260,7 +265,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
     renderMarkers(map);
   }, [renderMarkers, mapReady]);
 
-  // Focus marker: fitBounds with padding, or morph fallback
+  // Focus marker: pan only if marker is outside current viewport
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !focusMarkerId) return;
@@ -271,44 +276,38 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
     const markerInstance = markerInstancesRef.current[idx];
     if (!markerInstance) return;
 
-    const target = markerInstance.getPosition();
+    const target = markerInstance.getPosition() as naver.maps.LatLng;
+    const bounds = map.getBounds() as naver.maps.LatLngBounds;
 
-    if (focusPadding) {
-      const latLng = target as naver.maps.LatLng;
-      const bounds = new naver.maps.LatLngBounds(latLng, latLng);
-      map.fitBounds(bounds, focusPadding);
-      if (map.getZoom() > 15) map.setZoom(15);
-      return;
+    const currentZoom = map.getZoom();
+    const needsZoom = currentZoom < 15;
+
+    // Check visibility accounting for bottom sheet (~50% of viewport)
+    if (bounds.hasLatLng(target)) {
+      const sw = bounds.getSW();
+      const ne = bounds.getNE();
+      const mapHeight = map.getSize().height;
+      const sheetOffset = Math.round(window.innerHeight * 0.5);
+      const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
+      const isVisible = target.lat() > sw.lat() + latPerPixel * sheetOffset;
+      if (isVisible && !needsZoom) return;
     }
 
-    // focusPadding 없으면 기존 morph 로직
-    const center = map.getCenter();
-    const dx =
-      (center as naver.maps.LatLng).lng() - (target as naver.maps.LatLng).lng();
-    const dy =
-      (center as naver.maps.LatLng).lat() - (target as naver.maps.LatLng).lat();
-    const isFar = Math.sqrt(dx * dx + dy * dy) > 0.01; // ~1km
-
-    map.stop();
-
-    let idleListener: naver.maps.MapEventListener | undefined;
-
-    if (isFar) {
-      map.setCenter(target);
-      map.setZoom(15);
-      idleListener = naver.maps.Event.addListener(map, "idle", () => {
-        naver.maps.Event.removeListener(idleListener!);
-        idleListener = undefined;
-        map.morph(target, 17, { easing: "easeOutCubic", duration: 300 });
-      });
-    } else {
-      map.morph(target, 17, { easing: "easeOutCubic" });
-    }
-
-    return () => {
-      if (idleListener) naver.maps.Event.removeListener(idleListener);
-    };
-  }, [focusMarkerId, focusPadding, mapReady]);
+    // Move with offset so marker sits in the center of the visible area above the sheet
+    const targetZoom = needsZoom ? 15 : currentZoom;
+    const proj = map.getProjection();
+    // Apply offset at target zoom level for accurate positioning
+    if (needsZoom) map.setZoom(targetZoom, false);
+    const point = proj.fromCoordToOffset(target);
+    const offset = Math.round(window.innerHeight * 0.1);
+    const shifted = proj.fromOffsetToCoord(
+      new naver.maps.Point(point.x, point.y + offset),
+    );
+    if (needsZoom) map.setZoom(currentZoom, false);
+    map.morph(shifted as naver.maps.LatLng, targetZoom, {
+      easing: "easeOutCubic",
+    });
+  }, [focusMarkerId, mapReady]);
 
   useImperativeHandle(ref, () => ({
     morphTo(lat: number, lng: number, zoom: number) {
@@ -318,11 +317,48 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         easing: "easeOutCubic",
       });
     },
+    panTo(lat: number, lng: number) {
+      const map = mapRef.current;
+      if (!map) return;
+      map.morph(new naver.maps.LatLng(lat, lng), map.getZoom(), {
+        easing: "easeOutCubic",
+      });
+    },
+    fitBounds(points, padding, maxZoom) {
+      const map = mapRef.current;
+      if (!map || points.length === 0) return;
+      const bounds = new naver.maps.LatLngBounds(
+        new naver.maps.LatLng(points[0].lat, points[0].lng),
+        new naver.maps.LatLng(points[0].lat, points[0].lng),
+      );
+      for (const p of points) {
+        bounds.extend(new naver.maps.LatLng(p.lat, p.lng));
+      }
+      map.fitBounds(bounds, padding);
+      if (maxZoom !== undefined && map.getZoom() > maxZoom) {
+        map.setZoom(maxZoom);
+      }
+    },
     getCenter() {
       const map = mapRef.current;
       if (!map) return null;
       const center = map.getCenter() as naver.maps.LatLng;
       return { lat: center.lat(), lng: center.lng() };
+    },
+    isInBounds(lat: number, lng: number, bottomOffset = 0) {
+      const map = mapRef.current;
+      if (!map) return false;
+      const bounds = map.getBounds() as naver.maps.LatLngBounds;
+      const point = new naver.maps.LatLng(lat, lng);
+      if (!bounds.hasLatLng(point)) return false;
+      if (bottomOffset <= 0) return true;
+
+      // Exclude the area covered by bottom sheet
+      const sw = bounds.getSW();
+      const ne = bounds.getNE();
+      const mapHeight = map.getSize().height;
+      const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
+      return lat > sw.lat() + latPerPixel * bottomOffset;
     },
   }));
 

@@ -158,12 +158,26 @@ export function DubaiCookieMap() {
         router.push(url, { scroll: false });
       }
       if (mapRef.current) {
-        panToAboveSheet(
-          mapRef.current,
-          store.lat,
-          store.lng,
-          CLUSTER_MAX_ZOOM + 1,
-        );
+        const map = mapRef.current;
+        const bounds = map.getBounds() as naver.maps.LatLngBounds;
+        const storeLatLng = new naver.maps.LatLng(store.lat, store.lng);
+        const currentZoom = map.getZoom();
+        const needsZoom = currentZoom < 15;
+
+        let isVisible = bounds.hasLatLng(storeLatLng);
+        if (isVisible) {
+          const sw = bounds.getSW();
+          const ne = bounds.getNE();
+          const mapHeight = map.getSize().height;
+          const sheetOffset = Math.round(window.innerHeight * 0.5);
+          const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
+          isVisible = store.lat > sw.lat() + latPerPixel * sheetOffset;
+        }
+
+        if (!isVisible || needsZoom) {
+          const targetZoom = needsZoom ? CLUSTER_MAX_ZOOM + 1 : undefined;
+          panToAboveSheet(map, store.lat, store.lng, targetZoom);
+        }
       }
     },
     [router, buildUrl, queryParam, placeParam],
@@ -249,6 +263,60 @@ export function DubaiCookieMap() {
     if (!mapReadyRef.current) return;
     createMarkers(mapStores);
   }, [mapStores, createMarkers]);
+
+  // fitBounds to nearby search results (Naver Maps style)
+  const prevQueryRef = useRef(queryParam);
+  useEffect(() => {
+    if (prevQueryRef.current === queryParam) return;
+    prevQueryRef.current = queryParam;
+
+    const map = mapRef.current;
+    if (!map || !queryParam || sortedStores.length === 0) return;
+
+    // sortedStores is already sorted by distance from userCoords
+    const nearby = sortedStores
+      .filter(
+        (s) =>
+          !userCoords ||
+          calculateDistance(userCoords, { lat: s.lat, lng: s.lng }) <= 5000,
+      )
+      .slice(0, 5);
+
+    if (nearby.length === 0) return;
+
+    // Check if all nearby stores are already visible
+    const bounds = map.getBounds() as naver.maps.LatLngBounds;
+    const sw = bounds.getSW();
+    const ne = bounds.getNE();
+    const mapHeight = map.getSize().height;
+    const sheetOffset = Math.round(window.innerHeight * 0.5);
+    const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
+    const adjustedSouthLat = sw.lat() + latPerPixel * sheetOffset;
+
+    const allVisible = nearby.every((s) => {
+      const ll = new naver.maps.LatLng(s.lat, s.lng);
+      return bounds.hasLatLng(ll) && s.lat > adjustedSouthLat;
+    });
+
+    if (!allVisible) {
+      const fitBounds = new naver.maps.LatLngBounds(
+        new naver.maps.LatLng(nearby[0].lat, nearby[0].lng),
+        new naver.maps.LatLng(nearby[0].lat, nearby[0].lng),
+      );
+      for (const s of nearby) {
+        fitBounds.extend(new naver.maps.LatLng(s.lat, s.lng));
+      }
+      map.fitBounds(fitBounds, {
+        top: 80,
+        right: 40,
+        bottom: Math.round(window.innerHeight * 0.5) + 40,
+        left: 40,
+      });
+      if (map.getZoom() > 15) {
+        map.setZoom(15);
+      }
+    }
+  }, [queryParam, sortedStores, userCoords]);
 
   // Center on user location once
   useEffect(() => {
