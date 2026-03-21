@@ -14,7 +14,7 @@ import { MapSearchInput } from "./map-search-input";
 import { PlaceItem } from "@/components/place-search/place-item";
 import { MapResultSheet } from "./map-result-sheet";
 import { MapPlaceDetailSheet } from "./map-place-detail-sheet";
-import { MapOverlapPopover } from "./map-overlap-popover";
+import { MapOverlapPopover } from "@/components/map-overlap-popover";
 import { calculateDistance } from "@/lib/geo";
 import type { NaverSearchResult } from "@/types";
 
