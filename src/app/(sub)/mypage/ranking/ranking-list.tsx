@@ -5,7 +5,6 @@ import { Trophy } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Empty,
-  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
@@ -48,16 +47,13 @@ export function RankingList({ currentUserId }: RankingListProps) {
             <Trophy className="size-12 text-primary" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">아직 랭킹이 없어요</EmptyTitle>
-          <EmptyDescription>
-            장소를 등록하거나 리뷰를 작성해보세요
-          </EmptyDescription>
         </EmptyHeader>
       </Empty>
     );
   }
 
   return (
-    <div className="flex flex-col p-4">
+    <div className="flex flex-col px-4">
       <div className="divide-y">
         {users.map((user, index) => (
           <RankingCard
