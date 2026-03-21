@@ -6,8 +6,10 @@ import {
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { MapOverlapPopover } from "@/components/map-overlap-popover";
-import type { OverlapMarkerItem } from "@/components/map-overlap-popover";
+import {
+  MapOverlapPopover,
+  type OverlapMarkerItem,
+} from "@/components/map-overlap-popover";
 import { calculateDistance } from "@/lib/geo";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { getOverlappingMarkers } from "@/lib/marker-overlap";
@@ -248,7 +250,9 @@ export function DubaiCookieMap() {
                   category: s.category,
                 };
               })
-              .filter((item): item is OverlapMarkerItem => item !== null);
+              .filter(
+                (item): item is NonNullable<typeof item> => item !== null,
+              );
 
             const el = marker.getElement();
             const rect = el?.getBoundingClientRect();

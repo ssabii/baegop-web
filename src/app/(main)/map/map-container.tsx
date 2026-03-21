@@ -92,8 +92,6 @@ export function MapContainer() {
     isFetchingNextPage,
     isLoading,
   } = useSearchPlaces(searchQuery, effectiveCoords);
-  console.log("results", results);
-
   // Derive UI state from URL params (single source of truth)
   const selectedItem = useMemo(() => {
     if (!placeParam) return null;
