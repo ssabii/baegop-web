@@ -13,7 +13,7 @@ interface RankingCardProps {
 export function RankingCard({ user, rank, isCurrentUser }: RankingCardProps) {
   return (
     <div
-      className={cn("flex items-center gap-3 px-4 py-3", {
+      className={cn("flex items-center gap-2 px-4 py-3", {
         "bg-primary/10": isCurrentUser,
       })}
     >
@@ -45,7 +45,11 @@ export function RankingCard({ user, rank, isCurrentUser }: RankingCardProps) {
       >
         {user.nickname ?? "사용자"}
       </span>
-      <span className="shrink-0 text-sm font-bold text-accent-foreground">
+      <span
+        className={cn("font-bold shrink-0 text-sm text-muted-foreground", {
+          "text-accent-foreground": isCurrentUser,
+        })}
+      >
         {user.total_points.toLocaleString()}P
       </span>
     </div>

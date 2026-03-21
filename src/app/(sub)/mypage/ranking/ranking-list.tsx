@@ -57,7 +57,7 @@ export function RankingList({ currentUserId }: RankingListProps) {
   }
 
   return (
-    <div className="flex flex-col py-2">
+    <div className="flex flex-col p-4">
       <div className="divide-y">
         {users.map((user, index) => (
           <RankingCard

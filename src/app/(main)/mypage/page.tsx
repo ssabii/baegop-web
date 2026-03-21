@@ -69,7 +69,7 @@ export default async function MyPage() {
               href="/mypage/ranking"
               title="랭킹"
               badge={
-                <span className="text-sm text-muted-foreground font-semibold">
+                <span className="text-sm text-accent-foreground font-semibold">
                   {(profile?.total_points ?? 0).toLocaleString()}P
                 </span>
               }
