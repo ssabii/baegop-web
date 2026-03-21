@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SubHeader } from "@/components/sub-header";
-import { RankingList } from "@/components/ranking/ranking-list";
+import { RankingList } from "./ranking-list";
 
 export default async function RankingPage() {
   const supabase = await createClient();
