@@ -1,19 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
 import {
   DUBAI_COOKIE_STORES,
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
-import { createMarkerClustering } from "@/lib/marker-clustering";
-import { calculateDistance } from "@/lib/geo";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { calculateDistance } from "@/lib/geo";
+import { createMarkerClustering } from "@/lib/marker-clustering";
+import dynamic from "next/dynamic";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DubaiCookieSearchInput } from "./dubai-cookie-search-input";
-import { LocationButton } from "./location-button";
 import { StoreDrawer } from "./store-drawer";
 import { StoreListSheet } from "./store-list-sheet";
 
@@ -57,18 +55,11 @@ function createMarkerContent(name: string): string {
 </div>`;
 }
 
-function getSheetBottom(snap: number | string): string {
-  if (typeof snap === "string") return snap; // "200px"
-  return `${snap * 100}%`; // 0.3 → "30%", 0.5 → "50%"
-}
-
 export function DubaiCookieMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") ?? "";
   const placeParam = searchParams.get("place") ?? "";
-
-  const [sheetSnap, setSheetSnap] = useState<number | string>(0.5);
 
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
@@ -399,21 +390,12 @@ export function DubaiCookieMap() {
         initialQuery={queryParam}
       />
 
-      <div
-        className={cn("absolute right-4 z-42 transition-all duration-300", {
-          "pointer-events-none opacity-0": sheetSnap === 1,
-        })}
-        style={{ bottom: `calc(${getSheetBottom(sheetSnap)} + 16px)` }}
-      >
-        <LocationButton onLocate={handleLocate} />
-      </div>
-
       {showList && (
         <StoreListSheet
           stores={sortedStores}
           onSelectStore={handleSelectStore}
           onClose={isSearching ? handleCloseList : handleBack}
-          onSnapChange={setSheetSnap}
+          onLocate={handleLocate}
         />
       )}
 
@@ -422,7 +404,7 @@ export function DubaiCookieMap() {
           key={selectedStore.placeId}
           store={selectedStore}
           onClose={handleCloseDetail}
-          onSnapChange={setSheetSnap}
+          onLocate={handleLocate}
         />
       )}
     </>

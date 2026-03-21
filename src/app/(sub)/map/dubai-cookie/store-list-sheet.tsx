@@ -17,6 +17,7 @@ import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 import { MapViewButton } from "./map-view-button";
+import { LocationButton } from "@/components/location-button";
 
 const COMPACT_SNAP = 0.3;
 const HALF_SNAP = 0.5;
@@ -27,7 +28,7 @@ interface StoreListSheetProps {
   stores: DubaiCookieStore[];
   onSelectStore: (store: DubaiCookieStore) => void;
   onClose: () => void;
-  onSnapChange?: (snap: number | string) => void;
+  onLocate: (position: { lat: number; lng: number }) => void;
 }
 
 function StoreListItem({
@@ -78,7 +79,7 @@ export function StoreListSheet({
   stores,
   onSelectStore,
   onClose,
-  onSnapChange,
+  onLocate,
 }: StoreListSheetProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -91,10 +92,6 @@ export function StoreListSheet({
   const contentRef = useRef<HTMLDivElement>(null);
 
   const isFullSnap = activeSnap === FULL_SNAP;
-
-  useEffect(() => {
-    onSnapChange?.(activeSnap);
-  }, [activeSnap, onSnapChange]);
 
   useEffect(() => {
     if (!isFullSnap && contentRef.current) {
@@ -147,7 +144,7 @@ export function StoreListSheet({
             <Drawer.Title className="sr-only">매장 목록</Drawer.Title>
 
             {!isFullSnap && (
-              <div className="mx-auto w-full max-w-4xl">
+              <div className="relative mx-auto w-full max-w-4xl">
                 <div className="flex shrink-0 justify-center py-3">
                   <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
                 </div>
@@ -160,6 +157,9 @@ export function StoreListSheet({
                   >
                     <X className="size-5" />
                   </Button>
+                </div>
+                <div className="absolute -top-12 right-2">
+                  <LocationButton onLocate={onLocate} />
                 </div>
               </div>
             )}
