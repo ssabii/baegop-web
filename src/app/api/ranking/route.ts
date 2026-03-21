@@ -13,10 +13,17 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createClient();
 
+  // 관리자 계정 제외 (테스트 데이터로 인해 랭킹 왜곡)
+  const EXCLUDED_USER_IDS = [
+    "76406f2a-810d-4ad4-b0ab-13b60bf14845",
+    "ef926746-b13c-4f65-8cc5-ab424cc73948",
+  ];
+
   const { data, error } = await supabase
     .from("profiles")
     .select("id, nickname, avatar_url, total_points")
     .gt("total_points", 0)
+    .not("id", "in", `(${EXCLUDED_USER_IDS.join(",")})`)
     .order("total_points", { ascending: false })
     .order("id")
     .range(cursor, cursor + limit - 1);
