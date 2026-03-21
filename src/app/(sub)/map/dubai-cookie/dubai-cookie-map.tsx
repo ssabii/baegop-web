@@ -1,19 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
 import {
   DUBAI_COOKIE_STORES,
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
-import { createMarkerClustering } from "@/lib/marker-clustering";
-import { calculateDistance } from "@/lib/geo";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import {
+  MapOverlapPopover,
+  type OverlapMarkerItem,
+} from "@/components/map-overlap-popover";
+import { calculateDistance } from "@/lib/geo";
+import { createMarkerClustering } from "@/lib/marker-clustering";
+import { getOverlappingMarkers } from "@/lib/marker-overlap";
+import dynamic from "next/dynamic";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DubaiCookieSearchInput } from "./dubai-cookie-search-input";
-import { LocationButton } from "./location-button";
 import { StoreDrawer } from "./store-drawer";
 import { StoreListSheet } from "./store-list-sheet";
 
@@ -26,7 +29,7 @@ const NaverMap = dynamic(() => import("@/components/naver-map"), {
   ),
 });
 
-const CLUSTER_MAX_ZOOM = 15;
+const CLUSTER_MAX_ZOOM = 16;
 
 /** Pan (and optionally zoom) so the marker sits in the upper portion of the visible map */
 function panToAboveSheet(
@@ -57,18 +60,16 @@ function createMarkerContent(name: string): string {
 </div>`;
 }
 
-function getSheetBottom(snap: number | string): string {
-  if (typeof snap === "string") return snap; // "200px"
-  return `${snap * 100}%`; // 0.3 → "30%", 0.5 → "50%"
-}
-
 export function DubaiCookieMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") ?? "";
   const placeParam = searchParams.get("place") ?? "";
 
-  const [sheetSnap, setSheetSnap] = useState<number | string>(0.5);
+  const [overlapState, setOverlapState] = useState<{
+    items: OverlapMarkerItem[];
+    anchorPos: { x: number; y: number };
+  } | null>(null);
 
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
@@ -158,12 +159,26 @@ export function DubaiCookieMap() {
         router.push(url, { scroll: false });
       }
       if (mapRef.current) {
-        panToAboveSheet(
-          mapRef.current,
-          store.lat,
-          store.lng,
-          CLUSTER_MAX_ZOOM + 1,
-        );
+        const map = mapRef.current;
+        const bounds = map.getBounds() as naver.maps.LatLngBounds;
+        const storeLatLng = new naver.maps.LatLng(store.lat, store.lng);
+        const currentZoom = map.getZoom();
+        const needsZoom = currentZoom < 15;
+
+        let isVisible = bounds.hasLatLng(storeLatLng);
+        if (isVisible) {
+          const sw = bounds.getSW();
+          const ne = bounds.getNE();
+          const mapHeight = map.getSize().height;
+          const sheetOffset = Math.round(window.innerHeight * 0.5);
+          const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
+          isVisible = store.lat > sw.lat() + latPerPixel * sheetOffset;
+        }
+
+        if (!isVisible || needsZoom) {
+          const targetZoom = needsZoom ? CLUSTER_MAX_ZOOM + 1 : undefined;
+          panToAboveSheet(map, store.lat, store.lng, targetZoom);
+        }
       }
     },
     [router, buildUrl, queryParam, placeParam],
@@ -176,6 +191,19 @@ export function DubaiCookieMap() {
   const handleCloseList = useCallback(() => {
     router.replace("/map/dubai-cookie", { scroll: false });
   }, [router]);
+
+  const handleOverlapSelect = useCallback(
+    (id: string) => {
+      setOverlapState(null);
+      const store = DUBAI_COOKIE_STORES.find((s) => s.placeId === id);
+      if (store) handleSelectStore(store);
+    },
+    [handleSelectStore],
+  );
+
+  const handleOverlapClose = useCallback(() => {
+    setOverlapState(null);
+  }, []);
 
   // --- Marker management ---
   const createMarkers = useCallback(
@@ -203,16 +231,49 @@ export function DubaiCookieMap() {
         });
 
         naver.maps.Event.addListener(marker, "click", () => {
-          const url = buildUrl({
-            query: queryParamRef.current || undefined,
-            place: store.placeId,
-          });
-          if (placeParamRef.current) {
-            router.replace(url, { scroll: false });
+          const overlapping = getOverlappingMarkers(
+            map,
+            marker,
+            markers,
+          );
+
+          if (overlapping.length > 0) {
+            const allOverlapping = [marker, ...overlapping];
+            const overlapItems = allOverlapping
+              .map((m) => {
+                const idx = markers.indexOf(m);
+                if (idx < 0) return null;
+                const s = stores[idx];
+                return {
+                  id: s.placeId,
+                  title: s.name,
+                  category: s.category,
+                };
+              })
+              .filter(
+                (item): item is NonNullable<typeof item> => item !== null,
+              );
+
+            const el = marker.getElement();
+            const rect = el?.getBoundingClientRect();
+            const anchorPos = rect
+              ? { x: rect.left + rect.width / 2, y: rect.top }
+              : { x: 0, y: 0 };
+
+            setOverlapState({ items: overlapItems, anchorPos });
           } else {
-            router.push(url, { scroll: false });
+            setOverlapState(null);
+            const url = buildUrl({
+              query: queryParamRef.current || undefined,
+              place: store.placeId,
+            });
+            if (placeParamRef.current) {
+              router.replace(url, { scroll: false });
+            } else {
+              router.push(url, { scroll: false });
+            }
+            panToAboveSheet(map, store.lat, store.lng);
           }
-          panToAboveSheet(map, store.lat, store.lng);
         });
 
         markers.push(marker);
@@ -250,35 +311,59 @@ export function DubaiCookieMap() {
     createMarkers(mapStores);
   }, [mapStores, createMarkers]);
 
-  // Fit bounds to search results when query changes
+  // fitBounds to nearby search results (Naver Maps style)
   const prevQueryRef = useRef(queryParam);
   useEffect(() => {
     if (prevQueryRef.current === queryParam) return;
     prevQueryRef.current = queryParam;
 
     const map = mapRef.current;
-    if (!map || !queryParam || filteredStores.length === 0) return;
+    if (!map || !queryParam || sortedStores.length === 0) return;
 
-    if (filteredStores.length === 1) {
-      panToAboveSheet(map, filteredStores[0].lat, filteredStores[0].lng);
-      map.setZoom(CLUSTER_MAX_ZOOM + 1);
-      return;
-    }
+    // sortedStores is already sorted by distance from userCoords
+    const nearby = sortedStores
+      .filter(
+        (s) =>
+          !userCoords ||
+          calculateDistance(userCoords, { lat: s.lat, lng: s.lng }) <= 5000,
+      )
+      .slice(0, 5);
 
-    const bounds = new naver.maps.LatLngBounds(
-      new naver.maps.LatLng(filteredStores[0].lat, filteredStores[0].lng),
-      new naver.maps.LatLng(filteredStores[0].lat, filteredStores[0].lng),
-    );
-    for (const s of filteredStores) {
-      bounds.extend(new naver.maps.LatLng(s.lat, s.lng));
-    }
-    map.fitBounds(bounds, {
-      top: 80,
-      right: 40,
-      bottom: Math.round(window.innerHeight * 0.5) + 40,
-      left: 40,
+    if (nearby.length === 0) return;
+
+    // Check if all nearby stores are already visible
+    const bounds = map.getBounds() as naver.maps.LatLngBounds;
+    const sw = bounds.getSW();
+    const ne = bounds.getNE();
+    const mapHeight = map.getSize().height;
+    const sheetOffset = Math.round(window.innerHeight * 0.5);
+    const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
+    const adjustedSouthLat = sw.lat() + latPerPixel * sheetOffset;
+
+    const allVisible = nearby.every((s) => {
+      const ll = new naver.maps.LatLng(s.lat, s.lng);
+      return bounds.hasLatLng(ll) && s.lat > adjustedSouthLat;
     });
-  }, [queryParam, filteredStores]);
+
+    if (!allVisible) {
+      const fitBounds = new naver.maps.LatLngBounds(
+        new naver.maps.LatLng(nearby[0].lat, nearby[0].lng),
+        new naver.maps.LatLng(nearby[0].lat, nearby[0].lng),
+      );
+      for (const s of nearby) {
+        fitBounds.extend(new naver.maps.LatLng(s.lat, s.lng));
+      }
+      map.fitBounds(fitBounds, {
+        top: 80,
+        right: 40,
+        bottom: Math.round(window.innerHeight * 0.5) + 40,
+        left: 40,
+      });
+      if (map.getZoom() > 15) {
+        map.setZoom(15);
+      }
+    }
+  }, [queryParam, sortedStores, userCoords]);
 
   // Center on user location once
   useEffect(() => {
@@ -287,6 +372,7 @@ export function DubaiCookieMap() {
     mapRef.current.setCenter(
       new naver.maps.LatLng(userCoords.lat, userCoords.lng),
     );
+    mapRef.current.setZoom(15);
   }, [userCoords]);
 
   const handleReady = useCallback(
@@ -295,6 +381,7 @@ export function DubaiCookieMap() {
       mapReadyRef.current = true;
 
       const clickListener = naver.maps.Event.addListener(map, "click", () => {
+        setOverlapState(null);
         if (placeParamRef.current) {
           router.back();
         }
@@ -353,6 +440,15 @@ export function DubaiCookieMap() {
     <>
       <NaverMap onReady={handleReady} className="fixed inset-0" />
 
+      {overlapState && (
+        <MapOverlapPopover
+          items={overlapState.items}
+          anchorPos={overlapState.anchorPos}
+          onSelect={handleOverlapSelect}
+          onClose={handleOverlapClose}
+        />
+      )}
+
       <DubaiCookieSearchInput
         onBack={handleBack}
         onSearch={handleSearch}
@@ -360,21 +456,12 @@ export function DubaiCookieMap() {
         initialQuery={queryParam}
       />
 
-      <div
-        className={cn("absolute right-4 z-42 transition-all duration-300", {
-          "pointer-events-none opacity-0": sheetSnap === 1,
-        })}
-        style={{ bottom: `calc(${getSheetBottom(sheetSnap)} + 16px)` }}
-      >
-        <LocationButton onLocate={handleLocate} />
-      </div>
-
       {showList && (
         <StoreListSheet
           stores={sortedStores}
           onSelectStore={handleSelectStore}
           onClose={isSearching ? handleCloseList : handleBack}
-          onSnapChange={setSheetSnap}
+          onLocate={handleLocate}
         />
       )}
 
@@ -383,7 +470,7 @@ export function DubaiCookieMap() {
           key={selectedStore.placeId}
           store={selectedStore}
           onClose={handleCloseDetail}
-          onSnapChange={setSheetSnap}
+          onLocate={handleLocate}
         />
       )}
     </>
