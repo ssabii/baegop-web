@@ -7,6 +7,7 @@ export interface Profile {
   nickname: string;
   avatarUrl: string | null;
   email: string | null;
+  totalPoints: number;
 }
 
 
@@ -35,7 +36,7 @@ export function useProfile() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("nickname, avatar_url")
+        .select("nickname, avatar_url, total_points")
         .eq("id", user.id)
         .single();
 
@@ -45,6 +46,7 @@ export function useProfile() {
         nickname: profile?.nickname ?? user.email ?? "사용자",
         avatarUrl: profile?.avatar_url ?? null,
         email: maskedEmail,
+        totalPoints: profile?.total_points ?? 0,
       } as Profile;
     },
     staleTime: QUERY_STALE_TIME,
