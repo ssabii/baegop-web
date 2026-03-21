@@ -6,8 +6,11 @@ import {
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { MapOverlapPopover } from "@/components/map-overlap-popover";
+import type { OverlapMarkerItem } from "@/components/map-overlap-popover";
 import { calculateDistance } from "@/lib/geo";
 import { createMarkerClustering } from "@/lib/marker-clustering";
+import { getOverlappingMarkers } from "@/lib/marker-overlap";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -60,6 +63,11 @@ export function DubaiCookieMap() {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") ?? "";
   const placeParam = searchParams.get("place") ?? "";
+
+  const [overlapState, setOverlapState] = useState<{
+    items: OverlapMarkerItem[];
+    anchorPos: { x: number; y: number };
+  } | null>(null);
 
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
@@ -182,6 +190,19 @@ export function DubaiCookieMap() {
     router.replace("/map/dubai-cookie", { scroll: false });
   }, [router]);
 
+  const handleOverlapSelect = useCallback(
+    (id: string) => {
+      setOverlapState(null);
+      const store = DUBAI_COOKIE_STORES.find((s) => s.placeId === id);
+      if (store) handleSelectStore(store);
+    },
+    [handleSelectStore],
+  );
+
+  const handleOverlapClose = useCallback(() => {
+    setOverlapState(null);
+  }, []);
+
   // --- Marker management ---
   const createMarkers = useCallback(
     (stores: DubaiCookieStore[]) => {
@@ -208,16 +229,47 @@ export function DubaiCookieMap() {
         });
 
         naver.maps.Event.addListener(marker, "click", () => {
-          const url = buildUrl({
-            query: queryParamRef.current || undefined,
-            place: store.placeId,
-          });
-          if (placeParamRef.current) {
-            router.replace(url, { scroll: false });
+          const overlapping = getOverlappingMarkers(
+            map,
+            marker,
+            markers,
+          );
+
+          if (overlapping.length > 0) {
+            const allOverlapping = [marker, ...overlapping];
+            const overlapItems = allOverlapping
+              .map((m) => {
+                const idx = markers.indexOf(m);
+                if (idx < 0) return null;
+                const s = stores[idx];
+                return {
+                  id: s.placeId,
+                  title: s.name,
+                  category: s.category,
+                };
+              })
+              .filter((item): item is OverlapMarkerItem => item !== null);
+
+            const el = marker.getElement();
+            const rect = el?.getBoundingClientRect();
+            const anchorPos = rect
+              ? { x: rect.left + rect.width / 2, y: rect.top }
+              : { x: 0, y: 0 };
+
+            setOverlapState({ items: overlapItems, anchorPos });
           } else {
-            router.push(url, { scroll: false });
+            setOverlapState(null);
+            const url = buildUrl({
+              query: queryParamRef.current || undefined,
+              place: store.placeId,
+            });
+            if (placeParamRef.current) {
+              router.replace(url, { scroll: false });
+            } else {
+              router.push(url, { scroll: false });
+            }
+            panToAboveSheet(map, store.lat, store.lng);
           }
-          panToAboveSheet(map, store.lat, store.lng);
         });
 
         markers.push(marker);
@@ -325,6 +377,7 @@ export function DubaiCookieMap() {
       mapReadyRef.current = true;
 
       const clickListener = naver.maps.Event.addListener(map, "click", () => {
+        setOverlapState(null);
         if (placeParamRef.current) {
           router.back();
         }
@@ -382,6 +435,15 @@ export function DubaiCookieMap() {
   return (
     <>
       <NaverMap onReady={handleReady} className="fixed inset-0" />
+
+      {overlapState && (
+        <MapOverlapPopover
+          items={overlapState.items}
+          anchorPos={overlapState.anchorPos}
+          onSelect={handleOverlapSelect}
+          onClose={handleOverlapClose}
+        />
+      )}
 
       <DubaiCookieSearchInput
         onBack={handleBack}
