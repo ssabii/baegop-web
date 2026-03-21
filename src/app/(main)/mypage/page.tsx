@@ -22,16 +22,22 @@ export default async function MyPage() {
 
   if (!user) redirect("/signin");
 
-  const [{ count: reviewCount }, { count: favoriteCount }] = await Promise.all([
-    supabase
-      .from("reviews")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id),
-    supabase
-      .from("favorites")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id),
-  ]);
+  const [{ count: reviewCount }, { count: favoriteCount }, { data: profile }] =
+    await Promise.all([
+      supabase
+        .from("reviews")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("favorites")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("profiles")
+        .select("total_points")
+        .eq("id", user.id)
+        .single(),
+    ]);
 
   return (
     <main className="w-full min-h-screen pb-17 bg-muted">
@@ -45,7 +51,6 @@ export default async function MyPage() {
           {/* 프로필 섹션 */}
           <ProfileSection />
 
-          <MypageMenuItem href="/mypage/ranking" title="랭킹" />
           <MypageMenuItem href="/mypage/theme" title="테마" />
           <ItemGroup className="rounded-xl bg-background">
             <MypageMenuItem
@@ -66,6 +71,17 @@ export default async function MyPage() {
                   {favoriteCount ?? 0}
                 </span>
               }
+              inGroup
+            />
+            <MypageMenuItem
+              href="/mypage/ranking"
+              title="랭킹"
+              badge={
+                <span className="text-sm text-muted-foreground font-semibold">
+                  {profile?.total_points ?? 0}P
+                </span>
+              }
+              newBadge
               inGroup
             />
             <Item asChild>
