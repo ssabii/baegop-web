@@ -34,7 +34,6 @@ interface ReviewCardProps {
     profiles: {
       nickname: string | null;
       avatar_url: string | null;
-      total_points: number;
     } | null;
   };
   isOwner: boolean;
@@ -90,14 +89,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
         </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">
-              {nickname}
-              {review.profiles?.total_points ? (
-                <span className="ml-1 text-xs font-bold text-primary">
-                  {review.profiles.total_points}P
-                </span>
-              ) : null}
-            </span>
+            <span className="text-sm font-medium">{nickname}</span>
             {isOwner && (
               <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
                 <DrawerTrigger asChild>
