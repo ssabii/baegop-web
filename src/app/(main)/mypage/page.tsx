@@ -1,12 +1,4 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemGroup,
-  ItemTitle,
-} from "@/components/ui/item";
+import { ItemGroup } from "@/components/ui/item";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { LogoutMenuItem } from "./logout-menu-item";
@@ -84,21 +76,12 @@ export default async function MyPage() {
               newBadge
               inGroup
             />
-            <Item asChild>
-              <Link href="/map/dubai-cookie">
-                <ItemContent>
-                  <ItemTitle className="font-bold">
-                    <span className="relative">
-                      두쫀쿠 지도
-                      <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-red-500" />
-                    </span>
-                  </ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <ChevronRight className="size-4" />
-                </ItemActions>
-              </Link>
-            </Item>
+            <MypageMenuItem
+              href="/map/dubai-cookie"
+              title="두쫀쿠 지도"
+              newBadge
+              inGroup
+            />
           </ItemGroup>
           <ItemGroup className="rounded-xl bg-background">
             <MypageMenuItem
