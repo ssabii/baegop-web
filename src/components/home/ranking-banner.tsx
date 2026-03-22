@@ -36,6 +36,7 @@ export function RankingBanner() {
         open={loginDialogOpen}
         onOpenChange={setLoginDialogOpen}
         description="로그인하시면 랭킹을 확인할 수 있어요."
+        redirect="/mypage/ranking"
       />
     </>
   );

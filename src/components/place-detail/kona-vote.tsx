@@ -78,6 +78,7 @@ export function KonaVoteSection({
             <span className="text-sm font-bold">코나카드</span>
             <InfoDrawer
               title="코나카드"
+              trigger={{ "aria-label": "코나카드 투표 안내" }}
               description="결제 가능 여부를 투표해주세요. 투표 결과에 따라 가능 여부가 표시돼요."
             />
           </div>
