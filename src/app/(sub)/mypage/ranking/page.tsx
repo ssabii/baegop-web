@@ -1,7 +1,14 @@
 import { redirect } from "next/navigation";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/server";
 import { SubHeader } from "@/components/sub-header";
 import { POINTS } from "@/lib/constants";
+import { fetchRanking } from "@/lib/queries/ranking";
+import { rankingKeys } from "@/lib/query-keys";
 import { RankingList } from "./ranking-list";
 import { RankingPoint } from "./ranking-point";
 
@@ -13,6 +20,8 @@ export default async function RankingPage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/signin");
+
+  const queryClient = new QueryClient();
 
   const [
     { data: profile },
@@ -43,6 +52,11 @@ export default async function RankingPage() {
       .from("kona_card_votes")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id),
+    queryClient.prefetchInfiniteQuery({
+      queryKey: rankingKeys.all,
+      queryFn: () => fetchRanking(),
+      initialPageParam: 0,
+    }),
   ]);
 
   const photoCount =
@@ -66,7 +80,9 @@ export default async function RankingPage() {
           totalPoints={profile?.total_points ?? 0}
           stats={stats}
         />
-        <RankingList currentUserId={user.id} />
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <RankingList currentUserId={user.id} />
+        </HydrationBoundary>
       </div>
     </div>
   );

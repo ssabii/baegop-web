@@ -49,7 +49,7 @@ function BannerContent() {
         <Trophy className="size-10" strokeWidth={2} />
         <div className="text-left">
           <p className="text-sm font-medium text-white/80">
-            활동으로 포인트를 모아보세요!
+            활동으로 포인트를 모아보세요
           </p>
           <p className="font-bold">랭킹</p>
         </div>

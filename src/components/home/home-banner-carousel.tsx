@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { RankingBanner } from "./ranking-banner";
 import { DubaiCookieBanner } from "./dubai-cookie-banner";
+import Autoplay from "embla-carousel-autoplay";
 
 const BANNERS = [
   { key: "ranking", component: RankingBanner },
@@ -32,8 +33,13 @@ export function HomeBannerCarousel() {
 
   return (
     <div className="flex flex-col gap-2">
-      <Carousel setApi={setApi} opts={{ loop: true }}>
-        <CarouselContent>
+      <Carousel
+        setApi={setApi}
+        opts={{ loop: true, align: "start" }}
+        plugins={[Autoplay({ delay: 5000 })]}
+        orientation="vertical"
+      >
+        <CarouselContent className="h-22">
           {BANNERS.map(({ key, component: Banner }) => (
             <CarouselItem key={key}>
               <Banner />
