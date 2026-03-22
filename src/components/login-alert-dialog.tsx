@@ -17,14 +17,18 @@ interface LoginAlertDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   description: string;
+  /** 로그인 후 이동할 경로. 미지정 시 현재 페이지로 복귀 */
+  redirect?: string;
 }
 
 export function LoginAlertDialog({
   open,
   onOpenChange,
   description,
+  redirect,
 }: LoginAlertDialogProps) {
   const pathname = usePathname();
+  const redirectPath = redirect ?? pathname;
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -37,7 +41,7 @@ export function LoginAlertDialog({
           <AlertDialogCancel>취소</AlertDialogCancel>
           <AlertDialogAction asChild>
             <Link
-              href={`/signin?redirect=${encodeURIComponent(pathname)}`}
+              href={`/signin?redirect=${encodeURIComponent(redirectPath)}`}
             >
               로그인
             </Link>

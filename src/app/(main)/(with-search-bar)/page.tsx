@@ -1,6 +1,10 @@
 import { Suspense } from "react";
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-import { DubaiCookieBanner } from "@/components/home/dubai-cookie-banner";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { HomeBannerCarousel } from "@/components/home/home-banner-carousel";
 import { HomeTabs } from "@/components/home/home-tabs";
 import { HomeFooter } from "@/components/home/home-footer";
 import { PlaceList } from "@/components/home/place-list";
@@ -55,7 +59,7 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-4 px-4 pt-21 pb-23">
-      <DubaiCookieBanner />
+      <HomeBannerCarousel />
       <Suspense fallback={<PlaceListSkeleton />}>
         <HomeTabs />
         <HydrationBoundary state={dehydrate(queryClient)}>

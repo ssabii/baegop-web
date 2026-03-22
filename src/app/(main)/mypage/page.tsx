@@ -1,12 +1,4 @@
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemGroup,
-  ItemTitle,
-} from "@/components/ui/item";
+import { ItemGroup } from "@/components/ui/item";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { LogoutMenuItem } from "./logout-menu-item";
@@ -22,16 +14,22 @@ export default async function MyPage() {
 
   if (!user) redirect("/signin");
 
-  const [{ count: reviewCount }, { count: favoriteCount }] = await Promise.all([
-    supabase
-      .from("reviews")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id),
-    supabase
-      .from("favorites")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id),
-  ]);
+  const [{ count: reviewCount }, { count: favoriteCount }, { data: profile }] =
+    await Promise.all([
+      supabase
+        .from("reviews")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("favorites")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("profiles")
+        .select("total_points")
+        .eq("id", user.id)
+        .single(),
+    ]);
 
   return (
     <main className="w-full min-h-screen pb-17 bg-muted">
@@ -67,21 +65,23 @@ export default async function MyPage() {
               }
               inGroup
             />
-            <Item asChild>
-              <Link href="/map/dubai-cookie">
-                <ItemContent>
-                  <ItemTitle className="font-bold">
-                    <span className="relative">
-                      두쫀쿠 지도
-                      <span className="absolute -top-0.5 -right-2.5 size-2 rounded-full bg-red-500" />
-                    </span>
-                  </ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <ChevronRight className="size-4" />
-                </ItemActions>
-              </Link>
-            </Item>
+            <MypageMenuItem
+              href="/mypage/ranking"
+              title="랭킹"
+              badge={
+                <span className="text-sm text-accent-foreground font-semibold">
+                  {(profile?.total_points ?? 0).toLocaleString()}P
+                </span>
+              }
+              newBadge
+              inGroup
+            />
+            <MypageMenuItem
+              href="/map/dubai-cookie"
+              title="두쫀쿠 지도"
+              newBadge
+              inGroup
+            />
           </ItemGroup>
           <ItemGroup className="rounded-xl bg-background">
             <MypageMenuItem
