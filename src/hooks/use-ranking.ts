@@ -1,29 +1,21 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { rankingKeys } from "@/lib/query-keys";
+import type { RankingResult } from "@/lib/queries/ranking";
 
-export interface RankingUser {
-  id: string;
-  nickname: string | null;
-  avatar_url: string | null;
-  total_points: number;
-}
-
-interface RankingResponse {
-  items: RankingUser[];
-  nextCursor: number | null;
-}
+export type { RankingUser } from "@/lib/queries/ranking";
 
 const LIMIT = 20;
 
 export function useRanking() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["ranking"],
+      queryKey: rankingKeys.all,
       queryFn: async ({ pageParam = 0 }) => {
         const res = await fetch(
           `/api/ranking?cursor=${pageParam}&limit=${LIMIT}`,
         );
         if (!res.ok) throw new Error("Failed to fetch ranking");
-        return res.json() as Promise<RankingResponse>;
+        return res.json() as Promise<RankingResult>;
       },
       initialPageParam: 0,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
