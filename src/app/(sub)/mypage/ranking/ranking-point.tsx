@@ -37,7 +37,9 @@ export function RankingPoint({ totalPoints, stats }: RankingPointProps) {
                 className="flex items-center justify-between text-sm"
               >
                 <span className="text-muted-foreground">{rule.label}</span>
-                <span className="font-bold">{rule.point}P</span>
+                <span className="font-bold text-accent-foreground">
+                  {rule.point}P
+                </span>
               </li>
             ))}
           </ul>
@@ -54,8 +56,8 @@ export function RankingPoint({ totalPoints, stats }: RankingPointProps) {
               className="flex items-center justify-between text-sm"
             >
               <span className="text-muted-foreground">{stat.label}</span>
-              <span className="text-muted-foreground">
-                {stat.count}건 · {(stat.count * stat.pointPer).toLocaleString()}P
+              <span className="font-bold text-accent-foreground">
+                {stat.count}건
               </span>
             </div>
           ))}
