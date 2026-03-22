@@ -27,6 +27,10 @@ export const searchKeys = {
     ["search-places", query, lat, lng] as const,
 };
 
+export const rankingKeys = {
+  all: ["ranking"] as const,
+};
+
 export const mapKeys = {
   places: ["map-places"] as const,
 };
