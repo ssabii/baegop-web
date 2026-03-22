@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Info } from "lucide-react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import { InfoDrawer } from "@/components/info-drawer";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Toggle } from "@/components/ui/toggle";
@@ -84,28 +76,11 @@ export function KonaVoteSection({
           <div className="flex items-center gap-2">
             <img src="/icons/kona.png" alt="코나카드" className="size-4" />
             <span className="text-sm font-bold">코나카드</span>
-            <Drawer>
-              <DrawerTrigger asChild>
-                <button
-                  type="button"
-                  className="text-muted-foreground/60 cursor-pointer focus-visible:outline-none"
-                  aria-label="코나카드 결제 안내"
-                >
-                  <Info className="size-3.5" />
-                </button>
-              </DrawerTrigger>
-              <DrawerContent>
-                <div className="max-w-4xl mx-auto w-full p-4">
-                  <DrawerHeader>
-                    <DrawerTitle className="text-left">코나카드</DrawerTitle>
-                    <DrawerDescription className="text-left">
-                      결제 가능 여부를 투표해주세요. <br />
-                      투표 결과에 따라 가능 여부가 표시돼요.
-                    </DrawerDescription>
-                  </DrawerHeader>
-                </div>
-              </DrawerContent>
-            </Drawer>
+            <InfoDrawer
+              title="코나카드"
+              trigger={{ "aria-label": "코나카드 투표 안내" }}
+              description="결제 가능 여부를 투표해주세요. 투표 결과에 따라 가능 여부가 표시돼요."
+            />
           </div>
           <span className={cn("text-sm font-semibold", config.className)}>
             {config.label}
