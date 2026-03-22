@@ -9,7 +9,7 @@ interface PointStat {
   pointPer: number;
 }
 
-interface RankingPointProps {
+interface PointSectionProps {
   totalPoints: number;
   stats: PointStat[];
 }
@@ -21,7 +21,7 @@ const POINT_RULES = [
   { label: "코나카드 투표", point: POINTS.KONA_VOTE },
 ];
 
-export function RankingPoint({ totalPoints, stats }: RankingPointProps) {
+export function PointSection({ totalPoints, stats }: PointSectionProps) {
   return (
     <div className="py-4 px-6">
       <div className="flex items-center gap-1">

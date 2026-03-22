@@ -10,7 +10,7 @@ import { POINTS } from "@/lib/constants";
 import { fetchRanking } from "@/lib/queries/ranking";
 import { rankingKeys } from "@/lib/query-keys";
 import { RankingList } from "./ranking-list";
-import { RankingPoint } from "./ranking-point";
+import { PointSection } from "./point-section";
 
 export default async function RankingPage() {
   const supabase = await createClient();
@@ -23,6 +23,39 @@ export default async function RankingPage() {
 
   const queryClient = new QueryClient();
 
+  const totalPointQuery = supabase
+    .from("profiles")
+    .select("total_points")
+    .eq("id", user.id)
+    .single();
+
+  const placeCountQuery = supabase
+    .from("places")
+    .select("*", { count: "exact", head: true })
+    .eq("created_by", user.id);
+
+  const reviewCountQuery = supabase
+    .from("reviews")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  const reviewPhotoQuery = supabase
+    .from("reviews")
+    .select("image_urls")
+    .eq("user_id", user.id)
+    .not("image_urls", "is", null);
+
+  const voteCountQuery = supabase
+    .from("kona_card_votes")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
+  const rankingPrefetch = queryClient.prefetchInfiniteQuery({
+    queryKey: rankingKeys.all,
+    queryFn: () => fetchRanking(),
+    initialPageParam: 0,
+  });
+
   const [
     { data: profile },
     { count: placeCount },
@@ -30,33 +63,12 @@ export default async function RankingPage() {
     { data: reviewPhotos },
     { count: voteCount },
   ] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("total_points")
-      .eq("id", user.id)
-      .single(),
-    supabase
-      .from("places")
-      .select("*", { count: "exact", head: true })
-      .eq("created_by", user.id),
-    supabase
-      .from("reviews")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id),
-    supabase
-      .from("reviews")
-      .select("image_urls")
-      .eq("user_id", user.id)
-      .not("image_urls", "is", null),
-    supabase
-      .from("kona_card_votes")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id),
-    queryClient.prefetchInfiniteQuery({
-      queryKey: rankingKeys.all,
-      queryFn: () => fetchRanking(),
-      initialPageParam: 0,
-    }),
+    totalPointQuery,
+    placeCountQuery,
+    reviewCountQuery,
+    reviewPhotoQuery,
+    voteCountQuery,
+    rankingPrefetch,
   ]);
 
   const photoCount =
@@ -76,7 +88,7 @@ export default async function RankingPage() {
     <div className="flex min-h-dvh flex-col">
       <SubHeader title="랭킹" />
       <div className="flex flex-1 flex-col mx-auto w-full max-w-4xl">
-        <RankingPoint
+        <PointSection
           totalPoints={profile?.total_points ?? 0}
           stats={stats}
         />
