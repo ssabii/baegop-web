@@ -75,9 +75,8 @@ export function ResetPasswordForm() {
       <form onSubmit={handleSubmit} noValidate>
         <FieldGroup>
           <div className="flex flex-col items-center gap-2 text-center">
-            <Link href="/" className="flex items-center gap-1">
-              <img src="/baegop.svg" alt="배곱" className="size-6" />
-              <h1 className="text-2xl font-bold">배곱</h1>
+            <Link href="/">
+              <img src="/baegop-symbol.svg" alt="배곱" className="w-32" />
             </Link>
             <FieldDescription>새로운 비밀번호를 설정해주세요</FieldDescription>
           </div>
