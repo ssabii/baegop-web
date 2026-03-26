@@ -13,7 +13,7 @@ export async function SearchBar() {
       <div className="px-4 gap-3 flex h-11 items-center bg-background rounded-full max-w-4xl mx-auto border shadow-sm">
         <Link href="/">
           <img
-            src="/baegop.svg"
+            src="/baegop-logo.svg"
             alt="배곱"
             width={24}
             height={24}
