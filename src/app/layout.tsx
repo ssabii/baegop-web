@@ -20,6 +20,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "배곱",
   description: "배고플땐 배곱",
+  openGraph: {
+    images: [
+      {
+        url: "https://aeeznpdtczcyrqbnzxmb.supabase.co/storage/v1/object/public/assets/baegop-og@1x.png",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
