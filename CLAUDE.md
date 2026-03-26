@@ -13,6 +13,7 @@ pnpm dev          # 개발 서버 실행
 pnpm build        # 프로덕션 빌드
 pnpm start        # 프로덕션 서버 실행
 pnpm lint         # ESLint 실행
+pnpm db:types     # Supabase 타입 재생성 (src/types/database.ts)
 pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 ```
 
@@ -31,14 +32,23 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 - `src/lib/supabase/server.ts` — 서버용 (Server Components, Route Handlers)
 - `src/lib/supabase/middleware.ts` — Auth 세션 갱신 + 보호 라우트 리다이렉트
 
+### Route Groups
+- `(main)` — 공개 라우트 (홈, 검색 등). 바텀 네비게이션 포함 레이아웃.
+- `(sub)` — 보호 라우트 (마이페이지 등). 서브 헤더 레이아웃.
+
 ### Auth & Protected Routes
-미들웨어(`src/middleware.ts`)가 모든 요청에서 Supabase 세션을 갱신. 보호 라우트(`/mypage`)는 미인증 시 `/login`으로 리다이렉트.
+미들웨어(`src/middleware.ts`)가 모든 요청에서 Supabase 세션을 갱신. 보호 라우트(`/mypage`)는 미인증 시 `/signin`으로 리다이렉트.
 
 ### Naver Search API Proxy
 네이버 검색 API는 서버사이드 Route Handler(`src/app/api/naver-search/route.ts`)를 통해 프록시. CORS 회피 + API 키 보호 목적.
 
 ### Category Handling
 카테고리 테이블 없음. 네이버 API가 반환하는 카테고리 문자열(예: `"음식점>한식"`)을 `places.category`에 직접 저장.
+
+### React Query
+- `src/lib/query-keys.ts` — 쿼리 키 팩토리. 모든 쿼리 키는 여기서 관리.
+- `src/providers/providers.tsx` — QueryClientProvider, ThemeProvider, ConfirmDialogProvider 래핑.
+- `next.config.ts`의 `staleTimes.dynamic: 300` — 클라이언트 라우터 캐시 5분 유지.
 
 ### Kona Card Crowdsourcing
 코나카드 결제 가능 여부는 등록자 입력 + 사용자 투표로 관리. 투표 임계값(`KONA_VOTE_THRESHOLD = 3`) 초과 시 상태 자동 변경.
@@ -140,4 +150,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY      # Supabase anon key
 NAVER_CLIENT_ID                    # 네이버 검색 API (서버 전용)
 NAVER_CLIENT_SECRET                # 네이버 검색 API (서버 전용)
 NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID   # 네이버 지도 API (클라이언트)
+SUPABASE_SERVICE_ROLE_KEY          # Supabase 관리자 (서버 전용, 회원탈퇴 등)
+NEXT_PUBLIC_GA_MEASUREMENT_ID      # Google Analytics
 ```
