@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
-import { COMPANY_LOCATION } from "@/lib/constants";
+
+const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }; // 서울 시청
 
 interface NaverMapProps {
   center?: { lat: number; lng: number };
@@ -50,7 +51,7 @@ async function loadNaverMapsScript(): Promise<void> {
 }
 
 export default function NaverMap({
-  center = COMPANY_LOCATION,
+  center = DEFAULT_CENTER,
   zoom = 15,
   onReady,
   className,

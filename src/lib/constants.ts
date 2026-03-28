@@ -255,6 +255,13 @@ export const POINTS = {
   KONA_VOTE: 1,
 } as const;
 
+// 네이버 지도 현위치 마커 아이콘
+export const LOCATION_MARKER_ICON = {
+  content: `<div style="width:16px;height:16px;border-radius:50%;background:#4285F4;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
+  size: { width: 16, height: 16 },
+  anchor: { x: 8, y: 8 },
+} as const;
+
 // 크몽 사무실 좌표
 export const COMPANY_LOCATION = {
   name: "크몽",
