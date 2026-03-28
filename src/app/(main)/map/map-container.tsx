@@ -56,6 +56,7 @@ export function MapContainer() {
 
   const handleLocate = useCallback((position: { lat: number; lng: number }) => {
     mapViewRef.current?.morphTo(position.lat, position.lng, 16);
+    mapViewRef.current?.setLocationMarker(position.lat, position.lng);
   }, []);
 
   const handleDragEnd = useCallback(() => {

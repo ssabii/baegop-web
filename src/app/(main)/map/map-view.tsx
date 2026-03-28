@@ -53,6 +53,7 @@ export interface MapViewHandle {
   ) => void;
   getCenter: () => { lat: number; lng: number } | null;
   isInBounds: (lat: number, lng: number, bottomOffset?: number) => boolean;
+  setLocationMarker: (lat: number, lng: number) => void;
 }
 
 interface MapViewProps {
@@ -86,6 +87,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markerInstancesRef = useRef<naver.maps.Marker[]>([]);
   const clusterCleanupRef = useRef<(() => void) | null>(null);
+  const locationMarkerRef = useRef<naver.maps.Marker | null>(null);
   const markersRef = useRef(markers);
   const onDragEndRef = useRef(onDragEnd);
   const onMarkerClickRef = useRef(onMarkerClick);
@@ -254,6 +256,10 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         naver.maps.Event.removeListener(dragEndListener);
         naver.maps.Event.removeListener(clickListener);
         clearMarkers();
+        if (locationMarkerRef.current) {
+          locationMarkerRef.current.setMap(null);
+          locationMarkerRef.current = null;
+        }
         mapRef.current = null;
       };
     },
@@ -361,6 +367,25 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       const mapHeight = map.getSize().height;
       const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
       return lat > sw.lat() + latPerPixel * bottomOffset;
+    },
+    setLocationMarker(lat: number, lng: number) {
+      const map = mapRef.current;
+      if (!map) return;
+      const latlng = new naver.maps.LatLng(lat, lng);
+      if (locationMarkerRef.current) {
+        locationMarkerRef.current.setPosition(latlng);
+      } else {
+        locationMarkerRef.current = new naver.maps.Marker({
+          position: latlng,
+          map,
+          icon: {
+            content: `<div style="width:16px;height:16px;border-radius:50%;background:#4285F4;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
+            size: new naver.maps.Size(16, 16),
+            anchor: new naver.maps.Point(8, 8),
+          },
+          zIndex: 100,
+        });
+      }
     },
   }));
 
