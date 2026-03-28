@@ -56,6 +56,7 @@ export interface MapViewHandle {
 }
 
 interface MapViewProps {
+  center?: { lat: number; lng: number };
   markers: MapMarker[];
   fitBoundsPadding?: Padding;
   focusMarkerId?: string | null;
@@ -69,6 +70,7 @@ interface MapViewProps {
 
 export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   {
+    center,
     markers,
     fitBoundsPadding,
     focusMarkerId,
@@ -364,7 +366,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
 
   return (
     <div className={cn("relative", className)}>
-      <NaverMap onReady={handleReady} className="size-full" />
+      <NaverMap center={center} onReady={handleReady} className="size-full" />
     </div>
   );
 });

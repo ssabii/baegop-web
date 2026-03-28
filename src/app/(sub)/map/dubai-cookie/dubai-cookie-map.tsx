@@ -6,6 +6,7 @@ import {
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import {
   MapOverlapPopover,
   type OverlapMarkerItem,
@@ -75,7 +76,6 @@ export function DubaiCookieMap() {
   const markersRef = useRef<naver.maps.Marker[]>([]);
   const clusterCleanupRef = useRef<(() => void) | null>(null);
   const locationMarkerRef = useRef<naver.maps.Marker | null>(null);
-  const initialCenteredRef = useRef(false);
   const mapReadyRef = useRef(false);
 
   // Refs for stable access in map event handlers (avoid stale closures)
@@ -86,7 +86,8 @@ export function DubaiCookieMap() {
     placeParamRef.current = placeParam;
   }, [queryParam, placeParam]);
 
-  const { coords: userCoords } = useGeolocation();
+  const { coords: userCoords, loading: geoLoading } = useGeolocation();
+  const initialCenter = userCoords ?? COMPANY_LOCATION;
 
   // Filter stores by query
   const filteredStores = useMemo(() => {
@@ -365,16 +366,6 @@ export function DubaiCookieMap() {
     }
   }, [queryParam, sortedStores, userCoords]);
 
-  // Center on user location once
-  useEffect(() => {
-    if (!userCoords || !mapRef.current || initialCenteredRef.current) return;
-    initialCenteredRef.current = true;
-    mapRef.current.setCenter(
-      new naver.maps.LatLng(userCoords.lat, userCoords.lng),
-    );
-    mapRef.current.setZoom(15);
-  }, [userCoords]);
-
   const handleReady = useCallback(
     (map: naver.maps.Map) => {
       mapRef.current = map;
@@ -438,7 +429,13 @@ export function DubaiCookieMap() {
 
   return (
     <>
-      <NaverMap onReady={handleReady} className="fixed inset-0" />
+      {geoLoading && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center bg-muted">
+          <Spinner className="size-8 text-primary" />
+        </div>
+      )}
+
+      <NaverMap center={initialCenter} onReady={handleReady} className="fixed inset-0" />
 
       {overlapState && (
         <MapOverlapPopover

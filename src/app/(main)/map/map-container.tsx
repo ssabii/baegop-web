@@ -6,6 +6,7 @@ import { useInView } from "react-intersection-observer";
 import { useSearchPlaces } from "@/components/place-search/use-search-places";
 import { SearchNoResults } from "@/components/place-search/search-no-results";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import { Spinner } from "@/components/ui/spinner";
 import { LocationButton } from "@/components/location-button";
 import { MapView, type MapMarker, type MapViewHandle } from "./map-view";
@@ -52,7 +53,6 @@ export function MapContainer() {
   }
 
   const mapViewRef = useRef<MapViewHandle>(null);
-  const initialCenteredRef = useRef(false);
 
   const handleLocate = useCallback((position: { lat: number; lng: number }) => {
     mapViewRef.current?.morphTo(position.lat, position.lng, 16);
@@ -71,15 +71,7 @@ export function MapContainer() {
   }, []);
 
   const { coords: userCoords, loading: geoLoading } = useGeolocation();
-
-  // Center on user location once on initial load (skip if searching)
-  useEffect(() => {
-    if (!userCoords || initialCenteredRef.current) return;
-    initialCenteredRef.current = true;
-    if (!queryParam) {
-      mapViewRef.current?.morphTo(userCoords.lat, userCoords.lng, 15);
-    }
-  }, [userCoords, queryParam]);
+  const initialCenter = userCoords ?? COMPANY_LOCATION;
 
   const effectiveCoords = searchCoords ?? userCoords;
   // Delay search until geolocation resolves to prevent double fitBounds
@@ -313,8 +305,15 @@ export function MapContainer() {
 
   return (
     <>
+      {geoLoading && (
+        <div className="fixed inset-x-0 top-0 bottom-15 z-20 flex items-center justify-center bg-muted">
+          <Spinner className="size-8 text-primary" />
+        </div>
+      )}
+
       <MapView
         ref={mapViewRef}
+        center={initialCenter}
         markers={displayMarkers}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
