@@ -40,7 +40,7 @@ export function PlaceList({ initialData }: PlaceListProps) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex min-h-0 flex-1 items-center justify-center">
         <Spinner className="size-8 text-primary" />
       </div>
     );
@@ -67,7 +67,7 @@ export function PlaceList({ initialData }: PlaceListProps) {
             };
 
     return (
-      <div className="flex flex-1 items-center justify-center">
+      <div className="flex min-h-0 flex-1 items-center justify-center">
         <Empty className="border-none">
           <EmptyHeader className="gap-1">
             <EmptyMedia
