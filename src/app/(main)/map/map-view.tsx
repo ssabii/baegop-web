@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { LOCATION_MARKER_ICON } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { getOverlappingMarkers } from "@/lib/marker-overlap";
@@ -53,9 +54,11 @@ export interface MapViewHandle {
   ) => void;
   getCenter: () => { lat: number; lng: number } | null;
   isInBounds: (lat: number, lng: number, bottomOffset?: number) => boolean;
+  setLocationMarker: (lat: number, lng: number) => void;
 }
 
 interface MapViewProps {
+  center?: { lat: number; lng: number };
   markers: MapMarker[];
   fitBoundsPadding?: Padding;
   focusMarkerId?: string | null;
@@ -69,6 +72,7 @@ interface MapViewProps {
 
 export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   {
+    center,
     markers,
     fitBoundsPadding,
     focusMarkerId,
@@ -84,6 +88,7 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   const mapRef = useRef<naver.maps.Map | null>(null);
   const markerInstancesRef = useRef<naver.maps.Marker[]>([]);
   const clusterCleanupRef = useRef<(() => void) | null>(null);
+  const locationMarkerRef = useRef<naver.maps.Marker | null>(null);
   const markersRef = useRef(markers);
   const onDragEndRef = useRef(onDragEnd);
   const onMarkerClickRef = useRef(onMarkerClick);
@@ -252,6 +257,10 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         naver.maps.Event.removeListener(dragEndListener);
         naver.maps.Event.removeListener(clickListener);
         clearMarkers();
+        if (locationMarkerRef.current) {
+          locationMarkerRef.current.setMap(null);
+          locationMarkerRef.current = null;
+        }
         mapRef.current = null;
       };
     },
@@ -360,11 +369,30 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
       return lat > sw.lat() + latPerPixel * bottomOffset;
     },
+    setLocationMarker(lat: number, lng: number) {
+      const map = mapRef.current;
+      if (!map) return;
+      const latlng = new naver.maps.LatLng(lat, lng);
+      if (locationMarkerRef.current) {
+        locationMarkerRef.current.setPosition(latlng);
+      } else {
+        locationMarkerRef.current = new naver.maps.Marker({
+          position: latlng,
+          map,
+          icon: {
+            content: LOCATION_MARKER_ICON.content,
+            size: new naver.maps.Size(LOCATION_MARKER_ICON.size.width, LOCATION_MARKER_ICON.size.height),
+            anchor: new naver.maps.Point(LOCATION_MARKER_ICON.anchor.x, LOCATION_MARKER_ICON.anchor.y),
+          },
+          zIndex: 100,
+        });
+      }
+    },
   }));
 
   return (
     <div className={cn("relative", className)}>
-      <NaverMap onReady={handleReady} className="size-full" />
+      <NaverMap center={center} onReady={handleReady} className="size-full" />
     </div>
   );
 });
