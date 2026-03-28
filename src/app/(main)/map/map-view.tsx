@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { LOCATION_MARKER_ICON } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { getOverlappingMarkers } from "@/lib/marker-overlap";
@@ -379,9 +380,9 @@ export const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
           position: latlng,
           map,
           icon: {
-            content: `<div style="width:16px;height:16px;border-radius:50%;background:#4285F4;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
-            size: new naver.maps.Size(16, 16),
-            anchor: new naver.maps.Point(8, 8),
+            content: LOCATION_MARKER_ICON.content,
+            size: new naver.maps.Size(LOCATION_MARKER_ICON.size.width, LOCATION_MARKER_ICON.size.height),
+            anchor: new naver.maps.Point(LOCATION_MARKER_ICON.anchor.x, LOCATION_MARKER_ICON.anchor.y),
           },
           zIndex: 100,
         });

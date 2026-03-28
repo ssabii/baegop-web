@@ -6,7 +6,7 @@ import {
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { COMPANY_LOCATION } from "@/lib/constants";
+import { COMPANY_LOCATION, LOCATION_MARKER_ICON } from "@/lib/constants";
 import {
   MapOverlapPopover,
   type OverlapMarkerItem,
@@ -414,9 +414,9 @@ export function DubaiCookieMap() {
         position: latlng,
         map,
         icon: {
-          content: `<div style="width:16px;height:16px;border-radius:50%;background:#4285F4;border:3px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>`,
-          size: new naver.maps.Size(16, 16),
-          anchor: new naver.maps.Point(8, 8),
+          content: LOCATION_MARKER_ICON.content,
+          size: new naver.maps.Size(LOCATION_MARKER_ICON.size.width, LOCATION_MARKER_ICON.size.height),
+          anchor: new naver.maps.Point(LOCATION_MARKER_ICON.anchor.x, LOCATION_MARKER_ICON.anchor.y),
         },
         zIndex: 100,
       });
