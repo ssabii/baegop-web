@@ -305,16 +305,15 @@ export function MapContainer() {
 
   return (
     <>
-      {geoLoading && (
+      {geoLoading ? (
         <div className="fixed inset-x-0 top-0 bottom-15 z-20 flex items-center justify-center bg-muted">
           <Spinner className="size-8 text-primary" />
         </div>
-      )}
-
-      <MapView
-        ref={mapViewRef}
-        center={initialCenter}
-        markers={displayMarkers}
+      ) : (
+        <MapView
+          ref={mapViewRef}
+          center={initialCenter}
+          markers={displayMarkers}
         focusMarkerId={focusMarkerId}
         onMarkerClick={handleMarkerClick}
         onOverlapClick={handleOverlapClick}
@@ -323,6 +322,7 @@ export function MapContainer() {
         showLabels={isSearching}
         className="fixed inset-x-0 top-0 bottom-15"
       />
+      )}
 
       {overlapState && (
         <MapOverlapPopover

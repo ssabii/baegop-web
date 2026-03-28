@@ -429,13 +429,13 @@ export function DubaiCookieMap() {
 
   return (
     <>
-      {geoLoading && (
+      {geoLoading ? (
         <div className="fixed inset-0 z-20 flex items-center justify-center bg-muted">
           <Spinner className="size-8 text-primary" />
         </div>
+      ) : (
+        <NaverMap center={initialCenter} onReady={handleReady} className="fixed inset-0" />
       )}
-
-      <NaverMap center={initialCenter} onReady={handleReady} className="fixed inset-0" />
 
       {overlapState && (
         <MapOverlapPopover
