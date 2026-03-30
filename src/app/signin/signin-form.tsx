@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { NaverIcon } from "@/components/naver-icon";
 import { toast } from "sonner";
+import { Provider } from "@supabase/supabase-js";
 
 function getAuthErrorMessage(errorCode?: string, errorDescription?: string) {
   if (
@@ -100,7 +101,7 @@ export function SignInForm({
     router.refresh();
   };
 
-  const handleKakaoLogin = async () => {
+  const handleOAuthLogin = async (provider: Provider | "custom:naver") => {
     const supabase = createClient();
 
     const callbackParams = new URLSearchParams({
@@ -108,37 +109,7 @@ export function SignInForm({
     });
 
     await supabase.auth.signInWithOAuth({
-      provider: "kakao",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
-      },
-    });
-  };
-
-  const handleNaverLogin = async () => {
-    const supabase = createClient();
-
-    const callbackParams = new URLSearchParams({
-      redirect: redirectTo || "/",
-    });
-
-    await supabase.auth.signInWithOAuth({
-      provider: "custom:naver" as "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
-      },
-    });
-  };
-
-  const handleGoogleLogin = async () => {
-    const supabase = createClient();
-
-    const callbackParams = new URLSearchParams({
-      redirect: redirectTo || "/",
-    });
-
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: provider as Provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
       },
@@ -215,7 +186,7 @@ export function SignInForm({
                 type="button"
                 size="xl"
                 className="w-full bg-[oklch(0.9_0.19_102.86)] text-black/85 hover:bg-[oklch(0.80_0.19_102.86)]"
-                onClick={handleKakaoLogin}
+                onClick={() => handleOAuthLogin("kakao")}
                 disabled={isLoading}
               >
                 <Image
@@ -230,7 +201,7 @@ export function SignInForm({
                 type="button"
                 size="xl"
                 className="w-full bg-[#03C75A] text-white hover:bg-[#03C75A]/90"
-                onClick={handleNaverLogin}
+                onClick={() => handleOAuthLogin("custom:naver")}
                 disabled={isLoading}
               >
                 <NaverIcon className="size-5" />
@@ -241,7 +212,7 @@ export function SignInForm({
                 variant="outline"
                 size="xl"
                 className="w-full"
-                onClick={handleGoogleLogin}
+                onClick={() => handleOAuthLogin("google")}
                 disabled={isLoading}
               >
                 <Image
@@ -267,10 +238,7 @@ export function SignInForm({
             </Field>
             <p className="text-sm text-muted-foreground text-center">
               {`로그인 시 `}
-              <Link
-                href="/terms"
-                className="underline underline-offset-4"
-              >
+              <Link href="/terms" className="underline underline-offset-4">
                 이용약관
               </Link>
               {` 및 `}
