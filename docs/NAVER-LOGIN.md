@@ -67,7 +67,7 @@ Authentication > Providers > Custom OIDC (naver):
 |------|-----|
 | Authorization URL | `https://nid.naver.com/oauth2.0/authorize` |
 | Token URL | `https://nid.naver.com/oauth2.0/token` |
-| Userinfo URL | `https://www.baegop.com/api/auth/naver` (프록시) |
+| Userinfo URL | `https://www.baegop.com/api/auth/naver/userinfo` (프록시) |
 | JWKS URI | `https://nid.naver.com/.well-known/jwks.json` |
 | Client ID | 네이버 개발자센터에서 발급 |
 | Client Secret | 네이버 개발자센터에서 발급 |
