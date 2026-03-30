@@ -15,14 +15,30 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { NaverIcon } from "@/components/naver-icon";
 import { toast } from "sonner";
+
+function getAuthErrorMessage(errorCode?: string, errorDescription?: string) {
+  if (
+    errorCode?.includes("email") ||
+    errorDescription?.toLowerCase().includes("email")
+  ) {
+    return "이메일 제공에 동의해주세요. 소셜 로그인에는 이메일이 필요합니다.";
+  }
+
+  return "로그인에 실패했습니다. 다시 시도해주세요.";
+}
 
 export function SignInForm({
   redirectTo,
   error: errorProp,
+  errorCode,
+  errorDescription,
 }: {
   redirectTo?: string;
   error?: string;
+  errorCode?: string;
+  errorDescription?: string;
 }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -33,13 +49,12 @@ export function SignInForm({
 
   useEffect(() => {
     if (errorProp) {
+      const message = getAuthErrorMessage(errorCode, errorDescription);
       setTimeout(() => {
-        toast.error("로그인에 실패했습니다. 다시 시도해주세요.", {
-          position: "top-center",
-        });
+        toast.error(message, { position: "top-center" });
       }, 0);
     }
-  }, [errorProp]);
+  }, [errorProp, errorCode, errorDescription]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +109,21 @@ export function SignInForm({
 
     await supabase.auth.signInWithOAuth({
       provider: "kakao",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
+      },
+    });
+  };
+
+  const handleNaverLogin = async () => {
+    const supabase = createClient();
+
+    const callbackParams = new URLSearchParams({
+      redirect: redirectTo || "/",
+    });
+
+    await supabase.auth.signInWithOAuth({
+      provider: "custom:naver" as "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
       },
@@ -195,6 +225,16 @@ export function SignInForm({
                   height={20}
                 />
                 카카오로 시작하기
+              </Button>
+              <Button
+                type="button"
+                size="xl"
+                className="w-full bg-[#03C75A] text-white hover:bg-[#03C75A]/90"
+                onClick={handleNaverLogin}
+                disabled={isLoading}
+              >
+                <NaverIcon className="size-5" />
+                네이버로 시작하기
               </Button>
               <Button
                 type="button"
