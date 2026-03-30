@@ -5,7 +5,12 @@ import { SignInForm } from "./signin-form";
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ redirect?: string; error?: string }>;
+  searchParams: Promise<{
+    redirect?: string;
+    error?: string;
+    error_code?: string;
+    error_description?: string;
+  }>;
 }) {
   const supabase = await createClient();
   const {
@@ -21,7 +26,12 @@ export default async function SignInPage({
   return (
     <div className="flex h-dvh items-center justify-center px-6 py-12 bg-background">
       <div className="w-full max-w-sm">
-        <SignInForm redirectTo={params.redirect} error={params.error} />
+        <SignInForm
+          redirectTo={params.redirect}
+          error={params.error}
+          errorCode={params.error_code}
+          errorDescription={params.error_description}
+        />
       </div>
     </div>
   );
