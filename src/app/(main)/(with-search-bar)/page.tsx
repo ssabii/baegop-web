@@ -8,6 +8,7 @@ import { HomeBannerCarousel } from "@/components/home/home-banner-carousel";
 import { HomeTabs } from "@/components/home/home-tabs";
 import { HomeFooter } from "@/components/home/home-footer";
 import { PlaceList } from "@/components/home/place-list";
+import { RecommendPlaces } from "@/components/home/recommend-places";
 import { PlaceListSkeleton } from "@/components/home/place-list-skeleton";
 import { fetchPlaces } from "@/lib/queries/places";
 import { placeKeys } from "@/lib/query-keys";
@@ -60,6 +61,7 @@ export default async function HomePage() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-4xl flex-col gap-4 px-4 pt-21 pb-23">
       <HomeBannerCarousel />
+      <RecommendPlaces />
       <Suspense fallback={<PlaceListSkeleton />}>
         <HomeTabs />
         <HydrationBoundary state={dehydrate(queryClient)}>
