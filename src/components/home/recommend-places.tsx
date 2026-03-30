@@ -87,7 +87,7 @@ export function RecommendPlaces() {
         <MapPin className="size-4 text-primary" />
         <h2 className="text-base font-bold">내 주변 추천</h2>
       </div>
-      <div className="flex flex-col divide-y">
+      <ul className="flex flex-col divide-y">
         {places.map((place) => (
           <PlaceCard
             key={place.id}
@@ -95,7 +95,7 @@ export function RecommendPlaces() {
             className="py-4"
           />
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

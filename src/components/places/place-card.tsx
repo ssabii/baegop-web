@@ -1,5 +1,4 @@
 import { optimizeNaverImageUrl } from "@/lib/image";
-import { cn } from "@/lib/utils";
 import { FavoriteButton } from "@/components/favorite-button";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import type { KonaCardStatus } from "@/types";
@@ -26,14 +25,23 @@ export function PlaceCard({
 }) {
   const status = (place.kona_card_status ?? "unknown") as KonaCardStatus;
 
+  const labelId = `place-${place.id}`;
+
   return (
-    <div className={cn("relative flex gap-3", className)}>
-      <Link href={`/places/${place.id}`} aria-label={place.name}>
+    <li className={className} aria-labelledby={labelId}>
+      <Link
+        href={`/places/${place.id}`}
+        className="flex gap-3"
+        aria-label={`${place.name} 상세 보기`}
+      >
         <div className="flex flex-1 flex-col justify-between overflow-hidden">
           <div className="space-y-1">
-            <h3 className="line-clamp-2 font-bold leading-snug text-left">
+            <span
+              id={labelId}
+              className="line-clamp-2 font-bold leading-snug"
+            >
               {place.name}
-            </h3>
+            </span>
             {place.category && (
               <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
                 <Tag className="size-3 shrink-0" />
@@ -65,7 +73,7 @@ export function PlaceCard({
           {place.image_urls?.[0] ? (
             <img
               src={optimizeNaverImageUrl(place.image_urls[0])}
-              alt={place.name}
+              alt=""
               className="aspect-square size-28 rounded-lg object-cover"
             />
           ) : (
@@ -79,6 +87,6 @@ export function PlaceCard({
           />
         </div>
       </Link>
-    </div>
+    </li>
   );
 }
