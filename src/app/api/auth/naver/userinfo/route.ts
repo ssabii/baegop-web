@@ -44,6 +44,7 @@ export async function GET(request: Request) {
   return NextResponse.json({
     sub: id,
     email,
+    email_verified: true,
     name: nickname,
     picture: profile_image,
   });

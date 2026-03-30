@@ -11,7 +11,6 @@ export interface Profile {
 }
 
 
-/** 이메일 @ 앞(로컬)만 마스킹. 앞 2자만 노출, 나머지는 각 글자 수에 맞게 * 처리 */
 export function getMaskedEmail(email: string): string {
   const [local, domain] = email.split("@");
 
@@ -20,8 +19,17 @@ export function getMaskedEmail(email: string): string {
   const maskedLocal =
     local.length <= 2
       ? "*".repeat(local.length)
-      : local.slice(0, 2) + "*".repeat(local.length - 2);
-  return domain ? `${maskedLocal}@${domain}` : maskedLocal;
+      : local.slice(0, 2) + "******";
+
+  if (!domain) return maskedLocal;
+
+  const dotIndex = domain.indexOf(".");
+  if (dotIndex <= 0) return `${maskedLocal}@${"*******"}`;
+
+  const maskedDomain =
+    domain.slice(0, 1) + "*******" + domain.slice(dotIndex);
+
+  return `${maskedLocal}@${maskedDomain}`;
 }
 
 export function useProfile() {
