@@ -54,7 +54,7 @@ export default function TermsPage() {
           <h2 className="text-lg font-semibold">제4조 (회원가입 및 계정)</h2>
           <ul className="mt-2 list-decimal space-y-1 pl-5">
             <li>
-              회원가입은 Google 또는 카카오 OAuth를 통해 이루어지며, 가입 시 본
+              회원가입은 Google, 카카오 또는 네이버 OAuth를 통해 이루어지며, 가입 시 본
               약관과 개인정보처리방침에 동의한 것으로 간주합니다.
             </li>
             <li>

@@ -15,14 +15,31 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { NaverIcon } from "@/components/naver-icon";
 import { toast } from "sonner";
+import { Provider } from "@supabase/supabase-js";
+
+function getAuthErrorMessage(errorCode?: string, errorDescription?: string) {
+  if (
+    errorCode?.includes("email") ||
+    errorDescription?.toLowerCase().includes("email")
+  ) {
+    return "이메일 제공에 동의해주세요. 소셜 로그인에는 이메일이 필요합니다.";
+  }
+
+  return "로그인에 실패했습니다. 다시 시도해주세요.";
+}
 
 export function SignInForm({
   redirectTo,
   error: errorProp,
+  errorCode,
+  errorDescription,
 }: {
   redirectTo?: string;
   error?: string;
+  errorCode?: string;
+  errorDescription?: string;
 }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -33,13 +50,12 @@ export function SignInForm({
 
   useEffect(() => {
     if (errorProp) {
+      const message = getAuthErrorMessage(errorCode, errorDescription);
       setTimeout(() => {
-        toast.error("로그인에 실패했습니다. 다시 시도해주세요.", {
-          position: "top-center",
-        });
+        toast.error(message, { position: "top-center" });
       }, 0);
     }
-  }, [errorProp]);
+  }, [errorProp, errorCode, errorDescription]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +101,7 @@ export function SignInForm({
     router.refresh();
   };
 
-  const handleKakaoLogin = async () => {
+  const handleOAuthLogin = async (provider: Provider | "custom:naver") => {
     const supabase = createClient();
 
     const callbackParams = new URLSearchParams({
@@ -93,22 +109,7 @@ export function SignInForm({
     });
 
     await supabase.auth.signInWithOAuth({
-      provider: "kakao",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
-      },
-    });
-  };
-
-  const handleGoogleLogin = async () => {
-    const supabase = createClient();
-
-    const callbackParams = new URLSearchParams({
-      redirect: redirectTo || "/",
-    });
-
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider: provider as Provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback?${callbackParams}`,
       },
@@ -185,7 +186,7 @@ export function SignInForm({
                 type="button"
                 size="xl"
                 className="w-full bg-[oklch(0.9_0.19_102.86)] text-black/85 hover:bg-[oklch(0.80_0.19_102.86)]"
-                onClick={handleKakaoLogin}
+                onClick={() => handleOAuthLogin("kakao")}
                 disabled={isLoading}
               >
                 <Image
@@ -198,10 +199,20 @@ export function SignInForm({
               </Button>
               <Button
                 type="button"
+                size="xl"
+                className="w-full bg-[#03C75A] text-white hover:bg-[#03C75A]/90"
+                onClick={() => handleOAuthLogin("custom:naver")}
+                disabled={isLoading}
+              >
+                <NaverIcon className="size-5" />
+                네이버로 시작하기
+              </Button>
+              <Button
+                type="button"
                 variant="outline"
                 size="xl"
                 className="w-full"
-                onClick={handleGoogleLogin}
+                onClick={() => handleOAuthLogin("google")}
                 disabled={isLoading}
               >
                 <Image
@@ -227,10 +238,7 @@ export function SignInForm({
             </Field>
             <p className="text-sm text-muted-foreground text-center">
               {`로그인 시 `}
-              <Link
-                href="/terms"
-                className="underline underline-offset-4"
-              >
+              <Link href="/terms" className="underline underline-offset-4">
                 이용약관
               </Link>
               {` 및 `}
