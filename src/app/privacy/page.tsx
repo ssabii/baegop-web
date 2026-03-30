@@ -24,7 +24,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold">2. 수집하는 개인정보 항목</h2>
           <p className="mt-2">
-            서비스는 Google 및 카카오 OAuth를 통해 다음 항목을 수집합니다.
+            서비스는 Google, 카카오 및 네이버 OAuth를 통해 다음 항목을 수집합니다.
           </p>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>이메일 주소</li>
