@@ -11,10 +11,10 @@ export interface PlaceCardProps {
   name: string;
   address: string;
   category: string | null;
-  kona_card_status: string | null;
+  kona_card_status?: string | null;
   image_urls?: string[] | null;
-  avg_rating: number | null;
-  review_count: number;
+  avg_rating?: number | null;
+  review_count?: number;
 }
 
 export function PlaceCard({
@@ -28,58 +28,57 @@ export function PlaceCard({
 
   return (
     <div className={cn("relative flex gap-3", className)}>
-      <Link
-        href={`/places/${place.id}`}
-        className="absolute inset-0"
-        aria-label={place.name}
-      />
-      <div className="flex flex-1 flex-col justify-between overflow-hidden">
-        <div className="space-y-1">
-          <h3 className="line-clamp-2 font-bold leading-snug text-left">
-            {place.name}
-          </h3>
-          {place.category && (
+      <Link href={`/places/${place.id}`} aria-label={place.name}>
+        <div className="flex flex-1 flex-col justify-between overflow-hidden">
+          <div className="space-y-1">
+            <h3 className="line-clamp-2 font-bold leading-snug text-left">
+              {place.name}
+            </h3>
+            {place.category && (
+              <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                <Tag className="size-3 shrink-0" />
+                <span className="truncate">{place.category}</span>
+              </p>
+            )}
             <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-              <Tag className="size-3 shrink-0" />
-              <span className="truncate">{place.category}</span>
+              <MapPin className="size-3 shrink-0" />
+              <span className="truncate">{place.address}</span>
             </p>
-          )}
-          <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-            <MapPin className="size-3 shrink-0" />
-            <span className="truncate">{place.address}</span>
-          </p>
-          <div className="flex items-center gap-2">
-            {place.review_count > 0 && (
-              <span className="flex items-center gap-1 text-xs font-medium text-yellow-500">
-                <Star className="size-3 fill-current" />
-                {place.avg_rating!.toFixed(1)}
-                <span className="text-muted-foreground">
-                  ({place.review_count})
+            {place.review_count != null && place.review_count > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1 text-xs font-medium text-yellow-500">
+                  <Star className="size-3 fill-current" />
+                  {place.avg_rating?.toFixed(1)}
+                  <span className="text-muted-foreground">
+                    ({place.review_count})
+                  </span>
                 </span>
-              </span>
+              </div>
+            )}
+            {place.kona_card_status != null && (
+              <KonaCardBadge status={status} />
             )}
           </div>
-          <KonaCardBadge status={status} />
         </div>
-      </div>
 
-      <div className="relative shrink-0">
-        {place.image_urls?.[0] ? (
-          <img
-            src={optimizeNaverImageUrl(place.image_urls[0])}
-            alt={place.name}
-            className="aspect-square size-28 rounded-lg object-cover"
+        <div className="relative shrink-0">
+          {place.image_urls?.[0] ? (
+            <img
+              src={optimizeNaverImageUrl(place.image_urls[0])}
+              alt={place.name}
+              className="aspect-square size-28 rounded-lg object-cover"
+            />
+          ) : (
+            <div className="flex aspect-square size-28 items-center justify-center rounded-lg bg-muted">
+              <Building2 className="size-6 text-muted-foreground" />
+            </div>
+          )}
+          <FavoriteButton
+            placeId={place.id}
+            className="absolute right-1 top-1 z-10 size-6 bg-transparent hover:bg-transparent active:bg-transparent [&_svg:not(.fill-rose-500)]:fill-muted [&_svg:not(.fill-rose-500)]:text-muted"
           />
-        ) : (
-          <div className="flex aspect-square size-28 items-center justify-center rounded-lg bg-muted">
-            <Building2 className="size-6 text-muted-foreground" />
-          </div>
-        )}
-        <FavoriteButton
-          placeId={place.id}
-          className="absolute right-1 top-1 z-10 size-6 bg-transparent hover:bg-transparent active:bg-transparent [&_svg:not(.fill-rose-500)]:fill-muted [&_svg:not(.fill-rose-500)]:text-muted"
-        />
-      </div>
+        </div>
+      </Link>
     </div>
   );
 }
