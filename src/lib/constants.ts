@@ -262,6 +262,12 @@ export const LOCATION_MARKER_ICON = {
   anchor: { x: 8, y: 8 },
 } as const;
 
+// 서울시청 좌표 (위치 권한 거부 시 fallback)
+export const SEOUL_CITY_HALL_LOCATION = {
+  lat: 37.5666805,
+  lng: 126.9784147,
+} as const;
+
 // 크몽 사무실 좌표
 export const COMPANY_LOCATION = {
   name: "크몽",

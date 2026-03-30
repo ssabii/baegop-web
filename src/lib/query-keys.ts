@@ -35,6 +35,12 @@ export const mapKeys = {
   places: ["map-places"] as const,
 };
 
+export const recommendKeys = {
+  all: ["recommend"] as const,
+  places: (lat: number, lng: number) =>
+    [...recommendKeys.all, "places", lat, lng] as const,
+};
+
 export const mypageKeys = {
   all: ["mypage"] as const,
   reviews: (userId: string) => [...mypageKeys.all, "reviews", userId] as const,
