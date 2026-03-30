@@ -21,7 +21,9 @@
 }
 ```
 
-Supabase 커스텀 OIDC는 표준 OIDC 형식(`{ "sub": "...", "email": "..." }`)을 기대하며, 중첩 응답 매핑을 지원하지 않는다. 이로 인해 "Error getting user email from external provider" 에러가 발생.
+Supabase 커스텀 OIDC는 [OIDC Standard Claims](https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims) 형식(`{ "sub": "...", "email": "...", "email_verified": true }`)을 기대하며, 중첩 응답 매핑을 지원하지 않는다. 이로 인해 "Error getting user email from external provider" 에러가 발생.
+
+프록시는 네이버 응답을 OIDC Standard Claims 형식으로 변환하며, `email_verified: true`를 포함하여 Supabase가 불필요한 이메일 확인 메일을 보내지 않도록 한다.
 
 ### 플로우
 
