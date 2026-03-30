@@ -52,11 +52,11 @@ export function MyPlaceList() {
 
   return (
     <>
-      <div className="p-4 divide-y">
+      <ul className="p-4 divide-y">
         {places.map((place) => (
           <PlaceCard key={place.id} place={place} className="py-4" />
         ))}
-      </div>
+      </ul>
       <div ref={sentinelRef} className="flex justify-center">
         {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
       </div>

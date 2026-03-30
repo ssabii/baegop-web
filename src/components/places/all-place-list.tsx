@@ -38,11 +38,11 @@ export function AllPlaceList() {
 
   return (
     <>
-      <div className="flex flex-col divide-y">
+      <ul className="flex flex-col divide-y">
         {places.map((place) => (
           <PlaceCard place={place} key={place.id} className="py-4" />
         ))}
-      </div>
+      </ul>
       <div ref={sentinelRef} className="flex justify-center">
         {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
       </div>

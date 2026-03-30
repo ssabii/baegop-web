@@ -59,3 +59,29 @@ export interface NaverPlaceMenu {
   description: string | null;
   recommend: boolean;
 }
+
+// 네이버 Smart-Around API 응답
+export interface SmartAroundPlace {
+  rank: number;
+  id: string;
+  name: string;
+  x: string;
+  y: string;
+  distance: number;
+  categoryName: string;
+  category: string[];
+  reviewCount: number;
+  address: string;
+  roadAddress: string;
+  images: string[];
+}
+
+export interface SmartAroundResponse {
+  result: {
+    meta: {
+      totalCount: number;
+      count: number;
+    };
+    list: SmartAroundPlace[];
+  };
+}
