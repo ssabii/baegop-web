@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SignInForm } from "./signin-form";
+import { SignInTerms } from "./signin-terms";
 
 export default async function SignInPage({
   searchParams,
@@ -24,7 +25,7 @@ export default async function SignInPage({
   const params = await searchParams;
 
   return (
-    <div className="flex h-dvh items-center justify-center px-6 py-12 bg-background">
+    <div className="flex h-dvh flex-col items-center justify-center px-5 py-12 bg-background">
       <div className="w-full max-w-sm">
         <SignInForm
           redirectTo={params.redirect}
@@ -33,6 +34,7 @@ export default async function SignInPage({
           errorDescription={params.error_description}
         />
       </div>
+      <SignInTerms />
     </div>
   );
 }
