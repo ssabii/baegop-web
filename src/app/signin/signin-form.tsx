@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { NaverIcon } from "@/components/naver-icon";
+import { KakaoIcon } from "@/components/icons/kakao-icon";
+import { GoogleIcon } from "@/components/icons/google-icon";
+import { NaverIcon } from "@/components/icons/naver-icon";
 import { toast } from "sonner";
 import { Provider } from "@supabase/supabase-js";
 
@@ -189,12 +191,7 @@ export function SignInForm({
                 onClick={() => handleOAuthLogin("kakao")}
                 disabled={isLoading}
               >
-                <Image
-                  src="/icons/kakao.svg"
-                  alt="Kakao"
-                  width={20}
-                  height={20}
-                />
+                <KakaoIcon className="size-5" />
                 카카오로 시작하기
               </Button>
               <Button
@@ -215,12 +212,7 @@ export function SignInForm({
                 onClick={() => handleOAuthLogin("google")}
                 disabled={isLoading}
               >
-                <Image
-                  src="/icons/google.svg"
-                  alt="Google"
-                  width={20}
-                  height={20}
-                />
+                <GoogleIcon className="size-5" />
                 Google로 시작하기
               </Button>
               {/* <FieldDescription className="text-center">
