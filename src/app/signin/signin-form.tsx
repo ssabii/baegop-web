@@ -1,23 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
-import { NaverIcon } from "@/components/naver-icon";
 import { toast } from "sonner";
 import { Provider } from "@supabase/supabase-js";
+import SignInButton from "@/app/signin/signin-button";
+import { SignInBubble } from "@/app/signin/signin-bubble";
 
 function getAuthErrorMessage(errorCode?: string, errorDescription?: string) {
   if (
@@ -117,19 +108,15 @@ export function SignInForm({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="w-full max-w-sm">
-        <div>
-          <FieldGroup>
-            <div className="flex flex-col items-center gap-2 text-center">
-              <Link href="/">
-                <img src="/baegop-symbol.svg" alt="배곱" className="w-32" />
-              </Link>
-              <FieldDescription>
-                소셜 로그인으로 배곱을 시작해보세요
-              </FieldDescription>
-            </div>
-            {/* <Field data-invalid={emailError ? true : undefined}>
+    <div className="flex flex-col items-center">
+      <Link href="/" className="mb-8">
+        <img
+          src="/baegop-symbol.svg"
+          alt="배곱"
+          className="w-[130px] h-[38px]"
+        />
+      </Link>
+      {/* <Field data-invalid={emailError ? true : undefined}>
               <FieldLabel htmlFor="email">이메일</FieldLabel>
               <Input
                 id="email"
@@ -181,49 +168,27 @@ export function SignInForm({
               </Button>
             </Field>
             <FieldSeparator>또는</FieldSeparator> */}
-            <Field className="gap-4 max-w-xs mx-auto">
-              <Button
-                type="button"
-                size="xl"
-                className="w-full bg-[oklch(0.9_0.19_102.86)] text-black/85 hover:bg-[oklch(0.80_0.19_102.86)]"
-                onClick={() => handleOAuthLogin("kakao")}
-                disabled={isLoading}
-              >
-                <Image
-                  src="/icons/kakao.svg"
-                  alt="Kakao"
-                  width={20}
-                  height={20}
-                />
-                카카오로 시작하기
-              </Button>
-              <Button
-                type="button"
-                size="xl"
-                className="w-full bg-[#03C75A] text-white hover:bg-[#03C75A]/90"
-                onClick={() => handleOAuthLogin("custom:naver")}
-                disabled={isLoading}
-              >
-                <NaverIcon className="size-5" />
-                네이버로 시작하기
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="xl"
-                className="w-full"
-                onClick={() => handleOAuthLogin("google")}
-                disabled={isLoading}
-              >
-                <Image
-                  src="/icons/google.svg"
-                  alt="Google"
-                  width={20}
-                  height={20}
-                />
-                Google로 시작하기
-              </Button>
-              {/* <FieldDescription className="text-center">
+      <div className="flex flex-col gap-2.5 mb-6 w-full">
+        <SignInBubble className="self-center" />
+        <SignInButton
+          provider="kakao"
+          type="button"
+          onClick={() => handleOAuthLogin("kakao")}
+          disabled={isLoading}
+        />
+        <SignInButton
+          provider="google"
+          type="button"
+          onClick={() => handleOAuthLogin("google")}
+          disabled={isLoading}
+        />
+        <SignInButton
+          provider="naver"
+          type="button"
+          onClick={() => handleOAuthLogin("custom:naver")}
+          disabled={isLoading}
+        />
+        {/* <FieldDescription className="text-center">
                 계정이 없으신가요?{" "}
                 <Link
                   href={
@@ -235,25 +200,13 @@ export function SignInForm({
                   회원가입
                 </Link>
               </FieldDescription> */}
-            </Field>
-            <p className="text-sm text-muted-foreground text-center">
-              {`로그인 시 `}
-              <Link href="/terms" className="underline underline-offset-4">
-                이용약관
-              </Link>
-              {` 및 `}
-              <Link
-                href="/privacy"
-                className="font-bold text-accent-foreground underline underline-offset-4"
-              >
-                개인정보처리방침
-              </Link>
-              에<br />
-              동의한 것으로 간주합니다.
-            </p>
-          </FieldGroup>
-        </div>
       </div>
+      <Link
+        href="/"
+        className="text-sm text-center text-gray-400 dark:text-white underline"
+      >
+        로그인하지 않고 둘러보기
+      </Link>
     </div>
   );
 }
