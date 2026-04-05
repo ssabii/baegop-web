@@ -5,19 +5,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
-import { KakaoIcon } from "@/components/icons/kakao-icon";
-import { GoogleIcon } from "@/components/icons/google-icon";
-import { NaverIcon } from "@/components/icons/naver-icon";
 import { toast } from "sonner";
 import { Provider } from "@supabase/supabase-js";
 import SignInButton from "@/app/signin/signin-button";
@@ -121,20 +108,15 @@ export function SignInForm({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <FieldGroup>
-          <div className="flex flex-col items-center gap-2 text-center">
-            <Link href="/">
-              <img
-                src="/baegop-symbol.svg"
-                alt="배곱"
-                className="w-[130px] h-[38px]"
-              />
-            </Link>
-          </div>
-          <SignInBubble className="self-center" />
-          {/* <Field data-invalid={emailError ? true : undefined}>
+    <div className="flex flex-col items-center">
+      <Link href="/" className="mb-8">
+        <img
+          src="/baegop-symbol.svg"
+          alt="배곱"
+          className="w-[130px] h-[38px]"
+        />
+      </Link>
+      {/* <Field data-invalid={emailError ? true : undefined}>
               <FieldLabel htmlFor="email">이메일</FieldLabel>
               <Input
                 id="email"
@@ -186,26 +168,27 @@ export function SignInForm({
               </Button>
             </Field>
             <FieldSeparator>또는</FieldSeparator> */}
-          <Field className="gap-4">
-            <SignInButton
-              provider="kakao"
-              type="button"
-              onClick={() => handleOAuthLogin("kakao")}
-              disabled={isLoading}
-            />
-            <SignInButton
-              provider="google"
-              type="button"
-              onClick={() => handleOAuthLogin("google")}
-              disabled={isLoading}
-            />
-            <SignInButton
-              provider="naver"
-              type="button"
-              onClick={() => handleOAuthLogin("custom:naver")}
-              disabled={isLoading}
-            />
-            {/* <FieldDescription className="text-center">
+      <div className="flex flex-col gap-2.5 mb-6 w-full">
+        <SignInBubble className="self-center" />
+        <SignInButton
+          provider="kakao"
+          type="button"
+          onClick={() => handleOAuthLogin("kakao")}
+          disabled={isLoading}
+        />
+        <SignInButton
+          provider="google"
+          type="button"
+          onClick={() => handleOAuthLogin("google")}
+          disabled={isLoading}
+        />
+        <SignInButton
+          provider="naver"
+          type="button"
+          onClick={() => handleOAuthLogin("custom:naver")}
+          disabled={isLoading}
+        />
+        {/* <FieldDescription className="text-center">
                 계정이 없으신가요?{" "}
                 <Link
                   href={
@@ -217,30 +200,13 @@ export function SignInForm({
                   회원가입
                 </Link>
               </FieldDescription> */}
-          </Field>
-          <Link
-            href="/"
-            className="text-sm text-center text-gray-400 dark:text-white underline"
-          >
-            로그인하지 않고 둘러보기
-          </Link>
-          <p className="text-sm text-muted-foreground text-center">
-            {`로그인 시 `}
-            <Link href="/terms" className="underline underline-offset-4">
-              이용약관
-            </Link>
-            {` 및 `}
-            <Link
-              href="/privacy"
-              className="font-bold text-accent-foreground underline underline-offset-4"
-            >
-              개인정보처리방침
-            </Link>
-            에<br />
-            동의한 것으로 간주합니다.
-          </p>
-        </FieldGroup>
       </div>
+      <Link
+        href="/"
+        className="text-sm text-center text-gray-400 dark:text-white underline"
+      >
+        로그인하지 않고 둘러보기
+      </Link>
     </div>
   );
 }
