@@ -9,7 +9,9 @@ import { useGeolocation } from "@/hooks/use-geolocation";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { Spinner } from "@/components/ui/spinner";
 import { LocationButton } from "@/components/location-button";
-import { MapView, type MapMarker, type MapViewHandle } from "./map-view";
+import { NaverMapProvider } from "@/components/NaverMapContext";
+import { useNaverMap } from "@/components/useNaverMap";
+import { MapView, type MapMarker } from "./map-view";
 import { useMapPlaces } from "./use-map-places";
 import { MapSearchInput } from "./map-search-input";
 import { PlaceItem } from "@/components/place-search/place-item";
@@ -23,6 +25,14 @@ const NEARBY_COUNT = 5;
 const NEARBY_MAX_DISTANCE_M = 5000;
 
 export function MapContainer() {
+  return (
+    <NaverMapProvider>
+      <MapContainerInner />
+    </NaverMapProvider>
+  );
+}
+
+function MapContainerInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") ?? "";
@@ -52,12 +62,16 @@ export function MapContainer() {
     setSearchCoords(undefined);
   }
 
-  const mapViewRef = useRef<MapViewHandle>(null);
+  const { morphTo, fitBounds, getCenter, isInBounds, setLocationMarker } =
+    useNaverMap();
 
-  const handleLocate = useCallback((position: { lat: number; lng: number }) => {
-    mapViewRef.current?.morphTo(position.lat, position.lng, 16);
-    mapViewRef.current?.setLocationMarker(position.lat, position.lng);
-  }, []);
+  const handleLocate = useCallback(
+    (position: { lat: number; lng: number }) => {
+      morphTo(position.lat, position.lng, 16);
+      setLocationMarker(position.lat, position.lng);
+    },
+    [morphTo, setLocationMarker],
+  );
 
   const handleDragEnd = useCallback(() => {
     setOverlapState(null);
@@ -65,11 +79,11 @@ export function MapContainer() {
   }, []);
 
   const handleSearchInMap = useCallback(() => {
-    const center = mapViewRef.current?.getCenter();
+    const center = getCenter();
     if (!center) return;
     setSearchCoords(center);
     setMapMoved(false);
-  }, []);
+  }, [getCenter]);
 
   const { coords: userCoords, loading: geoLoading } = useGeolocation();
   const initialCenter = userCoords ?? COMPANY_LOCATION;
@@ -281,11 +295,11 @@ export function MapContainer() {
 
     const sheetOffset = Math.round(window.innerHeight * 0.5);
     const allVisible = nearby.every((r) =>
-      mapViewRef.current?.isInBounds(r.lat, r.lng, sheetOffset),
+      isInBounds(r.lat, r.lng, sheetOffset),
     );
 
     if (!allVisible) {
-      mapViewRef.current?.fitBounds(
+      fitBounds(
         nearby,
         {
           top: 80,
@@ -296,7 +310,7 @@ export function MapContainer() {
         15,
       );
     }
-  }, [showSheet, hasResults, query, results, searchCoords]);
+  }, [showSheet, hasResults, query, results, searchCoords, isInBounds, fitBounds]);
 
   const displayMarkers = isSearching
     ? showSheet && hasResults
@@ -312,17 +326,16 @@ export function MapContainer() {
         </div>
       ) : (
         <MapView
-          ref={mapViewRef}
           center={initialCenter}
           markers={displayMarkers}
-        focusMarkerId={focusMarkerId}
-        onMarkerClick={handleMarkerClick}
-        onOverlapClick={handleOverlapClick}
-        onMapClick={handleOverlapClose}
-        onDragEnd={handleDragEnd}
-        showLabels={isSearching}
-        className="fixed inset-x-0 top-0 bottom-15"
-      />
+          focusMarkerId={focusMarkerId}
+          onMarkerClick={handleMarkerClick}
+          onOverlapClick={handleOverlapClick}
+          onMapClick={handleOverlapClose}
+          onDragEnd={handleDragEnd}
+          showLabels={isSearching}
+          className="fixed inset-x-0 top-0 bottom-15"
+        />
       )}
 
       {overlapState && (
