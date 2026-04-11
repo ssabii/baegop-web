@@ -4,24 +4,25 @@ import { useCallback, useContext } from "react";
 import { NaverMapContext } from "./NaverMapContext";
 import { LOCATION_MARKER_ICON } from "@/lib/constants";
 
-type Padding = {
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
+type LatLngLiteral = { lat: number; lng: number };
 
 export interface NaverMapActions {
-  morphTo: (lat: number, lng: number, zoom: number) => void;
-  panTo: (lat: number, lng: number) => void;
-  fitBounds: (
-    points: { lat: number; lng: number }[],
-    padding: Padding,
-    maxZoom?: number,
+  morph: (
+    coord: LatLngLiteral,
+    zoom?: number,
+    transitionOptions?: naver.maps.TransitionOptions,
   ) => void;
-  getCenter: () => { lat: number; lng: number } | null;
-  isInBounds: (lat: number, lng: number, bottomOffset?: number) => boolean;
-  setLocationMarker: (lat: number, lng: number) => void;
+  panTo: (
+    coord: LatLngLiteral,
+    transitionOptions?: naver.maps.TransitionOptions,
+  ) => void;
+  fitBounds: (
+    bounds: LatLngLiteral[] | naver.maps.LatLngBounds,
+    options?: naver.maps.FitBoundsOptions,
+  ) => void;
+  getCenter: () => LatLngLiteral | null;
+  isInBounds: (coord: LatLngLiteral, bottomOffset?: number) => boolean;
+  setLocationMarker: (coord: LatLngLiteral) => void;
   getMap: () => naver.maps.Map | null;
 }
 
@@ -34,54 +35,60 @@ export function useNaverMap(): NaverMapActions {
 
   const { mapRef, locationMarkerRef } = context;
 
-  const getMap = useCallback(
-    () => mapRef.current,
-    [mapRef],
-  );
+  const getMap = useCallback(() => mapRef.current, [mapRef]);
 
-  const morphTo = useCallback(
-    (lat: number, lng: number, zoom: number) => {
+  const morph = useCallback(
+    (
+      coord: LatLngLiteral,
+      zoom?: number,
+      transitionOptions?: naver.maps.TransitionOptions,
+    ) => {
       const map = mapRef.current;
       if (!map) return;
-      map.morph(new naver.maps.LatLng(lat, lng), zoom, {
-        easing: "easeOutCubic",
-      });
+      map.morph(
+        new naver.maps.LatLng(coord.lat, coord.lng),
+        zoom,
+        transitionOptions,
+      );
     },
     [mapRef],
   );
 
   const panTo = useCallback(
-    (lat: number, lng: number) => {
+    (
+      coord: LatLngLiteral,
+      transitionOptions?: naver.maps.TransitionOptions,
+    ) => {
       const map = mapRef.current;
       if (!map) return;
-      map.morph(new naver.maps.LatLng(lat, lng), map.getZoom(), {
-        easing: "easeOutCubic",
-      });
+      map.panTo(
+        new naver.maps.LatLng(coord.lat, coord.lng),
+        transitionOptions,
+      );
     },
     [mapRef],
   );
 
   const fitBounds = useCallback(
     (
-      points: { lat: number; lng: number }[],
-      padding: Padding,
-      maxZoom?: number,
+      bounds: LatLngLiteral[] | naver.maps.LatLngBounds,
+      options?: naver.maps.FitBoundsOptions,
     ) => {
       const map = mapRef.current;
-      if (!map || points.length === 0) return;
+      if (!map) return;
 
-      const bounds = new naver.maps.LatLngBounds(
-        new naver.maps.LatLng(points[0].lat, points[0].lng),
-        new naver.maps.LatLng(points[0].lat, points[0].lng),
-      );
-      for (const p of points) {
-        bounds.extend(new naver.maps.LatLng(p.lat, p.lng));
-      }
-
-      map.fitBounds(bounds, padding);
-
-      if (maxZoom !== undefined && map.getZoom() > maxZoom) {
-        map.setZoom(maxZoom);
+      if (Array.isArray(bounds)) {
+        if (bounds.length === 0) return;
+        const latLngBounds = new naver.maps.LatLngBounds(
+          new naver.maps.LatLng(bounds[0].lat, bounds[0].lng),
+          new naver.maps.LatLng(bounds[0].lat, bounds[0].lng),
+        );
+        for (const p of bounds) {
+          latLngBounds.extend(new naver.maps.LatLng(p.lat, p.lng));
+        }
+        map.fitBounds(latLngBounds, options);
+      } else {
+        map.fitBounds(bounds, options);
       }
     },
     [mapRef],
@@ -95,12 +102,12 @@ export function useNaverMap(): NaverMapActions {
   }, [mapRef]);
 
   const isInBounds = useCallback(
-    (lat: number, lng: number, bottomOffset = 0) => {
+    (coord: LatLngLiteral, bottomOffset = 0) => {
       const map = mapRef.current;
       if (!map) return false;
 
       const bounds = map.getBounds() as naver.maps.LatLngBounds;
-      const point = new naver.maps.LatLng(lat, lng);
+      const point = new naver.maps.LatLng(coord.lat, coord.lng);
       if (!bounds.hasLatLng(point)) return false;
       if (bottomOffset <= 0) return true;
 
@@ -108,17 +115,17 @@ export function useNaverMap(): NaverMapActions {
       const ne = bounds.getNE();
       const mapHeight = map.getSize().height;
       const latPerPixel = (ne.lat() - sw.lat()) / mapHeight;
-      return lat > sw.lat() + latPerPixel * bottomOffset;
+      return coord.lat > sw.lat() + latPerPixel * bottomOffset;
     },
     [mapRef],
   );
 
   const setLocationMarker = useCallback(
-    (lat: number, lng: number) => {
+    (coord: LatLngLiteral) => {
       const map = mapRef.current;
       if (!map) return;
 
-      const latlng = new naver.maps.LatLng(lat, lng);
+      const latlng = new naver.maps.LatLng(coord.lat, coord.lng);
 
       if (locationMarkerRef.current) {
         locationMarkerRef.current.setPosition(latlng);
@@ -145,7 +152,7 @@ export function useNaverMap(): NaverMapActions {
   );
 
   return {
-    morphTo,
+    morph,
     panTo,
     fitBounds,
     getCenter,
