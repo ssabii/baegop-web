@@ -62,15 +62,15 @@ function MapContainerInner() {
     setSearchCoords(undefined);
   }
 
-  const { morphTo, fitBounds, getCenter, isInBounds, setLocationMarker } =
+  const { morph, fitBounds, getCenter, isInBounds, setLocationMarker } =
     useNaverMap();
 
   const handleLocate = useCallback(
     (position: { lat: number; lng: number }) => {
-      morphTo(position.lat, position.lng, 16);
-      setLocationMarker(position.lat, position.lng);
+      morph(position, 16);
+      setLocationMarker(position);
     },
-    [morphTo, setLocationMarker],
+    [morph, setLocationMarker],
   );
 
   const handleDragEnd = useCallback(() => {
@@ -294,21 +294,16 @@ function MapContainerInner() {
       .slice(0, NEARBY_COUNT);
 
     const sheetOffset = Math.round(window.innerHeight * 0.5);
-    const allVisible = nearby.every((r) =>
-      isInBounds(r.lat, r.lng, sheetOffset),
-    );
+    const allVisible = nearby.every((r) => isInBounds(r, sheetOffset));
 
     if (!allVisible) {
-      fitBounds(
-        nearby,
-        {
-          top: 80,
-          bottom: Math.round(window.innerHeight * 0.5),
-          left: 40,
-          right: 40,
-        },
-        15,
-      );
+      fitBounds(nearby, {
+        top: 80,
+        bottom: Math.round(window.innerHeight * 0.5),
+        left: 40,
+        right: 40,
+        maxZoom: 15,
+      });
     }
   }, [showSheet, hasResults, query, results, searchCoords, isInBounds, fitBounds]);
 
