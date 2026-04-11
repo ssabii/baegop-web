@@ -82,7 +82,7 @@ function DubaiCookieMapInner() {
     anchorPos: { x: number; y: number };
   } | null>(null);
 
-  const { morphTo, setLocationMarker, getMap } = useNaverMap();
+  const { morph, setLocationMarker, getMap } = useNaverMap();
   const markersRef = useRef<naver.maps.Marker[]>([]);
   const clusterCleanupRef = useRef<(() => void) | null>(null);
   const mapLoadedRef = useRef(false);
@@ -412,10 +412,10 @@ function DubaiCookieMapInner() {
 
   const handleLocate = useCallback(
     (position: { lat: number; lng: number }) => {
-      morphTo(position.lat, position.lng, 16);
-      setLocationMarker(position.lat, position.lng);
+      morph(position, 16);
+      setLocationMarker(position);
     },
-    [morphTo, setLocationMarker],
+    [morph, setLocationMarker],
   );
 
   // UI state
