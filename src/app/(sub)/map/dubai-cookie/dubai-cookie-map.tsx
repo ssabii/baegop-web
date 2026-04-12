@@ -6,7 +6,7 @@ import {
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { COMPANY_LOCATION, LOCATION_MARKER_ICON } from "@/lib/constants";
+import { COMPANY_LOCATION } from "@/lib/constants";
 import {
   MapOverlapPopover,
   type OverlapMarkerItem,
@@ -14,6 +14,8 @@ import {
 import { calculateDistance } from "@/lib/geo";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { getOverlappingMarkers } from "@/lib/marker-overlap";
+import { NaverMapProvider } from "@/components/NaverMapContext";
+import { useNaverMap } from "@/components/useNaverMap";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -21,7 +23,7 @@ import { DubaiCookieSearchInput } from "./dubai-cookie-search-input";
 import { StoreDrawer } from "./store-drawer";
 import { StoreListSheet } from "./store-list-sheet";
 
-const NaverMap = dynamic(() => import("@/components/naver-map"), {
+const NaverMap = dynamic(() => import("@/components/NaverMap"), {
   ssr: false,
   loading: () => (
     <div className="flex size-full items-center justify-center bg-muted text-sm text-muted-foreground">
@@ -62,6 +64,14 @@ function createMarkerContent(name: string): string {
 }
 
 export function DubaiCookieMap() {
+  return (
+    <NaverMapProvider>
+      <DubaiCookieMapInner />
+    </NaverMapProvider>
+  );
+}
+
+function DubaiCookieMapInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("query") ?? "";
@@ -72,11 +82,11 @@ export function DubaiCookieMap() {
     anchorPos: { x: number; y: number };
   } | null>(null);
 
-  const mapRef = useRef<naver.maps.Map | null>(null);
+  const { morph, setLocationMarker, getMap } = useNaverMap();
   const markersRef = useRef<naver.maps.Marker[]>([]);
   const clusterCleanupRef = useRef<(() => void) | null>(null);
-  const locationMarkerRef = useRef<naver.maps.Marker | null>(null);
-  const mapReadyRef = useRef(false);
+  const mapLoadedRef = useRef(false);
+  const listenersRef = useRef<naver.maps.MapEventListener[]>([]);
 
   // Refs for stable access in map event handlers (avoid stale closures)
   const queryParamRef = useRef(queryParam);
@@ -153,14 +163,13 @@ export function DubaiCookieMap() {
         place: store.placeId,
       });
       if (placeParam) {
-        // detail → detail: replace
         router.replace(url, { scroll: false });
       } else {
-        // list → detail: push
         router.push(url, { scroll: false });
       }
-      if (mapRef.current) {
-        const map = mapRef.current;
+
+      const map = getMap();
+      if (map) {
         const bounds = map.getBounds() as naver.maps.LatLngBounds;
         const storeLatLng = new naver.maps.LatLng(store.lat, store.lng);
         const currentZoom = map.getZoom();
@@ -182,7 +191,7 @@ export function DubaiCookieMap() {
         }
       }
     },
-    [router, buildUrl, queryParam, placeParam],
+    [router, buildUrl, queryParam, placeParam, getMap],
   );
 
   const handleCloseDetail = useCallback(() => {
@@ -209,7 +218,7 @@ export function DubaiCookieMap() {
   // --- Marker management ---
   const createMarkers = useCallback(
     (stores: DubaiCookieStore[]) => {
-      const map = mapRef.current;
+      const map = getMap();
       if (!map) return;
 
       // Cleanup existing
@@ -303,12 +312,12 @@ export function DubaiCookieMap() {
         },
       });
     },
-    [buildUrl, router],
+    [buildUrl, router, getMap],
   );
 
-  // Recreate markers when mapStores change (after map is ready)
+  // Recreate markers when mapStores change (after map is loaded)
   useEffect(() => {
-    if (!mapReadyRef.current) return;
+    if (!mapLoadedRef.current) return;
     createMarkers(mapStores);
   }, [mapStores, createMarkers]);
 
@@ -318,7 +327,7 @@ export function DubaiCookieMap() {
     if (prevQueryRef.current === queryParam) return;
     prevQueryRef.current = queryParam;
 
-    const map = mapRef.current;
+    const map = getMap();
     if (!map || !queryParam || sortedStores.length === 0) return;
 
     // sortedStores is already sorted by distance from userCoords
@@ -364,64 +373,50 @@ export function DubaiCookieMap() {
         map.setZoom(15);
       }
     }
-  }, [queryParam, sortedStores, userCoords]);
+  }, [queryParam, sortedStores, userCoords, getMap]);
 
-  const handleReady = useCallback(
-    (map: naver.maps.Map) => {
-      mapRef.current = map;
-      mapReadyRef.current = true;
-
-      const clickListener = naver.maps.Event.addListener(map, "click", () => {
-        setOverlapState(null);
-        if (placeParamRef.current) {
-          router.back();
-        }
-      });
-
-      createMarkers(mapStores);
-
-      return () => {
-        naver.maps.Event.removeListener(clickListener);
-        clusterCleanupRef.current?.();
-        clusterCleanupRef.current = null;
-        markersRef.current.forEach((m) => {
-          naver.maps.Event.clearInstanceListeners(m);
-          m.setMap(null);
-        });
-        markersRef.current = [];
-        if (locationMarkerRef.current) {
-          locationMarkerRef.current.setMap(null);
-          locationMarkerRef.current = null;
-        }
-        mapRef.current = null;
-        mapReadyRef.current = false;
-      };
-    },
-    [createMarkers, mapStores, router],
-  );
-
-  const handleLocate = useCallback((position: { lat: number; lng: number }) => {
-    const map = mapRef.current;
+  const handleReady = useCallback(() => {
+    const map = getMap();
     if (!map) return;
 
-    const latlng = new naver.maps.LatLng(position.lat, position.lng);
-    map.morph(latlng, 16, { easing: "easeOutCubic" });
+    const clickListener = naver.maps.Event.addListener(map, "click", () => {
+      setOverlapState(null);
+      if (placeParamRef.current) {
+        router.back();
+      }
+    });
 
-    if (locationMarkerRef.current) {
-      locationMarkerRef.current.setPosition(latlng);
-    } else {
-      locationMarkerRef.current = new naver.maps.Marker({
-        position: latlng,
-        map,
-        icon: {
-          content: LOCATION_MARKER_ICON.content,
-          size: new naver.maps.Size(LOCATION_MARKER_ICON.size.width, LOCATION_MARKER_ICON.size.height),
-          anchor: new naver.maps.Point(LOCATION_MARKER_ICON.anchor.x, LOCATION_MARKER_ICON.anchor.y),
-        },
-        zIndex: 100,
-      });
-    }
+    listenersRef.current = [clickListener];
+    createMarkers(mapStores);
+  }, [getMap, createMarkers, mapStores, router]);
+
+  const handleLoaded = useCallback(() => {
+    mapLoadedRef.current = true;
   }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      listenersRef.current.forEach((l) => naver.maps.Event.removeListener(l));
+      listenersRef.current = [];
+      clusterCleanupRef.current?.();
+      clusterCleanupRef.current = null;
+      markersRef.current.forEach((m) => {
+        naver.maps.Event.clearInstanceListeners(m);
+        m.setMap(null);
+      });
+      markersRef.current = [];
+      mapLoadedRef.current = false;
+    };
+  }, []);
+
+  const handleLocate = useCallback(
+    (position: { lat: number; lng: number }) => {
+      morph(position, 16);
+      setLocationMarker(position);
+    },
+    [morph, setLocationMarker],
+  );
 
   // UI state
   const isSearching = !!queryParam;
@@ -434,7 +429,12 @@ export function DubaiCookieMap() {
           <Spinner className="size-8 text-primary" />
         </div>
       ) : (
-        <NaverMap center={initialCenter} onReady={handleReady} className="fixed inset-0" />
+        <NaverMap
+          center={initialCenter}
+          onReady={handleReady}
+          onLoaded={handleLoaded}
+          className="fixed inset-0"
+        />
       )}
 
       {overlapState && (
