@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { NaverMapProvider } from "@/components/NaverMapContext";
+import { useNaverMap } from "@/components/useNaverMap";
 import dynamic from "next/dynamic";
 
-const NaverMap = dynamic(() => import("@/components/naver-map"), {
+const NaverMap = dynamic(() => import("@/components/NaverMap"), {
   ssr: false,
   loading: () => (
     <div className="flex h-[30vh] items-center justify-center overflow-hidden rounded-xl border bg-muted">
@@ -22,29 +24,42 @@ interface PlaceMapProps {
   address?: string;
 }
 
-export function PlaceMap({ lat, lng, name, address }: PlaceMapProps) {
+export function PlaceMap(props: PlaceMapProps) {
+  return (
+    <NaverMapProvider>
+      <PlaceMapInner {...props} />
+    </NaverMapProvider>
+  );
+}
+
+function PlaceMapInner({ lat, lng, name }: PlaceMapProps) {
   const numLat = Number(lat);
   const numLng = Number(lng);
+  const { getMap } = useNaverMap();
+  const markerRef = useRef<naver.maps.Marker | null>(null);
 
-  const handleReady = useCallback(
-    (map: naver.maps.Map) => {
-      const marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(numLat, numLng),
-        map,
-        title: name,
-        icon: {
-          content: MARKER_ICON,
-          size: new naver.maps.Size(16, 16),
-          anchor: new naver.maps.Point(8, 16),
-        },
-      });
+  const handleReady = useCallback(() => {
+    const map = getMap();
+    if (!map) return;
 
-      return () => {
-        marker.setMap(null);
-      };
-    },
-    [numLat, numLng, name],
-  );
+    markerRef.current = new naver.maps.Marker({
+      position: new naver.maps.LatLng(numLat, numLng),
+      map,
+      title: name,
+      icon: {
+        content: MARKER_ICON,
+        size: new naver.maps.Size(16, 16),
+        anchor: new naver.maps.Point(8, 16),
+      },
+    });
+  }, [getMap, numLat, numLng, name]);
+
+  useEffect(() => {
+    return () => {
+      markerRef.current?.setMap(null);
+      markerRef.current = null;
+    };
+  }, []);
 
   return (
     <section>
@@ -52,7 +67,7 @@ export function PlaceMap({ lat, lng, name, address }: PlaceMapProps) {
         center={{ lat: numLat, lng: numLng }}
         zoom={17}
         onReady={handleReady}
-        className="isolate h-[30vh] rounded-xl overflow-hidden border"
+        className="isolate h-[30vh] overflow-hidden rounded-xl border"
       />
     </section>
   );
