@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useContext } from "react";
 import { useTheme } from "next-themes";
+import { NaverMapContext } from "./NaverMapContext";
 
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }; // 서울 시청
 
 interface NaverMapProps {
   center?: { lat: number; lng: number };
   zoom?: number;
-  onReady?: (map: naver.maps.Map) => (() => void) | void;
+  onReady?: () => void;
+  onLoaded?: () => void;
   className?: string;
 }
 
@@ -54,13 +56,42 @@ export default function NaverMap({
   center = DEFAULT_CENTER,
   zoom = 15,
   onReady,
+  onLoaded,
   className,
 }: NaverMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const onReadyCleanupRef = useRef<(() => void) | null>(null);
-  const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { resolvedTheme } = useTheme();
+  const context = useContext(NaverMapContext);
+
+  const onReadyRef = useRef(onReady);
+  const onLoadedRef = useRef(onLoaded);
+  useEffect(() => {
+    onReadyRef.current = onReady;
+  }, [onReady]);
+  useEffect(() => {
+    onLoadedRef.current = onLoaded;
+  }, [onLoaded]);
+
+  const registerMap = useCallback(
+    (map: naver.maps.Map) => {
+      if (context) {
+        context.mapRef.current = map;
+      }
+      onReadyRef.current?.();
+    },
+    [context],
+  );
+
+  const unregisterMap = useCallback(() => {
+    if (context) {
+      if (context.locationMarkerRef.current) {
+        context.locationMarkerRef.current.setMap(null);
+        context.locationMarkerRef.current = null;
+      }
+      context.mapRef.current = null;
+    }
+  }, [context]);
 
   const initMap = useCallback(
     (container: HTMLDivElement) => {
@@ -91,16 +122,18 @@ export default function NaverMap({
 
       cachedTheme = resolvedTheme;
 
+      registerMap(cachedMapInstance);
+
       const idleListener = naver.maps.Event.addListener(
         cachedMapInstance,
         "idle",
         () => {
           naver.maps.Event.removeListener(idleListener);
-          setReady(true);
+          onLoadedRef.current?.();
         },
       );
     },
-    [center.lat, center.lng, zoom, resolvedTheme],
+    [center.lat, center.lng, zoom, resolvedTheme, registerMap],
   );
 
   // Mount: reattach cached DOM or create new map
@@ -116,13 +149,13 @@ export default function NaverMap({
         new naver.maps.LatLng(center.lat, center.lng),
       );
       cachedMapInstance.setZoom(zoom);
-      setReady(true);
+
+      registerMap(cachedMapInstance);
+      onLoadedRef.current?.();
 
       return () => {
-        onReadyCleanupRef.current?.();
-        onReadyCleanupRef.current = null;
+        unregisterMap();
         cachedMapEl?.remove();
-        setReady(false);
       };
     }
 
@@ -139,10 +172,8 @@ export default function NaverMap({
 
     return () => {
       mounted = false;
-      onReadyCleanupRef.current?.();
-      onReadyCleanupRef.current = null;
+      unregisterMap();
       cachedMapEl?.remove();
-      setReady(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -151,21 +182,10 @@ export default function NaverMap({
   useEffect(() => {
     if (!cachedMapInstance || !containerRef.current) return;
     if (cachedTheme === resolvedTheme) return;
-    onReadyCleanupRef.current?.();
-    onReadyCleanupRef.current = null;
-    setReady(false);
+    unregisterMap();
     initMap(containerRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedTheme]);
-
-  // Invoke onReady callback when map is ready
-  useEffect(() => {
-    if (!ready || !cachedMapInstance || !onReady) return;
-
-    onReadyCleanupRef.current?.();
-    const cleanup = onReady(cachedMapInstance);
-    onReadyCleanupRef.current = cleanup ?? null;
-  }, [ready, onReady]);
 
   if (error) {
     return (
