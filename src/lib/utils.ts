@@ -28,5 +28,5 @@ const AVATAR_COUNT = 6;
 
 export const generateRandomAvatarUrl = () => {
   const index = Math.floor(Math.random() * AVATAR_COUNT) + 1;
-  return `https://aeeznpdtczcyrqbnzxmb.supabase.co/storage/v1/object/public/assets/baegop-avatar-${index}@3x.png`;
+  return `https://aeeznpdtczcyrqbnzxmb.supabase.co/storage/v1/object/public/assets/avatar/baegop-avatar-${index}@3x.png`;
 };
