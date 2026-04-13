@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
 import { validatePassword } from "@/lib/password";
-import { generateRandomNickname } from "@/lib/utils";
+import { generateRandomAvatarUrl, generateRandomNickname } from "@/lib/utils";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -82,7 +82,10 @@ export function SignUpForm({
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
-        data: { nickname: generateRandomNickname() },
+        data: {
+          nickname: generateRandomNickname(),
+          avatar_url: generateRandomAvatarUrl(),
+        },
       },
     });
 

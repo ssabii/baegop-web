@@ -23,3 +23,10 @@ export const generateRandomNickname = () => {
   const number = Math.floor(Math.random() * 100);
   return `${adjective}${noun}${number}`;
 };
+
+const AVATAR_COUNT = 6;
+
+export const generateRandomAvatarUrl = () => {
+  const index = Math.floor(Math.random() * AVATAR_COUNT) + 1;
+  return `https://aeeznpdtczcyrqbnzxmb.supabase.co/storage/v1/object/public/assets/avatar/baegop-avatar-${index}@3x.png`;
+};
