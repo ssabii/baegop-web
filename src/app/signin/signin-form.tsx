@@ -203,7 +203,7 @@ export function SignInForm({
       </div>
       <Link
         href="/"
-        className="text-sm text-center text-gray-400 dark:text-white underline"
+        className="text-sm text-center text-[#4B5563] underline dark:text-[#D1D5DB]"
       >
         로그인하지 않고 둘러보기
       </Link>

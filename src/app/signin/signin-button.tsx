@@ -22,9 +22,9 @@ const baseClassName =
 const classNameMap: Record<Provider, string> = {
   kakao: `bg-[oklch(0.9_0.19_102.86)]  hover:bg-[oklch(0.80_0.19_102.86)]`,
   naver:
-    "bg-background hover:bg-accent border border-gray-200 dark:text-white dark:border-[var(--border)]",
+    "bg-background hover:bg-accent border border-gray-200 dark:text-white dark:border-[#4B5563]",
   google:
-    "bg-background hover:bg-accent border border-gray-200 dark:text-white dark:border-[var(--border)]",
+    "bg-background hover:bg-accent border border-gray-200 dark:text-white dark:border-[#4B5563]",
 };
 
 const textMap: Record<Provider, string> = {
