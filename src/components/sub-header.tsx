@@ -27,7 +27,7 @@ export function SubHeader({ title, onBack, rightElement }: SubHeaderProps) {
   }, [router]);
 
   return (
-    <header className="sticky top-0 z-40 flex h-12 items-center justify-center border-b border-border bg-background">
+    <header className="border-border bg-background sticky top-0 z-40 flex h-12 items-center justify-center border-b">
       <div className="relative flex h-full w-full max-w-4xl items-center justify-center">
         <Button
           className="absolute left-0"
@@ -41,9 +41,7 @@ export function SubHeader({ title, onBack, rightElement }: SubHeaderProps) {
         <h1 className="truncate px-12 text-center text-base font-bold">
           {title}
         </h1>
-        {rightElement && (
-          <div className="absolute right-0">{rightElement}</div>
-        )}
+        {rightElement && <div className="absolute right-0">{rightElement}</div>}
       </div>
     </header>
   );

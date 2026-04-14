@@ -26,7 +26,12 @@ export function useUpdateReview(naverPlaceId: string, reviewId: number) {
           ? await uploadReviewImages(naverPlaceId, files)
           : undefined;
 
-      await updateReview(reviewId, { rating, content }, keptImageUrls, newImageUrls);
+      await updateReview(
+        reviewId,
+        { rating, content },
+        keptImageUrls,
+        newImageUrls,
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.all });

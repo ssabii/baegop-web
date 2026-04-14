@@ -71,7 +71,7 @@ export function KonaVoteSection({
 
   return (
     <>
-      <section className="rounded-xl bg-muted p-4 space-y-3">
+      <section className="bg-muted space-y-3 rounded-xl p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src="/icons/kona.png" alt="코나카드" className="size-4" />
@@ -89,7 +89,7 @@ export function KonaVoteSection({
 
         {showVoteUI && (
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">
+            <span className="text-muted-foreground text-sm">
               코나카드 결제가 가능한가요?
             </span>
             <div className="flex items-center gap-1">
@@ -100,7 +100,7 @@ export function KonaVoteSection({
                 onPressedChange={() => handleVote("unavailable")}
                 disabled={isPending}
                 className={cn(
-                  "px-2 h-[30px] text-xs cursor-pointer rounded-lg",
+                  "h-[30px] cursor-pointer rounded-lg px-2 text-xs",
                   {
                     "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
                       userVote === "unavailable",
@@ -117,7 +117,7 @@ export function KonaVoteSection({
                 onPressedChange={() => handleVote("available")}
                 disabled={isPending}
                 className={cn(
-                  "px-2 h-[30px] text-xs cursor-pointer rounded-lg",
+                  "h-[30px] cursor-pointer rounded-lg px-2 text-xs",
                   {
                     "data-[state=on]:bg-primary data-[state=on]:text-primary-foreground":
                       userVote === "available",

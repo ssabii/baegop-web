@@ -17,14 +17,14 @@ const iconMap: Record<Provider, React.ReactNode> = {
 };
 
 const baseClassName =
-  "w-full flex items-center justify-center gap-2 py-3.5 text-sm font-bold rounded-full text-[#1a1a1a] cursor-pointer";
+  "w-full max-w-[335px] mx-auto flex items-center justify-center gap-2 py-3.5 text-sm font-bold rounded-full text-[#1a1a1a] cursor-pointer";
 
 const classNameMap: Record<Provider, string> = {
   kakao: `bg-[oklch(0.9_0.19_102.86)]  hover:bg-[oklch(0.80_0.19_102.86)]`,
   naver:
-    "bg-background hover:bg-accent border border-gray-200 dark:text-white dark:border-[var(--border)]",
+    "bg-background hover:bg-accent border border-gray-200 dark:text-white dark:border-[#4B5563]",
   google:
-    "bg-background hover:bg-accent border border-gray-200 dark:text-white dark:border-[var(--border)]",
+    "bg-background hover:bg-accent border border-gray-200 dark:text-white dark:border-[#4B5563]",
 };
 
 const textMap: Record<Provider, string> = {

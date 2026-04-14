@@ -7,12 +7,7 @@ type MarkerColor =
   | "Yellow"
   | "Red"
   | (string & {});
-type MapType =
-  | "basic"
-  | "traffic"
-  | "satellite"
-  | "satellite_base"
-  | "terrain";
+type MapType = "basic" | "traffic" | "satellite" | "satellite_base" | "terrain";
 type ImageFormat = "jpg" | "jpeg" | "png8" | "png";
 
 type DefaultMarker = {
@@ -65,11 +60,7 @@ function buildMarkerParam(markers: Marker[]): string {
   return markers
     .map((m) => {
       if (m.type === "e") {
-        const parts = [
-          `type:e`,
-          `icon:${m.icon}`,
-          `pos:${m.lng} ${m.lat}`,
-        ];
+        const parts = [`type:e`, `icon:${m.icon}`, `pos:${m.lng} ${m.lat}`];
         if (m.anchor) parts.splice(2, 0, `anchor:${m.anchor}`);
         return parts.join("|");
       }

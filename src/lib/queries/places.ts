@@ -168,7 +168,6 @@ export async function fetchPlaces({
     toPlaceRow(raw),
   );
 
-
   if (orderBy === "created_at") {
     const nextCursor = places.length === limit ? cursor + limit : null;
     return { items: places, nextCursor };

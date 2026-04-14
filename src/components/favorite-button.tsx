@@ -46,7 +46,7 @@ export function FavoriteButton({ placeId, className }: FavoriteButtonProps) {
       >
         <Heart
           className={cn("size-5", {
-            "fill-rose-500 text-rose-500 animate-[favorite-bounce_0.3s_ease]":
+            "animate-[favorite-bounce_0.3s_ease] fill-rose-500 text-rose-500":
               isFavorited,
             "fill-secondary text-secondary-foreground": !isFavorited,
           })}

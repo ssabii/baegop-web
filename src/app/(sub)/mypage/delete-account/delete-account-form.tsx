@@ -11,9 +11,9 @@ export function DeleteAccountForm() {
 
   return (
     <>
-      <div className="max-w-4xl mx-auto w-full px-4 py-8">
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
         <h2 className="text-base font-bold">탈퇴 시 유의사항</h2>
-        <ul className="ml-4 mt-3 flex flex-col gap-2 text-sm text-secondary-foreground list-disc list-outside">
+        <ul className="text-secondary-foreground mt-3 ml-4 flex list-outside list-disc flex-col gap-2 text-sm">
           <li>
             계정 정보(이메일, 프로필)는 즉시 삭제되며, 복구할 수 없습니다.
           </li>

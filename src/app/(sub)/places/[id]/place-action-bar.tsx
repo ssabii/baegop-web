@@ -81,7 +81,7 @@ export function PlaceActionBar({
     <>
       <BottomActionBar>
         <div
-          className={cn("mx-auto max-w-4xl grid gap-3", {
+          className={cn("mx-auto grid max-w-4xl gap-3", {
             "grid-cols-2": !isRegistered,
           })}
         >
@@ -109,7 +109,7 @@ export function PlaceActionBar({
             리뷰 작성
           </Button>
           {!isRegistered && (
-            <p className="col-span-2 text-xs text-muted-foreground text-center">
+            <p className="text-muted-foreground col-span-2 text-center text-xs">
               리뷰를 작성하면 장소가 등록돼요!
             </p>
           )}

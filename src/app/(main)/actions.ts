@@ -11,7 +11,7 @@ export async function createPlaceWithReview(
     rating: number;
     content: string;
   },
-  images?: FormData
+  images?: FormData,
 ) {
   const supabase = await createClient();
 

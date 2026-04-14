@@ -4,9 +4,13 @@ import { searchPlaces } from "@/lib/search";
 
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("query");
-  const displayParam = Number(request.nextUrl.searchParams.get("display")) || 10;
+  const displayParam =
+    Number(request.nextUrl.searchParams.get("display")) || 10;
   const display = Math.min(Math.max(displayParam, 1), 100);
-  const start = Math.max(Number(request.nextUrl.searchParams.get("start")) || 1, 1);
+  const start = Math.max(
+    Number(request.nextUrl.searchParams.get("start")) || 1,
+    1,
+  );
 
   if (!query) {
     return NextResponse.json(
@@ -15,8 +19,10 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const x = request.nextUrl.searchParams.get("x") ?? String(COMPANY_LOCATION.lng);
-  const y = request.nextUrl.searchParams.get("y") ?? String(COMPANY_LOCATION.lat);
+  const x =
+    request.nextUrl.searchParams.get("x") ?? String(COMPANY_LOCATION.lng);
+  const y =
+    request.nextUrl.searchParams.get("y") ?? String(COMPANY_LOCATION.lat);
 
   try {
     const items = await searchPlaces(query, display, x, y, start);

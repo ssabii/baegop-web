@@ -73,7 +73,9 @@ export async function updateFeedback(
     .single();
 
   // 삭제할 이미지 계산
-  const keptOriginalUrls = new Set(keptImageUrls.map(toOriginalSupabaseImageUrl));
+  const keptOriginalUrls = new Set(
+    keptImageUrls.map(toOriginalSupabaseImageUrl),
+  );
   const toDelete = (existing?.image_urls ?? []).filter(
     (url) => !keptOriginalUrls.has(url),
   );

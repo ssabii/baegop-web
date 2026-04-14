@@ -29,7 +29,7 @@ export function ProfileEditForm() {
 
   if (isLoading || !profile) {
     return (
-      <div className="max-w-4xl mx-auto w-full px-4 py-8">
+      <div className="mx-auto w-full max-w-4xl px-4 py-8">
         <div className="flex justify-center px-4 pt-8 pb-6">
           <Skeleton className="size-24 rounded-full" />
         </div>
@@ -140,7 +140,7 @@ function ProfileEditFormContent({ profile }: { profile: Profile }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto w-full px-4 py-8">
+    <div className="mx-auto w-full max-w-4xl px-4 py-8">
       {/* 아바타 섹션 */}
       <div className="flex justify-center px-4 pt-8 pb-6">
         <button
@@ -159,11 +159,11 @@ function ProfileEditFormContent({ profile }: { profile: Profile }) {
               className="object-cover"
             />
             <AvatarFallback className="text-3xl">
-              <UserRound className="size-20 text-muted-foreground" />
+              <UserRound className="text-muted-foreground size-20" />
             </AvatarFallback>
           </Avatar>
-          <div className="absolute right-0 bottom-0 flex size-6 items-center justify-center rounded-full bg-background border">
-            <Camera className="size-4 text-foreground" />
+          <div className="bg-background absolute right-0 bottom-0 flex size-6 items-center justify-center rounded-full border">
+            <Camera className="text-foreground size-4" />
           </div>
         </button>
         <input
@@ -190,7 +190,7 @@ function ProfileEditFormContent({ profile }: { profile: Profile }) {
       {/* 닉네임 변경 Drawer */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
         <DrawerContent>
-          <div className="max-w-4xl mx-auto w-full">
+          <div className="mx-auto w-full max-w-4xl">
             <DrawerHeader>
               <DrawerTitle className="sr-only">닉네임 변경</DrawerTitle>
             </DrawerHeader>
@@ -210,7 +210,7 @@ function ProfileEditFormContent({ profile }: { profile: Profile }) {
                 className="h-12 dark:bg-transparent"
               />
               {nicknameError && (
-                <p className="mt-2 text-sm text-destructive">{nicknameError}</p>
+                <p className="text-destructive mt-2 text-sm">{nicknameError}</p>
               )}
             </div>
             <DrawerFooter>

@@ -16,7 +16,9 @@ export default async function ReviewWritePage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const params = new URLSearchParams({ redirect: `/places/${naverPlaceId}/review/new` });
+    const params = new URLSearchParams({
+      redirect: `/places/${naverPlaceId}/review/new`,
+    });
     redirect(`/signin?${params}`);
   }
 
@@ -35,7 +37,9 @@ export default async function ReviewWritePage({
       place={{
         name: place.name,
         category: place.category,
-        imageUrl: place.image_urls?.[0] ? optimizeNaverImageUrl(place.image_urls[0]) : null,
+        imageUrl: place.image_urls?.[0]
+          ? optimizeNaverImageUrl(place.image_urls[0])
+          : null,
       }}
     />
   );

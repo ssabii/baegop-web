@@ -10,7 +10,7 @@ export async function SearchBar() {
 
   return (
     <div className="fixed inset-x-0 top-0 z-40 px-4 py-3">
-      <div className="px-4 gap-3 flex h-11 items-center bg-background rounded-full max-w-4xl mx-auto border shadow-sm">
+      <div className="bg-background mx-auto flex h-11 max-w-4xl items-center gap-3 rounded-full border px-4 shadow-sm">
         <Link href="/">
           <img
             src="/baegop-logo.svg"
@@ -22,7 +22,7 @@ export async function SearchBar() {
         </Link>
         <Link
           href="/search"
-          className="min-w-0 flex-1 items-center truncate text-muted-foreground"
+          className="text-muted-foreground min-w-0 flex-1 items-center truncate"
         >
           찾고 싶은 장소가 있나요?
         </Link>

@@ -34,7 +34,8 @@ const createGeolocationCache = () => {
     init: () => {
       if (resolved) return;
       navigator.geolocation.getCurrentPosition(
-        (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (pos) =>
+          resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
         () => resolve(),
       );
     },

@@ -34,7 +34,9 @@ export function MypageMenuItem({
     <Item asChild>
       <Link href={href}>
         <ItemContent>
-          <ItemTitle className={cn("font-bold", { "text-destructive": isDestructive })}>
+          <ItemTitle
+            className={cn("font-bold", { "text-destructive": isDestructive })}
+          >
             {newBadge ? (
               <span className="relative">
                 {title}
@@ -57,7 +59,5 @@ export function MypageMenuItem({
     return content;
   }
 
-  return (
-    <ItemGroup className="rounded-xl bg-background">{content}</ItemGroup>
-  );
+  return <ItemGroup className="bg-background rounded-xl">{content}</ItemGroup>;
 }

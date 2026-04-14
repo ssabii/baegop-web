@@ -287,10 +287,7 @@ function MapContainerInner() {
         lat: parseFloat(r.y),
         lng: parseFloat(r.x),
       }))
-      .filter(
-        (r) =>
-          calculateDistance(origin, r) <= NEARBY_MAX_DISTANCE_M,
-      )
+      .filter((r) => calculateDistance(origin, r) <= NEARBY_MAX_DISTANCE_M)
       .slice(0, NEARBY_COUNT);
 
     const sheetOffset = Math.round(window.innerHeight * 0.5);
@@ -305,7 +302,15 @@ function MapContainerInner() {
         maxZoom: 15,
       });
     }
-  }, [showSheet, hasResults, query, results, searchCoords, isInBounds, fitBounds]);
+  }, [
+    showSheet,
+    hasResults,
+    query,
+    results,
+    searchCoords,
+    isInBounds,
+    fitBounds,
+  ]);
 
   const displayMarkers = isSearching
     ? showSheet && hasResults
@@ -316,8 +321,8 @@ function MapContainerInner() {
   return (
     <>
       {geoLoading ? (
-        <div className="fixed inset-x-0 top-0 bottom-15 z-20 flex items-center justify-center bg-muted">
-          <Spinner className="size-8 text-primary" />
+        <div className="bg-muted fixed inset-x-0 top-0 bottom-15 z-20 flex items-center justify-center">
+          <Spinner className="text-primary size-8" />
         </div>
       ) : (
         <MapView
@@ -378,7 +383,7 @@ function MapContainerInner() {
               {/* Infinite scroll sentinel */}
               <div ref={sentinelRef} className="flex justify-center py-4">
                 {isFetchingNextPage && (
-                  <Spinner className="size-6 text-primary" />
+                  <Spinner className="text-primary size-6" />
                 )}
               </div>
             </>

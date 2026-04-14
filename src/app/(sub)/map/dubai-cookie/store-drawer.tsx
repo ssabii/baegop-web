@@ -64,21 +64,21 @@ function StoreDetail({ store }: { store: DubaiCookieStore }) {
           href={`/places/${store.placeId}`}
           className="group inline-flex max-w-full items-start gap-1 pr-12"
         >
-          <h3 className="min-w-0 shrink text-xl font-bold leading-snug group-hover:underline">
+          <h3 className="min-w-0 shrink text-xl leading-snug font-bold group-hover:underline">
             {store.name}
           </h3>
-          <ExternalLink className="mt-1.5 size-4 shrink-0 text-foreground" />
+          <ExternalLink className="text-foreground mt-1.5 size-4 shrink-0" />
         </Link>
 
         {category && (
-          <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
             <Tag className="size-3 shrink-0" />
             <span>{category}</span>
           </div>
         )}
 
         {store.phone && (
-          <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
             <Phone className="size-3 shrink-0" />
             <a href={`tel:${store.phone}`} className="hover:underline">
               {store.phone}
@@ -86,7 +86,7 @@ function StoreDetail({ store }: { store: DubaiCookieStore }) {
           </div>
         )}
 
-        <div className="flex items-start gap-1 text-sm font-medium text-muted-foreground">
+        <div className="text-muted-foreground flex items-start gap-1 text-sm font-medium">
           <MapPin className="mt-0.5 size-3 shrink-0" />
           <span>{store.roadAddress || store.address}</span>
         </div>
@@ -101,7 +101,7 @@ function StoreDetail({ store }: { store: DubaiCookieStore }) {
                 <span className="text-sm font-medium text-yellow-500">
                   {data.avgRating.toFixed(1)}
                 </span>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-muted-foreground text-sm">
                   ({data.reviewCount})
                 </span>
               </div>
@@ -126,8 +126,8 @@ function StoreDetail({ store }: { store: DubaiCookieStore }) {
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="flex h-48 w-full items-center justify-center rounded-lg bg-muted">
-            <Building2 className="size-8 text-muted-foreground" />
+          <div className="bg-muted flex h-48 w-full items-center justify-center rounded-lg">
+            <Building2 className="text-muted-foreground size-8" />
           </div>
         )}
       </Link>
@@ -177,7 +177,7 @@ function StoreDrawerHeader({
       {isRegistered && (
         <FavoriteButton
           placeId={store.placeId}
-          className="size-8 bg-secondary"
+          className="bg-secondary size-8"
         />
       )}
       <Button
@@ -254,7 +254,7 @@ export function StoreDrawer({ store, onClose, onLocate }: StoreDrawerProps) {
         >
           <div
             className={cn(
-              "pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t bg-background shadow-lg transition-[border-radius,border-color] duration-300",
+              "bg-background pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t shadow-lg transition-[border-radius,border-color] duration-300",
               {
                 "rounded-t-2xl": !isFullSnap,
                 "rounded-none border-t-transparent": isFullSnap,
@@ -263,8 +263,8 @@ export function StoreDrawer({ store, onClose, onLocate }: StoreDrawerProps) {
           >
             <Drawer.Title className="sr-only">매장 상세</Drawer.Title>
 
-            <div className="relative mx-auto w-full max-w-4xl flex shrink-0 justify-center py-3">
-              <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+            <div className="relative mx-auto flex w-full max-w-4xl shrink-0 justify-center py-3">
+              <div className="bg-muted-foreground/30 h-1.5 w-10 rounded-full" />
               <div className="absolute -top-12 right-2">
                 <LocationButton onLocate={onLocate} />
               </div>

@@ -11,7 +11,7 @@ export function KonaCardBadge({ status }: KonaCardBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-full px-1.5 py-1 text-xs font-medium",
+        "inline-flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-1 text-xs font-medium whitespace-nowrap",
         {
           "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300":
             status === "available",

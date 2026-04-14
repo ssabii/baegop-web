@@ -2,9 +2,9 @@ export default function TermsPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       <h1 className="text-2xl font-bold">서비스 이용약관</h1>
-      <p className="mt-2 text-muted-foreground">시행일: 2026년 3월 2일</p>
+      <p className="text-muted-foreground mt-2">시행일: 2026년 3월 2일</p>
 
-      <div className="mt-8 space-y-8 leading-relaxed text-foreground">
+      <div className="text-foreground mt-8 space-y-8 leading-relaxed">
         <section>
           <h2 className="text-lg font-semibold">제1조 (목적)</h2>
           <p className="mt-2">
@@ -54,8 +54,8 @@ export default function TermsPage() {
           <h2 className="text-lg font-semibold">제4조 (회원가입 및 계정)</h2>
           <ul className="mt-2 list-decimal space-y-1 pl-5">
             <li>
-              회원가입은 Google, 카카오 또는 네이버 OAuth를 통해 이루어지며, 가입 시 본
-              약관과 개인정보처리방침에 동의한 것으로 간주합니다.
+              회원가입은 Google, 카카오 또는 네이버 OAuth를 통해 이루어지며,
+              가입 시 본 약관과 개인정보처리방침에 동의한 것으로 간주합니다.
             </li>
             <li>
               이용자는 정확한 정보를 제공해야 하며, 타인의 정보를 도용해서는 안

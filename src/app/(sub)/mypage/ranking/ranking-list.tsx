@@ -31,7 +31,7 @@ export function RankingList({ currentUserId }: RankingListProps) {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Spinner className="size-8 text-primary" />
+        <Spinner className="text-primary size-8" />
       </div>
     );
   }
@@ -44,7 +44,7 @@ export function RankingList({ currentUserId }: RankingListProps) {
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <Trophy className="size-12 text-primary" />
+            <Trophy className="text-primary size-12" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">아직 랭킹이 없어요</EmptyTitle>
         </EmptyHeader>
@@ -65,7 +65,7 @@ export function RankingList({ currentUserId }: RankingListProps) {
         ))}
       </div>
       <div ref={sentinelRef} className="flex items-center justify-center py-4">
-        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+        {isFetchingNextPage && <Spinner className="text-primary size-6" />}
       </div>
     </div>
   );

@@ -46,7 +46,7 @@ export function RecommendPlaces() {
     return (
       <section>
         <div className="flex items-center gap-1.5 py-2">
-          <MapPin className="size-4 text-primary" />
+          <MapPin className="text-primary size-4" />
           <h2 className="text-base font-bold">내 주변 추천</h2>
         </div>
         <RecommendPlacesSkeleton />
@@ -58,7 +58,7 @@ export function RecommendPlaces() {
     return (
       <section>
         <div className="flex items-center gap-1.5 py-2">
-          <MapPin className="size-4 text-primary" />
+          <MapPin className="text-primary size-4" />
           <h2 className="text-base font-bold">내 주변 추천</h2>
         </div>
         <Empty className="border-none">
@@ -67,11 +67,9 @@ export function RecommendPlaces() {
               variant="icon"
               className="size-12 rounded-none bg-transparent"
             >
-              <MapPinOff className="size-12 text-primary" />
+              <MapPinOff className="text-primary size-12" />
             </EmptyMedia>
-            <EmptyTitle className="font-bold">
-              추천할 장소가 없어요
-            </EmptyTitle>
+            <EmptyTitle className="font-bold">추천할 장소가 없어요</EmptyTitle>
             <EmptyDescription>
               현재 위치 기준으로 장소를 추천할 수 없어요
             </EmptyDescription>
@@ -84,7 +82,7 @@ export function RecommendPlaces() {
   return (
     <section>
       <div className="flex items-center gap-1.5 py-2">
-        <MapPin className="size-4 text-primary" />
+        <MapPin className="text-primary size-4" />
         <h2 className="text-base font-bold">내 주변 추천</h2>
       </div>
       <ul className="flex flex-col divide-y">

@@ -36,19 +36,16 @@ export function PlaceCard({
       >
         <div className="flex flex-1 flex-col justify-between overflow-hidden">
           <div className="space-y-1">
-            <span
-              id={labelId}
-              className="line-clamp-2 font-bold leading-snug"
-            >
+            <span id={labelId} className="line-clamp-2 leading-snug font-bold">
               {place.name}
             </span>
             {place.category && (
-              <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+              <p className="text-muted-foreground flex items-center gap-1 text-xs font-medium">
                 <Tag className="size-3 shrink-0" />
                 <span className="truncate">{place.category}</span>
               </p>
             )}
-            <p className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+            <p className="text-muted-foreground flex items-center gap-1 text-xs font-medium">
               <MapPin className="size-3 shrink-0" />
               <span className="truncate">{place.address}</span>
             </p>
@@ -77,13 +74,13 @@ export function PlaceCard({
               className="aspect-square size-28 rounded-lg object-cover"
             />
           ) : (
-            <div className="flex aspect-square size-28 items-center justify-center rounded-lg bg-muted">
-              <Building2 className="size-6 text-muted-foreground" />
+            <div className="bg-muted flex aspect-square size-28 items-center justify-center rounded-lg">
+              <Building2 className="text-muted-foreground size-6" />
             </div>
           )}
           <FavoriteButton
             placeId={place.id}
-            className="absolute right-1 top-1 z-10 size-6 bg-transparent hover:bg-transparent active:bg-transparent [&_svg:not(.fill-rose-500)]:fill-muted [&_svg:not(.fill-rose-500)]:text-muted"
+            className="[&_svg:not(.fill-rose-500)]:fill-muted [&_svg:not(.fill-rose-500)]:text-muted absolute top-1 right-1 z-10 size-6 bg-transparent hover:bg-transparent active:bg-transparent"
           />
         </div>
       </Link>

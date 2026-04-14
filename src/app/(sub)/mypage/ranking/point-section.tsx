@@ -23,9 +23,9 @@ const POINT_RULES = [
 
 export function PointSection({ totalPoints, stats }: PointSectionProps) {
   return (
-    <div className="py-4 px-6">
+    <div className="px-6 py-4">
       <div className="flex items-center gap-1">
-        <h2 className="text-base font-bold text-muted-foreground">내 포인트</h2>
+        <h2 className="text-muted-foreground text-base font-bold">내 포인트</h2>
         <InfoDrawer
           title="포인트 안내"
           description="활동에 따라 포인트를 받을 수 있어요"
@@ -37,7 +37,7 @@ export function PointSection({ totalPoints, stats }: PointSectionProps) {
                 className="flex items-center justify-between text-sm"
               >
                 <span className="text-muted-foreground">{rule.label}</span>
-                <span className="font-bold text-accent-foreground">
+                <span className="text-accent-foreground font-bold">
                   {rule.point}P
                 </span>
               </li>
@@ -45,7 +45,7 @@ export function PointSection({ totalPoints, stats }: PointSectionProps) {
           </ul>
         </InfoDrawer>
       </div>
-      <p className="text-lg font-bold text-accent-foreground">
+      <p className="text-accent-foreground text-lg font-bold">
         {totalPoints.toLocaleString()}P
       </p>
       {stats.length > 0 && (
@@ -56,7 +56,7 @@ export function PointSection({ totalPoints, stats }: PointSectionProps) {
               className="flex items-center justify-between text-sm"
             >
               <span className="text-muted-foreground">{stat.label}</span>
-              <span className="font-bold text-accent-foreground">
+              <span className="text-accent-foreground font-bold">
                 {stat.count}건
               </span>
             </div>
