@@ -122,8 +122,7 @@ export async function fetchPlaceBySearch(
         if (!res.ok) throw new Error("Failed to search place");
 
         const json = await res.json();
-        const items: NaverSearchResult[] =
-          json[0]?.data?.places?.items ?? [];
+        const items: NaverSearchResult[] = json[0]?.data?.places?.items ?? [];
         const match = items.find((item) => item.id === placeId);
         if (!match) throw new Error("No matching place found");
 

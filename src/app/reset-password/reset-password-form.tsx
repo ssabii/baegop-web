@@ -103,7 +103,7 @@ export function ResetPasswordForm() {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground"
+                className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
@@ -141,7 +141,7 @@ export function ResetPasswordForm() {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground"
+                className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 tabIndex={-1}
               >
@@ -157,7 +157,12 @@ export function ResetPasswordForm() {
             )}
           </Field>
           <Field>
-            <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              size="xl"
+              className="w-full"
+              disabled={isLoading}
+            >
               {isLoading ? <Spinner /> : "비밀번호 변경"}
             </Button>
           </Field>

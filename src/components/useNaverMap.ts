@@ -61,10 +61,7 @@ export function useNaverMap(): NaverMapActions {
     ) => {
       const map = mapRef.current;
       if (!map) return;
-      map.panTo(
-        new naver.maps.LatLng(coord.lat, coord.lng),
-        transitionOptions,
-      );
+      map.panTo(new naver.maps.LatLng(coord.lat, coord.lng), transitionOptions);
     },
     [mapRef],
   );

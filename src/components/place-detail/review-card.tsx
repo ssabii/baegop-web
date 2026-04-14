@@ -79,15 +79,25 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
   const nickname = review.profiles?.nickname ?? "탈퇴한 사용자";
 
   return (
-    <div className={cn("py-4 space-y-2 transition-opacity", { "opacity-50": isPending })}>
+    <div
+      className={cn("space-y-2 py-4 transition-opacity", {
+        "opacity-50": isPending,
+      })}
+    >
       <div className="flex items-start gap-2">
         <Avatar className="size-10 shrink-0">
-          <AvatarImage src={review.profiles?.avatar_url ? optimizeSupabaseImageUrl(review.profiles.avatar_url) : undefined} />
+          <AvatarImage
+            src={
+              review.profiles?.avatar_url
+                ? optimizeSupabaseImageUrl(review.profiles.avatar_url)
+                : undefined
+            }
+          />
           <AvatarFallback>
-            <UserRound className="size-10 text-muted-foreground" />
+            <UserRound className="text-muted-foreground size-10" />
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">{nickname}</span>
             {isOwner && (
@@ -106,12 +116,12 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent>
-                  <div className="max-w-4xl mx-auto w-full p-4">
+                  <div className="mx-auto w-full max-w-4xl p-4">
                     <DrawerTitle className="sr-only">리뷰 관리</DrawerTitle>
                     <div className="flex flex-col py-2">
                       <button
                         type="button"
-                        className="flex items-center gap-3 py-4 text-base font-bold cursor-pointer"
+                        className="flex cursor-pointer items-center gap-3 py-4 text-base font-bold"
                         onClick={handleEdit}
                       >
                         <Pencil className="size-4" />
@@ -119,7 +129,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                       </button>
                       <button
                         type="button"
-                        className="flex items-center gap-3 py-4 text-base font-bold text-destructive cursor-pointer"
+                        className="text-destructive flex cursor-pointer items-center gap-3 py-4 text-base font-bold"
                         onClick={handleDelete}
                       >
                         <Trash2 className="size-4" />
@@ -134,7 +144,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
           <div className="flex items-center gap-1.5">
             <StarRating rating={review.rating} />
             {review.created_at && (
-              <span className="text-xs text-muted-foreground/60">
+              <span className="text-muted-foreground/60 text-xs">
                 {formatRelativeDate(review.created_at)}
               </span>
             )}
@@ -142,7 +152,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
         </div>
       </div>
       {review.content && (
-        <p className="text-sm text-secondary-foreground">{review.content}</p>
+        <p className="text-secondary-foreground text-sm">{review.content}</p>
       )}
       {(review.image_urls?.length ?? 0) > 0 && (
         <ReviewImages images={review.image_urls!} />

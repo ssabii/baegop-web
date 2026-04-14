@@ -22,8 +22,8 @@ export function MapSearchInput({
   const isIdle = !showBack && !query;
 
   return (
-    <div className="fixed inset-x-0 top-0 z-43 px-4 py-3 bg-transparent">
-      <div className="mx-auto flex h-11 max-w-4xl items-center rounded-full border bg-background shadow-sm">
+    <div className="fixed inset-x-0 top-0 z-43 bg-transparent px-4 py-3">
+      <div className="bg-background mx-auto flex h-11 max-w-4xl items-center rounded-full border shadow-sm">
         {/* Idle: baegop icon + placeholder */}
         {isIdle && (
           <button
@@ -38,7 +38,7 @@ export function MapSearchInput({
               height={20}
               className="shrink-0"
             />
-            <span className="truncate text-muted-foreground">
+            <span className="text-muted-foreground truncate">
               찾고 싶은 장소가 있나요?
             </span>
           </button>
@@ -49,7 +49,7 @@ export function MapSearchInput({
           <button
             type="button"
             onClick={onBack}
-            className="shrink-0 cursor-pointer pl-4 text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer pl-4 transition-colors"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -84,7 +84,7 @@ export function MapSearchInput({
               e.stopPropagation();
               onClear();
             }}
-            className="shrink-0 cursor-pointer pr-4 text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer pr-4 transition-colors"
           >
             <X className="size-5" />
           </button>

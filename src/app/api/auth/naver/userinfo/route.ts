@@ -7,7 +7,10 @@ export async function GET(request: Request) {
 
   if (!authorization) {
     return NextResponse.json(
-      { error: "missing_token", error_description: "Authorization header is required" },
+      {
+        error: "missing_token",
+        error_description: "Authorization header is required",
+      },
       { status: 401 },
     );
   }
@@ -18,7 +21,10 @@ export async function GET(request: Request) {
 
   if (!response.ok) {
     return NextResponse.json(
-      { error: "provider_error", error_description: "Failed to fetch user info from Naver" },
+      {
+        error: "provider_error",
+        error_description: "Failed to fetch user info from Naver",
+      },
       { status: response.status },
     );
   }
@@ -27,7 +33,10 @@ export async function GET(request: Request) {
 
   if (data.resultcode !== "00" || !data.response) {
     return NextResponse.json(
-      { error: "invalid_response", error_description: "Invalid response from Naver" },
+      {
+        error: "invalid_response",
+        error_description: "Invalid response from Naver",
+      },
       { status: 502 },
     );
   }
@@ -36,7 +45,10 @@ export async function GET(request: Request) {
 
   if (!email) {
     return NextResponse.json(
-      { error: "email_required", error_description: "Email is required but not provided by Naver" },
+      {
+        error: "email_required",
+        error_description: "Email is required but not provided by Naver",
+      },
       { status: 400 },
     );
   }

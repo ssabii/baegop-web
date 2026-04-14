@@ -27,7 +27,7 @@ export function MyPlaceList() {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Spinner className="size-8 text-primary" />
+        <Spinner className="text-primary size-8" />
       </div>
     );
   }
@@ -41,7 +41,7 @@ export function MyPlaceList() {
               variant="icon"
               className="size-12 rounded-none bg-transparent"
             >
-              <Heart className="size-12 text-primary" />
+              <Heart className="text-primary size-12" />
             </EmptyMedia>
             <EmptyTitle className="font-bold">찜한 장소가 없어요</EmptyTitle>
           </EmptyHeader>
@@ -52,13 +52,13 @@ export function MyPlaceList() {
 
   return (
     <>
-      <ul className="p-4 divide-y">
+      <ul className="divide-y p-4">
         {places.map((place) => (
           <PlaceCard key={place.id} place={place} className="py-4" />
         ))}
       </ul>
       <div ref={sentinelRef} className="flex justify-center">
-        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+        {isFetchingNextPage && <Spinner className="text-primary size-6" />}
       </div>
     </>
   );

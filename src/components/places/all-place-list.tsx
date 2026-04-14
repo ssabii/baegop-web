@@ -23,7 +23,7 @@ export function AllPlaceList() {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Spinner className="size-8 text-primary" />
+        <Spinner className="text-primary size-8" />
       </div>
     );
   }
@@ -44,7 +44,7 @@ export function AllPlaceList() {
         ))}
       </ul>
       <div ref={sentinelRef} className="flex justify-center">
-        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+        {isFetchingNextPage && <Spinner className="text-primary size-6" />}
       </div>
     </>
   );

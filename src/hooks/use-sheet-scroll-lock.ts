@@ -7,7 +7,7 @@ import { useRef, useEffect, type RefObject } from "react";
  * When `isScrollable` is false, resets scrollTop and detaches listeners.
  */
 export function useSheetScrollLock(
-  isScrollable: boolean
+  isScrollable: boolean,
 ): RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement>(null);
   const startY = useRef(0);

@@ -16,7 +16,7 @@ export function ReviewImages({ images }: ReviewImagesProps) {
 
   return (
     <>
-      <div className="flex gap-2 overflow-x-auto scrollbar-none md:grid md:grid-cols-5">
+      <div className="scrollbar-none flex gap-2 overflow-x-auto md:grid md:grid-cols-5">
         {images.map((url, i) => (
           <button
             key={i}

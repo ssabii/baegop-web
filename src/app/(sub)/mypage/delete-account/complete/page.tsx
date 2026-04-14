@@ -19,11 +19,9 @@ export default function DeleteAccountCompletePage() {
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <CircleCheck className="size-12 text-primary" />
+            <CircleCheck className="text-primary size-12" />
           </EmptyMedia>
-          <EmptyTitle className="font-bold">
-            회원탈퇴가 완료되었어요
-          </EmptyTitle>
+          <EmptyTitle className="font-bold">회원탈퇴가 완료되었어요</EmptyTitle>
           <EmptyDescription>
             그동안 배곱을 이용해주셔서 감사합니다
           </EmptyDescription>

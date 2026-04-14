@@ -61,7 +61,7 @@ export function ForgotPasswordForm() {
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <Mail className="size-12 text-primary" />
+            <Mail className="text-primary size-12" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">이메일을 확인해주세요</EmptyTitle>
           <EmptyDescription>
@@ -112,7 +112,12 @@ export function ForgotPasswordForm() {
             {emailError && <FieldDescription>{emailError}</FieldDescription>}
           </Field>
           <Field>
-            <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              size="xl"
+              className="w-full"
+              disabled={isLoading}
+            >
               {isLoading ? <Spinner /> : "재설정 링크 보내기"}
             </Button>
           </Field>

@@ -49,12 +49,12 @@ function StoreListItem({
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="text-base font-bold">{store.name}</span>
         {store.category && (
-          <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+          <span className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
             <Tag className="size-3 shrink-0" />
             <span>{store.category}</span>
           </span>
         )}
-        <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+        <span className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
           <MapPin className="size-3 shrink-0" />
           <span>{formatShortAddress(store.roadAddress || store.address)}</span>
         </span>
@@ -67,8 +67,8 @@ function StoreListItem({
           onError={() => setImgError(true)}
         />
       ) : (
-        <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <Building2 className="size-5 text-muted-foreground" />
+        <div className="bg-muted flex size-20 shrink-0 items-center justify-center rounded-lg">
+          <Building2 className="text-muted-foreground size-5" />
         </div>
       )}
     </button>
@@ -134,7 +134,7 @@ export function StoreListSheet({
         >
           <div
             className={cn(
-              "pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t bg-background shadow-lg transition-[border-radius,border-color] duration-300",
+              "bg-background pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t shadow-lg transition-[border-radius,border-color] duration-300",
               {
                 "rounded-t-2xl": !isFullSnap,
                 "rounded-none border-t-transparent": isFullSnap,
@@ -146,7 +146,7 @@ export function StoreListSheet({
             {!isFullSnap && (
               <div className="relative mx-auto w-full max-w-4xl">
                 <div className="flex shrink-0 justify-center py-3">
-                  <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+                  <div className="bg-muted-foreground/30 h-1.5 w-10 rounded-full" />
                 </div>
                 <div className="flex shrink-0 justify-end px-4 pb-2">
                   <Button
@@ -189,7 +189,7 @@ export function StoreListSheet({
                         variant="icon"
                         className="size-12 rounded-none bg-transparent"
                       >
-                        <PackageOpen className="size-12 text-primary" />
+                        <PackageOpen className="text-primary size-12" />
                       </EmptyMedia>
                       <EmptyTitle className="font-bold">
                         검색 결과가 없어요

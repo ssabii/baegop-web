@@ -35,7 +35,7 @@ export function MapViewButton({ scrollRef, onClick }: MapViewButtonProps) {
         "absolute inset-x-0 bottom-4 flex justify-center transition-all duration-300",
         {
           "translate-y-0 opacity-100": visible,
-          "translate-y-4 pointer-events-none opacity-0": !visible,
+          "pointer-events-none translate-y-4 opacity-0": !visible,
         },
       )}
     >

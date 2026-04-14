@@ -42,7 +42,7 @@ export function InfoDrawer({
         </button>
       </DrawerTrigger>
       <DrawerContent>
-        <div className="max-w-4xl mx-auto w-full p-4">
+        <div className="mx-auto w-full max-w-4xl p-4">
           <DrawerHeader>
             <DrawerTitle className="text-left">{title}</DrawerTitle>
             {description && (

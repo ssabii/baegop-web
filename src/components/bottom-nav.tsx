@@ -37,8 +37,8 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 bg-background border-t">
-      <div className="flex max-w-lg items-center justify-around p-2 mx-auto">
+    <nav className="bg-background fixed inset-x-0 bottom-0 z-40 border-t">
+      <div className="mx-auto flex max-w-lg items-center justify-around p-2">
         {tabs.map(({ label, icon: Icon, href, match }) => {
           const active = match(pathname);
           return (

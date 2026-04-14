@@ -209,7 +209,12 @@ export function SignUpForm({
             )}
           </Field>
           <Field>
-            <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              size="xl"
+              className="w-full"
+              disabled={isLoading}
+            >
               {isLoading ? <Spinner /> : "회원가입"}
             </Button>
           </Field>

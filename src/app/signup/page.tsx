@@ -19,7 +19,7 @@ export default async function SignUpPage({
   const params = await searchParams;
 
   return (
-    <div className="flex min-h-dvh items-center justify-center px-6 py-12 bg-background">
+    <div className="bg-background flex min-h-dvh items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
         <SignUpForm error={params.error} redirectTo={params.redirect} />
       </div>

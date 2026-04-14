@@ -21,11 +21,11 @@ export function ProfileSection() {
 
   if (isLoading) {
     return (
-      <ItemGroup className="rounded-xl bg-background">
+      <ItemGroup className="bg-background rounded-xl">
         <Item className="gap-2">
           <ItemMedia
             variant="icon"
-            className="shrink-0 size-14 bg-transparent border-none"
+            className="size-14 shrink-0 border-none bg-transparent"
           >
             <Skeleton className="size-14 rounded-full" />
           </ItemMedia>
@@ -41,12 +41,12 @@ export function ProfileSection() {
   if (!profile) return null;
 
   return (
-    <ItemGroup className="rounded-xl bg-background">
+    <ItemGroup className="bg-background rounded-xl">
       <Item asChild className="gap-2">
         <Link href="/mypage/profile">
           <ItemMedia
             variant="icon"
-            className="shrink-0 size-14 bg-transparent border-none"
+            className="size-14 shrink-0 border-none bg-transparent"
           >
             <Avatar className="size-14">
               <AvatarImage
@@ -58,15 +58,15 @@ export function ProfileSection() {
                 }
               />
               <AvatarFallback>
-                <UserRound className="size-12 text-muted-foreground" />
+                <UserRound className="text-muted-foreground size-12" />
               </AvatarFallback>
             </Avatar>
           </ItemMedia>
           <ItemContent className="flex-1 gap-0">
-            <ItemTitle className="text-xl font-bold line-clamp-1">
+            <ItemTitle className="line-clamp-1 text-xl font-bold">
               {profile.nickname}
             </ItemTitle>
-            <ItemDescription className="text-base line-clamp-1">
+            <ItemDescription className="line-clamp-1 text-base">
               {profile.email}
             </ItemDescription>
           </ItemContent>

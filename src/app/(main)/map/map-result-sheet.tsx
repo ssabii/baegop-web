@@ -80,11 +80,11 @@ export function MapResultSheet({
       <Drawer.Portal>
         <Drawer.Content
           aria-describedby={undefined}
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-41 flex h-dvh flex-col outline-none bg-transparent"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-41 flex h-dvh flex-col bg-transparent outline-none"
         >
           <div
             className={cn(
-              "pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t bg-background shadow-lg transition-[border-radius,border-color] duration-300",
+              "bg-background pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t shadow-lg transition-[border-radius,border-color] duration-300",
               {
                 "rounded-t-2xl": !isFullSnap,
                 "rounded-none border-t-transparent": isFullSnap,
@@ -98,7 +98,7 @@ export function MapResultSheet({
             {!isFullSnap && (
               <div className="relative mx-auto w-full max-w-4xl">
                 <div className="flex shrink-0 justify-center py-3">
-                  <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+                  <div className="bg-muted-foreground/30 h-1.5 w-10 rounded-full" />
                 </div>
                 <div className="flex shrink-0 justify-end px-4 pb-2">
                   <Button
@@ -129,7 +129,7 @@ export function MapResultSheet({
             <div
               ref={contentRef}
               className={cn(
-                "min-h-0 flex-1 overscroll-contain mx-auto max-w-4xl w-full",
+                "mx-auto min-h-0 w-full max-w-4xl flex-1 overscroll-contain",
                 {
                   "overflow-y-auto pt-17": isFullSnap,
                   "overflow-hidden": !isFullSnap,

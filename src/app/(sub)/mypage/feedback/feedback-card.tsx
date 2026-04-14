@@ -50,7 +50,8 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
     setDrawerOpen(false);
     const ok = await confirm({
       title: "피드백 삭제",
-      description: "삭제된 피드백은 복구할 수 없습니다.\n정말 삭제하시겠습니까?",
+      description:
+        "삭제된 피드백은 복구할 수 없습니다.\n정말 삭제하시겠습니까?",
       confirmLabel: "삭제",
       variant: "default",
     });
@@ -71,7 +72,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
 
   return (
     <div
-      className={cn("py-4 space-y-2 transition-opacity", {
+      className={cn("space-y-2 py-4 transition-opacity", {
         "opacity-50": isPending,
       })}
     >
@@ -81,7 +82,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
             {FEEDBACK_CATEGORY_LABELS[feedback.category]}
           </Badge>
           {feedback.created_at && (
-            <span className="text-xs text-muted-foreground/60">
+            <span className="text-muted-foreground/60 text-xs">
               {formatRelativeDate(feedback.created_at)}
             </span>
           )}
@@ -101,12 +102,12 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
             </Button>
           </DrawerTrigger>
           <DrawerContent>
-            <div className="max-w-4xl mx-auto w-full p-4">
+            <div className="mx-auto w-full max-w-4xl p-4">
               <DrawerTitle className="sr-only">피드백 관리</DrawerTitle>
               <div className="flex flex-col py-2">
                 <button
                   type="button"
-                  className="flex items-center gap-3 py-4 text-base font-bold cursor-pointer"
+                  className="flex cursor-pointer items-center gap-3 py-4 text-base font-bold"
                   onClick={handleEdit}
                 >
                   <Pencil className="size-4" />
@@ -114,7 +115,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
                 </button>
                 <button
                   type="button"
-                  className="flex items-center gap-3 py-4 text-base font-bold text-destructive cursor-pointer"
+                  className="text-destructive flex cursor-pointer items-center gap-3 py-4 text-base font-bold"
                   onClick={handleDelete}
                 >
                   <Trash2 className="size-4" />
@@ -125,11 +126,11 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
           </DrawerContent>
         </Drawer>
       </div>
-      <p className="line-clamp-3 text-sm text-secondary-foreground">
+      <p className="text-secondary-foreground line-clamp-3 text-sm">
         {feedback.content}
       </p>
       {images.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto scrollbar-none md:grid md:grid-cols-5">
+        <div className="scrollbar-none flex gap-2 overflow-x-auto md:grid md:grid-cols-5">
           {images.map((url, i) => (
             <button
               key={i}

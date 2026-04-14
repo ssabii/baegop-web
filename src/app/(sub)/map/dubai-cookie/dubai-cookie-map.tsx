@@ -26,8 +26,8 @@ import { StoreListSheet } from "./store-list-sheet";
 const NaverMap = dynamic(() => import("@/components/NaverMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex size-full items-center justify-center bg-muted text-sm text-muted-foreground">
-      <Spinner className="size-8 text-primary" aria-label="로딩 중" />
+    <div className="bg-muted text-muted-foreground flex size-full items-center justify-center text-sm">
+      <Spinner className="text-primary size-8" aria-label="로딩 중" />
     </div>
   ),
 });
@@ -241,11 +241,7 @@ function DubaiCookieMapInner() {
         });
 
         naver.maps.Event.addListener(marker, "click", () => {
-          const overlapping = getOverlappingMarkers(
-            map,
-            marker,
-            markers,
-          );
+          const overlapping = getOverlappingMarkers(map, marker, markers);
 
           if (overlapping.length > 0) {
             const allOverlapping = [marker, ...overlapping];
@@ -425,8 +421,8 @@ function DubaiCookieMapInner() {
   return (
     <>
       {geoLoading ? (
-        <div className="fixed inset-0 z-20 flex items-center justify-center bg-muted">
-          <Spinner className="size-8 text-primary" />
+        <div className="bg-muted fixed inset-0 z-20 flex items-center justify-center">
+          <Spinner className="text-primary size-8" />
         </div>
       ) : (
         <NaverMap

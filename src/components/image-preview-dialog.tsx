@@ -126,7 +126,7 @@ export function ImageCarouselDialog({
                 <img
                   src={src}
                   alt={alt ? `${alt} ${i + 1}` : ""}
-                  className="max-h-[80dvh] max-w-full select-none object-contain"
+                  className="max-h-[80dvh] max-w-full object-contain select-none"
                   draggable={false}
                 />
               </CarouselItem>
@@ -139,7 +139,7 @@ export function ImageCarouselDialog({
           <button
             type="button"
             onClick={() => api?.scrollPrev()}
-            className="absolute left-3 top-1/2 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
+            className="absolute top-1/2 left-3 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -148,7 +148,7 @@ export function ImageCarouselDialog({
           <button
             type="button"
             onClick={() => api?.scrollNext()}
-            className="absolute right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
+            className="absolute top-1/2 right-3 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm"
           >
             <ChevronRight className="size-5" />
           </button>

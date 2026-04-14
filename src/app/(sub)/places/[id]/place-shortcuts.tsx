@@ -6,7 +6,6 @@ import type { NaverWalkingRoute } from "@/lib/naver";
 import type { LucideIcon } from "lucide-react";
 import { MapPin, Phone, Route } from "lucide-react";
 
-
 interface ShortcutItem {
   href: string;
   icon: LucideIcon;
@@ -19,7 +18,7 @@ function ShortcutButton({ href, icon: Icon, label, external }: ShortcutItem) {
     <Button
       variant="outline"
       size="lg"
-      className="flex-1 flex-col min-[375px]:flex-row gap-1 min-[375px]:gap-1.5 h-auto px-0 has-[>svg]:px-0 py-3 rounded-xl"
+      className="h-auto flex-1 flex-col gap-1 rounded-xl px-0 py-3 has-[>svg]:px-0 min-[375px]:flex-row min-[375px]:gap-1.5"
       asChild
     >
       <a
@@ -27,7 +26,7 @@ function ShortcutButton({ href, icon: Icon, label, external }: ShortcutItem) {
         {...(external && { target: "_blank", rel: "noopener noreferrer" })}
       >
         <Icon className="size-5" />
-        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className="text-muted-foreground text-xs">{label}</span>
       </a>
     </Button>
   );

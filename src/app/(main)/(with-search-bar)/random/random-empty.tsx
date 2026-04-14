@@ -9,14 +9,14 @@ import {
 
 export function RandomEmptyNoResults() {
   return (
-    <div className="flex w-full h-full items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center">
       <Empty className="border-none py-12">
         <EmptyHeader className="gap-1">
           <EmptyMedia
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <SearchX className="size-12 text-primary" />
+            <SearchX className="text-primary size-12" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">
             조건에 맞는 장소가 없어요
@@ -37,7 +37,7 @@ export function RandomEmptyInitial() {
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <CircleQuestionMarkIcon className="size-12 text-primary" />
+            <CircleQuestionMarkIcon className="text-primary size-12" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">오늘 뭐 먹지?</EmptyTitle>
           <EmptyDescription>

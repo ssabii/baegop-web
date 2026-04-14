@@ -15,7 +15,7 @@ export default async function MyPlacesPage() {
   return (
     <div className="flex min-h-dvh flex-col">
       <SubHeader title="내 장소" />
-      <div className="flex flex-1 flex-col mx-auto w-full max-w-4xl">
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col">
         <MyPlaceList />
       </div>
     </div>

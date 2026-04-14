@@ -51,7 +51,10 @@ export function AuthButton({ user, profile }: AuthButtonProps) {
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar size="sm">
             {profile?.avatar_url && (
-              <AvatarImage src={optimizeSupabaseImageUrl(profile.avatar_url)} alt={displayName} />
+              <AvatarImage
+                src={optimizeSupabaseImageUrl(profile.avatar_url)}
+                alt={displayName}
+              />
             )}
             <AvatarFallback>{initials}</AvatarFallback>
           </Avatar>

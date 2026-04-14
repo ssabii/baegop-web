@@ -107,8 +107,8 @@ export function PlaceSearch() {
           >
             <PopoverAnchor
               asChild
-              className={cn("bg-background shadow-sm rounded-full", {
-                "rounded-t-3xl rounded-b-none border-t border-x border-b-0":
+              className={cn("bg-background rounded-full shadow-sm", {
+                "rounded-t-3xl rounded-b-none border-x border-t border-b-0":
                   popoverOpen,
                 border: !popoverOpen,
               })}
@@ -117,7 +117,7 @@ export function PlaceSearch() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="absolute left-4 top-1/2 z-10 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+                  className="text-muted-foreground hover:text-foreground absolute top-1/2 left-4 z-10 -translate-y-1/2 cursor-pointer transition-colors"
                 >
                   <ChevronLeft className="size-5" />
                 </button>
@@ -130,7 +130,7 @@ export function PlaceSearch() {
                   onFocus={handleFocus}
                   autoFocus={!initialQuery}
                   className={cn(
-                    "h-11 bg-transparent dark:bg-transparent border-none rounded-xl pl-12 focus-visible:ring-0 text-base placeholder:text-base",
+                    "h-11 rounded-xl border-none bg-transparent pl-12 text-base placeholder:text-base focus-visible:ring-0 dark:bg-transparent",
                     {
                       "pr-12": input,
                       "rounded-b-none": popoverOpen,
@@ -141,7 +141,7 @@ export function PlaceSearch() {
                   <button
                     type="button"
                     onClick={() => handleClear()}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer transition-colors"
                   >
                     {isSearching ? (
                       <Spinner className="size-5" />
@@ -156,7 +156,7 @@ export function PlaceSearch() {
           <PopoverContent
             align="start"
             sideOffset={0}
-            className="w-(--radix-popper-anchor-width) overflow-hidden rounded-t-none rounded-b-3xl border-x border-b bg-background p-0 shadow-sm"
+            className="bg-background w-(--radix-popper-anchor-width) overflow-hidden rounded-t-none rounded-b-3xl border-x border-b p-0 shadow-sm"
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
           >
@@ -196,7 +196,7 @@ export function PlaceSearch() {
             <button
               type="button"
               onClick={clearAll}
-              className="cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground cursor-pointer text-xs transition-colors"
             >
               전체 삭제
             </button>
@@ -207,15 +207,15 @@ export function PlaceSearch() {
                 <button
                   type="button"
                   onClick={() => handleRecentClick(term)}
-                  className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 text-left transition-colors hover:bg-accent"
+                  className="hover:bg-accent flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 text-left transition-colors"
                 >
-                  <Clock className="size-4 shrink-0 text-muted-foreground" />
+                  <Clock className="text-muted-foreground size-4 shrink-0" />
                   <span className="truncate text-sm">{term}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => removeSearch(term)}
-                  className="shrink-0 cursor-pointer p-2 text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer p-2 transition-colors"
                 >
                   <X className="size-4" />
                 </button>
@@ -228,7 +228,7 @@ export function PlaceSearch() {
       {/* Loading */}
       {pendingSearch && isLoading && (
         <div className="flex flex-1 flex-col items-center justify-center">
-          <Spinner className="size-8 text-primary" />
+          <Spinner className="text-primary size-8" />
         </div>
       )}
 

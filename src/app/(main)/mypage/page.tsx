@@ -32,7 +32,7 @@ export default async function MyPage() {
     ]);
 
   return (
-    <main className="w-full min-h-screen pb-17 bg-muted">
+    <main className="bg-muted min-h-screen w-full pb-17">
       <div className="mx-auto w-full max-w-4xl px-4 py-8">
         <nav className="flex flex-col gap-3" aria-labelledby="mypage-menu">
           {/* 메뉴 리스트 */}
@@ -44,12 +44,12 @@ export default async function MyPage() {
           <ProfileSection />
 
           <MypageMenuItem href="/mypage/theme" title="테마" />
-          <ItemGroup className="rounded-xl bg-background">
+          <ItemGroup className="bg-background rounded-xl">
             <MypageMenuItem
               href="/mypage/reviews"
               title="내 리뷰"
               badge={
-                <span className="text-sm text-muted-foreground font-semibold">
+                <span className="text-muted-foreground text-sm font-semibold">
                   {reviewCount ?? 0}
                 </span>
               }
@@ -59,7 +59,7 @@ export default async function MyPage() {
               href="/mypage/places"
               title="내 장소"
               badge={
-                <span className="text-sm text-muted-foreground font-semibold">
+                <span className="text-muted-foreground text-sm font-semibold">
                   {favoriteCount ?? 0}
                 </span>
               }
@@ -69,7 +69,7 @@ export default async function MyPage() {
               href="/mypage/ranking"
               title="랭킹"
               badge={
-                <span className="text-sm text-accent-foreground font-semibold">
+                <span className="text-accent-foreground text-sm font-semibold">
                   {(profile?.total_points ?? 0).toLocaleString()}P
                 </span>
               }
@@ -83,7 +83,7 @@ export default async function MyPage() {
               inGroup
             />
           </ItemGroup>
-          <ItemGroup className="rounded-xl bg-background">
+          <ItemGroup className="bg-background rounded-xl">
             <MypageMenuItem
               href="/mypage/feedback"
               title="피드백 보내기"
@@ -92,7 +92,7 @@ export default async function MyPage() {
             <MypageMenuItem href="/terms" title="이용약관" inGroup />
             <MypageMenuItem href="/privacy" title="개인정보처리방침" inGroup />
           </ItemGroup>
-          <ItemGroup className="rounded-xl bg-background">
+          <ItemGroup className="bg-background rounded-xl">
             <LogoutMenuItem />
             {user.app_metadata.providers?.includes("email") && (
               <MypageMenuItem

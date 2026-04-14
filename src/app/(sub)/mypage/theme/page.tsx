@@ -32,7 +32,7 @@ export default function ThemePage() {
     <div className="h-dvh">
       <SubHeader title="테마" />
       <div className="mx-auto w-full max-w-4xl px-4 pt-8">
-        <ItemGroup className="rounded-xl bg-card">
+        <ItemGroup className="bg-card rounded-xl">
           {THEME_OPTIONS.map(({ value, label }) => (
             <Item
               key={value}
@@ -44,7 +44,7 @@ export default function ThemePage() {
               </ItemContent>
               {theme === value && (
                 <ItemActions>
-                  <Check className="size-4 text-primary" />
+                  <Check className="text-primary size-4" />
                 </ItemActions>
               )}
             </Item>

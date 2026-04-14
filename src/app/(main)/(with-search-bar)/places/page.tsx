@@ -1,5 +1,9 @@
 import { Suspense } from "react";
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import { AllPlaceList } from "@/components/places";
 import { QUERY_STALE_TIME } from "@/lib/constants";
 import { fetchPlaces } from "@/lib/queries/places";

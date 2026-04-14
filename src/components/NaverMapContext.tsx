@@ -19,6 +19,8 @@ export function NaverMapProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <NaverMapContext.Provider value={value}>{children}</NaverMapContext.Provider>
+    <NaverMapContext.Provider value={value}>
+      {children}
+    </NaverMapContext.Provider>
   );
 }

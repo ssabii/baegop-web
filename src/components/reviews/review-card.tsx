@@ -39,7 +39,7 @@ export function ReviewCard({ review, onClick, className }: ReviewCardProps) {
             {review.place?.name ?? "알 수 없는 장소"}
           </span>
           {review.place && (
-            <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+            <ChevronRight className="text-muted-foreground size-4 shrink-0" />
           )}
         </div>
         <div className="flex items-center gap-1.5">
@@ -56,19 +56,19 @@ export function ReviewCard({ review, onClick, className }: ReviewCardProps) {
             ))}
           </div>
           {review.created_at && (
-            <span className="text-xs text-muted-foreground/60">
+            <span className="text-muted-foreground/60 text-xs">
               {formatRelativeDate(review.created_at)}
             </span>
           )}
         </div>
         {review.content && (
-          <p className="line-clamp-2 text-sm text-secondary-foreground">
+          <p className="text-secondary-foreground line-clamp-2 text-sm">
             {review.content}
           </p>
         )}
       </div>
       {images.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto scrollbar-none md:grid md:grid-cols-5">
+        <div className="scrollbar-none flex gap-2 overflow-x-auto md:grid md:grid-cols-5">
           {images.map((url, i) => (
             <button
               key={i}

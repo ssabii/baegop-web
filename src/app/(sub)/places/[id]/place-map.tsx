@@ -9,8 +9,8 @@ import dynamic from "next/dynamic";
 const NaverMap = dynamic(() => import("@/components/NaverMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-[30vh] items-center justify-center overflow-hidden rounded-xl border bg-muted">
-      <Spinner className="size-8 text-primary" aria-label="로딩 중" />
+    <div className="bg-muted flex h-[30vh] items-center justify-center overflow-hidden rounded-xl border">
+      <Spinner className="text-primary size-8" aria-label="로딩 중" />
     </div>
   ),
 });

@@ -5,11 +5,7 @@ import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -183,7 +179,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
         onBack={handleBack}
       />
 
-      <main className="max-w-4xl mx-auto w-full px-4 pt-4 pb-32">
+      <main className="mx-auto w-full max-w-4xl px-4 pt-4 pb-32">
         <div className="space-y-6">
           {/* 카테고리 */}
           <div>
@@ -216,19 +212,19 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                 setDrawerContent(content);
                 setContentDrawerOpen(true);
               }}
-              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
+              className="focus-visible:border-ring focus-visible:ring-ring/50 mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
             >
               {content ? (
-                <div className="w-full min-w-0 line-clamp-4 whitespace-pre-wrap text-left">
+                <div className="line-clamp-4 w-full min-w-0 text-left whitespace-pre-wrap">
                   {content}
                 </div>
               ) : (
-                <div className="w-full whitespace-pre-wrap text-left text-muted-foreground">
+                <div className="text-muted-foreground w-full text-left whitespace-pre-wrap">
                   {FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
                 </div>
               )}
             </button>
-            <p className="mt-1 text-right text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-right text-sm">
               (최소 {MIN_FEEDBACK_CONTENT_LENGTH}자) {content.length}/
               {MAX_FEEDBACK_CONTENT_LENGTH}
             </p>
@@ -239,7 +235,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             onOpenChange={setContentDrawerOpen}
           >
             <DrawerContent>
-              <div className="max-w-4xl mx-auto w-full p-4">
+              <div className="mx-auto w-full max-w-4xl p-4">
                 <DrawerTitle className="sr-only">피드백 내용 작성</DrawerTitle>
                 <Textarea
                   autoFocus
@@ -258,11 +254,11 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                   maxLength={MAX_FEEDBACK_CONTENT_LENGTH}
                   rows={8}
                 />
-                <p className="mt-2 text-right text-sm text-muted-foreground">
+                <p className="text-muted-foreground mt-2 text-right text-sm">
                   {drawerContent.length}/{MAX_FEEDBACK_CONTENT_LENGTH}
                 </p>
                 <Button
-                  className="w-full mt-4"
+                  className="mt-4 w-full"
                   size="xl"
                   onClick={() => {
                     setContent(drawerContent);
@@ -279,7 +275,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
           <div>
             <div className="flex items-baseline gap-1.5">
               <Label className="text-base font-bold">사진</Label>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground text-sm">
                 {totalImageCount}/{MAX_FEEDBACK_IMAGES}
               </span>
             </div>
@@ -288,7 +284,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                 type="button"
                 disabled={isPending || compressingCount > 0}
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
+                className="text-muted-foreground hover:border-primary hover:text-primary mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
               >
                 {compressingCount > 0 ? (
                   <Loader2 className="size-5 animate-spin" />
@@ -320,7 +316,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                       type="button"
                       disabled={isPending || compressingCount > 0}
                       onClick={() => removeExistingImage(url)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
+                      className="bg-foreground/80 text-background absolute top-1 right-1 rounded-full p-0.5 shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
@@ -348,7 +344,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                       type="button"
                       disabled={isPending || compressingCount > 0}
                       onClick={() => removeNewFile(i)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
+                      className="bg-foreground/80 text-background absolute top-1 right-1 rounded-full p-0.5 shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
@@ -359,7 +355,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                     type="button"
                     disabled={isPending || compressingCount > 0}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
+                    className="text-muted-foreground hover:border-primary hover:text-primary flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
                   >
                     {compressingCount > 0 ? (
                       <Loader2 className="size-5 animate-spin" />

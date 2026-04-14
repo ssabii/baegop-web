@@ -10,7 +10,7 @@ const ReactQueryDevtools =
     ? lazy(() =>
         import("@tanstack/react-query-devtools").then((mod) => ({
           default: mod.ReactQueryDevtools,
-        }))
+        })),
       )
     : () => null;
 
@@ -25,9 +25,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         enableSystem
         disableTransitionOnChange
       >
-        <ConfirmDialogProvider>
-          {children}
-        </ConfirmDialogProvider>
+        <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
       </ThemeProvider>
       <Suspense>
         <ReactQueryDevtools initialIsOpen={false} />

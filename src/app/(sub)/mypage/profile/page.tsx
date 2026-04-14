@@ -13,7 +13,7 @@ export default async function ProfileEditPage() {
   if (!user) redirect("/signin");
 
   return (
-    <div className="h-dvh flex flex-col">
+    <div className="flex h-dvh flex-col">
       <SubHeader title="프로필" />
       <ProfileEditForm />
     </div>

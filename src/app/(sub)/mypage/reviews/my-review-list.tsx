@@ -32,7 +32,7 @@ export function MyReviewList({ userId }: MyReviewListProps) {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Spinner className="size-8 text-primary" />
+        <Spinner className="text-primary size-8" />
       </div>
     );
   }
@@ -46,7 +46,7 @@ export function MyReviewList({ userId }: MyReviewListProps) {
               variant="icon"
               className="size-12 rounded-none bg-transparent"
             >
-              <MessageCircle className="size-12 text-primary" />
+              <MessageCircle className="text-primary size-12" />
             </EmptyMedia>
             <EmptyTitle className="font-bold">작성한 리뷰가 없어요</EmptyTitle>
           </EmptyHeader>
@@ -57,7 +57,7 @@ export function MyReviewList({ userId }: MyReviewListProps) {
 
   return (
     <>
-      <div className="p-4 divide-y">
+      <div className="divide-y p-4">
         {reviews.map((review) => {
           const place = review.places
             ? { id: String(review.places.id), name: review.places.name }
@@ -74,7 +74,7 @@ export function MyReviewList({ userId }: MyReviewListProps) {
         })}
       </div>
       <div ref={sentinelRef} className="flex justify-center">
-        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+        {isFetchingNextPage && <Spinner className="text-primary size-6" />}
       </div>
     </>
   );

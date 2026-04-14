@@ -10,24 +10,20 @@ export interface Profile {
   totalPoints: number;
 }
 
-
 export function getMaskedEmail(email: string): string {
   const [local, domain] = email.split("@");
 
   if (!local) return email;
 
   const maskedLocal =
-    local.length <= 2
-      ? "*".repeat(local.length)
-      : local.slice(0, 2) + "******";
+    local.length <= 2 ? "*".repeat(local.length) : local.slice(0, 2) + "******";
 
   if (!domain) return maskedLocal;
 
   const dotIndex = domain.indexOf(".");
   if (dotIndex <= 0) return `${maskedLocal}@${"*******"}`;
 
-  const maskedDomain =
-    domain.slice(0, 1) + "*******" + domain.slice(dotIndex);
+  const maskedDomain = domain.slice(0, 1) + "*******" + domain.slice(dotIndex);
 
   return `${maskedLocal}@${maskedDomain}`;
 }

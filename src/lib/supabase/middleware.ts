@@ -16,17 +16,17 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   const {
@@ -37,9 +37,7 @@ export async function updateSession(request: NextRequest) {
   const protectedPaths = ["/mypage"];
   const publicPaths = ["/mypage/delete-account/complete"];
   const isProtected =
-    protectedPaths.some((path) =>
-      request.nextUrl.pathname.startsWith(path)
-    ) &&
+    protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path)) &&
     !publicPaths.includes(request.nextUrl.pathname);
 
   if (!user && isProtected) {

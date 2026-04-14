@@ -41,7 +41,7 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
   if (isLoading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Spinner className="size-8 text-primary" />
+        <Spinner className="text-primary size-8" />
       </div>
     );
   }
@@ -55,7 +55,7 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
               variant="icon"
               className="size-12 rounded-none bg-transparent"
             >
-              <Send className="size-12 text-primary" />
+              <Send className="text-primary size-12" />
             </EmptyMedia>
             <EmptyTitle className="font-bold">
               작성한 피드백이 없어요
@@ -74,13 +74,13 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
 
   return (
     <>
-      <div className="p-4 pb-23 divide-y">
+      <div className="divide-y p-4 pb-23">
         {feedbacks.map((feedback) => (
           <FeedbackCard key={feedback.id} feedback={feedback} />
         ))}
       </div>
       <div ref={sentinelRef} className="flex justify-center">
-        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+        {isFetchingNextPage && <Spinner className="text-primary size-6" />}
       </div>
       <BottomActionBar>
         <div className="mx-auto flex max-w-4xl">

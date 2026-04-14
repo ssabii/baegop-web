@@ -190,7 +190,7 @@ export default function NaverMap({
   if (error) {
     return (
       <div className={className}>
-        <div className="flex h-full items-center justify-center rounded-lg border bg-muted p-4 text-sm text-muted-foreground">
+        <div className="bg-muted text-muted-foreground flex h-full items-center justify-center rounded-lg border p-4 text-sm">
           {error}
         </div>
       </div>

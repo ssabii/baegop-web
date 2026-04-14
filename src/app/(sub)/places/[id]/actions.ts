@@ -82,7 +82,9 @@ export async function updateReview(
     .single();
 
   // 삭제할 이미지 계산: DB에 있지만 keptImageUrls에 없는 이미지
-  const keptOriginalUrls = new Set(keptImageUrls.map(toOriginalSupabaseImageUrl));
+  const keptOriginalUrls = new Set(
+    keptImageUrls.map(toOriginalSupabaseImageUrl),
+  );
   const toDelete = (existing?.image_urls ?? []).filter(
     (url) => !keptOriginalUrls.has(url),
   );
