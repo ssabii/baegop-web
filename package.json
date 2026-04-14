@@ -43,6 +43,7 @@
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.8.2",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "puppeteer": "^24.37.3",
     "shadcn": "^3.8.4",
     "tailwindcss": "^4",
