@@ -50,7 +50,7 @@ function ReviewEmpty() {
           variant="icon"
           className="size-12 rounded-none bg-transparent"
         >
-          <MessageCircle className="size-12 text-primary" />
+          <MessageCircle className="text-primary size-12" />
         </EmptyMedia>
         <EmptyTitle className="font-bold">작성된 리뷰가 없어요</EmptyTitle>
         <EmptyDescription>첫 번째 리뷰를 작성해보세요!</EmptyDescription>
@@ -84,7 +84,7 @@ function ReviewSectionContent({
   if (isLoading) {
     return (
       <div className="flex h-[30vh] items-center justify-center">
-        <Spinner className="size-8 text-primary" />
+        <Spinner className="text-primary size-8" />
       </div>
     );
   }
@@ -106,7 +106,7 @@ function ReviewSectionContent({
         ))}
       </div>
       <div ref={sentinelRef} className="flex items-center justify-center">
-        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+        {isFetchingNextPage && <Spinner className="text-primary size-6" />}
       </div>
     </div>
   );

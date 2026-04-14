@@ -2,9 +2,9 @@ export default function PrivacyPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       <h1 className="text-2xl font-bold">개인정보처리방침</h1>
-      <p className="mt-2 text-muted-foreground">시행일: 2026년 3월 2일</p>
+      <p className="text-muted-foreground mt-2">시행일: 2026년 3월 2일</p>
 
-      <div className="mt-8 space-y-8 leading-relaxed text-foreground">
+      <div className="text-foreground mt-8 space-y-8 leading-relaxed">
         <section>
           <h2 className="text-lg font-semibold">
             1. 개인정보의 수집 및 이용 목적
@@ -24,7 +24,8 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold">2. 수집하는 개인정보 항목</h2>
           <p className="mt-2">
-            서비스는 Google, 카카오 및 네이버 OAuth를 통해 다음 항목을 수집합니다.
+            서비스는 Google, 카카오 및 네이버 OAuth를 통해 다음 항목을
+            수집합니다.
           </p>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>이메일 주소</li>

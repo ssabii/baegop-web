@@ -17,7 +17,12 @@ export async function GET(
   const supabase = await createClient();
 
   // Step 1: DB 장소 조회 + 인증 확인 (병렬)
-  const [{ data: place }, { data: { user: authUser } }] = await Promise.all([
+  const [
+    { data: place },
+    {
+      data: { user: authUser },
+    },
+  ] = await Promise.all([
     supabase.from("places").select("*").eq("id", naverPlaceId).single(),
     supabase.auth.getUser(),
   ]);
@@ -29,7 +34,10 @@ export async function GET(
   const walkingRouteQuery =
     x && y
       ? fetchWalkingRoutes(
-          { lng: String(COMPANY_LOCATION.lng), lat: String(COMPANY_LOCATION.lat) },
+          {
+            lng: String(COMPANY_LOCATION.lng),
+            lat: String(COMPANY_LOCATION.lat),
+          },
           { lng: x, lat: y },
         )
       : Promise.resolve(null);
@@ -71,7 +79,8 @@ export async function GET(
       ? {
           id: place.id,
           name: place.name,
-          kona_card_status: (place.kona_card_status as KonaCardStatus) ?? "unknown",
+          kona_card_status:
+            (place.kona_card_status as KonaCardStatus) ?? "unknown",
           image_urls: place.image_urls,
         }
       : null,

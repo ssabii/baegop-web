@@ -5,11 +5,7 @@ import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
@@ -181,14 +177,14 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
         onBack={handleBack}
       />
 
-      <main className="max-w-4xl mx-auto w-full px-4 pt-4 pb-32">
+      <main className="mx-auto w-full max-w-4xl px-4 pt-4 pb-32">
         <div className="space-y-6">
           {/* 가게 정보 */}
           <div className="flex gap-3">
             <div className="flex-1">
               <h2 className="line-clamp-2 font-bold">{place.name}</h2>
               {place.category && (
-                <p className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+                <p className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
                   <Tag className="size-3 shrink-0" />
                   <span className="truncate">{place.category}</span>
                 </p>
@@ -201,8 +197,8 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                 className="aspect-square size-17 shrink-0 rounded-lg object-cover"
               />
             ) : (
-              <div className="flex aspect-square size-17 shrink-0 items-center justify-center rounded-lg bg-muted">
-                <Building2 className="size-5 text-muted-foreground" />
+              <div className="bg-muted flex aspect-square size-17 shrink-0 items-center justify-center rounded-lg">
+                <Building2 className="text-muted-foreground size-5" />
               </div>
             )}
           </div>
@@ -243,19 +239,19 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                 setDrawerContent(content);
                 setContentDrawerOpen(true);
               }}
-              className="mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
+              className="focus-visible:border-ring focus-visible:ring-ring/50 mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
             >
               {content ? (
-                <div className="w-full min-w-0 line-clamp-4 whitespace-pre-wrap text-left">
+                <div className="line-clamp-4 w-full min-w-0 text-left whitespace-pre-wrap">
                   {content}
                 </div>
               ) : (
-                <div className="w-full text-left text-muted-foreground">
+                <div className="text-muted-foreground w-full text-left">
                   장소에 대한 자세한 리뷰를 남겨주세요
                 </div>
               )}
             </button>
-            <p className="mt-1 text-right text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-right text-sm">
               {content.length}/{MAX_CONTENT_LENGTH}
             </p>
           </div>
@@ -265,7 +261,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             onOpenChange={setContentDrawerOpen}
           >
             <DrawerContent>
-              <div className="max-w-4xl mx-auto w-full p-4">
+              <div className="mx-auto w-full max-w-4xl p-4">
                 <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
                 <Textarea
                   autoFocus
@@ -284,11 +280,11 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                   maxLength={MAX_CONTENT_LENGTH}
                   rows={5}
                 />
-                <p className="mt-2 text-right text-sm text-muted-foreground">
+                <p className="text-muted-foreground mt-2 text-right text-sm">
                   {drawerContent.length}/{MAX_CONTENT_LENGTH}
                 </p>
                 <Button
-                  className="w-full mt-4"
+                  className="mt-4 w-full"
                   size="xl"
                   onClick={() => {
                     setContent(drawerContent);
@@ -305,7 +301,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
           <div>
             <div className="flex items-baseline gap-1.5">
               <Label className="text-base font-bold">사진</Label>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-muted-foreground text-sm">
                 {totalImageCount}/{MAX_IMAGES}
               </span>
             </div>
@@ -314,7 +310,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                 type="button"
                 disabled={isPending || compressingCount > 0}
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
+                className="text-muted-foreground hover:border-primary hover:text-primary mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
               >
                 {compressingCount > 0 ? (
                   <Loader2 className="size-5 animate-spin" />
@@ -346,7 +342,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                       type="button"
                       disabled={isPending || compressingCount > 0}
                       onClick={() => removeExistingImage(url)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
+                      className="bg-foreground/80 text-background absolute top-1 right-1 rounded-full p-0.5 shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
@@ -374,7 +370,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                       type="button"
                       disabled={isPending || compressingCount > 0}
                       onClick={() => removeNewFile(i)}
-                      className="absolute top-1 right-1 rounded-full bg-foreground/80 p-0.5 text-background shadow-sm disabled:pointer-events-none disabled:opacity-50"
+                      className="bg-foreground/80 text-background absolute top-1 right-1 rounded-full p-0.5 shadow-sm disabled:pointer-events-none disabled:opacity-50"
                     >
                       <X className="size-3" />
                     </button>
@@ -385,7 +381,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                     type="button"
                     disabled={isPending || compressingCount > 0}
                     onClick={() => fileInputRef.current?.click()}
-                    className="flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
+                    className="text-muted-foreground hover:border-primary hover:text-primary flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
                   >
                     {compressingCount > 0 ? (
                       <Loader2 className="size-5 animate-spin" />

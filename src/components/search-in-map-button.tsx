@@ -20,8 +20,8 @@ export function SearchInMapButton({
       className={cn(
         "absolute -top-12 left-1/2 -translate-x-1/2 transition-all duration-300",
         {
-          "opacity-100 translate-y-0": visible,
-          "opacity-0 translate-y-2 pointer-events-none": !visible,
+          "translate-y-0 opacity-100": visible,
+          "pointer-events-none translate-y-2 opacity-0": !visible,
         },
       )}
     >
@@ -31,8 +31,7 @@ export function SearchInMapButton({
         className={cn("rounded-full shadow-lg", className)}
         onClick={onClick}
       >
-        <RotateCcw className="size-4" />
-        현 지도에서 검색
+        <RotateCcw className="size-4" />현 지도에서 검색
       </Button>
     </div>
   );

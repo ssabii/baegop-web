@@ -20,11 +20,11 @@ export function RandomCard({ place }: RandomCardProps) {
         <img
           src={thumbnail}
           alt={place.name}
-          className="h-48 w-full object-cover rounded-xl"
+          className="h-48 w-full rounded-xl object-cover"
         />
       ) : (
-        <div className="flex h-48 w-full items-center justify-center bg-muted rounded-xl">
-          <Building2 className="size-12 text-muted-foreground" />
+        <div className="bg-muted flex h-48 w-full items-center justify-center rounded-xl">
+          <Building2 className="text-muted-foreground size-12" />
         </div>
       )}
 
@@ -32,13 +32,13 @@ export function RandomCard({ place }: RandomCardProps) {
         <h2 className="text-xl font-bold">{place.name}</h2>
 
         {place.category && (
-          <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+          <p className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
             <Tag className="size-4 shrink-0" />
             {place.category}
           </p>
         )}
 
-        <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+        <p className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
           <MapPin className="size-4 shrink-0" />
           <span className="truncate">{place.address}</span>
         </p>
@@ -49,7 +49,7 @@ export function RandomCard({ place }: RandomCardProps) {
             <span className="text-sm font-medium text-yellow-500">
               {place.avg_rating.toFixed(1)}
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-muted-foreground text-sm">
               ({place.review_count})
             </span>
           </div>

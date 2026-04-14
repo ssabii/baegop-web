@@ -52,13 +52,10 @@ export function HomeBannerCarousel() {
           <button
             key={key}
             type="button"
-            className={cn(
-              "size-1.5 rounded-full transition-colors",
-              {
-                "bg-foreground": current === index,
-                "bg-foreground/20": current !== index,
-              },
-            )}
+            className={cn("size-1.5 rounded-full transition-colors", {
+              "bg-foreground": current === index,
+              "bg-foreground/20": current !== index,
+            })}
             onClick={() => api?.scrollTo(index)}
             aria-label={`배너 ${index + 1}`}
           />

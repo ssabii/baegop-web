@@ -43,8 +43,13 @@ export default async function PlaceDetailPage({
   const authQuery = supabase.auth.getUser();
   const naverDetailQuery = fetchPlaceDetail(naverPlaceId);
 
-  const [{ data: place }, { data: { user: authUser } }, naverDetail] =
-    await Promise.all([placeQuery, authQuery, naverDetailQuery]);
+  const [
+    { data: place },
+    {
+      data: { user: authUser },
+    },
+    naverDetail,
+  ] = await Promise.all([placeQuery, authQuery, naverDetailQuery]);
 
   const isRegistered = !!place;
   const user = authUser ? { id: authUser.id } : null;
@@ -80,7 +85,9 @@ export default async function PlaceDetailPage({
   const reviewsQuery = isRegistered
     ? supabase
         .from("reviews")
-        .select("*, profiles(nickname, avatar_url, total_points)", { count: "exact" })
+        .select("*, profiles(nickname, avatar_url, total_points)", {
+          count: "exact",
+        })
         .eq("place_id", place.id)
         .order("created_at", { ascending: false })
         .range(0, PAGE_SIZE - 1)
@@ -116,7 +123,9 @@ export default async function PlaceDetailPage({
   const initialReviews = {
     items: reviews.map((review) => ({
       ...review,
-      image_urls: (review.image_urls ?? []).map((url) => optimizeSupabaseImageUrl(url)),
+      image_urls: (review.image_urls ?? []).map((url) =>
+        optimizeSupabaseImageUrl(url),
+      ),
     })),
     nextCursor: reviews.length === PAGE_SIZE ? PAGE_SIZE : null,
   };
@@ -151,19 +160,19 @@ export default async function PlaceDetailPage({
             </div>
 
             {detail.category && (
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
                 <Tag className="size-4 shrink-0" />
                 {detail.category}
               </div>
             )}
             {detail.phone && (
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
                 <Phone className="size-4 shrink-0" />
                 <a href={`tel:${detail.phone}`}>{detail.phone}</a>
               </div>
             )}
             {walkingRoute && (
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
                 <Footprints className="size-4 shrink-0" />
                 <div className="flex items-center">
                   <div>
@@ -177,7 +186,7 @@ export default async function PlaceDetailPage({
               </div>
             )}
             {address && (
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
                 <MapPin className="size-4 shrink-0" />
                 <span className="[text-decoration:none]">{address}</span>
               </div>
@@ -185,11 +194,11 @@ export default async function PlaceDetailPage({
             {/* 별점 */}
             {isRegistered && avgRating !== null && (
               <div className="flex items-center gap-1">
-                <Star className="size-4 text-yellow-500 fill-yellow-500" />
+                <Star className="size-4 fill-yellow-500 text-yellow-500" />
                 <span className="text-sm font-medium text-yellow-500">
                   {avgRating.toFixed(1)}
                 </span>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-muted-foreground text-sm">
                   ({reviewCount})
                 </span>
               </div>
@@ -208,11 +217,7 @@ export default async function PlaceDetailPage({
           </section>
 
           {/* 장소 맵 */}
-          <PlaceMap
-            lat={detail.y}
-            lng={detail.x}
-            name={detail.name}
-          />
+          <PlaceMap lat={detail.y} lng={detail.x} name={detail.name} />
 
           {/* 바로가기 버튼 */}
           <PlaceShortcuts

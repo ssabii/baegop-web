@@ -29,14 +29,14 @@ export function RandomContent({
 
   if (!hasPlaces) {
     return (
-      <div className="absolute inset-0 flex w-full h-full items-center justify-center">
+      <div className="absolute inset-0 flex h-full w-full items-center justify-center">
         <RandomEmptyNoResults />
       </div>
     );
   }
 
   return (
-    <div className="absolute inset-0 flex w-full h-full items-center justify-center">
+    <div className="absolute inset-0 flex h-full w-full items-center justify-center">
       <RandomEmptyInitial />
     </div>
   );

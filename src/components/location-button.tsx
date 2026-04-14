@@ -45,10 +45,10 @@ export function LocationButton({ onLocate }: LocationButtonProps) {
       <button
         type="button"
         onClick={handleClick}
-        className="flex size-10 cursor-pointer items-center justify-center rounded-full border bg-background shadow-sm transition-colors hover:bg-accent"
+        className="bg-background hover:bg-accent flex size-10 cursor-pointer items-center justify-center rounded-full border shadow-sm transition-colors"
         aria-label="현재 위치"
       >
-        <LocateFixed className="size-5 text-foreground" />
+        <LocateFixed className="text-foreground size-5" />
       </button>
 
       <Dialog open={errorOpen} onOpenChange={setErrorOpen}>

@@ -23,7 +23,7 @@ export function RankingCard({ user, rank, isCurrentUser }: RankingCardProps) {
         "bg-primary/10 dark:bg-primary/20": isCurrentUser,
       })}
     >
-      <div className="w-8 shrink-0 flex justify-center">
+      <div className="flex w-8 shrink-0 justify-center">
         <span
           className={cn(
             "text-sm font-bold",
@@ -47,18 +47,18 @@ export function RankingCard({ user, rank, isCurrentUser }: RankingCardProps) {
           }
         />
         <AvatarFallback>
-          <UserRound className="size-10 text-muted-foreground" />
+          <UserRound className="text-muted-foreground size-10" />
         </AvatarFallback>
       </Avatar>
       <span
-        className={cn("flex-1 text-sm font-medium truncate", {
+        className={cn("flex-1 truncate text-sm font-medium", {
           "font-bold": isCurrentUser,
         })}
       >
         {user.nickname ?? "사용자"}
       </span>
       <span
-        className={cn("font-bold shrink-0 text-sm text-muted-foreground", {
+        className={cn("text-muted-foreground shrink-0 text-sm font-bold", {
           "text-accent-foreground": isCurrentUser,
         })}
       >

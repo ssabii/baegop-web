@@ -27,7 +27,12 @@ export function useUpdateFeedback(feedbackId: number) {
           ? await uploadFeedbackImages(feedbackId, files)
           : undefined;
 
-      await updateFeedback(feedbackId, { category, content }, keptImageUrls, newImageUrls);
+      await updateFeedback(
+        feedbackId,
+        { category, content },
+        keptImageUrls,
+        newImageUrls,
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });

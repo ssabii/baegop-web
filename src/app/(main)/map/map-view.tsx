@@ -11,8 +11,8 @@ import dynamic from "next/dynamic";
 const NaverMap = dynamic(() => import("@/components/NaverMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex size-full items-center justify-center rounded-lg border bg-muted text-sm text-muted-foreground">
-      <Spinner className="size-8 text-primary" aria-label="로딩 중" />
+    <div className="bg-muted text-muted-foreground flex size-full items-center justify-center rounded-lg border text-sm">
+      <Spinner className="text-primary size-8" aria-label="로딩 중" />
     </div>
   ),
 });
@@ -43,7 +43,10 @@ interface MapViewProps {
   fitBoundsPadding?: Padding;
   focusMarkerId?: string | null;
   onMarkerClick?: (id: string) => void;
-  onOverlapClick?: (markers: MapMarker[], anchorPos: { x: number; y: number }) => void;
+  onOverlapClick?: (
+    markers: MapMarker[],
+    anchorPos: { x: number; y: number },
+  ) => void;
   onDragEnd?: () => void;
   onMapClick?: () => void;
   showLabels?: boolean;
@@ -208,21 +211,17 @@ export function MapView({
       },
     );
 
-    const dragEndListener = naver.maps.Event.addListener(
-      map,
-      "dragend",
-      () => {
-        const endCenter = map.getCenter() as naver.maps.LatLng;
-        if (
-          dragStartCenter &&
-          (dragStartCenter.lat() !== endCenter.lat() ||
-            dragStartCenter.lng() !== endCenter.lng())
-        ) {
-          onDragEndRef.current?.();
-        }
-        dragStartCenter = null;
-      },
-    );
+    const dragEndListener = naver.maps.Event.addListener(map, "dragend", () => {
+      const endCenter = map.getCenter() as naver.maps.LatLng;
+      if (
+        dragStartCenter &&
+        (dragStartCenter.lat() !== endCenter.lat() ||
+          dragStartCenter.lng() !== endCenter.lng())
+      ) {
+        onDragEndRef.current?.();
+      }
+      dragStartCenter = null;
+    });
 
     const clickListener = naver.maps.Event.addListener(map, "click", () => {
       onMapClickRef.current?.();

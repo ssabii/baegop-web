@@ -33,7 +33,7 @@ export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
-        <Spinner className="size-8 text-primary" />
+        <Spinner className="text-primary size-8" />
       </div>
     );
   }
@@ -46,7 +46,7 @@ export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
             variant="icon"
             className="size-12 rounded-none bg-transparent"
           >
-            <UtensilsCrossed className="size-12 text-primary" />
+            <UtensilsCrossed className="text-primary size-12" />
           </EmptyMedia>
           <EmptyTitle className="font-bold">등록된 메뉴가 없어요</EmptyTitle>
         </EmptyHeader>
@@ -72,18 +72,21 @@ export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
               )}
               <div className="truncate text-sm font-bold">{menu.name}</div>
               {menu.description && (
-                <div className="line-clamp-2 text-sm text-muted-foreground">
+                <div className="text-muted-foreground line-clamp-2 text-sm">
                   {menu.description}
                 </div>
               )}
               {menu.price && (
-                <div className="text-sm font-bold text-accent-foreground">
+                <div className="text-accent-foreground text-sm font-bold">
                   {Number(menu.price).toLocaleString()}원
                 </div>
               )}
             </div>
             {menu.images.length > 0 ? (
-              <ImagePreviewDialog src={optimizeNaverImageUrl(menu.images[0])} alt={menu.name}>
+              <ImagePreviewDialog
+                src={optimizeNaverImageUrl(menu.images[0])}
+                alt={menu.name}
+              >
                 <img
                   src={optimizeNaverImageUrl(menu.images[0])}
                   alt={menu.name}
@@ -91,15 +94,15 @@ export function MenuSection({ naverPlaceId, initialData }: MenuSectionProps) {
                 />
               </ImagePreviewDialog>
             ) : (
-              <div className="flex size-22 shrink-0 items-center justify-center rounded-lg bg-muted">
-                <UtensilsCrossed className="size-5 text-muted-foreground" />
+              <div className="bg-muted flex size-22 shrink-0 items-center justify-center rounded-lg">
+                <UtensilsCrossed className="text-muted-foreground size-5" />
               </div>
             )}
           </li>
         ))}
       </ul>
       <div ref={sentinelRef} className="flex items-center justify-center">
-        {isFetchingNextPage && <Spinner className="size-6 text-primary" />}
+        {isFetchingNextPage && <Spinner className="text-primary size-6" />}
       </div>
     </div>
   );

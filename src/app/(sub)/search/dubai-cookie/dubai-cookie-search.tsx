@@ -38,12 +38,12 @@ function StoreListItem({
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="text-base font-bold">{store.name}</span>
         {store.category && (
-          <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+          <span className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
             <Tag className="size-3 shrink-0" />
             <span>{store.category}</span>
           </span>
         )}
-        <span className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+        <span className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
           <MapPin className="size-3 shrink-0" />
           <span>{formatShortAddress(store.roadAddress || store.address)}</span>
         </span>
@@ -56,8 +56,8 @@ function StoreListItem({
           onError={() => setImgError(true)}
         />
       ) : (
-        <div className="flex size-20 shrink-0 items-center justify-center rounded-lg bg-muted">
-          <Building2 className="size-5 text-muted-foreground" />
+        <div className="bg-muted flex size-20 shrink-0 items-center justify-center rounded-lg">
+          <Building2 className="text-muted-foreground size-5" />
         </div>
       )}
     </button>
@@ -142,11 +142,11 @@ export function DubaiCookieSearch() {
           onSubmit={handleSubmit}
           className="relative mx-auto max-w-4xl"
         >
-          <div className="relative flex h-11 items-center rounded-full border bg-background shadow-sm">
+          <div className="bg-background relative flex h-11 items-center rounded-full border shadow-sm">
             <button
               type="button"
               onClick={handleBack}
-              className="absolute left-4 top-1/2 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 left-4 z-10 -translate-y-1/2 cursor-pointer transition-colors"
             >
               <ChevronLeft className="size-5" />
             </button>
@@ -165,7 +165,7 @@ export function DubaiCookieSearch() {
               <button
                 type="button"
                 onClick={handleClear}
-                className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer transition-colors"
               >
                 <X className="size-5" />
               </button>
@@ -207,7 +207,7 @@ export function DubaiCookieSearch() {
             <button
               type="button"
               onClick={clearAll}
-              className="cursor-pointer text-xs text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground cursor-pointer text-xs transition-colors"
             >
               전체 삭제
             </button>
@@ -218,15 +218,15 @@ export function DubaiCookieSearch() {
                 <button
                   type="button"
                   onClick={() => handleRecentClick(term)}
-                  className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 text-left transition-colors hover:bg-accent"
+                  className="hover:bg-accent flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 text-left transition-colors"
                 >
-                  <Clock className="size-4 shrink-0 text-muted-foreground" />
+                  <Clock className="text-muted-foreground size-4 shrink-0" />
                   <span className="truncate text-sm">{term}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => removeSearch(term)}
-                  className="shrink-0 cursor-pointer p-2 text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer p-2 transition-colors"
                 >
                   <X className="size-4" />
                 </button>

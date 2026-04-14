@@ -53,10 +53,10 @@ export function RandomFilter({
   return (
     <>
       <div
-        className="absolute inset-x-0 top-0 z-10 h-[38px] bg-background pb-3"
+        className="bg-background absolute inset-x-0 top-0 z-10 h-[38px] pb-3"
         onClick={() => onOpenChange(true)}
       >
-        <div className="flex gap-2 px-4 overflow-x-auto scrollbar-none">
+        <div className="scrollbar-none flex gap-2 overflow-x-auto px-4">
           {categories.length === 0 && !konaOnly ? (
             <Badge variant="secondary" className="shrink-0">
               전체
@@ -85,14 +85,14 @@ export function RandomFilter({
 
       <Drawer open={open} onOpenChange={handleOpenChange}>
         <DrawerContent>
-          <div className="max-w-4xl mx-auto w-full">
+          <div className="mx-auto w-full max-w-4xl">
             <DrawerHeader className="text-left">
               <DrawerTitle className="text-left">필터</DrawerTitle>
             </DrawerHeader>
 
             <div className="space-y-4 px-4 pb-4">
               <div className="space-y-2">
-                <p className="text-sm font-medium text-accent-foreground">
+                <p className="text-accent-foreground text-sm font-medium">
                   카테고리
                 </p>
                 <ToggleGroup
@@ -123,7 +123,7 @@ export function RandomFilter({
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm font-medium text-accent-foreground">
+                <p className="text-accent-foreground text-sm font-medium">
                   결제
                 </p>
                 <ToggleGroup

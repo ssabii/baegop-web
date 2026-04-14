@@ -66,14 +66,14 @@ export function MapOverlapPopover({
             <li key={item.id}>
               <button
                 type="button"
-                className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-accent"
+                className="hover:bg-accent flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm"
                 onClick={() => onSelect(item.id)}
               >
-                <MapPin className="size-4 shrink-0 text-primary" />
+                <MapPin className="text-primary size-4 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{item.title}</p>
                   {item.category && (
-                    <p className="truncate text-xs text-muted-foreground">
+                    <p className="text-muted-foreground truncate text-xs">
                       {item.category}
                     </p>
                   )}

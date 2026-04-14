@@ -5,8 +5,7 @@ import type {
   SmartAroundResponse,
 } from "@/types";
 
-const SMART_AROUND_URL =
-  "https://map.naver.com/p/api/smart-around/places";
+const SMART_AROUND_URL = "https://map.naver.com/p/api/smart-around/places";
 
 const NAVER_MAP_HEADERS = {
   "User-Agent":

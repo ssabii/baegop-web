@@ -113,7 +113,7 @@ export function SignInForm({
         <img
           src="/baegop-symbol.svg"
           alt="배곱"
-          className="w-[130px] h-[38px]"
+          className="h-[38px] w-[130px]"
         />
       </Link>
       {/* <Field data-invalid={emailError ? true : undefined}>
@@ -168,7 +168,7 @@ export function SignInForm({
               </Button>
             </Field>
             <FieldSeparator>또는</FieldSeparator> */}
-      <div className="flex flex-col gap-2.5 mb-6 w-full">
+      <div className="mb-6 flex w-full flex-col gap-2.5">
         <SignInBubble className="self-center" />
         <SignInButton
           provider="kakao"
@@ -203,7 +203,7 @@ export function SignInForm({
       </div>
       <Link
         href="/"
-        className="text-sm text-center text-[#4B5563] underline dark:text-[#D1D5DB]"
+        className="text-center text-sm text-[#4B5563] underline dark:text-[#D1D5DB]"
       >
         로그인하지 않고 둘러보기
       </Link>

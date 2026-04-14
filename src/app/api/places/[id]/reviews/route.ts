@@ -31,7 +31,9 @@ export async function GET(
 
   const items = (data ?? []).map((review) => ({
     ...review,
-    image_urls: (review.image_urls ?? []).map((url) => optimizeSupabaseImageUrl(url)),
+    image_urls: (review.image_urls ?? []).map((url) =>
+      optimizeSupabaseImageUrl(url),
+    ),
   }));
   const nextCursor = items.length === limit ? cursor + limit : null;
 

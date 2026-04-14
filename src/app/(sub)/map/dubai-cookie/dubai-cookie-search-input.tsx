@@ -21,8 +21,8 @@ export function DubaiCookieSearchInput({
   const [value, setValue] = useState("");
 
   useEffect(() => {
-      setValue(initialQuery);
-    },[initialQuery]);
+    setValue(initialQuery);
+  }, [initialQuery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,11 +44,11 @@ export function DubaiCookieSearchInput({
         onSubmit={handleSubmit}
         className="relative mx-auto max-w-4xl"
       >
-        <div className="relative flex h-11 items-center rounded-full border bg-background shadow-sm">
+        <div className="bg-background relative flex h-11 items-center rounded-full border shadow-sm">
           <button
             type="button"
             onClick={onBack}
-            className="absolute left-4 top-1/2 z-10 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 left-4 z-10 -translate-y-1/2 cursor-pointer transition-colors"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -65,7 +65,7 @@ export function DubaiCookieSearchInput({
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer transition-colors"
             >
               <X className="size-5" />
             </button>

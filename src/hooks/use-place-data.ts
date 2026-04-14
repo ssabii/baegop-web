@@ -19,7 +19,10 @@ interface PlaceDataResponse {
   } | null;
 }
 
-export function usePlaceData(naverPlaceId: string, coords: { x: string; y: string }) {
+export function usePlaceData(
+  naverPlaceId: string,
+  coords: { x: string; y: string },
+) {
   return useQuery({
     queryKey: placeKeys.data(naverPlaceId),
     queryFn: async () => {

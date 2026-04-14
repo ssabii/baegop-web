@@ -47,23 +47,26 @@ export function PlaceItem({
         )}
         <span className={cn("flex items-center gap-1", metaClass)}>
           <MapPin className="size-3 shrink-0" />
-          <span>
-            {formatShortAddress(item.roadAddress || item.address)}
-          </span>
+          <span>{formatShortAddress(item.roadAddress || item.address)}</span>
         </span>
       </div>
       {item.imageUrl && !imgError ? (
         <img
-          src={optimizeNaverImageUrl(item.imageUrl.replace(/^http:\/\//, "https://"))}
+          src={optimizeNaverImageUrl(
+            item.imageUrl.replace(/^http:\/\//, "https://"),
+          )}
           alt=""
           className={cn(thumbClass, "shrink-0 rounded-lg object-cover")}
           onError={() => setImgError(true)}
         />
       ) : (
         <div
-          className={cn("flex shrink-0 items-center justify-center rounded-lg bg-muted", thumbClass)}
+          className={cn(
+            "bg-muted flex shrink-0 items-center justify-center rounded-lg",
+            thumbClass,
+          )}
         >
-          <Building2 className="size-5 text-muted-foreground" />
+          <Building2 className="text-muted-foreground size-5" />
         </div>
       )}
     </button>

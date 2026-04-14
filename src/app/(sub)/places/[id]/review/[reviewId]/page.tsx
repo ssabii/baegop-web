@@ -45,12 +45,16 @@ export default async function ReviewEditPage({
         id: review.id,
         rating: review.rating,
         content: review.content,
-        image_urls: (review.image_urls ?? []).map((url) => optimizeSupabaseImageUrl(url)),
+        image_urls: (review.image_urls ?? []).map((url) =>
+          optimizeSupabaseImageUrl(url),
+        ),
       }}
       place={{
         name: place.name,
         category: place.category,
-        imageUrl: place.image_urls?.[0] ? optimizeNaverImageUrl(place.image_urls[0]) : null,
+        imageUrl: place.image_urls?.[0]
+          ? optimizeNaverImageUrl(place.image_urls[0])
+          : null,
       }}
     />
   );

@@ -25,10 +25,7 @@ const LIMIT = 10;
 
 export type { ReviewsResponse };
 
-export function useReviews(
-  placeId: string,
-  initialData?: ReviewsResponse,
-) {
+export function useReviews(placeId: string, initialData?: ReviewsResponse) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
       queryKey: reviewKeys.list(placeId),

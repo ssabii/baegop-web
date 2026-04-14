@@ -17,7 +17,10 @@ export function SearchBarAvatar() {
     <Link href="/mypage">
       <Avatar size="sm">
         {profile.avatarUrl && (
-          <AvatarImage src={optimizeSupabaseImageUrl(profile.avatarUrl)} alt={profile.nickname} />
+          <AvatarImage
+            src={optimizeSupabaseImageUrl(profile.avatarUrl)}
+            alt={profile.nickname}
+          />
         )}
         <AvatarFallback>
           <User className="size-3.5" />

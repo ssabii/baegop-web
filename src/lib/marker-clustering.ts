@@ -6,9 +6,16 @@ declare global {
       gridSize: number;
       maxZoom: number;
       minClusterSize: number;
-      icons: Array<{ content: string; size: naver.maps.Size; anchor: naver.maps.Point }>;
+      icons: Array<{
+        content: string;
+        size: naver.maps.Size;
+        anchor: naver.maps.Point;
+      }>;
       indexGenerator: number[];
-      stylingFunction: (clusterMarker: naver.maps.Marker, count: number) => void;
+      stylingFunction: (
+        clusterMarker: naver.maps.Marker,
+        count: number,
+      ) => void;
     }) => {
       setMap: (map: naver.maps.Map | null) => void;
     };
@@ -32,14 +39,19 @@ function isDarkMode(): boolean {
   return document.documentElement.classList.contains("dark");
 }
 
-function createClusterIcon(size: number, colors?: { light: string; dark: string }): {
+function createClusterIcon(
+  size: number,
+  colors?: { light: string; dark: string },
+): {
   content: string;
   size: naver.maps.Size;
   anchor: naver.maps.Point;
 } {
   const half = size / 2;
   const bg = colors
-    ? (isDarkMode() ? colors.dark : colors.light)
+    ? isDarkMode()
+      ? colors.dark
+      : colors.light
     : "oklch(var(--primary))";
   const fg = colors ? "#fff" : "oklch(var(--primary-foreground))";
   return {

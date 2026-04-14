@@ -34,22 +34,22 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
   const isRegistered = !!data?.place;
 
   return (
-    <div className="px-4 pb-8 space-y-4">
+    <div className="space-y-4 px-4 pb-8">
       <div className="space-y-1">
         {/* 제목 + 링크 */}
         <Link
           href={`/places/${item.id}`}
-          className="inline-flex max-w-full items-start gap-1 group pr-12"
+          className="group inline-flex max-w-full items-start gap-1 pr-12"
         >
-          <h3 className="min-w-0 shrink text-xl font-bold leading-snug group-hover:underline">
+          <h3 className="min-w-0 shrink text-xl leading-snug font-bold group-hover:underline">
             {item.name}
           </h3>
-          <ExternalLink className="size-4 shrink-0 text-foreground mt-1.5" />
+          <ExternalLink className="text-foreground mt-1.5 size-4 shrink-0" />
         </Link>
 
         {/* 카테고리 */}
         {category && (
-          <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
             <Tag className="size-3 shrink-0" />
             <span>{category}</span>
           </div>
@@ -57,7 +57,7 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
 
         {/* 전화번호 */}
         {item.phone && (
-          <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
             <Phone className="size-3 shrink-0" />
             <a href={`tel:${item.phone}`} className="hover:underline">
               {item.phone}
@@ -66,7 +66,7 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
         )}
 
         {/* 주소 (풀 주소) */}
-        <div className="flex items-start gap-1 text-sm font-medium text-muted-foreground">
+        <div className="text-muted-foreground flex items-start gap-1 text-sm font-medium">
           <MapPin className="mt-0.5 size-3 shrink-0" />
           <span>{item.roadAddress || item.address}</span>
         </div>
@@ -82,7 +82,7 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
                 <span className="text-sm font-medium text-yellow-500">
                   {data.avgRating.toFixed(1)}
                 </span>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-muted-foreground text-sm">
                   ({data.reviewCount})
                 </span>
               </div>
@@ -109,8 +109,8 @@ export function MapPlaceDetail({ item }: MapPlaceDetailProps) {
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="flex h-48 w-full items-center justify-center rounded-lg bg-muted">
-            <Building2 className="size-8 text-muted-foreground" />
+          <div className="bg-muted flex h-48 w-full items-center justify-center rounded-lg">
+            <Building2 className="text-muted-foreground size-8" />
           </div>
         )}
       </Link>

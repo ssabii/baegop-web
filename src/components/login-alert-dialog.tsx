@@ -40,9 +40,7 @@ export function LoginAlertDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Link
-              href={`/signin?redirect=${encodeURIComponent(redirectPath)}`}
-            >
+            <Link href={`/signin?redirect=${encodeURIComponent(redirectPath)}`}>
               로그인
             </Link>
           </AlertDialogAction>

@@ -88,7 +88,7 @@ export function MapPlaceDetailSheet({
         >
           <div
             className={cn(
-              "pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t bg-background shadow-lg transition-[border-radius,border-color] duration-300",
+              "bg-background pointer-events-auto relative flex min-h-0 flex-1 flex-col border-t shadow-lg transition-[border-radius,border-color] duration-300",
               {
                 "rounded-t-2xl": !isFullSnap,
                 "rounded-none border-t-transparent": isFullSnap,
@@ -97,19 +97,19 @@ export function MapPlaceDetailSheet({
           >
             <Drawer.Title className="sr-only">장소 상세</Drawer.Title>
             {/* Drag handle */}
-            <div className="relative mx-auto w-full max-w-4xl flex shrink-0 justify-center py-3">
-              <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+            <div className="relative mx-auto flex w-full max-w-4xl shrink-0 justify-center py-3">
+              <div className="bg-muted-foreground/30 h-1.5 w-10 rounded-full" />
               <div className="absolute -top-12 right-2">
                 <LocationButton onLocate={onLocate} />
               </div>
             </div>
 
             {/* Close button + Favorite */}
-            <div className="max-w-4xl mx-auto w-full flex shrink-0 items-center justify-end gap-2 px-4 pb-2">
+            <div className="mx-auto flex w-full max-w-4xl shrink-0 items-center justify-end gap-2 px-4 pb-2">
               {isRegistered && (
                 <FavoriteButton
                   placeId={item.id}
-                  className="size-8 bg-secondary"
+                  className="bg-secondary size-8"
                 />
               )}
               <Button
@@ -126,7 +126,7 @@ export function MapPlaceDetailSheet({
             <div
               ref={contentRef}
               className={cn(
-                "min-h-0 flex-1 overscroll-contain mx-auto max-w-4xl w-full",
+                "mx-auto min-h-0 w-full max-w-4xl flex-1 overscroll-contain",
                 {
                   "overflow-y-auto": isFullSnap,
                   "overflow-hidden": !isFullSnap,

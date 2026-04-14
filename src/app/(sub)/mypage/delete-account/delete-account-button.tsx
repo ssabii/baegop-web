@@ -41,7 +41,12 @@ export function DeleteAccountButton({ disabled }: DeleteAccountButtonProps) {
   };
 
   return (
-    <Button className="w-full transition-none has-[>svg]:px-8" size="xl" disabled={disabled || isLoading} onClick={handleClick}>
+    <Button
+      className="w-full transition-none has-[>svg]:px-8"
+      size="xl"
+      disabled={disabled || isLoading}
+      onClick={handleClick}
+    >
       {isLoading && <Spinner />}
       회원탈퇴
     </Button>

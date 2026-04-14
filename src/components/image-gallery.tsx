@@ -17,8 +17,8 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
 
   if (images.length === 0) {
     return (
-      <div className="flex h-48 w-full items-center justify-center bg-muted">
-        <Building2 className="size-12 text-muted-foreground" />
+      <div className="bg-muted flex h-48 w-full items-center justify-center">
+        <Building2 className="text-muted-foreground size-12" />
       </div>
     );
   }
@@ -38,7 +38,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
       <div className="relative">
         <div
           ref={scrollRef}
-          className="flex snap-x snap-mandatory overflow-x-auto scrollbar-none"
+          className="scrollbar-none flex snap-x snap-mandatory overflow-x-auto"
           onScroll={(e) => {
             const el = e.currentTarget;
             const index = Math.round(el.scrollLeft / el.clientWidth);
@@ -53,7 +53,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
                 setPreviewIndex(i);
                 setPreviewOpen(true);
               }}
-              className="w-full shrink-0 snap-center cursor-pointer"
+              className="w-full shrink-0 cursor-pointer snap-center"
             >
               <img
                 src={src}
@@ -71,7 +71,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
               <button
                 type="button"
                 onClick={() => scrollTo(current - 1)}
-                className="absolute left-2 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/60"
+                className="absolute top-1/2 left-2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/60"
               >
                 <ChevronLeft className="size-4" />
               </button>
@@ -80,7 +80,7 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
               <button
                 type="button"
                 onClick={() => scrollTo(current + 1)}
-                className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/60"
+                className="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-black/40 text-white transition-opacity hover:bg-black/60"
               >
                 <ChevronRight className="size-4" />
               </button>

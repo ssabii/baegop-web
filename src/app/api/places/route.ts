@@ -6,7 +6,8 @@ const DEFAULT_LIMIT = 10;
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
 
-  const orderBy = (searchParams.get("orderBy") ?? "created_at") as PlacesOrderBy;
+  const orderBy = (searchParams.get("orderBy") ??
+    "created_at") as PlacesOrderBy;
   const ascending = searchParams.get("ascending") === "true";
   const cursor = Math.max(Number(searchParams.get("cursor")) || 0, 0);
   const limit = Math.min(
