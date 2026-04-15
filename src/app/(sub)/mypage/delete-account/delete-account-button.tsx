@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { createClient } from "@/lib/supabase/client";
+import { profileKeys } from "@/lib/query-keys";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
@@ -14,6 +17,7 @@ interface DeleteAccountButtonProps {
 
 export function DeleteAccountButton({ disabled }: DeleteAccountButtonProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const confirm = useConfirmDialog();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,6 +35,9 @@ export function DeleteAccountButton({ disabled }: DeleteAccountButtonProps) {
     setIsLoading(true);
     try {
       await deleteAccount();
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      queryClient.setQueryData(profileKeys.all, null);
       router.replace("/mypage/delete-account/complete");
     } catch {
       setIsLoading(false);
