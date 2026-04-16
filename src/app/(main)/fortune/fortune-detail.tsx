@@ -3,16 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Clock,
-  MapPin,
-  Phone,
-  Star,
-  UtensilsCrossed,
-} from "lucide-react";
+import { ArrowLeft, Clock, MapPin, Phone, Star } from "lucide-react";
 import { FortuneActionButton } from "./fortune-action-button";
 import type { MockRestaurant } from "./fortune-data";
+import { RestaurantThumbnail } from "./restaurant-thumbnail";
 
 interface FortuneDetailProps {
   restaurant: MockRestaurant;
@@ -38,7 +32,10 @@ export function FortuneDetail({
     >
       <Header onBack={onBack} />
 
-      <RestaurantImage imageUrl={restaurant.imageUrl} name={restaurant.name} />
+      <RestaurantThumbnail
+        imageUrl={restaurant.imageUrl}
+        name={restaurant.name}
+      />
 
       <div className="flex flex-col gap-6 p-4">
         <Headline restaurant={restaurant} />
@@ -71,30 +68,6 @@ function Header({ onBack }: { onBack: () => void }) {
       >
         <ArrowLeft className="size-5" />
       </Button>
-    </div>
-  );
-}
-
-function RestaurantImage({
-  imageUrl,
-  name,
-}: {
-  imageUrl?: string;
-  name: string;
-}) {
-  if (imageUrl) {
-    return (
-      <img
-        src={imageUrl}
-        alt={name}
-        className="aspect-[16/10] w-full object-cover"
-      />
-    );
-  }
-
-  return (
-    <div className="flex aspect-[16/10] w-full items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200">
-      <UtensilsCrossed className="size-16 text-orange-400/50" />
     </div>
   );
 }
