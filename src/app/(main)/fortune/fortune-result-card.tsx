@@ -2,9 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Info, Star, UtensilsCrossed } from "lucide-react";
+import { Info, Star } from "lucide-react";
 import { FortuneActionButton } from "./fortune-action-button";
 import type { MockRestaurant } from "./fortune-data";
+import { RestaurantThumbnail } from "./restaurant-thumbnail";
 
 interface FortuneResultCardProps {
   restaurant: MockRestaurant;
@@ -29,7 +30,11 @@ export function FortuneResultCard({
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
       <Headline restaurant={restaurant} />
-      <Thumbnail imageUrl={restaurant.imageUrl} name={restaurant.name} />
+      <RestaurantThumbnail
+        imageUrl={restaurant.imageUrl}
+        name={restaurant.name}
+        rounded
+      />
       <InfoRow restaurant={restaurant} />
       <FortuneMessage message={restaurant.fortuneMessage} />
 
@@ -59,32 +64,6 @@ function Headline({ restaurant }: { restaurant: MockRestaurant }) {
       <p className="text-muted-foreground mt-1 text-sm">
         {restaurant.category} &middot; {restaurant.distanceText}
       </p>
-    </div>
-  );
-}
-
-function Thumbnail({
-  imageUrl,
-  name,
-}: {
-  imageUrl?: string;
-  name: string;
-}) {
-  if (imageUrl) {
-    return (
-      <div className="w-full overflow-hidden rounded-xl">
-        <img
-          src={imageUrl}
-          alt={name}
-          className="aspect-[16/10] w-full object-cover"
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex aspect-[16/10] w-full items-center justify-center rounded-xl bg-gradient-to-br from-orange-100 to-orange-200">
-      <UtensilsCrossed className="size-16 text-orange-400/50" />
     </div>
   );
 }

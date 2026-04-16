@@ -1,12 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import {
+  CAPSULE_COLORS,
+  DISPENSING_DURATION_MS,
+  SPINNING_DURATION_MS,
+} from "./constants";
+import { useDialInteraction } from "./use-dial-interaction";
 
 type MachineState = "idle" | "spinning" | "dispensing";
-
-// 다이얼을 한 바퀴(360도) 돌리면 뽑기가 실행됨
-const SPIN_THRESHOLD_DEGREES = 360;
 
 // 돔 내부에 장식용으로 표시되는 알록달록한 캡슐들
 const DECORATIVE_CAPSULES = [
@@ -22,12 +25,8 @@ const DECORATIVE_CAPSULES = [
   { color: "#F5C518", left: "10%", top: "30%", rotate: -60 },
 ];
 
-// 뽑기 결과로 나올 캡슐의 색상 후보
-const CAPSULE_COLORS = ["#FF6B35", "#F5C518", "#3B82F6", "#9B59B6", "#E05C3A"];
-
-// 뽑기 연출 타이밍
-const SPINNING_DURATION_MS = 800;
-const DISPENSING_DURATION_MS = 1400;
+const pickRandomCapsuleColor = () =>
+  CAPSULE_COLORS[Math.floor(Math.random() * CAPSULE_COLORS.length)];
 
 interface FortuneMachineProps {
   rerollsLeft: number;
@@ -42,95 +41,25 @@ export function FortuneMachine({
 }: FortuneMachineProps) {
   const [state, setState] = useState<MachineState>("idle");
   const [capsuleColor, setCapsuleColor] = useState(CAPSULE_COLORS[0]);
-  const [dialRotation, setDialRotation] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
 
-  const dialRef = useRef<HTMLButtonElement>(null);
-  const isDraggingRef = useRef(false);
-  const lastPointerAngleRef = useRef(0);
-  const accumulatedRotationRef = useRef(0);
-  const hasTriggeredRef = useRef(false);
-
-  const pickRandomCapsuleColor = () =>
-    CAPSULE_COLORS[Math.floor(Math.random() * CAPSULE_COLORS.length)];
-
-  const getPointerAngleFromDialCenter = (clientX: number, clientY: number) => {
-    const dial = dialRef.current;
-    if (!dial) return 0;
-    const rect = dial.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
-  };
-
-  const triggerFortune = () => {
+  // 뽑기 애니메이션 시퀀스: spinning → dispensing → 부모에 캡슐 준비 완료 알림 → idle로 복귀
+  const runFortuneSequence = () => {
     const color = pickRandomCapsuleColor();
     setCapsuleColor(color);
     setState("spinning");
-    hasTriggeredRef.current = true;
-    isDraggingRef.current = false;
-    setIsDragging(false);
 
     setTimeout(() => setState("dispensing"), SPINNING_DURATION_MS);
     setTimeout(() => {
       onCapsuleReady(color);
-      resetMachine();
+      setState("idle");
+      dial.reset();
     }, SPINNING_DURATION_MS + DISPENSING_DURATION_MS);
   };
 
-  const resetMachine = () => {
-    setState("idle");
-    setDialRotation(0);
-    hasTriggeredRef.current = false;
-  };
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (state !== "idle") return;
-    e.preventDefault();
-    dialRef.current?.setPointerCapture(e.pointerId);
-
-    isDraggingRef.current = true;
-    hasTriggeredRef.current = false;
-    accumulatedRotationRef.current = 0;
-    lastPointerAngleRef.current = getPointerAngleFromDialCenter(
-      e.clientX,
-      e.clientY,
-    );
-    setIsDragging(true);
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
-    if (!isDraggingRef.current) return;
-
-    const currentAngle = getPointerAngleFromDialCenter(e.clientX, e.clientY);
-    let angleDelta = currentAngle - lastPointerAngleRef.current;
-
-    // atan2는 -180~180 범위이므로 경계를 넘을 때 값이 튀는 것을 보정
-    if (angleDelta > 180) angleDelta -= 360;
-    if (angleDelta < -180) angleDelta += 360;
-
-    accumulatedRotationRef.current += angleDelta;
-    lastPointerAngleRef.current = currentAngle;
-    setDialRotation((prev) => prev + angleDelta);
-
-    const hasSpunEnough =
-      Math.abs(accumulatedRotationRef.current) >= SPIN_THRESHOLD_DEGREES;
-
-    if (hasSpunEnough && !hasTriggeredRef.current) {
-      triggerFortune();
-    }
-  };
-
-  const handlePointerUp = () => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    setIsDragging(false);
-
-    // 충분히 돌리지 못한 경우 다이얼을 원위치로 되돌림
-    if (!hasTriggeredRef.current) {
-      setDialRotation(0);
-    }
-  };
+  const dial = useDialInteraction({
+    enabled: state === "idle",
+    onSpinComplete: runFortuneSequence,
+  });
 
   return (
     <>
@@ -223,11 +152,11 @@ export function FortuneMachine({
               {/* 다이얼 (360도 돌리면 뽑기 실행) */}
               <div className="flex flex-col items-center gap-2">
                 <button
-                  ref={dialRef}
-                  onPointerDown={handlePointerDown}
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={handlePointerUp}
-                  onPointerCancel={handlePointerUp}
+                  ref={dial.dialRef}
+                  onPointerDown={dial.handlers.onPointerDown}
+                  onPointerMove={dial.handlers.onPointerMove}
+                  onPointerUp={dial.handlers.onPointerUp}
+                  onPointerCancel={dial.handlers.onPointerUp}
                   disabled={state !== "idle"}
                   className={cn(
                     "relative h-[72px] w-[72px] touch-none rounded-full border-[5px] border-orange-300 bg-primary",
@@ -235,13 +164,13 @@ export function FortuneMachine({
                     "disabled:cursor-not-allowed disabled:opacity-50",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     {
-                      "cursor-grabbing": isDragging,
-                      "cursor-grab": !isDragging,
+                      "cursor-grabbing": dial.isDragging,
+                      "cursor-grab": !dial.isDragging,
                     },
                   )}
                   style={{
-                    transform: `rotate(${dialRotation}deg)`,
-                    transition: isDragging
+                    transform: `rotate(${dial.rotation}deg)`,
+                    transition: dial.isDragging
                       ? "none"
                       : "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   }}
@@ -289,7 +218,8 @@ function DroppedCapsule({ color }: { color: string }) {
       className="h-10 w-10 rounded-full shadow-md"
       style={{
         backgroundColor: color,
-        animation: "capsule-drop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+        animation:
+          "capsule-drop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
       }}
     />
   );
