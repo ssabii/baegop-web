@@ -2,11 +2,14 @@
 
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import {
+  CAPSULE_COLORS,
+  DISPENSING_DURATION_MS,
+  SPIN_THRESHOLD_DEGREES,
+  SPINNING_DURATION_MS,
+} from "./fortune-constants";
 
 type MachineState = "idle" | "spinning" | "dispensing";
-
-// 다이얼을 한 바퀴(360도) 돌리면 뽑기가 실행됨
-const SPIN_THRESHOLD_DEGREES = 360;
 
 // 돔 내부에 장식용으로 표시되는 알록달록한 캡슐들
 const DECORATIVE_CAPSULES = [
@@ -21,13 +24,6 @@ const DECORATIVE_CAPSULES = [
   { color: "#FF6B35", left: "42%", top: "68%", rotate: 80 },
   { color: "#F5C518", left: "10%", top: "30%", rotate: -60 },
 ];
-
-// 뽑기 결과로 나올 캡슐의 색상 후보
-const CAPSULE_COLORS = ["#FF6B35", "#F5C518", "#3B82F6", "#9B59B6", "#E05C3A"];
-
-// 뽑기 연출 타이밍
-const SPINNING_DURATION_MS = 800;
-const DISPENSING_DURATION_MS = 1400;
 
 interface FortuneMachineProps {
   rerollsLeft: number;

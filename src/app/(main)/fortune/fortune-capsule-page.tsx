@@ -3,6 +3,11 @@
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import {
+  BACKGROUND,
+  INITIAL_CAPSULE_COLOR,
+  MAX_ROLLS,
+} from "./fortune-constants";
+import {
   getAlternativeRestaurant,
   getDailyRestaurant,
   type MockRestaurant,
@@ -11,16 +16,6 @@ import { FortuneDetail } from "./fortune-detail";
 import { FortuneMachine } from "./fortune-machine";
 import { FortuneResultCard } from "./fortune-result-card";
 import { FortuneTransition } from "./fortune-transition";
-
-// 첫 뽑기 + 리롤 2번 = 총 3번의 기회
-const MAX_ROLLS = 3;
-
-const INITIAL_CAPSULE_COLOR = "#FF6B35";
-
-const BACKGROUND = {
-  warm: "linear-gradient(to bottom, #FFD4A8, #FFB87A, #FF9E5E)",
-  white: "#ffffff",
-} as const;
 
 type Phase = "machine" | "transition" | "result" | "detail";
 
