@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { SPIN_THRESHOLD_DEGREES } from "./fortune-constants";
+import { SPIN_THRESHOLD_DEGREES } from "./constants";
 
 interface UseDialInteractionOptions {
   // false일 때는 다이얼이 반응하지 않음 (뽑기 중/완료 후 비활성화)

@@ -6,7 +6,7 @@ import {
   CAPSULE_COLORS,
   DISPENSING_DURATION_MS,
   SPINNING_DURATION_MS,
-} from "./fortune-constants";
+} from "./constants";
 import { useDialInteraction } from "./use-dial-interaction";
 
 type MachineState = "idle" | "spinning" | "dispensing";

@@ -6,7 +6,7 @@ import {
   BACKGROUND,
   INITIAL_CAPSULE_COLOR,
   MAX_ROLLS,
-} from "./fortune-constants";
+} from "./constants";
 import {
   getAlternativeRestaurant,
   getDailyRestaurant,
