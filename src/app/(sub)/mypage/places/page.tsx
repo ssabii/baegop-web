@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { SubHeader } from "@/components/sub-header";
+import { createClient } from "@/lib/supabase/server";
 import { MyPlaceList } from "./my-place-list";
 
 export default async function MyPlacesPage() {

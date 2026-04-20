@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { mypageKeys } from "@/lib/query-keys";
+import { Ellipsis, Pencil, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -18,11 +19,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { FEEDBACK_CATEGORY_LABELS } from "@/lib/constants";
 import { formatRelativeDate } from "@/lib/date";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
+import { mypageKeys } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
-import type { FeedbackWithImages } from "@/types";
-import { Ellipsis, Pencil, Trash2 } from "lucide-react";
 import { deleteFeedback } from "./actions";
-import { toast } from "sonner";
+import type { FeedbackWithImages } from "@/types";
 
 interface FeedbackCardProps {
   feedback: FeedbackWithImages;
@@ -60,7 +60,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
     startTransition(async () => {
       try {
         await deleteFeedback(feedback.id);
-        queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
+        void queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
         toast.success("피드백이 삭제되었어요.", { position: "top-center" });
       } catch {
         toast.error("피드백 삭제에 실패했어요. 다시 시도해주세요.", {

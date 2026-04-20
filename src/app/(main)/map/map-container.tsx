@@ -1,24 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import { useSearchPlaces } from "@/components/place-search/use-search-places";
+import { LocationButton } from "@/components/location-button";
+import { MapOverlapPopover } from "@/components/map-overlap-popover";
+import { NaverMapProvider } from "@/components/NaverMapContext";
+import { PlaceItem } from "@/components/place-search/place-item";
 import { SearchNoResults } from "@/components/place-search/search-no-results";
+import { useSearchPlaces } from "@/components/place-search/use-search-places";
+import { Spinner } from "@/components/ui/spinner";
+import { useNaverMap } from "@/components/useNaverMap";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { COMPANY_LOCATION } from "@/lib/constants";
-import { Spinner } from "@/components/ui/spinner";
-import { LocationButton } from "@/components/location-button";
-import { NaverMapProvider } from "@/components/NaverMapContext";
-import { useNaverMap } from "@/components/useNaverMap";
+import { calculateDistance } from "@/lib/geo";
+import { MapPlaceDetailSheet } from "./map-place-detail-sheet";
+import { MapResultSheet } from "./map-result-sheet";
+import { MapSearchInput } from "./map-search-input";
 import { MapView, type MapMarker } from "./map-view";
 import { useMapPlaces } from "./use-map-places";
-import { MapSearchInput } from "./map-search-input";
-import { PlaceItem } from "@/components/place-search/place-item";
-import { MapResultSheet } from "./map-result-sheet";
-import { MapPlaceDetailSheet } from "./map-place-detail-sheet";
-import { MapOverlapPopover } from "@/components/map-overlap-popover";
-import { calculateDistance } from "@/lib/geo";
 import type { NaverSearchResult } from "@/types";
 
 const NEARBY_COUNT = 5;
@@ -122,7 +122,7 @@ function MapContainerInner() {
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
+        void fetchNextPage();
       }
     },
   });

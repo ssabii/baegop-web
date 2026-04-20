@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
-import Providers from "@/providers";
+import { Geist, Geist_Mono } from "next/font/google";
 import AnalyticsTracker from "@/components/analytics-tracker";
 import { Toaster } from "@/components/ui/sonner";
+import Providers from "@/providers";
+import type { Metadata } from "next";
 import "./globals.css";
 
 const geistSans = Geist({

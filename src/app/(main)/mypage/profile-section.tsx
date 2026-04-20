@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronRight, UserRound } from "lucide-react";
-import { optimizeSupabaseImageUrl } from "@/lib/image";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Item,
   ItemActions,
@@ -14,7 +12,9 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile } from "@/hooks/use-profile";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
 
 export function ProfileSection() {
   const { profile, isLoading } = useProfile();

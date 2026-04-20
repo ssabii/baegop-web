@@ -1,9 +1,9 @@
 "use client";
 
 import { useInView } from "react-intersection-observer";
+import { PlaceCard, EmptyPlace } from "@/components/places";
 import { Spinner } from "@/components/ui/spinner";
 import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
-import { PlaceCard, EmptyPlace } from "@/components/places";
 import { useAllPlaces } from "./use-all-places";
 
 export function AllPlaceList() {
@@ -15,7 +15,7 @@ export function AllPlaceList() {
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
+        void fetchNextPage();
       }
     },
   });

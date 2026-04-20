@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Drawer } from "vaul";
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Drawer } from "vaul";
 import { FavoriteButton } from "@/components/favorite-button";
 import { LocationButton } from "@/components/location-button";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { usePlaceData } from "@/hooks/use-place-data";
-import { MapViewButton } from "./map-view-button";
+import { cn } from "@/lib/utils";
 import { MapPlaceDetail } from "./map-place-detail";
+import { MapViewButton } from "./map-view-button";
 import type { NaverSearchResult } from "@/types";
 
 const COMPACT_SNAP = 0.2;

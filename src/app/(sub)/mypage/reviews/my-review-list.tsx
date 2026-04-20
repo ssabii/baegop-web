@@ -1,5 +1,7 @@
 "use client";
 
+import { MessageCircle } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import { ReviewCard } from "@/components/reviews";
 import {
   Empty,
@@ -8,8 +10,6 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
-import { MessageCircle } from "lucide-react";
-import { useInView } from "react-intersection-observer";
 import { useMyReviews } from "./use-my-reviews";
 
 interface MyReviewListProps {
@@ -23,7 +23,7 @@ export function MyReviewList({ userId }: MyReviewListProps) {
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
+        void fetchNextPage();
       }
     },
   });

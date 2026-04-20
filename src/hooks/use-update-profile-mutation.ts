@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/client";
 import { profileKeys } from "@/lib/query-keys";
+import { createClient } from "@/lib/supabase/client";
 import { type Profile } from "./use-profile";
 
 export function useUpdateProfileMutation() {

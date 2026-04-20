@@ -1,12 +1,9 @@
 "use client";
 
+import { Camera, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Camera, UserRound } from "lucide-react";
 import { toast } from "sonner";
-import { optimizeSupabaseImageUrl } from "@/lib/image";
-import { type Profile, useProfile } from "@/hooks/use-profile";
-import { useUpdateProfileMutation } from "@/hooks/use-update-profile-mutation";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,6 +17,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
+import { type Profile, useProfile } from "@/hooks/use-profile";
+import { useUpdateProfileMutation } from "@/hooks/use-update-profile-mutation";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { uploadAvatar } from "./actions";
 
 const NICKNAME_REGEX = /^[가-힣a-zA-Z0-9]+(?:\s[가-힣a-zA-Z0-9]+)*$/;

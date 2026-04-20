@@ -1,7 +1,7 @@
 import { type ButtonHTMLAttributes } from "react";
+import { GoogleIcon } from "@/components/icons/google-icon";
 import { KakaoIcon } from "@/components/icons/kakao-icon";
 import { NaverIcon } from "@/components/icons/naver-icon";
-import { GoogleIcon } from "@/components/icons/google-icon";
 import { cn } from "@/lib/utils";
 
 type Provider = "kakao" | "naver" | "google";

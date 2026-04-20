@@ -1,5 +1,8 @@
 "use client";
 
+import { Send } from "lucide-react";
+import Link from "next/link";
+import { useInView } from "react-intersection-observer";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +14,8 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
-import Link from "next/link";
-import { Send } from "lucide-react";
-import { useInView } from "react-intersection-observer";
-import { useMyFeedbacks } from "./use-my-feedbacks";
 import { FeedbackCard } from "./feedback-card";
+import { useMyFeedbacks } from "./use-my-feedbacks";
 
 interface MyFeedbackListProps {
   userId: string;
@@ -33,7 +33,7 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
+        void fetchNextPage();
       }
     },
   });

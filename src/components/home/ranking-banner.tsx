@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { ChevronRight, Trophy } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
 import { useProfile } from "@/hooks/use-profile";
 

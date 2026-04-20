@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/client";
-import { profileKeys } from "@/lib/query-keys";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { profileKeys } from "@/lib/query-keys";
+import { createClient } from "@/lib/supabase/client";
 import { deleteAccount } from "./actions";
-import { toast } from "sonner";
 
 interface DeleteAccountButtonProps {
   disabled?: boolean;

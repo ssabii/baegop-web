@@ -1,27 +1,27 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Ellipsis, Pencil, Trash2, UserRound } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { deleteReview } from "@/app/(sub)/places/[id]/actions";
+import { ReviewImages } from "@/app/(sub)/places/[id]/review-images";
+import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useQueryClient } from "@tanstack/react-query";
-import { reviewKeys } from "@/lib/query-keys";
-import { useConfirmDialog } from "@/components/confirm-dialog-provider";
-import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 import { formatRelativeDate } from "@/lib/date";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
+import { reviewKeys } from "@/lib/query-keys";
+import { cn } from "@/lib/utils";
 import { StarRating } from "./star-rating";
-import { ReviewImages } from "@/app/(sub)/places/[id]/review-images";
-import { deleteReview } from "@/app/(sub)/places/[id]/actions";
 
 interface ReviewCardProps {
   review: {
@@ -65,7 +65,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     startTransition(async () => {
       try {
         await deleteReview(review.id);
-        queryClient.invalidateQueries({ queryKey: reviewKeys.all });
+        void queryClient.invalidateQueries({ queryKey: reviewKeys.all });
         router.refresh();
         toast.success("리뷰가 삭제되었어요.", { position: "top-center" });
       } catch {

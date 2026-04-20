@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import {
   Building2,
   ExternalLink,
@@ -10,14 +8,16 @@ import {
   Star,
   Tag,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { useState } from "react";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import { KonaVoteSection } from "@/components/place-detail/kona-vote";
 import { PlaceTabs } from "@/components/place-detail/place-tabs";
-import { optimizeNaverImageUrl } from "@/lib/image";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePlaceData } from "@/hooks/use-place-data";
+import { optimizeNaverImageUrl } from "@/lib/image";
 import type { NaverSearchResult } from "@/types";
 
 interface MapPlaceDetailProps {

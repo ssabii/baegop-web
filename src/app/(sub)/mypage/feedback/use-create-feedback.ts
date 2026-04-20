@@ -2,9 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { mypageKeys } from "@/lib/query-keys";
-import type { FeedbackCategory } from "@/types";
 import { createFeedback, updateFeedbackImageUrls } from "./actions";
 import { uploadFeedbackImages } from "./upload-feedback-images";
+import type { FeedbackCategory } from "@/types";
 
 export function useCreateFeedback() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export function useCreateFeedback() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
+      void queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
       toast.success("피드백이 등록되었어요.", { position: "top-center" });
       router.back();
     },

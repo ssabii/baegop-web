@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { Building2, MapPin, Tag } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
+import { cn } from "@/lib/utils";
 import type { NaverSearchResult } from "@/types";
 
 interface PlaceItemProps {

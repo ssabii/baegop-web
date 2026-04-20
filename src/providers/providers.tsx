@@ -1,8 +1,8 @@
 "use client";
 
-import { lazy, Suspense, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
+import { lazy, Suspense, useState } from "react";
 import { ConfirmDialogProvider } from "@/components/confirm-dialog-provider";
 
 const ReactQueryDevtools =

@@ -89,7 +89,7 @@ export function usePlaceSuggestions({
     }
 
     if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => searchSuggestions(input), 300);
+    timerRef.current = setTimeout(() => void searchSuggestions(input), 300);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);

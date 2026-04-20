@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
-import type { NaverPlaceDetail, NaverSearchResult } from "@/types";
 import { optimizeNaverImageUrl, optimizeNaverImageUrls } from "@/lib/image";
+import type { NaverPlaceDetail, NaverSearchResult } from "@/types";
 
 const GRAPHQL_URL = "https://pcmap-api.place.naver.com/place/graphql";
 

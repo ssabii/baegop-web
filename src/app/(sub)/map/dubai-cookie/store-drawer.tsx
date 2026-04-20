@@ -1,16 +1,6 @@
 "use client";
 
 import {
-  useState,
-  useCallback,
-  useEffect,
-  useRef,
-  useLayoutEffect,
-} from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { Drawer } from "vaul";
-import {
   Building2,
   ExternalLink,
   MapPin,
@@ -19,20 +9,30 @@ import {
   Tag,
   X,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+} from "react";
+import { Drawer } from "vaul";
 import { FavoriteButton } from "@/components/favorite-button";
+import { LocationButton } from "@/components/location-button";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
 import { KonaVoteSection } from "@/components/place-detail/kona-vote";
 import { PlaceTabs } from "@/components/place-detail/place-tabs";
-import { cn } from "@/lib/utils";
-import { optimizeNaverImageUrl } from "@/lib/image";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePlaceData } from "@/hooks/use-place-data";
-import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
+import { optimizeNaverImageUrl } from "@/lib/image";
+import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
-import { LocationButton } from "@/components/location-button";
+import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 
 const COMPACT_SNAP = "200px";
 const HALF_SNAP = 0.5;

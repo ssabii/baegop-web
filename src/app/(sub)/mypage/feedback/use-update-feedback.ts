@@ -2,9 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { mypageKeys } from "@/lib/query-keys";
-import type { FeedbackCategory } from "@/types";
 import { updateFeedback } from "./actions";
 import { uploadFeedbackImages } from "./upload-feedback-images";
+import type { FeedbackCategory } from "@/types";
 
 export function useUpdateFeedback(feedbackId: number) {
   const router = useRouter();
@@ -35,7 +35,7 @@ export function useUpdateFeedback(feedbackId: number) {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
+      void queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
       toast.success("피드백이 수정되었어요.", { position: "top-center" });
       router.back();
     },

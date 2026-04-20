@@ -1,5 +1,7 @@
 "use client";
 
+import { Check } from "lucide-react";
+import { useTheme } from "next-themes";
 import { SubHeader } from "@/components/sub-header";
 import {
   Item,
@@ -8,8 +10,6 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
-import { Check } from "lucide-react";
-import { useTheme } from "next-themes";
 
 const THEME_OPTIONS = [
   { value: "light", label: "라이트" },

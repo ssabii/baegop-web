@@ -1,13 +1,13 @@
 "use client";
 
+import { type Provider } from "@supabase/supabase-js";
+import Link from "next/link";
 import { useEffect } from "react";
 
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { type Provider } from "@supabase/supabase-js";
-import SignInButton from "@/app/signin/signin-button";
 import { SignInBubble } from "@/app/signin/signin-bubble";
+import SignInButton from "@/app/signin/signin-button";
+import { createClient } from "@/lib/supabase/client";
 
 function getAuthErrorMessage(errorCode?: string, errorDescription?: string) {
   if (

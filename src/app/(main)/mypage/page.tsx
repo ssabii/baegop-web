@@ -1,6 +1,6 @@
+import { redirect } from "next/navigation";
 import { ItemGroup } from "@/components/ui/item";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import { LogoutMenuItem } from "./logout-menu-item";
 import { MypageMenuItem } from "./mypage-menu-item";
 import { ProfileSection } from "./profile-section";

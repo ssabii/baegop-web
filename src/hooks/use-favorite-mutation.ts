@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toggleFavorite } from "@/app/(sub)/places/[id]/actions";
 import { toast } from "sonner";
+import { toggleFavorite } from "@/app/(sub)/places/[id]/actions";
 import { favoriteKeys } from "@/lib/query-keys";
 
 export function useFavoriteMutation() {

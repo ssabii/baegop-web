@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { PlaceTabs } from "@/components/place-detail/place-tabs";
 import type { MenusResponse } from "@/components/place-detail/use-menus";
 import type { ReviewsResponse } from "@/components/place-detail/use-reviews";

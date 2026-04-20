@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { User } from "lucide-react";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { optimizeSupabaseImageUrl } from "@/lib/image";
 import { useProfile } from "@/hooks/use-profile";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
 
 export function SearchBarAvatar() {
   const { profile, isLoading } = useProfile();

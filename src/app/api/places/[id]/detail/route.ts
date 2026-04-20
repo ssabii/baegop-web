@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { fetchWalkingRoutes } from "@/lib/naver";
+import { createClient } from "@/lib/supabase/server";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 export async function GET(
