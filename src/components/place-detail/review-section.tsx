@@ -1,8 +1,7 @@
 "use client";
 
-import { useInView } from "react-intersection-observer";
 import { MessageCircle } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
+import { useInView } from "react-intersection-observer";
 import {
   Empty,
   EmptyDescription,
@@ -10,6 +9,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { Spinner } from "@/components/ui/spinner";
 import { ReviewCard } from "./review-card";
 import { useReviews, type ReviewsResponse } from "./use-reviews";
 

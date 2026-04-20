@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useContext } from "react";
-import { NaverMapContext } from "./NaverMapContext";
 import { LOCATION_MARKER_ICON } from "@/lib/constants";
+import { NaverMapContext } from "./NaverMapContext";
 
 type LatLngLiteral = { lat: number; lng: number };
 

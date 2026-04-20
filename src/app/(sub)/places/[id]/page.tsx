@@ -1,4 +1,11 @@
+import { Dot, Footprints, Home, MapPin, Phone, Star, Tag } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { FavoriteButton } from "@/components/favorite-button";
 import { ImageGallery } from "@/components/image-gallery";
+import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
+import { KonaVoteSection } from "@/components/place-detail/kona-vote";
+import { UnregisteredBadge } from "@/components/place-detail/unregistered-badge";
 import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
 import { COMPANY_LOCATION } from "@/lib/constants";
@@ -10,18 +17,11 @@ import {
   fetchWalkingRoutes,
 } from "@/lib/naver";
 import { createClient } from "@/lib/supabase/server";
-import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
-import { FavoriteButton } from "@/components/favorite-button";
-import { Dot, Footprints, Home, MapPin, Phone, Star, Tag } from "lucide-react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
-import { KonaVoteSection } from "@/components/place-detail/kona-vote";
-import { UnregisteredBadge } from "@/components/place-detail/unregistered-badge";
 import { PlaceActionBar } from "./place-action-bar";
 import { PlaceMap } from "./place-map";
 import { PlaceShortcuts } from "./place-shortcuts";
 import { PlaceTabsWithUrl } from "./place-tabs-with-url";
+import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
 
 export default async function PlaceDetailPage({
   params,

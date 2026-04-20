@@ -1,5 +1,8 @@
 "use client";
 
+import { Building2, ChevronLeft, Clock, MapPin, Tag, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useRef, useState } from "react";
 import {
   Empty,
   EmptyDescription,
@@ -16,9 +19,6 @@ import { useRecentSearches } from "@/hooks/use-recent-searches";
 import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
-import { Building2, ChevronLeft, Clock, MapPin, Tag, X } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
 
 function StoreListItem({
   store,

@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { Building2, Home, MapPin, Shuffle, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const tabs = [
   { label: "홈", icon: Home, href: "/", match: (p: string) => p === "/" },

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Drawer } from "vaul";
 import { Building2, MapPin, PackageOpen, Tag, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Drawer } from "vaul";
+import { LocationButton } from "@/components/location-button";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -12,12 +13,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { cn } from "@/lib/utils";
 import { formatShortAddress } from "@/lib/address";
 import { optimizeNaverImageUrl } from "@/lib/image";
-import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
+import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
-import { LocationButton } from "@/components/location-button";
+import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 
 const COMPACT_SNAP = 0.3;
 const HALF_SNAP = 0.5;

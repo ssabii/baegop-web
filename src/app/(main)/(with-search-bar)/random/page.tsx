@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
-import { optimizeNaverImageUrls } from "@/lib/image";
 import { EmptyPlace } from "@/components/places";
+import { optimizeNaverImageUrls } from "@/lib/image";
+import { createClient } from "@/lib/supabase/server";
 import { Roulette } from "./roulette";
 
 export default async function RandomPage() {

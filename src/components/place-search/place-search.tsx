@@ -1,22 +1,22 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Clock, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import {
   Popover,
   PopoverAnchor,
   PopoverContent,
 } from "@/components/ui/popover";
+import { Spinner } from "@/components/ui/spinner";
+import { useRecentSearches } from "@/hooks/use-recent-searches";
+import { cn } from "@/lib/utils";
 import { PlaceItem } from "./place-item";
-import { usePlaceSuggestions } from "./use-place-suggestions";
-import { useSearchPlaces } from "./use-search-places";
 import { SearchEmpty } from "./search-empty";
 import { SearchNoResults } from "./search-no-results";
-import { useRecentSearches } from "@/hooks/use-recent-searches";
+import { usePlaceSuggestions } from "./use-place-suggestions";
+import { useSearchPlaces } from "./use-search-places";
 
 export function PlaceSearch() {
   const router = useRouter();

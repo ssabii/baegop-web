@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
-import { validatePassword } from "@/lib/password";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -16,7 +14,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
+import { validatePassword } from "@/lib/password";
+import { createClient } from "@/lib/supabase/client";
 
 export function ResetPasswordForm() {
   const router = useRouter();

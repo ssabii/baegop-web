@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { fetchPlaces, type PlacesOrderBy } from "@/lib/queries/places";
 
 const DEFAULT_LIMIT = 10;

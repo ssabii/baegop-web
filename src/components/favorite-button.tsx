@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { LoginAlertDialog } from "@/components/login-alert-dialog";
-import { useFavorites } from "@/hooks/use-favorites";
+import { Button } from "@/components/ui/button";
 import { useFavoriteMutation } from "@/hooks/use-favorite-mutation";
+import { useFavorites } from "@/hooks/use-favorites";
 import { useProfile } from "@/hooks/use-profile";
 import { cn } from "@/lib/utils";
 

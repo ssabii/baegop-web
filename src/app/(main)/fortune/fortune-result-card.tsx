@@ -1,11 +1,11 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Info, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { FortuneActionButton } from "./fortune-action-button";
-import type { MockRestaurant } from "./fortune-data";
 import { RestaurantThumbnail } from "./restaurant-thumbnail";
+import type { MockRestaurant } from "./fortune-data";
 
 interface FortuneResultCardProps {
   restaurant: MockRestaurant;

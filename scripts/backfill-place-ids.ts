@@ -11,8 +11,8 @@
  * place ID를 확보하고 DB에 저장한다.
  */
 
-import puppeteer, { type Browser } from "puppeteer";
 import { createClient } from "@supabase/supabase-js";
+import puppeteer, { type Browser } from "puppeteer";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;

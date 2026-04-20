@@ -50,11 +50,8 @@ export function useGeolocation(): GeolocationResult {
   const [loading, setLoading] = useState(!geoCache.isResolved());
 
   useEffect(() => {
-    if (geoCache.isResolved()) {
-      setCoords(geoCache.getCoords());
-      setLoading(false);
-      return;
-    }
+    // useState 초기값으로 캐시 상태를 이미 반영했으므로 resolve 완료 시 추가 작업 불필요
+    if (geoCache.isResolved()) return;
 
     const unsubscribe = geoCache.subscribe(() => {
       setCoords(geoCache.getCoords());

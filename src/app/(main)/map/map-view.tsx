@@ -1,12 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
+import { useNaverMap } from "@/components/useNaverMap";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { getOverlappingMarkers } from "@/lib/marker-overlap";
-import { useNaverMap } from "@/components/useNaverMap";
-import dynamic from "next/dynamic";
+import { cn } from "@/lib/utils";
 
 const NaverMap = dynamic(() => import("@/components/NaverMap"), {
   ssr: false,

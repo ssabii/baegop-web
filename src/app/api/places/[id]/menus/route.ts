@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { fetchPlaceDetail } from "@/lib/naver";
 
 const DEFAULT_LIMIT = 10;

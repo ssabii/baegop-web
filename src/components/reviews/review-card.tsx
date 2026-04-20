@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { ChevronRight, Star } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { formatRelativeDate } from "@/lib/date";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
-import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { cn } from "@/lib/utils";
 
 interface ReviewCardProps {

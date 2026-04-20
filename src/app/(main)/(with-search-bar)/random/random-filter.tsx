@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { CATEGORY_FILTERS, type CategoryFilter } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +11,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { CATEGORY_FILTERS, type CategoryFilter } from "@/lib/constants";
 
 interface RandomFilterProps {
   open: boolean;

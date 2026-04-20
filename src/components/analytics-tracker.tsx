@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { track } from "@vercel/analytics";
+import { useEffect, useRef } from "react";
 import { useProfile } from "@/hooks/use-profile";
 
 export default function AnalyticsTracker() {

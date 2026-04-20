@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import { SPIN_THRESHOLD_DEGREES } from "./constants";
 
 interface UseDialInteractionOptions {
+  // 다이얼 DOM 요소의 ref (컴포넌트에서 생성하여 전달)
+  dialRef: React.RefObject<HTMLButtonElement | null>;
   // false일 때는 다이얼이 반응하지 않음 (뽑기 중/완료 후 비활성화)
   enabled: boolean;
   // 다이얼이 SPIN_THRESHOLD_DEGREES 이상 돌아갔을 때 한 번만 호출됨
@@ -11,7 +13,6 @@ interface UseDialInteractionOptions {
 }
 
 interface UseDialInteractionResult {
-  dialRef: React.RefObject<HTMLButtonElement | null>;
   rotation: number;
   isDragging: boolean;
   handlers: {
@@ -26,13 +27,12 @@ interface UseDialInteractionResult {
 // 여러 ref가 한 포인터 상태 머신을 구성하는 복잡성을 감추고,
 // 컴포넌트는 "돌아갔는가?"라는 결과만 콜백으로 받는다.
 export function useDialInteraction({
+  dialRef,
   enabled,
   onSpinComplete,
 }: UseDialInteractionOptions): UseDialInteractionResult {
   const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-
-  const dialRef = useRef<HTMLButtonElement>(null);
   const isDraggingRef = useRef(false);
   const lastPointerAngleRef = useRef(0);
   const accumulatedRotationRef = useRef(0);
@@ -104,7 +104,6 @@ export function useDialInteraction({
   };
 
   return {
-    dialRef,
     rotation,
     isDragging,
     handlers: { onPointerDown, onPointerMove, onPointerUp },

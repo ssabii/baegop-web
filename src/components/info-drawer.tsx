@@ -1,7 +1,6 @@
 "use client";
 
 import { Info } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
   Drawer,
   DrawerContent,
@@ -10,6 +9,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { cn } from "@/lib/utils";
 
 interface InfoDrawerProps {
   title: string;

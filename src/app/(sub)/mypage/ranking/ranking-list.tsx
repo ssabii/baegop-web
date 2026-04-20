@@ -1,14 +1,14 @@
 "use client";
 
-import { useInView } from "react-intersection-observer";
 import { Trophy } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
+import { useInView } from "react-intersection-observer";
 import {
   Empty,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { Spinner } from "@/components/ui/spinner";
 import { useRanking } from "@/hooks/use-ranking";
 import { RankingCard } from "./ranking-card";
 

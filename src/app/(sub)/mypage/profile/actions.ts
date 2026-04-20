@@ -1,7 +1,7 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { toOriginalSupabaseImageUrl } from "@/lib/image";
+import { createClient } from "@/lib/supabase/server";
 
 export async function uploadAvatar(formData: FormData) {
   const supabase = await createClient();

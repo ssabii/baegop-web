@@ -1,9 +1,9 @@
-import { optimizeNaverImageUrl } from "@/lib/image";
-import { FavoriteButton } from "@/components/favorite-button";
-import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
-import type { KonaCardStatus } from "@/types";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
 import Link from "next/link";
+import { FavoriteButton } from "@/components/favorite-button";
+import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
+import { optimizeNaverImageUrl } from "@/lib/image";
+import type { KonaCardStatus } from "@/types";
 
 export interface PlaceCardProps {
   id: string;

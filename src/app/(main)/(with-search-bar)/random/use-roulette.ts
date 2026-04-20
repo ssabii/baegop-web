@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useCallback, useMemo } from "react";
 import { matchesCategory } from "@/lib/category";
 import { CATEGORY_FILTERS, type CategoryFilter } from "@/lib/constants";
 import type { RandomPlace } from "./types";
