@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Provider } from "@supabase/supabase-js";
@@ -32,13 +31,6 @@ export function SignInForm({
   errorCode?: string;
   errorDescription?: string;
 }) {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-
   useEffect(() => {
     if (errorProp) {
       const message = getAuthErrorMessage(errorCode, errorDescription);
@@ -47,50 +39,6 @@ export function SignInForm({
       }, 0);
     }
   }, [errorProp, errorCode, errorDescription]);
-
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setEmailError("");
-    setPasswordError("");
-
-    if (!email) {
-      setEmailError("이메일을 입력해주세요.");
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError("올바른 이메일 형식이 아닙니다.");
-      return;
-    }
-
-    if (!password) {
-      setPasswordError("비밀번호를 입력해주세요.");
-      return;
-    }
-
-    setIsLoading(true);
-
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      setIsLoading(false);
-      if (error.message === "Email not confirmed") {
-        setEmailError(
-          "이메일 인증이 완료되지 않았습니다. 메일함을 확인해주세요.",
-        );
-      } else {
-        setPasswordError("이메일 또는 비밀번호가 올바르지 않습니다.");
-      }
-      return;
-    }
-
-    router.push(redirectTo || "/");
-    router.refresh();
-  };
 
   const handleOAuthLogin = async (provider: Provider | "custom:naver") => {
     const supabase = createClient();
@@ -128,7 +76,7 @@ export function SignInForm({
                   setEmail(e.target.value);
                   setEmailError("");
                 }}
-                disabled={isLoading}
+                disabled={false}
                 autoComplete="email"
                 aria-invalid={!!emailError}
               />
@@ -154,7 +102,7 @@ export function SignInForm({
                   setPassword(e.target.value);
                   setPasswordError("");
                 }}
-                disabled={isLoading}
+                disabled={false}
                 autoComplete="current-password"
                 aria-invalid={!!passwordError}
               />
@@ -163,7 +111,7 @@ export function SignInForm({
               )}
             </Field>
             <Field>
-              <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
+              <Button type="submit" size="xl" className="w-full" disabled={false}>
                 {isLoading ? <Spinner /> : "로그인"}
               </Button>
             </Field>
@@ -174,19 +122,19 @@ export function SignInForm({
           provider="kakao"
           type="button"
           onClick={() => handleOAuthLogin("kakao")}
-          disabled={isLoading}
+          disabled={false}
         />
         <SignInButton
           provider="google"
           type="button"
           onClick={() => handleOAuthLogin("google")}
-          disabled={isLoading}
+          disabled={false}
         />
         <SignInButton
           provider="naver"
           type="button"
           onClick={() => handleOAuthLogin("custom:naver")}
-          disabled={isLoading}
+          disabled={false}
         />
         {/* <FieldDescription className="text-center">
                 계정이 없으신가요?{" "}

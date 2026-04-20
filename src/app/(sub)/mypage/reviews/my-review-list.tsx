@@ -11,7 +11,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { MessageCircle } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { useMyReviews } from "./use-my-reviews";
-import { cn } from "@/lib/utils";
 
 interface MyReviewListProps {
   userId: string;
