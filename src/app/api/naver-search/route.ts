@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { searchPlaces } from "@/lib/search";
 

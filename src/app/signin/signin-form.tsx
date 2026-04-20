@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Provider } from "@supabase/supabase-js";
+import { type Provider } from "@supabase/supabase-js";
 import SignInButton from "@/app/signin/signin-button";
 import { SignInBubble } from "@/app/signin/signin-bubble";
 

@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes } from "react";
+import { type ButtonHTMLAttributes } from "react";
 import { KakaoIcon } from "@/components/icons/kakao-icon";
 import { NaverIcon } from "@/components/icons/naver-icon";
 import { GoogleIcon } from "@/components/icons/google-icon";
