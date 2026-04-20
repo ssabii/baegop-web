@@ -1,16 +1,16 @@
-import { redirect } from "next/navigation";
 import {
   dehydrate,
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { SubHeader } from "@/components/sub-header";
 import { POINTS } from "@/lib/constants";
 import { fetchRanking } from "@/lib/queries/ranking";
 import { rankingKeys } from "@/lib/query-keys";
-import { RankingList } from "./ranking-list";
+import { createClient } from "@/lib/supabase/server";
 import { PointSection } from "./point-section";
+import { RankingList } from "./ranking-list";
 
 export default async function RankingPage() {
   const supabase = await createClient();

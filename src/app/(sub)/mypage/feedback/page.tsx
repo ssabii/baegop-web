@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { SubHeader } from "@/components/sub-header";
+import { createClient } from "@/lib/supabase/server";
 import { MyFeedbackList } from "./my-feedback-list";
 
 export default async function MyFeedbacksPage() {

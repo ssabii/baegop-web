@@ -1,11 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import type { User } from "@supabase/supabase-js";
 import { LogOut, User as UserIcon } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { optimizeSupabaseImageUrl } from "@/lib/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { optimizeSupabaseImageUrl } from "@/lib/image";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 interface AuthButtonProps {
   user: User | null;

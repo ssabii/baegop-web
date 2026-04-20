@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { Building2, MapPin, Star, Tag } from "lucide-react";
-import type { KonaCardStatus } from "@/types";
-import type { RandomPlace } from "./types";
+import Link from "next/link";
 import { KonaCardBadge } from "@/components/place-detail/kona-card-badge";
+import type { RandomPlace } from "./types";
+import type { KonaCardStatus } from "@/types";
 
 interface RandomCardProps {
   place: RandomPlace;

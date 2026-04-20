@@ -1,6 +1,8 @@
 "use client";
 
 import { MapPinOff, MapPin } from "lucide-react";
+import { PlaceCard } from "@/components/places";
+import { PlaceCardSkeleton } from "@/components/places/place-card-skeleton";
 import {
   Empty,
   EmptyDescription,
@@ -8,13 +10,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { PlaceCard } from "@/components/places";
-import { PlaceCardSkeleton } from "@/components/places/place-card-skeleton";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { SEOUL_CITY_HALL_LOCATION } from "@/lib/constants";
-import type { NaverSearchResult } from "@/types";
-import type { PlaceCardProps } from "@/components/places/place-card";
 import { useRecommendPlaces } from "./use-recommend-places";
+import type { PlaceCardProps } from "@/components/places/place-card";
+import type { NaverSearchResult } from "@/types";
 
 function toPlaceCardProps(place: NaverSearchResult): PlaceCardProps {
   return {

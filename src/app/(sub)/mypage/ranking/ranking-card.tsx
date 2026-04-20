@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
 import { UserRound } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { optimizeSupabaseImageUrl } from "@/lib/image";
+import { cn } from "@/lib/utils";
 import type { RankingUser } from "@/hooks/use-ranking";
 
 const RANK_STYLES: Record<number, string> = {

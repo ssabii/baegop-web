@@ -1,10 +1,10 @@
+import { MapPin, Phone, Route } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { COMPANY_LOCATION } from "@/lib/constants";
 import { buildNaverWalkingRouteLink } from "@/lib/naver";
 import type { NaverWalkingRoute } from "@/lib/naver";
 import type { LucideIcon } from "lucide-react";
-import { MapPin, Phone, Route } from "lucide-react";
 
 interface ShortcutItem {
   href: string;

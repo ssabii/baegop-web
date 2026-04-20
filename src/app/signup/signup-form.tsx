@@ -1,13 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
-import { validatePassword } from "@/lib/password";
-import { generateRandomAvatarUrl, generateRandomNickname } from "@/lib/utils";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +15,10 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
+import { PASSWORD_MIN_LENGTH } from "@/lib/constants";
+import { validatePassword } from "@/lib/password";
+import { createClient } from "@/lib/supabase/client";
+import { generateRandomAvatarUrl, generateRandomNickname } from "@/lib/utils";
 
 export function SignUpForm({
   error: errorProp,

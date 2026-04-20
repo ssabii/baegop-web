@@ -1,5 +1,7 @@
 "use client";
 
+import { Heart } from "lucide-react";
+import { useInView } from "react-intersection-observer";
 import { PlaceCard } from "@/components/places";
 import {
   Empty,
@@ -8,8 +10,6 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
-import { Heart } from "lucide-react";
-import { useInView } from "react-intersection-observer";
 import { useMyPlaces } from "./use-my-places";
 
 export function MyPlaceList() {

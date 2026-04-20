@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
-import { Spinner } from "@/components/ui/spinner";
-import { NaverMapProvider } from "@/components/NaverMapContext";
-import { useNaverMap } from "@/components/useNaverMap";
 import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef } from "react";
+import { NaverMapProvider } from "@/components/NaverMapContext";
+import { Spinner } from "@/components/ui/spinner";
+import { useNaverMap } from "@/components/useNaverMap";
 
 const NaverMap = dynamic(() => import("@/components/NaverMap"), {
   ssr: false,

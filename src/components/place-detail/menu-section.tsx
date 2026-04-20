@@ -1,15 +1,15 @@
 "use client";
 
-import { useInView } from "react-intersection-observer";
 import { UtensilsCrossed } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
+import { useInView } from "react-intersection-observer";
+import { ImagePreviewDialog } from "@/components/image-preview-dialog";
 import {
   Empty,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { ImagePreviewDialog } from "@/components/image-preview-dialog";
+import { Spinner } from "@/components/ui/spinner";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { useMenus, type MenusResponse } from "./use-menus";
 

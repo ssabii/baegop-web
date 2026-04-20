@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 const ALLOWED_KEYS = ["w", "h", "level", "scale", "maptype", "format", "lang"];
 

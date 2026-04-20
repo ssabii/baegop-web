@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { type Provider } from "@supabase/supabase-js";
 import Link from "next/link";
+ 
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
+ 
+
 import { toast } from "sonner";
-import { Provider } from "@supabase/supabase-js";
-import SignInButton from "@/app/signin/signin-button";
 import { SignInBubble } from "@/app/signin/signin-bubble";
+import SignInButton from "@/app/signin/signin-button";
+import { createClient } from "@/lib/supabase/client";
 
 function getAuthErrorMessage(errorCode?: string, errorDescription?: string) {
   if (
@@ -32,11 +34,17 @@ export function SignInForm({
   errorCode?: string;
   errorDescription?: string;
 }) {
+   
   const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [email, setEmail] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [password, setPassword] = useState("");
+   
   const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [emailError, setEmailError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [passwordError, setPasswordError] = useState("");
 
   useEffect(() => {
@@ -48,6 +56,7 @@ export function SignInForm({
     }
   }, [errorProp, errorCode, errorDescription]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError("");

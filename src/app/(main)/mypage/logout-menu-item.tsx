@@ -1,16 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { ChevronRight } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/client";
-import { profileKeys } from "@/lib/query-keys";
+import { ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   Item,
   ItemActions,
   ItemContent,
   ItemTitle,
 } from "@/components/ui/item";
+import { profileKeys } from "@/lib/query-keys";
+import { createClient } from "@/lib/supabase/client";
 
 export function LogoutMenuItem() {
   const router = useRouter();

@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { optimizeNaverImageUrl, optimizeSupabaseImageUrl } from "@/lib/image";
+import { createClient } from "@/lib/supabase/server";
 import { ReviewFormPage } from "../review-form-page";
 
 export default async function ReviewEditPage({

@@ -1,8 +1,8 @@
 "use client";
 
 import { ChevronLeft, X } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { SearchBarAvatar } from "@/components/search-bar-avatar";
+import { cn } from "@/lib/utils";
 
 interface MapSearchInputProps {
   query: string;

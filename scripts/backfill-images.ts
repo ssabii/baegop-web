@@ -9,8 +9,8 @@
  * 2) naver_place_id가 없는 맛집 → 네이버 이미지 검색 API 폴백
  */
 
-import puppeteer, { type Browser } from "puppeteer";
 import { createClient } from "@supabase/supabase-js";
+import puppeteer, { type Browser } from "puppeteer";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

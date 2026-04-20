@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef, useState } from "react";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 
 interface ImageGalleryProps {

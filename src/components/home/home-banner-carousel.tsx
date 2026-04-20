@@ -1,16 +1,16 @@
 "use client";
 
+import Autoplay from "embla-carousel-autoplay";
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { RankingBanner } from "./ranking-banner";
+import { cn } from "@/lib/utils";
 import { DubaiCookieBanner } from "./dubai-cookie-banner";
-import Autoplay from "embla-carousel-autoplay";
+import { RankingBanner } from "./ranking-banner";
 
 const BANNERS = [
   { key: "ranking", component: RankingBanner },

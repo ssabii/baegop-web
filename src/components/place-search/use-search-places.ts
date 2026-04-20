@@ -1,5 +1,5 @@
-import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { searchKeys } from "@/lib/query-keys";
 import type { NaverSearchResult } from "@/types";
 

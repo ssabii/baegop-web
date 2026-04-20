@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { optimizeNaverImageUrls } from "@/lib/image";
+import { createClient } from "@/lib/supabase/server";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 export interface OverlapMarkerItem {
   id: string;

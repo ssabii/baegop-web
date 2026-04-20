@@ -2,9 +2,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { mypageKeys } from "@/lib/query-keys";
-import type { FeedbackCategory } from "@/types";
 import { createFeedback, updateFeedbackImageUrls } from "./actions";
 import { uploadFeedbackImages } from "./upload-feedback-images";
+import type { FeedbackCategory } from "@/types";
 
 export function useCreateFeedback() {
   const router = useRouter();

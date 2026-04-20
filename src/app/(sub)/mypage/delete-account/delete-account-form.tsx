@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { BottomActionBar } from "@/components/bottom-action-bar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { BottomActionBar } from "@/components/bottom-action-bar";
 import { DeleteAccountButton } from "./delete-account-button";
 
 export function DeleteAccountForm() {
