@@ -43,10 +43,13 @@ export function ImageCarouselDialog({
   // Track current slide
   useEffect(() => {
     if (!api) return;
-    setCurrent(api.selectedScrollSnap());
+    const raf = requestAnimationFrame(() => {
+      setCurrent(api.selectedScrollSnap());
+    });
     const onSelect = () => setCurrent(api.selectedScrollSnap());
     api.on("select", onSelect);
     return () => {
+      cancelAnimationFrame(raf);
       api.off("select", onSelect);
     };
   }, [api]);

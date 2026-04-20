@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   CAPSULE_COLORS,
@@ -41,6 +41,7 @@ export function FortuneMachine({
 }: FortuneMachineProps) {
   const [state, setState] = useState<MachineState>("idle");
   const [capsuleColor, setCapsuleColor] = useState(CAPSULE_COLORS[0]);
+  const dialRef = useRef<HTMLButtonElement>(null);
 
   // 뽑기 애니메이션 시퀀스: spinning → dispensing → 부모에 캡슐 준비 완료 알림 → idle로 복귀
   const runFortuneSequence = () => {
@@ -57,6 +58,7 @@ export function FortuneMachine({
   };
 
   const dial = useDialInteraction({
+    dialRef,
     enabled: state === "idle",
     onSpinComplete: runFortuneSequence,
   });
@@ -152,7 +154,7 @@ export function FortuneMachine({
               {/* 다이얼 (360도 돌리면 뽑기 실행) */}
               <div className="flex flex-col items-center gap-2">
                 <button
-                  ref={dial.dialRef}
+                  ref={dialRef}
                   onPointerDown={dial.handlers.onPointerDown}
                   onPointerMove={dial.handlers.onPointerMove}
                   onPointerUp={dial.handlers.onPointerUp}
