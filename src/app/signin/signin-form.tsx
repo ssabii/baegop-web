@@ -2,7 +2,10 @@
 
 import { type Provider } from "@supabase/supabase-js";
 import Link from "next/link";
-import { useEffect } from "react";
+ 
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+ 
 
 import { toast } from "sonner";
 import { SignInBubble } from "@/app/signin/signin-bubble";
@@ -31,6 +34,19 @@ export function SignInForm({
   errorCode?: string;
   errorDescription?: string;
 }) {
+   
+  const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [email, setEmail] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [password, setPassword] = useState("");
+   
+  const [isLoading, setIsLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [emailError, setEmailError] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [passwordError, setPasswordError] = useState("");
+
   useEffect(() => {
     if (errorProp) {
       const message = getAuthErrorMessage(errorCode, errorDescription);
@@ -39,6 +55,51 @@ export function SignInForm({
       }, 0);
     }
   }, [errorProp, errorCode, errorDescription]);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError("");
+    setPasswordError("");
+
+    if (!email) {
+      setEmailError("이메일을 입력해주세요.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("올바른 이메일 형식이 아닙니다.");
+      return;
+    }
+
+    if (!password) {
+      setPasswordError("비밀번호를 입력해주세요.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setIsLoading(false);
+      if (error.message === "Email not confirmed") {
+        setEmailError(
+          "이메일 인증이 완료되지 않았습니다. 메일함을 확인해주세요.",
+        );
+      } else {
+        setPasswordError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      }
+      return;
+    }
+
+    router.push(redirectTo || "/");
+    router.refresh();
+  };
 
   const handleOAuthLogin = async (provider: Provider | "custom:naver") => {
     const supabase = createClient();
@@ -76,7 +137,7 @@ export function SignInForm({
                   setEmail(e.target.value);
                   setEmailError("");
                 }}
-                disabled={false}
+                disabled={isLoading}
                 autoComplete="email"
                 aria-invalid={!!emailError}
               />
@@ -102,7 +163,7 @@ export function SignInForm({
                   setPassword(e.target.value);
                   setPasswordError("");
                 }}
-                disabled={false}
+                disabled={isLoading}
                 autoComplete="current-password"
                 aria-invalid={!!passwordError}
               />
@@ -111,7 +172,7 @@ export function SignInForm({
               )}
             </Field>
             <Field>
-              <Button type="submit" size="xl" className="w-full" disabled={false}>
+              <Button type="submit" size="xl" className="w-full" disabled={isLoading}>
                 {isLoading ? <Spinner /> : "로그인"}
               </Button>
             </Field>
@@ -122,19 +183,19 @@ export function SignInForm({
           provider="kakao"
           type="button"
           onClick={() => handleOAuthLogin("kakao")}
-          disabled={false}
+          disabled={isLoading}
         />
         <SignInButton
           provider="google"
           type="button"
           onClick={() => handleOAuthLogin("google")}
-          disabled={false}
+          disabled={isLoading}
         />
         <SignInButton
           provider="naver"
           type="button"
           onClick={() => handleOAuthLogin("custom:naver")}
-          disabled={false}
+          disabled={isLoading}
         />
         {/* <FieldDescription className="text-center">
                 계정이 없으신가요?{" "}
