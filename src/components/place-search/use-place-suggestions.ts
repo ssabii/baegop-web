@@ -89,7 +89,8 @@ export function usePlaceSuggestions({
     }
 
     if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => void searchSuggestions(input), 300);
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    timerRef.current = setTimeout(() => searchSuggestions(input), 300);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
