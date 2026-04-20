@@ -52,10 +52,6 @@ const eslintConfig = defineConfig([
           alphabetize: { order: "asc", caseInsensitive: true },
         },
       ],
-
-      // -- 일반 --
-      // production 코드에 console 남기지 않기 (warn으로 개발 중 허용)
-      "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
   // TypeScript 타입 기반 정적 분석 — 비동기 에러를 컴파일 타임에 잡아준다
@@ -78,8 +74,6 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/await-thenable": "error",
     },
   },
-  // 스크립트 디렉토리는 console.log가 주요 출력 수단이므로 no-console 비활성화
-  { files: ["scripts/**"], rules: { "no-console": "off" } },
   globalIgnores([
     ".next/**",
     "out/**",
