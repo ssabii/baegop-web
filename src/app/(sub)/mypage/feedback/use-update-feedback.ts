@@ -35,7 +35,7 @@ export function useUpdateFeedback(feedbackId: number) {
       );
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
+      queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
       toast.success("피드백이 수정되었어요.", { position: "top-center" });
       router.back();
     },

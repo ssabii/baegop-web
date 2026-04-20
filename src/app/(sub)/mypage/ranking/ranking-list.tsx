@@ -23,7 +23,7 @@ export function RankingList({ currentUserId }: RankingListProps) {
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
       if (inView && hasNextPage && !isFetchingNextPage) {
-        void fetchNextPage();
+        fetchNextPage();
       }
     },
   });

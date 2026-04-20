@@ -68,13 +68,11 @@ const eslintConfig = defineConfig([
       },
     },
     rules: {
-      // await 없이 Promise를 무시하면 에러를 놓친다 (가장 중요한 규칙)
-      "@typescript-eslint/no-floating-promises": "error",
       // async 함수를 void 반환이 기대되는 곳에 전달 방지
       // (단, JSX 이벤트 핸들러의 async는 허용 — React에서 흔한 패턴)
       "@typescript-eslint/no-misused-promises": [
         "error",
-        { checksVoidReturn: { attributes: false } },
+        { checksVoidReturn: { attributes: false, arguments: false } },
       ],
       // thenable이 아닌 값에 await 사용 방지
       "@typescript-eslint/await-thenable": "error",

@@ -60,7 +60,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
     startTransition(async () => {
       try {
         await deleteFeedback(feedback.id);
-        void queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
+        queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
         toast.success("피드백이 삭제되었어요.", { position: "top-center" });
       } catch {
         toast.error("피드백 삭제에 실패했어요. 다시 시도해주세요.", {

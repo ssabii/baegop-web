@@ -27,7 +27,7 @@ export function useCreateReview(naverPlaceId: string) {
       await createReview(naverPlaceId, { rating, content }, imageUrls);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: reviewKeys.all });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.all });
       sessionStorage.setItem("scrollToReview", "true");
       toast.success("리뷰가 등록되었어요.", { position: "top-center" });
       router.replace(`/places/${naverPlaceId}?tab=review`);

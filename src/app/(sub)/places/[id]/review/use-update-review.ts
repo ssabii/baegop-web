@@ -34,7 +34,7 @@ export function useUpdateReview(naverPlaceId: string, reviewId: number) {
       );
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: reviewKeys.all });
+      queryClient.invalidateQueries({ queryKey: reviewKeys.all });
       sessionStorage.setItem("scrollToReview", "true");
       toast.success("리뷰가 수정되었어요.", { position: "top-center" });
       router.replace(`/places/${naverPlaceId}?tab=review`);

@@ -65,7 +65,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
     startTransition(async () => {
       try {
         await deleteReview(review.id);
-        void queryClient.invalidateQueries({ queryKey: reviewKeys.all });
+        queryClient.invalidateQueries({ queryKey: reviewKeys.all });
         router.refresh();
         toast.success("리뷰가 삭제되었어요.", { position: "top-center" });
       } catch {

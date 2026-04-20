@@ -28,7 +28,7 @@ export function useCreateFeedback() {
       }
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
+      queryClient.invalidateQueries({ queryKey: mypageKeys.feedbacks() });
       toast.success("피드백이 등록되었어요.", { position: "top-center" });
       router.back();
     },
