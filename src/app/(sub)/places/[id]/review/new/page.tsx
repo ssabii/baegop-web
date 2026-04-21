@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { createClient } from "@/lib/supabase/server";
-import { ReviewFormPage } from "../review-form-page";
+import { ReviewFormCreate } from "../review-form-create";
 
 export default async function ReviewWritePage({
   params,
@@ -31,8 +31,7 @@ export default async function ReviewWritePage({
   if (!place) notFound();
 
   return (
-    <ReviewFormPage
-      mode="create"
+    <ReviewFormCreate
       naverPlaceId={place.id}
       place={{
         name: place.name,
