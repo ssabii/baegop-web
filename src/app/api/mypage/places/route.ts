@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const DEFAULT_LIMIT = 10;
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const cursor = Math.max(Number(searchParams.get("cursor")) || 0, 0);
