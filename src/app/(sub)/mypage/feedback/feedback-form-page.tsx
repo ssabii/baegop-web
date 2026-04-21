@@ -1,15 +1,14 @@
 "use client";
 
-import { ImagePlus, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { ContentDrawerEditor } from "@/components/forms/content-drawer-editor";
+import { ImageSelector } from "@/components/forms/image-selector";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -19,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
+import { useImageForm } from "@/hooks/use-image-form";
 import {
   FEEDBACK_CATEGORIES,
   FEEDBACK_CATEGORY_LABELS,
@@ -28,7 +27,6 @@ import {
   MAX_FEEDBACK_IMAGES,
   MIN_FEEDBACK_CONTENT_LENGTH,
 } from "@/lib/constants";
-import { compressImage, optimizeSupabaseImageUrl } from "@/lib/image";
 import { useCreateFeedback } from "./use-create-feedback";
 import { useUpdateFeedback } from "./use-update-feedback";
 import type { FeedbackCategory, FeedbackWithImages } from "@/types";
@@ -44,8 +42,6 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
   const isEdit = props.mode === "edit";
   const feedback = isEdit ? props.feedback : null;
 
-  const existingUrls = feedback?.image_urls ?? [];
-
   const router = useRouter();
   const confirm = useConfirmDialog();
 
@@ -53,16 +49,13 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
     feedback?.category ?? "bug",
   );
   const [content, setContent] = useState(feedback?.content ?? "");
-  const [keptImageUrls, setKeptImageUrls] = useState<string[]>(existingUrls);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
-  const [compressingCount, setCompressingCount] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const previewsRef = useRef(previews);
+
+  const imageForm = useImageForm({
+    initialImageUrls: feedback?.image_urls ?? [],
+    maxImages: MAX_FEEDBACK_IMAGES,
+  });
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
-  const [drawerContent, setDrawerContent] = useState("");
-
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
@@ -70,74 +63,12 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
   const updateFeedback = useUpdateFeedback(feedback?.id ?? -1);
   const { mutate, isPending } = isEdit ? updateFeedback : createFeedback;
 
-  const totalImageCount = keptImageUrls.length + selectedFiles.length;
-  const allImages = [...keptImageUrls, ...previews];
-
+  const isBusy = isPending || imageForm.compressingCount > 0;
   const isDirty = isEdit
     ? category !== feedback!.category ||
       content !== feedback!.content ||
-      keptImageUrls.length !== existingUrls.length ||
-      selectedFiles.length > 0
-    : content.length > 0 || selectedFiles.length > 0;
-
-  useEffect(() => {
-    previewsRef.current = previews;
-  }, [previews]);
-
-  useEffect(() => {
-    return () => {
-      previewsRef.current.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, []);
-
-  async function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    if (files.length === 0) return;
-
-    const maxSize = 10 * 1024 * 1024;
-    const valid = files.filter((f) => f.size <= maxSize);
-
-    if (valid.length < files.length) {
-      toast.warning("10MB를 초과하는 이미지는 제외되었습니다.");
-    }
-
-    const remaining = MAX_FEEDBACK_IMAGES - totalImageCount;
-    const allowed = valid.slice(0, remaining);
-
-    if (allowed.length < valid.length) {
-      toast.warning(
-        `이미지는 최대 ${MAX_FEEDBACK_IMAGES}장까지 등록할 수 있습니다.`,
-      );
-    }
-
-    if (allowed.length > 0) {
-      setCompressingCount(allowed.length);
-      const compressed = await Promise.all(
-        allowed.map(async (file) => {
-          const result = await compressImage(file);
-          setCompressingCount((prev) => prev - 1);
-          return result;
-        }),
-      );
-      setSelectedFiles((prev) => [...prev, ...compressed]);
-      setPreviews((prev) => [
-        ...prev,
-        ...compressed.map((f) => URL.createObjectURL(f)),
-      ]);
-    }
-
-    e.target.value = "";
-  }
-
-  function removeExistingImage(url: string) {
-    setKeptImageUrls((prev) => prev.filter((u) => u !== url));
-  }
-
-  function removeNewFile(index: number) {
-    URL.revokeObjectURL(previews[index]);
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
-  }
+      imageForm.hasImageChanges
+    : content.length > 0 || imageForm.hasImageChanges;
 
   function handleSubmit() {
     if (content.length < MIN_FEEDBACK_CONTENT_LENGTH) return;
@@ -146,14 +77,14 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
       (mutate as typeof updateFeedback.mutate)({
         category,
         content,
-        keptImageUrls,
-        files: selectedFiles,
+        keptImageUrls: imageForm.keptImageUrls,
+        files: imageForm.selectedFiles,
       });
     } else {
       (mutate as typeof createFeedback.mutate)({
         category,
         content,
-        files: selectedFiles,
+        files: imageForm.selectedFiles,
       });
     }
   }
@@ -172,6 +103,11 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
     router.back();
   }
 
+  function openPreview(index: number) {
+    setPreviewIndex(index);
+    setPreviewOpen(true);
+  }
+
   return (
     <>
       <SubHeader
@@ -187,7 +123,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             <Select
               value={category}
               onValueChange={(v) => setCategory(v as FeedbackCategory)}
-              disabled={isPending || compressingCount > 0}
+              disabled={isBusy}
             >
               <SelectTrigger className="mt-2 w-full">
                 <SelectValue />
@@ -207,11 +143,8 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             <Label className="text-base font-bold">내용</Label>
             <button
               type="button"
-              disabled={isPending || compressingCount > 0}
-              onClick={() => {
-                setDrawerContent(content);
-                setContentDrawerOpen(true);
-              }}
+              disabled={isBusy}
+              onClick={() => setContentDrawerOpen(true)}
               className="focus-visible:border-ring focus-visible:ring-ring/50 mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
             >
               {content ? (
@@ -229,152 +162,33 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
               {MAX_FEEDBACK_CONTENT_LENGTH}
             </p>
           </div>
-          <Drawer
-            repositionInputs={false}
+          <ContentDrawerEditor
             open={contentDrawerOpen}
             onOpenChange={setContentDrawerOpen}
-          >
-            <DrawerContent>
-              <div className="mx-auto w-full max-w-4xl p-4">
-                <DrawerTitle className="sr-only">피드백 내용 작성</DrawerTitle>
-                <Textarea
-                  autoFocus
-                  className="field-sizing-fixed resize-none"
-                  placeholder={FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
-                  value={drawerContent}
-                  onChange={(e) =>
-                    setDrawerContent(
-                      e.target.value.slice(0, MAX_FEEDBACK_CONTENT_LENGTH),
-                    )
-                  }
-                  onFocus={(e) => {
-                    const el = e.currentTarget;
-                    el.setSelectionRange(el.value.length, el.value.length);
-                  }}
-                  maxLength={MAX_FEEDBACK_CONTENT_LENGTH}
-                  rows={8}
-                />
-                <p className="text-muted-foreground mt-2 text-right text-sm">
-                  {drawerContent.length}/{MAX_FEEDBACK_CONTENT_LENGTH}
-                </p>
-                <Button
-                  className="mt-4 w-full"
-                  size="xl"
-                  onClick={() => {
-                    setContent(drawerContent);
-                    setContentDrawerOpen(false);
-                  }}
-                >
-                  확인
-                </Button>
-              </div>
-            </DrawerContent>
-          </Drawer>
+            srTitle="피드백 내용 작성"
+            initialValue={content}
+            onConfirm={setContent}
+            placeholder={FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
+            maxLength={MAX_FEEDBACK_CONTENT_LENGTH}
+            rows={8}
+          />
 
           {/* 이미지 */}
-          <div>
-            <div className="flex items-baseline gap-1.5">
-              <Label className="text-base font-bold">사진</Label>
-              <span className="text-muted-foreground text-sm">
-                {totalImageCount}/{MAX_FEEDBACK_IMAGES}
-              </span>
-            </div>
-            {totalImageCount === 0 ? (
-              <button
-                type="button"
-                disabled={isPending || compressingCount > 0}
-                onClick={() => fileInputRef.current?.click()}
-                className="text-muted-foreground hover:border-primary hover:text-primary mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
-              >
-                {compressingCount > 0 ? (
-                  <Loader2 className="size-5 animate-spin" />
-                ) : (
-                  <ImagePlus className="size-5" />
-                )}
-              </button>
-            ) : (
-              <div className="mt-2 grid grid-cols-5 gap-2">
-                {keptImageUrls.map((url, i) => (
-                  <div key={url} className="relative">
-                    <button
-                      type="button"
-                      disabled={isPending || compressingCount > 0}
-                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
-                      onClick={() => {
-                        setPreviewIndex(i);
-                        setPreviewOpen(true);
-                      }}
-                    >
-                      <img
-                        src={optimizeSupabaseImageUrl(url, { width: 200 })}
-                        decoding="async"
-                        alt="기존 이미지"
-                        className="aspect-square w-full object-cover"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isPending || compressingCount > 0}
-                      onClick={() => removeExistingImage(url)}
-                      className="bg-foreground/80 text-background absolute top-1 right-1 rounded-full p-0.5 shadow-sm disabled:pointer-events-none disabled:opacity-50"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </div>
-                ))}
-                {previews.map((src, i) => (
-                  <div key={src} className="relative">
-                    <button
-                      type="button"
-                      disabled={isPending || compressingCount > 0}
-                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
-                      onClick={() => {
-                        setPreviewIndex(keptImageUrls.length + i);
-                        setPreviewOpen(true);
-                      }}
-                    >
-                      <img
-                        src={src}
-                        decoding="async"
-                        alt={`미리보기 ${i + 1}`}
-                        className="aspect-square w-full object-cover"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isPending || compressingCount > 0}
-                      onClick={() => removeNewFile(i)}
-                      className="bg-foreground/80 text-background absolute top-1 right-1 rounded-full p-0.5 shadow-sm disabled:pointer-events-none disabled:opacity-50"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </div>
-                ))}
-                {totalImageCount + compressingCount < MAX_FEEDBACK_IMAGES && (
-                  <button
-                    type="button"
-                    disabled={isPending || compressingCount > 0}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-muted-foreground hover:border-primary hover:text-primary flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
-                  >
-                    {compressingCount > 0 ? (
-                      <Loader2 className="size-5 animate-spin" />
-                    ) : (
-                      <ImagePlus className="size-5" />
-                    )}
-                  </button>
-                )}
-              </div>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple={MAX_FEEDBACK_IMAGES - totalImageCount > 1}
-              accept="image/*"
-              className="hidden"
-              onChange={handleFilesChange}
-            />
-          </div>
+          <ImageSelector
+            label="사진"
+            maxImages={MAX_FEEDBACK_IMAGES}
+            keptImageUrls={imageForm.keptImageUrls}
+            previews={imageForm.previews}
+            totalImageCount={imageForm.totalImageCount}
+            compressingCount={imageForm.compressingCount}
+            disabled={isBusy}
+            fileInputRef={imageForm.fileInputRef}
+            onFilesChange={imageForm.handleFilesChange}
+            onRemoveExisting={imageForm.removeExistingImage}
+            onRemoveNew={imageForm.removeNewFile}
+            onPreview={openPreview}
+            onAddClick={imageForm.openFilePicker}
+          />
         </div>
       </main>
 
@@ -385,7 +199,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             size="xl"
             className="flex-1"
             onClick={handleBack}
-            disabled={isPending || compressingCount > 0}
+            disabled={isBusy}
           >
             취소
           </Button>
@@ -393,11 +207,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             size="xl"
             className="flex-1 transition-none has-[>svg]:px-8"
             onClick={handleSubmit}
-            disabled={
-              content.length < MIN_FEEDBACK_CONTENT_LENGTH ||
-              isPending ||
-              compressingCount > 0
-            }
+            disabled={content.length < MIN_FEEDBACK_CONTENT_LENGTH || isBusy}
           >
             {isPending && <Spinner />}
             {isEdit ? "수정" : "작성"}
@@ -405,9 +215,9 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
         </div>
       </BottomActionBar>
 
-      {allImages.length > 0 && (
+      {imageForm.allImages.length > 0 && (
         <ImageCarouselDialog
-          images={allImages}
+          images={imageForm.allImages}
           initialIndex={previewIndex}
           alt="이미지 미리보기"
           open={previewOpen}
