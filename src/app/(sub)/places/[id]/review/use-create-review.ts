@@ -28,9 +28,8 @@ export function useCreateReview(naverPlaceId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reviewKeys.all });
-      sessionStorage.setItem("scrollToReview", "true");
       toast.success("리뷰가 등록되었어요.", { position: "top-center" });
-      router.replace(`/places/${naverPlaceId}?tab=review`);
+      router.replace(`/places/${naverPlaceId}?tab=review&scroll=review`);
     },
     onError: () => {
       toast.error("리뷰 등록에 실패했어요. 다시 시도해주세요.", {
