@@ -27,31 +27,22 @@ import {
   MAX_FEEDBACK_IMAGES,
   MIN_FEEDBACK_CONTENT_LENGTH,
 } from "@/lib/constants";
-import { useCreateFeedback } from "./use-create-feedback";
 import { useUpdateFeedback } from "./use-update-feedback";
 import type { FeedbackCategory, FeedbackWithImages } from "@/types";
 
-type FeedbackFormPageProps =
-  | { mode: "create" }
-  | {
-      mode: "edit";
-      feedback: FeedbackWithImages;
-    };
+interface FeedbackFormEditProps {
+  feedback: FeedbackWithImages;
+}
 
-export function FeedbackFormPage(props: FeedbackFormPageProps) {
-  const isEdit = props.mode === "edit";
-  const feedback = isEdit ? props.feedback : null;
-
+export function FeedbackFormEdit({ feedback }: FeedbackFormEditProps) {
   const router = useRouter();
   const confirm = useConfirmDialog();
 
-  const [category, setCategory] = useState<FeedbackCategory>(
-    feedback?.category ?? "bug",
-  );
-  const [content, setContent] = useState(feedback?.content ?? "");
+  const [category, setCategory] = useState<FeedbackCategory>(feedback.category);
+  const [content, setContent] = useState(feedback.content);
 
   const imageForm = useImageForm({
-    initialImageUrls: feedback?.image_urls ?? [],
+    initialImageUrls: feedback.image_urls ?? [],
     maxImages: MAX_FEEDBACK_IMAGES,
   });
 
@@ -59,43 +50,28 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
-  const createFeedback = useCreateFeedback();
-  const updateFeedback = useUpdateFeedback(feedback?.id ?? -1);
-  const { mutate, isPending } = isEdit ? updateFeedback : createFeedback;
-
+  const { mutate, isPending } = useUpdateFeedback(feedback.id);
   const isBusy = isPending || imageForm.compressingCount > 0;
-  const isDirty = isEdit
-    ? category !== feedback!.category ||
-      content !== feedback!.content ||
-      imageForm.hasImageChanges
-    : content.length > 0 || imageForm.hasImageChanges;
+  const isDirty =
+    category !== feedback.category ||
+    content !== feedback.content ||
+    imageForm.hasImageChanges;
 
   function handleSubmit() {
     if (content.length < MIN_FEEDBACK_CONTENT_LENGTH) return;
-
-    if (isEdit) {
-      (mutate as typeof updateFeedback.mutate)({
-        category,
-        content,
-        keptImageUrls: imageForm.keptImageUrls,
-        files: imageForm.selectedFiles,
-      });
-    } else {
-      (mutate as typeof createFeedback.mutate)({
-        category,
-        content,
-        files: imageForm.selectedFiles,
-      });
-    }
+    mutate({
+      category,
+      content,
+      keptImageUrls: imageForm.keptImageUrls,
+      files: imageForm.selectedFiles,
+    });
   }
 
   async function handleBack() {
     if (isDirty) {
       const ok = await confirm({
-        title: isEdit ? "피드백 수정 취소" : "피드백 작성 취소",
-        description: isEdit
-          ? "수정 중인 내용이 사라집니다.\n닫으시겠습니까?"
-          : "작성 중인 내용이 사라집니다.\n닫으시겠습니까?",
+        title: "피드백 수정 취소",
+        description: "수정 중인 내용이 사라집니다.\n닫으시겠습니까?",
         confirmLabel: "닫기",
       });
       if (!ok) return;
@@ -110,14 +86,10 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
 
   return (
     <>
-      <SubHeader
-        title={isEdit ? "피드백 수정" : "피드백 작성"}
-        onBack={handleBack}
-      />
+      <SubHeader title="피드백 수정" onBack={handleBack} />
 
       <main className="mx-auto w-full max-w-4xl px-4 pt-4 pb-32">
         <div className="space-y-6">
-          {/* 카테고리 */}
           <div>
             <Label className="text-base font-bold">카테고리</Label>
             <Select
@@ -138,7 +110,6 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             </Select>
           </div>
 
-          {/* 내용 */}
           <div>
             <Label className="text-base font-bold">내용</Label>
             <button
@@ -173,7 +144,6 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             rows={8}
           />
 
-          {/* 이미지 */}
           <ImageSelector
             label="사진"
             maxImages={MAX_FEEDBACK_IMAGES}
@@ -210,7 +180,7 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             disabled={content.length < MIN_FEEDBACK_CONTENT_LENGTH || isBusy}
           >
             {isPending && <Spinner />}
-            {isEdit ? "수정" : "작성"}
+            수정
           </Button>
         </div>
       </BottomActionBar>
