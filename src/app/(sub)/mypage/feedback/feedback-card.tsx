@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { DrawerBody } from "@/components/drawer-body";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -102,7 +103,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
             </Button>
           </DrawerTrigger>
           <DrawerContent>
-            <div className="mx-auto w-full max-w-4xl p-4">
+            <DrawerBody>
               <DrawerTitle className="sr-only">피드백 관리</DrawerTitle>
               <div className="flex flex-col py-2">
                 <button
@@ -122,7 +123,7 @@ export function FeedbackCard({ feedback }: FeedbackCardProps) {
                   삭제
                 </button>
               </div>
-            </div>
+            </DrawerBody>
           </DrawerContent>
         </Drawer>
       </div>
