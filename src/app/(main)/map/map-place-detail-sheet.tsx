@@ -8,14 +8,15 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { LocationButton } from "@/components/location-button";
 import { Button } from "@/components/ui/button";
 import { usePlaceData } from "@/hooks/use-place-data";
+import { SHEET_FULL_SNAP, SHEET_HALF_SNAP } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { MapPlaceDetail } from "./map-place-detail";
 import { MapViewButton } from "./map-view-button";
 import type { NaverSearchResult } from "@/types";
 
 const COMPACT_SNAP = 0.2;
-const HALF_SNAP = 0.5;
-const FULL_SNAP = 1;
+const HALF_SNAP = SHEET_HALF_SNAP;
+const FULL_SNAP = SHEET_FULL_SNAP;
 
 type SnapPoint = number | string;
 
