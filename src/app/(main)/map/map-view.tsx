@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { useNaverMap } from "@/components/useNaverMap";
+import { MAP_CLUSTER_MAX_ZOOM } from "@/lib/constants";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { getOverlappingMarkers } from "@/lib/marker-overlap";
 import { cn } from "@/lib/utils";
@@ -24,8 +25,6 @@ function createMarkerContent(title?: string): string {
     : "";
   return `<div style="display:flex;flex-direction:column;align-items:center;cursor:pointer;">${pin}${label}</div>`;
 }
-
-const CLUSTER_MAX_ZOOM = 16;
 
 export interface MapMarker {
   id: string;
@@ -159,7 +158,7 @@ export function MapView({
         gridSize: 120,
         minClusterSize: 2,
         clusterColors: { light: "#ee560c", dark: "#ee560c" },
-        maxZoom: CLUSTER_MAX_ZOOM,
+        maxZoom: MAP_CLUSTER_MAX_ZOOM,
         onClusterClick: (cluster) => {
           map.fitBounds(
             cluster.getBounds(),
@@ -170,8 +169,8 @@ export function MapView({
               left: 40,
             },
           );
-          if (map.getZoom() > CLUSTER_MAX_ZOOM + 1) {
-            map.setZoom(CLUSTER_MAX_ZOOM + 1);
+          if (map.getZoom() > MAP_CLUSTER_MAX_ZOOM + 1) {
+            map.setZoom(MAP_CLUSTER_MAX_ZOOM + 1);
           }
         },
       });

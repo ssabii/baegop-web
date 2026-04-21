@@ -15,7 +15,7 @@ import {
   type DubaiCookieStore,
 } from "@/data/dubai-cookie-stores";
 import { useGeolocation } from "@/hooks/use-geolocation";
-import { COMPANY_LOCATION } from "@/lib/constants";
+import { COMPANY_LOCATION, MAP_CLUSTER_MAX_ZOOM } from "@/lib/constants";
 import { calculateDistance } from "@/lib/geo";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { getOverlappingMarkers } from "@/lib/marker-overlap";
@@ -31,8 +31,6 @@ const NaverMap = dynamic(() => import("@/components/NaverMap"), {
     </div>
   ),
 });
-
-const CLUSTER_MAX_ZOOM = 16;
 
 /** Pan (and optionally zoom) so the marker sits in the upper portion of the visible map */
 function panToAboveSheet(
@@ -186,7 +184,7 @@ function DubaiCookieMapInner() {
         }
 
         if (!isVisible || needsZoom) {
-          const targetZoom = needsZoom ? CLUSTER_MAX_ZOOM + 1 : undefined;
+          const targetZoom = needsZoom ? MAP_CLUSTER_MAX_ZOOM + 1 : undefined;
           panToAboveSheet(map, store.lat, store.lng, targetZoom);
         }
       }
@@ -292,7 +290,7 @@ function DubaiCookieMapInner() {
         markers,
         gridSize: 120,
         minClusterSize: 2,
-        maxZoom: CLUSTER_MAX_ZOOM,
+        maxZoom: MAP_CLUSTER_MAX_ZOOM,
         clusterColors: { light: "#B0CC50", dark: "#8EB035" },
         onClusterClick: (cluster) => {
           map.fitBounds(cluster.getBounds(), {
@@ -302,8 +300,8 @@ function DubaiCookieMapInner() {
             left: 40,
           });
           // Cap zoom to prevent over-zooming when markers overlap
-          if (map.getZoom() > CLUSTER_MAX_ZOOM + 1) {
-            map.setZoom(CLUSTER_MAX_ZOOM + 1);
+          if (map.getZoom() > MAP_CLUSTER_MAX_ZOOM + 1) {
+            map.setZoom(MAP_CLUSTER_MAX_ZOOM + 1);
           }
         },
       });

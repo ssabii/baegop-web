@@ -276,3 +276,10 @@ export const COMPANY_LOCATION = {
   lng: 127.0268075,
   postalCode: "06625",
 } as const;
+
+// 지도 마커 클러스터링 최대 줌
+export const MAP_CLUSTER_MAX_ZOOM = 16;
+
+// 공통 시트 snap 비율 (COMPACT은 시트별로 고유)
+export const SHEET_HALF_SNAP = 0.5;
+export const SHEET_FULL_SNAP = 1;
