@@ -1,6 +1,7 @@
 "use client";
 
 import { Info } from "lucide-react";
+import { DrawerBody } from "@/components/drawer-body";
 import {
   Drawer,
   DrawerContent,
@@ -42,7 +43,7 @@ export function InfoDrawer({
         </button>
       </DrawerTrigger>
       <DrawerContent>
-        <div className="mx-auto w-full max-w-4xl p-4">
+        <DrawerBody>
           <DrawerHeader>
             <DrawerTitle className="text-left">{title}</DrawerTitle>
             {description && (
@@ -52,7 +53,7 @@ export function InfoDrawer({
             )}
           </DrawerHeader>
           {children}
-        </div>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   );

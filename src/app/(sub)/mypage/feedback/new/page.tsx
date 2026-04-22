@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { FeedbackFormPage } from "../feedback-form-page";
+import { FeedbackFormCreate } from "../feedback-form-create";
 
 export default async function FeedbackNewPage() {
   const supabase = await createClient();
@@ -13,5 +13,5 @@ export default async function FeedbackNewPage() {
     redirect(`/signin?${params}`);
   }
 
-  return <FeedbackFormPage mode="create" />;
+  return <FeedbackFormCreate />;
 }

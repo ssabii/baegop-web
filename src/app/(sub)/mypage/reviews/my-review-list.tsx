@@ -67,7 +67,6 @@ export function MyReviewList({ userId }: MyReviewListProps) {
               key={review.id}
               review={{ ...review, place }}
               className="py-4"
-              onClick={() => sessionStorage.setItem("scrollToReview", "true")}
             />
           );
         })}

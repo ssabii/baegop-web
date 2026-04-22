@@ -1,5 +1,3 @@
-"use client";
-
 import { InfoDrawer } from "@/components/info-drawer";
 import { POINTS } from "@/lib/constants";
 

@@ -1,6 +1,12 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { voteKonaCard } from "@/app/(sub)/places/[id]/actions";
+import {
+  mapKeys,
+  mypageKeys,
+  placeKeys,
+  rankingKeys,
+} from "@/lib/query-keys";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 interface UseKonaVoteOptions {
@@ -16,6 +22,7 @@ export function useKonaVote({
   initialUserVote,
   onSuccess,
 }: UseKonaVoteOptions) {
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<KonaCardStatus>(initialStatus);
   const [userVote, setUserVote] = useState<KonaVote | null>(initialUserVote);
 
@@ -40,6 +47,11 @@ export function useKonaVote({
     onSuccess: (result) => {
       setStatus(result.status);
       setUserVote(result.userVote);
+      // 임계값 도달 시 kona_card_status가 변경될 수 있어 관련 목록/상세를 무효화한다
+      queryClient.invalidateQueries({ queryKey: placeKeys.data(placeId) });
+      queryClient.invalidateQueries({ queryKey: rankingKeys.all });
+      queryClient.invalidateQueries({ queryKey: mapKeys.places });
+      queryClient.invalidateQueries({ queryKey: mypageKeys.places });
       onSuccess?.();
     },
   });
