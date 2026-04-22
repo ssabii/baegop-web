@@ -1,19 +1,18 @@
 "use client";
 
-import { Building2, ImagePlus, Loader2, Star, Tag, X } from "lucide-react";
+import { Building2, Star, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { ContentDrawerEditor } from "@/components/forms/content-drawer-editor";
+import { ImageSelector } from "@/components/forms/image-selector";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
-import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-import { Textarea } from "@/components/ui/textarea";
-import { compressImage, optimizeSupabaseImageUrl } from "@/lib/image";
+import { useImageForm } from "@/hooks/use-image-form";
 import { useCreateReview } from "./use-create-review";
 import { useUpdateReview } from "./use-update-review";
 
@@ -45,24 +44,19 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   const isEdit = props.mode === "edit";
   const review = isEdit ? props.review : null;
 
-  const existingUrls = review ? review.image_urls : [];
-
   const router = useRouter();
   const confirm = useConfirmDialog();
 
   const [rating, setRating] = useState(review?.rating ?? 0);
   const [hoverRating, setHoverRating] = useState(0);
   const [content, setContent] = useState(review?.content ?? "");
-  const [keptImageUrls, setKeptImageUrls] = useState<string[]>(existingUrls);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
-  const [compressingCount, setCompressingCount] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const previewsRef = useRef(previews);
+
+  const imageForm = useImageForm({
+    initialImageUrls: review?.image_urls ?? [],
+    maxImages: MAX_IMAGES,
+  });
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
-  const [drawerContent, setDrawerContent] = useState("");
-
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
@@ -70,72 +64,12 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   const updateReview = useUpdateReview(naverPlaceId, review?.id ?? -1);
   const { mutate, isPending } = isEdit ? updateReview : createReview;
 
-  const totalImageCount = keptImageUrls.length + selectedFiles.length;
-  const allImages = [...keptImageUrls, ...previews];
-
+  const isBusy = isPending || imageForm.compressingCount > 0;
   const isDirty = isEdit
     ? rating !== review!.rating ||
       content !== (review!.content ?? "") ||
-      keptImageUrls.length !== existingUrls.length ||
-      selectedFiles.length > 0
-    : rating > 0 || content.length > 0 || selectedFiles.length > 0;
-
-  useEffect(() => {
-    previewsRef.current = previews;
-  }, [previews]);
-
-  useEffect(() => {
-    return () => {
-      previewsRef.current.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, []);
-
-  async function handleFilesChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    if (files.length === 0) return;
-
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    const valid = files.filter((f) => f.size <= maxSize);
-
-    if (valid.length < files.length) {
-      toast.warning("10MB를 초과하는 이미지는 제외되었습니다.");
-    }
-
-    const remaining = MAX_IMAGES - totalImageCount;
-    const allowed = valid.slice(0, remaining);
-
-    if (allowed.length < valid.length) {
-      toast.warning(`이미지는 최대 ${MAX_IMAGES}장까지 등록할 수 있습니다.`);
-    }
-
-    if (allowed.length > 0) {
-      setCompressingCount(allowed.length);
-      const compressed = await Promise.all(
-        allowed.map(async (file) => {
-          const result = await compressImage(file);
-          setCompressingCount((prev) => prev - 1);
-          return result;
-        }),
-      );
-      setSelectedFiles((prev) => [...prev, ...compressed]);
-      setPreviews((prev) => [
-        ...prev,
-        ...compressed.map((f) => URL.createObjectURL(f)),
-      ]);
-    }
-
-    e.target.value = "";
-  }
-
-  function removeExistingImage(url: string) {
-    setKeptImageUrls((prev) => prev.filter((u) => u !== url));
-  }
-
-  function removeNewFile(index: number) {
-    URL.revokeObjectURL(previews[index]);
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-    setPreviews((prev) => prev.filter((_, i) => i !== index));
-  }
+      imageForm.hasImageChanges
+    : rating > 0 || content.length > 0 || imageForm.hasImageChanges;
 
   function handleSubmit() {
     if (rating === 0) return;
@@ -144,14 +78,14 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
       (mutate as typeof updateReview.mutate)({
         rating,
         content,
-        keptImageUrls,
-        files: selectedFiles,
+        keptImageUrls: imageForm.keptImageUrls,
+        files: imageForm.selectedFiles,
       });
     } else {
       (mutate as typeof createReview.mutate)({
         rating,
         content,
-        files: selectedFiles,
+        files: imageForm.selectedFiles,
       });
     }
   }
@@ -168,6 +102,11 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
       if (!ok) return;
     }
     router.back();
+  }
+
+  function openPreview(index: number) {
+    setPreviewIndex(index);
+    setPreviewOpen(true);
   }
 
   return (
@@ -211,7 +150,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
                 <button
                   key={star}
                   type="button"
-                  disabled={isPending || compressingCount > 0}
+                  disabled={isBusy}
                   onClick={() => setRating(star)}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
@@ -234,11 +173,8 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             <Label className="text-base font-bold">어떤 점이 좋았나요?</Label>
             <button
               type="button"
-              disabled={isPending || compressingCount > 0}
-              onClick={() => {
-                setDrawerContent(content);
-                setContentDrawerOpen(true);
-              }}
+              disabled={isBusy}
+              onClick={() => setContentDrawerOpen(true)}
               className="focus-visible:border-ring focus-visible:ring-ring/50 mt-2 flex min-h-30 w-full rounded-lg border px-3 py-3 text-left text-base outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50"
             >
               {content ? (
@@ -255,152 +191,33 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
               {content.length}/{MAX_CONTENT_LENGTH}
             </p>
           </div>
-          <Drawer
-            repositionInputs={false}
+          <ContentDrawerEditor
             open={contentDrawerOpen}
             onOpenChange={setContentDrawerOpen}
-          >
-            <DrawerContent>
-              <div className="mx-auto w-full max-w-4xl p-4">
-                <DrawerTitle className="sr-only">리뷰 내용 작성</DrawerTitle>
-                <Textarea
-                  autoFocus
-                  className="field-sizing-fixed resize-none"
-                  placeholder="장소에 대한 자세한 리뷰를 남겨주세요"
-                  value={drawerContent}
-                  onChange={(e) =>
-                    setDrawerContent(
-                      e.target.value.slice(0, MAX_CONTENT_LENGTH),
-                    )
-                  }
-                  onFocus={(e) => {
-                    const el = e.currentTarget;
-                    el.setSelectionRange(el.value.length, el.value.length);
-                  }}
-                  maxLength={MAX_CONTENT_LENGTH}
-                  rows={5}
-                />
-                <p className="text-muted-foreground mt-2 text-right text-sm">
-                  {drawerContent.length}/{MAX_CONTENT_LENGTH}
-                </p>
-                <Button
-                  className="mt-4 w-full"
-                  size="xl"
-                  onClick={() => {
-                    setContent(drawerContent);
-                    setContentDrawerOpen(false);
-                  }}
-                >
-                  확인
-                </Button>
-              </div>
-            </DrawerContent>
-          </Drawer>
+            srTitle="리뷰 내용 작성"
+            initialValue={content}
+            onConfirm={setContent}
+            placeholder="장소에 대한 자세한 리뷰를 남겨주세요"
+            maxLength={MAX_CONTENT_LENGTH}
+            rows={5}
+          />
 
           {/* 이미지 */}
-          <div>
-            <div className="flex items-baseline gap-1.5">
-              <Label className="text-base font-bold">사진</Label>
-              <span className="text-muted-foreground text-sm">
-                {totalImageCount}/{MAX_IMAGES}
-              </span>
-            </div>
-            {totalImageCount === 0 ? (
-              <button
-                type="button"
-                disabled={isPending || compressingCount > 0}
-                onClick={() => fileInputRef.current?.click()}
-                className="text-muted-foreground hover:border-primary hover:text-primary mt-2 flex aspect-5/1 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
-              >
-                {compressingCount > 0 ? (
-                  <Loader2 className="size-5 animate-spin" />
-                ) : (
-                  <ImagePlus className="size-5" />
-                )}
-              </button>
-            ) : (
-              <div className="mt-2 grid grid-cols-5 gap-2">
-                {keptImageUrls.map((url, i) => (
-                  <div key={url} className="relative">
-                    <button
-                      type="button"
-                      disabled={isPending || compressingCount > 0}
-                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
-                      onClick={() => {
-                        setPreviewIndex(i);
-                        setPreviewOpen(true);
-                      }}
-                    >
-                      <img
-                        src={optimizeSupabaseImageUrl(url, { width: 200 })}
-                        decoding="async"
-                        alt="기존 이미지"
-                        className="aspect-square w-full object-cover"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isPending || compressingCount > 0}
-                      onClick={() => removeExistingImage(url)}
-                      className="bg-foreground/80 text-background absolute top-1 right-1 rounded-full p-0.5 shadow-sm disabled:pointer-events-none disabled:opacity-50"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </div>
-                ))}
-                {previews.map((src, i) => (
-                  <div key={src} className="relative">
-                    <button
-                      type="button"
-                      disabled={isPending || compressingCount > 0}
-                      className="w-full cursor-pointer overflow-hidden rounded-lg disabled:pointer-events-none"
-                      onClick={() => {
-                        setPreviewIndex(keptImageUrls.length + i);
-                        setPreviewOpen(true);
-                      }}
-                    >
-                      <img
-                        src={src}
-                        decoding="async"
-                        alt={`미리보기 ${i + 1}`}
-                        className="aspect-square w-full object-cover"
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={isPending || compressingCount > 0}
-                      onClick={() => removeNewFile(i)}
-                      className="bg-foreground/80 text-background absolute top-1 right-1 rounded-full p-0.5 shadow-sm disabled:pointer-events-none disabled:opacity-50"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </div>
-                ))}
-                {totalImageCount + compressingCount < MAX_IMAGES && (
-                  <button
-                    type="button"
-                    disabled={isPending || compressingCount > 0}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-muted-foreground hover:border-primary hover:text-primary flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg border border-dashed transition-colors disabled:pointer-events-none disabled:opacity-50"
-                  >
-                    {compressingCount > 0 ? (
-                      <Loader2 className="size-5 animate-spin" />
-                    ) : (
-                      <ImagePlus className="size-5" />
-                    )}
-                  </button>
-                )}
-              </div>
-            )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple={MAX_IMAGES - totalImageCount > 1}
-              accept="image/*"
-              className="hidden"
-              onChange={handleFilesChange}
-            />
-          </div>
+          <ImageSelector
+            label="사진"
+            maxImages={MAX_IMAGES}
+            keptImageUrls={imageForm.keptImageUrls}
+            previews={imageForm.previews}
+            totalImageCount={imageForm.totalImageCount}
+            compressingCount={imageForm.compressingCount}
+            disabled={isBusy}
+            fileInputRef={imageForm.fileInputRef}
+            onFilesChange={imageForm.handleFilesChange}
+            onRemoveExisting={imageForm.removeExistingImage}
+            onRemoveNew={imageForm.removeNewFile}
+            onPreview={openPreview}
+            onAddClick={imageForm.openFilePicker}
+          />
         </div>
       </main>
 
@@ -411,7 +228,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             size="xl"
             className="flex-1"
             onClick={handleBack}
-            disabled={isPending || compressingCount > 0}
+            disabled={isBusy}
           >
             취소
           </Button>
@@ -419,7 +236,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             size="xl"
             className="flex-1 transition-none has-[>svg]:px-8"
             onClick={handleSubmit}
-            disabled={rating === 0 || isPending || compressingCount > 0}
+            disabled={rating === 0 || isBusy}
           >
             {isPending && <Spinner />}
             {isEdit ? "수정" : "작성"}
@@ -427,9 +244,9 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
         </div>
       </BottomActionBar>
 
-      {allImages.length > 0 && (
+      {imageForm.allImages.length > 0 && (
         <ImageCarouselDialog
-          images={allImages}
+          images={imageForm.allImages}
           initialIndex={previewIndex}
           alt="이미지 미리보기"
           open={previewOpen}
