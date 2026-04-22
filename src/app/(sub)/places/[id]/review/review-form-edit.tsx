@@ -1,58 +1,52 @@
 "use client";
 
-import { Building2, Star, Tag } from "lucide-react";
+import { Building2, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { ContentDrawerEditor } from "@/components/forms/content-drawer-editor";
 import { ImageSelector } from "@/components/forms/image-selector";
+import { StarRatingPicker } from "@/components/forms/star-rating-picker";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useImageForm } from "@/hooks/use-image-form";
-import { useCreateReview } from "./use-create-review";
 import { useUpdateReview } from "./use-update-review";
 
 const MAX_IMAGES = 5;
 const MAX_CONTENT_LENGTH = 300;
 
-type ReviewFormPageProps = {
+interface ReviewFormEditProps {
   naverPlaceId: string;
   place: {
     name: string;
     category: string | null;
     imageUrl: string | null;
   };
-} & (
-  | { mode: "create" }
-  | {
-      mode: "edit";
-      review: {
-        id: number;
-        rating: number;
-        content: string | null;
-        image_urls: string[];
-      };
-    }
-);
+  review: {
+    id: number;
+    rating: number;
+    content: string | null;
+    image_urls: string[];
+  };
+}
 
-export function ReviewFormPage(props: ReviewFormPageProps) {
-  const { naverPlaceId, place } = props;
-  const isEdit = props.mode === "edit";
-  const review = isEdit ? props.review : null;
-
+export function ReviewFormEdit({
+  naverPlaceId,
+  place,
+  review,
+}: ReviewFormEditProps) {
   const router = useRouter();
   const confirm = useConfirmDialog();
 
-  const [rating, setRating] = useState(review?.rating ?? 0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [content, setContent] = useState(review?.content ?? "");
+  const [rating, setRating] = useState(review.rating);
+  const [content, setContent] = useState(review.content ?? "");
 
   const imageForm = useImageForm({
-    initialImageUrls: review?.image_urls ?? [],
+    initialImageUrls: review.image_urls,
     maxImages: MAX_IMAGES,
   });
 
@@ -60,43 +54,28 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
-  const createReview = useCreateReview(naverPlaceId);
-  const updateReview = useUpdateReview(naverPlaceId, review?.id ?? -1);
-  const { mutate, isPending } = isEdit ? updateReview : createReview;
-
+  const { mutate, isPending } = useUpdateReview(naverPlaceId, review.id);
   const isBusy = isPending || imageForm.compressingCount > 0;
-  const isDirty = isEdit
-    ? rating !== review!.rating ||
-      content !== (review!.content ?? "") ||
-      imageForm.hasImageChanges
-    : rating > 0 || content.length > 0 || imageForm.hasImageChanges;
+  const isDirty =
+    rating !== review.rating ||
+    content !== (review.content ?? "") ||
+    imageForm.hasImageChanges;
 
   function handleSubmit() {
     if (rating === 0) return;
-
-    if (isEdit) {
-      (mutate as typeof updateReview.mutate)({
-        rating,
-        content,
-        keptImageUrls: imageForm.keptImageUrls,
-        files: imageForm.selectedFiles,
-      });
-    } else {
-      (mutate as typeof createReview.mutate)({
-        rating,
-        content,
-        files: imageForm.selectedFiles,
-      });
-    }
+    mutate({
+      rating,
+      content,
+      keptImageUrls: imageForm.keptImageUrls,
+      files: imageForm.selectedFiles,
+    });
   }
 
   async function handleBack() {
     if (isDirty) {
       const ok = await confirm({
-        title: isEdit ? "리뷰 수정 취소" : "리뷰 작성 취소",
-        description: isEdit
-          ? "수정 중인 내용이 사라집니다.\n닫으시겠습니까?"
-          : "작성 중인 내용이 사라집니다.\n닫으시겠습니까?",
+        title: "리뷰 수정 취소",
+        description: "수정 중인 내용이 사라집니다.\n닫으시겠습니까?",
         confirmLabel: "닫기",
       });
       if (!ok) return;
@@ -111,14 +90,10 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
 
   return (
     <>
-      <SubHeader
-        title={isEdit ? "리뷰 수정" : "리뷰 작성"}
-        onBack={handleBack}
-      />
+      <SubHeader title="리뷰 수정" onBack={handleBack} />
 
       <main className="mx-auto w-full max-w-4xl px-4 pt-4 pb-32">
         <div className="space-y-6">
-          {/* 가게 정보 */}
           <div className="flex gap-3">
             <div className="flex-1">
               <h2 className="line-clamp-2 font-bold">{place.name}</h2>
@@ -142,33 +117,15 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             )}
           </div>
 
-          {/* 별점 */}
           <div>
             <Label className="text-base font-bold">얼마나 만족하시나요?</Label>
-            <div className="mt-2 flex gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  disabled={isBusy}
-                  onClick={() => setRating(star)}
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  className="transition-colors disabled:pointer-events-none disabled:opacity-50"
-                >
-                  <Star
-                    className={`size-7 ${
-                      star <= (hoverRating || rating)
-                        ? "fill-yellow-500 text-yellow-500"
-                        : "text-muted-foreground/30"
-                    }`}
-                  />
-                </button>
-              ))}
-            </div>
+            <StarRatingPicker
+              value={rating}
+              onChange={setRating}
+              disabled={isBusy}
+            />
           </div>
 
-          {/* 내용 */}
           <div>
             <Label className="text-base font-bold">어떤 점이 좋았나요?</Label>
             <button
@@ -202,7 +159,6 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             rows={5}
           />
 
-          {/* 이미지 */}
           <ImageSelector
             label="사진"
             maxImages={MAX_IMAGES}
@@ -239,7 +195,7 @@ export function ReviewFormPage(props: ReviewFormPageProps) {
             disabled={rating === 0 || isBusy}
           >
             {isPending && <Spinner />}
-            {isEdit ? "수정" : "작성"}
+            수정
           </Button>
         </div>
       </BottomActionBar>

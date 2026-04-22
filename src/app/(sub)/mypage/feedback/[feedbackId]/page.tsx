@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { FeedbackFormPage } from "../feedback-form-page";
+import { FeedbackFormEdit } from "../feedback-form-edit";
 import type { FeedbackCategory, FeedbackWithImages } from "@/types";
 
 export default async function FeedbackEditPage({
@@ -38,5 +38,5 @@ export default async function FeedbackEditPage({
     image_urls: feedback.image_urls,
   };
 
-  return <FeedbackFormPage mode="edit" feedback={feedbackData} />;
+  return <FeedbackFormEdit feedback={feedbackData} />;
 }

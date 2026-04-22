@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { optimizeNaverImageUrl, optimizeSupabaseImageUrl } from "@/lib/image";
 import { createClient } from "@/lib/supabase/server";
-import { ReviewFormPage } from "../review-form-page";
+import { ReviewFormEdit } from "../review-form-edit";
 
 export default async function ReviewEditPage({
   params,
@@ -38,8 +38,7 @@ export default async function ReviewEditPage({
   if (!place) notFound();
 
   return (
-    <ReviewFormPage
-      mode="edit"
+    <ReviewFormEdit
       naverPlaceId={naverPlaceId}
       review={{
         id: review.id,

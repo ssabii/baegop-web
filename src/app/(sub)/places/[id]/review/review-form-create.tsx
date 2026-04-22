@@ -1,101 +1,64 @@
 "use client";
 
+import { Building2, Tag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { BottomActionBar } from "@/components/bottom-action-bar";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
 import { ContentDrawerEditor } from "@/components/forms/content-drawer-editor";
 import { ImageSelector } from "@/components/forms/image-selector";
+import { StarRatingPicker } from "@/components/forms/star-rating-picker";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
 import { SubHeader } from "@/components/sub-header";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { useImageForm } from "@/hooks/use-image-form";
-import {
-  FEEDBACK_CATEGORIES,
-  FEEDBACK_CATEGORY_LABELS,
-  FEEDBACK_CATEGORY_PLACEHOLDERS,
-  MAX_FEEDBACK_CONTENT_LENGTH,
-  MAX_FEEDBACK_IMAGES,
-  MIN_FEEDBACK_CONTENT_LENGTH,
-} from "@/lib/constants";
-import { useCreateFeedback } from "./use-create-feedback";
-import { useUpdateFeedback } from "./use-update-feedback";
-import type { FeedbackCategory, FeedbackWithImages } from "@/types";
+import { useCreateReview } from "./use-create-review";
 
-type FeedbackFormPageProps =
-  | { mode: "create" }
-  | {
-      mode: "edit";
-      feedback: FeedbackWithImages;
-    };
+const MAX_IMAGES = 5;
+const MAX_CONTENT_LENGTH = 300;
 
-export function FeedbackFormPage(props: FeedbackFormPageProps) {
-  const isEdit = props.mode === "edit";
-  const feedback = isEdit ? props.feedback : null;
+interface ReviewFormCreateProps {
+  naverPlaceId: string;
+  place: {
+    name: string;
+    category: string | null;
+    imageUrl: string | null;
+  };
+}
 
+export function ReviewFormCreate({
+  naverPlaceId,
+  place,
+}: ReviewFormCreateProps) {
   const router = useRouter();
   const confirm = useConfirmDialog();
 
-  const [category, setCategory] = useState<FeedbackCategory>(
-    feedback?.category ?? "bug",
-  );
-  const [content, setContent] = useState(feedback?.content ?? "");
+  const [rating, setRating] = useState(0);
+  const [content, setContent] = useState("");
 
-  const imageForm = useImageForm({
-    initialImageUrls: feedback?.image_urls ?? [],
-    maxImages: MAX_FEEDBACK_IMAGES,
-  });
+  const imageForm = useImageForm({ maxImages: MAX_IMAGES });
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
-  const createFeedback = useCreateFeedback();
-  const updateFeedback = useUpdateFeedback(feedback?.id ?? -1);
-  const { mutate, isPending } = isEdit ? updateFeedback : createFeedback;
-
+  const { mutate, isPending } = useCreateReview(naverPlaceId);
   const isBusy = isPending || imageForm.compressingCount > 0;
-  const isDirty = isEdit
-    ? category !== feedback!.category ||
-      content !== feedback!.content ||
-      imageForm.hasImageChanges
-    : content.length > 0 || imageForm.hasImageChanges;
+  const isDirty =
+    rating > 0 || content.length > 0 || imageForm.hasImageChanges;
 
   function handleSubmit() {
-    if (content.length < MIN_FEEDBACK_CONTENT_LENGTH) return;
-
-    if (isEdit) {
-      (mutate as typeof updateFeedback.mutate)({
-        category,
-        content,
-        keptImageUrls: imageForm.keptImageUrls,
-        files: imageForm.selectedFiles,
-      });
-    } else {
-      (mutate as typeof createFeedback.mutate)({
-        category,
-        content,
-        files: imageForm.selectedFiles,
-      });
-    }
+    if (rating === 0) return;
+    mutate({ rating, content, files: imageForm.selectedFiles });
   }
 
   async function handleBack() {
     if (isDirty) {
       const ok = await confirm({
-        title: isEdit ? "피드백 수정 취소" : "피드백 작성 취소",
-        description: isEdit
-          ? "수정 중인 내용이 사라집니다.\n닫으시겠습니까?"
-          : "작성 중인 내용이 사라집니다.\n닫으시겠습니까?",
+        title: "리뷰 작성 취소",
+        description: "작성 중인 내용이 사라집니다.\n닫으시겠습니까?",
         confirmLabel: "닫기",
       });
       if (!ok) return;
@@ -110,37 +73,44 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
 
   return (
     <>
-      <SubHeader
-        title={isEdit ? "피드백 수정" : "피드백 작성"}
-        onBack={handleBack}
-      />
+      <SubHeader title="리뷰 작성" onBack={handleBack} />
 
       <main className="mx-auto w-full max-w-4xl px-4 pt-4 pb-32">
         <div className="space-y-6">
-          {/* 카테고리 */}
-          <div>
-            <Label className="text-base font-bold">카테고리</Label>
-            <Select
-              value={category}
-              onValueChange={(v) => setCategory(v as FeedbackCategory)}
-              disabled={isBusy}
-            >
-              <SelectTrigger className="mt-2 w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FEEDBACK_CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {FEEDBACK_CATEGORY_LABELS[cat]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <h2 className="line-clamp-2 font-bold">{place.name}</h2>
+              {place.category && (
+                <p className="text-muted-foreground flex items-center gap-1 text-sm font-medium">
+                  <Tag className="size-3 shrink-0" />
+                  <span className="truncate">{place.category}</span>
+                </p>
+              )}
+            </div>
+            {place.imageUrl ? (
+              <img
+                src={place.imageUrl}
+                alt={place.name}
+                className="aspect-square size-17 shrink-0 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="bg-muted flex aspect-square size-17 shrink-0 items-center justify-center rounded-lg">
+                <Building2 className="text-muted-foreground size-5" />
+              </div>
+            )}
           </div>
 
-          {/* 내용 */}
           <div>
-            <Label className="text-base font-bold">내용</Label>
+            <Label className="text-base font-bold">얼마나 만족하시나요?</Label>
+            <StarRatingPicker
+              value={rating}
+              onChange={setRating}
+              disabled={isBusy}
+            />
+          </div>
+
+          <div>
+            <Label className="text-base font-bold">어떤 점이 좋았나요?</Label>
             <button
               type="button"
               disabled={isBusy}
@@ -152,31 +122,29 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
                   {content}
                 </div>
               ) : (
-                <div className="text-muted-foreground w-full text-left whitespace-pre-wrap">
-                  {FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
+                <div className="text-muted-foreground w-full text-left">
+                  장소에 대한 자세한 리뷰를 남겨주세요
                 </div>
               )}
             </button>
             <p className="text-muted-foreground mt-1 text-right text-sm">
-              (최소 {MIN_FEEDBACK_CONTENT_LENGTH}자) {content.length}/
-              {MAX_FEEDBACK_CONTENT_LENGTH}
+              {content.length}/{MAX_CONTENT_LENGTH}
             </p>
           </div>
           <ContentDrawerEditor
             open={contentDrawerOpen}
             onOpenChange={setContentDrawerOpen}
-            srTitle="피드백 내용 작성"
+            srTitle="리뷰 내용 작성"
             initialValue={content}
             onConfirm={setContent}
-            placeholder={FEEDBACK_CATEGORY_PLACEHOLDERS[category]}
-            maxLength={MAX_FEEDBACK_CONTENT_LENGTH}
-            rows={8}
+            placeholder="장소에 대한 자세한 리뷰를 남겨주세요"
+            maxLength={MAX_CONTENT_LENGTH}
+            rows={5}
           />
 
-          {/* 이미지 */}
           <ImageSelector
             label="사진"
-            maxImages={MAX_FEEDBACK_IMAGES}
+            maxImages={MAX_IMAGES}
             keptImageUrls={imageForm.keptImageUrls}
             previews={imageForm.previews}
             totalImageCount={imageForm.totalImageCount}
@@ -207,10 +175,10 @@ export function FeedbackFormPage(props: FeedbackFormPageProps) {
             size="xl"
             className="flex-1 transition-none has-[>svg]:px-8"
             onClick={handleSubmit}
-            disabled={content.length < MIN_FEEDBACK_CONTENT_LENGTH || isBusy}
+            disabled={rating === 0 || isBusy}
           >
             {isPending && <Spinner />}
-            {isEdit ? "수정" : "작성"}
+            작성
           </Button>
         </div>
       </BottomActionBar>
