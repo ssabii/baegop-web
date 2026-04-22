@@ -100,14 +100,10 @@ function MapContainerInner() {
     isLoading,
   } = useSearchPlaces(searchQuery, effectiveCoords);
   // Derive UI state from URL params (single source of truth)
-  const selectedItem = useMemo(() => {
-    if (!placeParam) return null;
-    // Search results first, then DB place detail
-    return (
-      results.find((r) => r.id === placeParam) ??
-      (dbDetailItem?.id === placeParam ? dbDetailItem : null)
-    );
-  }, [placeParam, results, dbDetailItem]);
+  const selectedItem = placeParam
+    ? (results.find((r) => r.id === placeParam) ??
+      (dbDetailItem?.id === placeParam ? dbDetailItem : null))
+    : null;
 
   const focusMarkerId = selectedItem?.id ?? null;
   const sheetOpen = !!query;
@@ -192,10 +188,6 @@ function MapContainerInner() {
     [router, buildUrl, query, placeParam],
   );
 
-  const dismissDetail = useCallback(() => {
-    router.back();
-  }, [router]);
-
   const handleClear = useCallback(() => {
     setOverlapState(null);
     setQuery("");
@@ -203,10 +195,6 @@ function MapContainerInner() {
     setSearchCoords(undefined);
     setDbDetailItem(null);
     router.replace("/map", { scroll: false });
-  }, [router]);
-
-  const handleBack = useCallback(() => {
-    router.back();
   }, [router]);
 
   const handleMarkerClick = useCallback(
@@ -357,7 +345,7 @@ function MapContainerInner() {
         }}
         onClear={handleClear}
         showBack={isSearching && sheetOpen}
-        onBack={handleBack}
+        onBack={() => router.back()}
       />
 
       {showSheet && !selectedItem && (
@@ -404,7 +392,7 @@ function MapContainerInner() {
       {selectedItem && (
         <MapPlaceDetailSheet
           item={selectedItem}
-          onDismiss={dismissDetail}
+          onDismiss={() => router.back()}
           onLocate={handleLocate}
         />
       )}
