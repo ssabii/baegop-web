@@ -29,14 +29,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePlaceData } from "@/hooks/use-place-data";
+import { SHEET_FULL_SNAP, SHEET_HALF_SNAP } from "@/lib/constants";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 
 const COMPACT_SNAP = "200px";
-const HALF_SNAP = 0.5;
-const FULL_SNAP = 1;
+const HALF_SNAP = SHEET_HALF_SNAP;
+const FULL_SNAP = SHEET_FULL_SNAP;
 type SnapPoint = number | string;
 
 interface StoreDrawerProps {

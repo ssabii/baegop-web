@@ -7,12 +7,13 @@ import { Drawer } from "vaul";
 import { LocationButton } from "@/components/location-button";
 import { SearchInMapButton } from "@/components/search-in-map-button";
 import { Button } from "@/components/ui/button";
+import { SHEET_FULL_SNAP, SHEET_HALF_SNAP } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
 
 const COMPACT_SNAP = 0.2;
-const HALF_SNAP = 0.5;
-const FULL_SNAP = 1;
+const HALF_SNAP = SHEET_HALF_SNAP;
+const FULL_SNAP = SHEET_FULL_SNAP;
 type SnapPoint = number | string;
 
 interface MapResultSheetProps {

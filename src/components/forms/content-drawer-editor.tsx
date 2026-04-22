@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DrawerBody } from "@/components/drawer-body";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,7 +30,7 @@ export function ContentDrawerEditor({
   return (
     <Drawer repositionInputs={false} open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
-        <div className="mx-auto w-full max-w-4xl p-4">
+        <DrawerBody>
           <DrawerTitle className="sr-only">{srTitle}</DrawerTitle>
           <EditorBody
             // 열릴 때마다 재마운트해 initialValue로 초기화
@@ -43,7 +44,7 @@ export function ContentDrawerEditor({
               onOpenChange(false);
             }}
           />
-        </div>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   );

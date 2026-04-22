@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { deleteReview } from "@/app/(sub)/places/[id]/actions";
 import { ReviewImages } from "@/app/(sub)/places/[id]/review-images";
 import { useConfirmDialog } from "@/components/confirm-dialog-provider";
+import { DrawerBody } from "@/components/drawer-body";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -116,7 +117,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent>
-                  <div className="mx-auto w-full max-w-4xl p-4">
+                  <DrawerBody>
                     <DrawerTitle className="sr-only">리뷰 관리</DrawerTitle>
                     <div className="flex flex-col py-2">
                       <button
@@ -136,7 +137,7 @@ export function ReviewCard({ review, isOwner, naverPlaceId }: ReviewCardProps) {
                         삭제
                       </button>
                     </div>
-                  </div>
+                  </DrawerBody>
                 </DrawerContent>
               </Drawer>
             )}

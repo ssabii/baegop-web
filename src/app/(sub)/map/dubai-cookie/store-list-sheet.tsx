@@ -14,14 +14,15 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { formatShortAddress } from "@/lib/address";
+import { SHEET_FULL_SNAP, SHEET_HALF_SNAP } from "@/lib/constants";
 import { optimizeNaverImageUrl } from "@/lib/image";
 import { cn } from "@/lib/utils";
 import { MapViewButton } from "./map-view-button";
 import type { DubaiCookieStore } from "@/data/dubai-cookie-stores";
 
 const COMPACT_SNAP = 0.3;
-const HALF_SNAP = 0.5;
-const FULL_SNAP = 1;
+const HALF_SNAP = SHEET_HALF_SNAP;
+const FULL_SNAP = SHEET_FULL_SNAP;
 type SnapPoint = number | string;
 
 interface StoreListSheetProps {
