@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         "X-NCP-APIGW-API-KEY-ID": clientId,
         "X-NCP-APIGW-API-KEY": clientSecret,
       },
-      cache: "no-store",
+      next: { revalidate: 604800 },
     },
   );
 
@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
   return new NextResponse(await res.arrayBuffer(), {
     headers: {
       "Content-Type": res.headers.get("content-type") || "image/png",
+      "Cache-Control": "public, max-age=604800, immutable",
     },
   });
 }
