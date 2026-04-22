@@ -20,11 +20,10 @@ interface ReviewCardProps {
     } | null;
     image_urls?: string[] | null;
   };
-  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   className?: string;
 }
 
-export function ReviewCard({ review, onClick, className }: ReviewCardProps) {
+export function ReviewCard({ review, className }: ReviewCardProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(0);
 
@@ -97,9 +96,8 @@ export function ReviewCard({ review, onClick, className }: ReviewCardProps) {
     <div className={cn("transition-colors", className)}>
       {review.place ? (
         <Link
-          href={`/places/${review.place.id}?tab=review`}
+          href={`/places/${review.place.id}?tab=review&scroll=review`}
           className="block"
-          onClick={(e) => onClick?.(e)}
         >
           {content}
         </Link>

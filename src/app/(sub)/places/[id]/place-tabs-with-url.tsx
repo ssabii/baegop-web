@@ -34,14 +34,16 @@ export function PlaceTabsWithUrl({
 
   const tab = searchParams.get("tab");
   const activeTab = tab === "review" ? "review" : "menu";
+  const shouldScroll = searchParams.get("scroll") === "review";
 
   useEffect(() => {
-    const scrollToReview = sessionStorage.getItem("scrollToReview");
-    if (scrollToReview === "true") {
-      sessionStorage.removeItem("scrollToReview");
-      tabsRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, []);
+    if (!shouldScroll) return;
+    tabsRef.current?.scrollIntoView({ behavior: "smooth" });
+    const params = new URLSearchParams(searchParams);
+    params.delete("scroll");
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [shouldScroll, pathname, router, searchParams]);
 
   function handleTabChange(value: string) {
     router.replace(`${pathname}?tab=${value}`, { scroll: false });
