@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef } from "react";
-import { NaverMapProvider } from "@/components/NaverMapContext";
+import { NaverMapProvider } from "@/components/naver-map-context";
 import { Spinner } from "@/components/ui/spinner";
-import { useNaverMap } from "@/components/useNaverMap";
+import { useNaverMap } from "@/components/use-naver-map";
 
-const NaverMap = dynamic(() => import("@/components/NaverMap"), {
+const NaverMap = dynamic(() => import("@/components/naver-map"), {
   ssr: false,
   loading: () => (
     <div className="bg-muted flex h-[30vh] items-center justify-center overflow-hidden rounded-xl border">

@@ -3,13 +3,13 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import { useNaverMap } from "@/components/useNaverMap";
+import { useNaverMap } from "@/components/use-naver-map";
 import { MAP_CLUSTER_MAX_ZOOM } from "@/lib/constants";
 import { createMarkerClustering } from "@/lib/marker-clustering";
 import { getOverlappingMarkers } from "@/lib/marker-overlap";
 import { cn } from "@/lib/utils";
 
-const NaverMap = dynamic(() => import("@/components/NaverMap"), {
+const NaverMap = dynamic(() => import("@/components/naver-map"), {
   ssr: false,
   loading: () => (
     <div className="bg-muted text-muted-foreground flex size-full items-center justify-center rounded-lg border text-sm">
