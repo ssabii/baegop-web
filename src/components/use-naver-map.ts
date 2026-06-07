@@ -2,7 +2,7 @@
 
 import { useCallback, useContext } from "react";
 import { LOCATION_MARKER_ICON } from "@/lib/constants";
-import { NaverMapContext } from "./NaverMapContext";
+import { NaverMapContext } from "./naver-map-context";
 
 type LatLngLiteral = { lat: number; lng: number };
 

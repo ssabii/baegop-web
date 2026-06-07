@@ -7,9 +7,9 @@ import {
   MapOverlapPopover,
   type OverlapMarkerItem,
 } from "@/components/map-overlap-popover";
-import { NaverMapProvider } from "@/components/NaverMapContext";
+import { NaverMapProvider } from "@/components/naver-map-context";
 import { Spinner } from "@/components/ui/spinner";
-import { useNaverMap } from "@/components/useNaverMap";
+import { useNaverMap } from "@/components/use-naver-map";
 import {
   DUBAI_COOKIE_STORES,
   type DubaiCookieStore,
@@ -23,7 +23,7 @@ import { DubaiCookieSearchInput } from "./dubai-cookie-search-input";
 import { StoreDrawer } from "./store-drawer";
 import { StoreListSheet } from "./store-list-sheet";
 
-const NaverMap = dynamic(() => import("@/components/NaverMap"), {
+const NaverMap = dynamic(() => import("@/components/naver-map"), {
   ssr: false,
   loading: () => (
     <div className="bg-muted text-muted-foreground flex size-full items-center justify-center text-sm">
