@@ -139,7 +139,7 @@ pnpm dlx shadcn@latest add <component>  # shadcn/ui 컴포넌트 추가
 3. **Draft PR + 체크리스트**: 큰 기능은 Draft PR을 먼저 만들고, 하위 PR을 체크리스트로 관리
 
 ### 릴리즈 플로우
-1. `develop`에서 `package.json` version 필드 수정
+1. `develop`에서 `package.json` version 필드 수정 (별도 `release/*` 브랜치를 만들지 않는다)
 2. `git commit -m "chore: release v{버전}"`
 3. `git push`
 4. `gh pr create --base main --title "Release v{버전}" --label release --assignee ssabii` (본문에 Changelog 작성)
