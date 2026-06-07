@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState, useCallback, useContext } from "react";
-import { NaverMapContext } from "./NaverMapContext";
+import { NaverMapContext } from "./naver-map-context";
 
 const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }; // 서울 시청
 
