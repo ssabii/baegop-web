@@ -3,6 +3,7 @@
 import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState } from "react";
 import { ImageCarouselDialog } from "@/components/image-preview-dialog";
+import { cn } from "@/lib/utils";
 
 interface ImageGalleryProps {
   images: string[];
@@ -96,9 +97,13 @@ export function ImageGallery({ images, alt = "" }: ImageGalleryProps) {
                 key={i}
                 type="button"
                 onClick={() => scrollTo(i)}
-                className={`size-1.5 cursor-pointer rounded-full transition-colors ${
-                  i === current ? "bg-white" : "bg-white/50"
-                }`}
+                className={cn(
+                  "size-1.5 cursor-pointer rounded-full transition-colors",
+                  {
+                    "bg-white": i === current,
+                    "bg-white/50": i !== current,
+                  },
+                )}
               />
             ))}
           </div>
