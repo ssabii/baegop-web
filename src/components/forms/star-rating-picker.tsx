@@ -2,6 +2,7 @@
 
 import { Star } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface StarRatingPickerProps {
   value: number;
@@ -29,11 +30,10 @@ export function StarRatingPicker({
           className="transition-colors disabled:pointer-events-none disabled:opacity-50"
         >
           <Star
-            className={`size-7 ${
-              star <= (hover || value)
-                ? "fill-yellow-500 text-yellow-500"
-                : "text-muted-foreground/30"
-            }`}
+            className={cn("size-7", {
+              "fill-yellow-500 text-yellow-500": star <= (hover || value),
+              "text-muted-foreground/30": star > (hover || value),
+            })}
           />
         </button>
       ))}

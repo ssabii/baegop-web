@@ -9,6 +9,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 interface ImageCarouselDialogProps {
   images: string[];
@@ -171,9 +172,13 @@ export function ImageCarouselDialog({
               tabIndex={0}
               onClick={() => api?.scrollTo(i)}
               onKeyDown={(e) => e.key === "Enter" && api?.scrollTo(i)}
-              className={`block size-2 cursor-pointer rounded-full transition-colors ${
-                i === current ? "bg-white" : "bg-white/50"
-              }`}
+              className={cn(
+                "block size-2 cursor-pointer rounded-full transition-colors",
+                {
+                  "bg-white": i === current,
+                  "bg-white/50": i !== current,
+                },
+              )}
             />
           ))}
         </div>
