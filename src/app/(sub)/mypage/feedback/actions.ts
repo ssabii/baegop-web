@@ -2,6 +2,7 @@
 
 import { toOriginalSupabaseImageUrl } from "@/lib/image";
 import { createClient } from "@/lib/supabase/server";
+import { assertValidFeedbackInput } from "@/lib/validation";
 import type { FeedbackCategory } from "@/types";
 
 export async function createFeedback(data: {
@@ -14,6 +15,8 @@ export async function createFeedback(data: {
   } = await supabase.auth.getUser();
 
   if (!user) throw new Error("로그인이 필요합니다");
+
+  assertValidFeedbackInput(data);
 
   const { data: feedback, error } = await supabase
     .from("feedbacks")
@@ -63,6 +66,11 @@ export async function updateFeedback(
   } = await supabase.auth.getUser();
 
   if (!user) throw new Error("로그인이 필요합니다");
+
+  assertValidFeedbackInput(
+    data,
+    keptImageUrls.length + (newImageUrls?.length ?? 0),
+  );
 
   // 기존 이미지 URL 조회
   const { data: existing } = await supabase
