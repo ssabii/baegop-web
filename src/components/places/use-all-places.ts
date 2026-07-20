@@ -21,7 +21,7 @@ interface PlacesResponse {
 const LIMIT = 10;
 
 export function useAllPlaces() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, refetch } =
     useInfiniteQuery({
       queryKey: placeKeys.list("all"),
       queryFn: async ({ pageParam = 0 }) => {
@@ -44,5 +44,7 @@ export function useAllPlaces() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isError,
+    refetch,
   };
 }

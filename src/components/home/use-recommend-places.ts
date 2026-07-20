@@ -4,7 +4,7 @@ import { recommendKeys } from "@/lib/query-keys";
 import type { NaverSearchResult } from "@/types";
 
 export function useRecommendPlaces(lat: number, lng: number) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: recommendKeys.places(lat, lng),
     queryFn: async () => {
       const params = new URLSearchParams({
@@ -21,5 +21,7 @@ export function useRecommendPlaces(lat: number, lng: number) {
   return {
     places: data ?? [],
     isLoading,
+    isError,
+    refetch,
   };
 }
