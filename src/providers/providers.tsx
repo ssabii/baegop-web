@@ -1,6 +1,11 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  HydrationBoundary,
+  QueryClient,
+  QueryClientProvider,
+  type DehydratedState,
+} from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { lazy, Suspense, useState } from "react";
 import { ConfirmDialogProvider } from "@/components/confirm-dialog-provider";
@@ -14,22 +19,30 @@ const ReactQueryDevtools =
       )
     : () => null;
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function Providers({
+  children,
+  dehydratedState,
+}: {
+  children: React.ReactNode;
+  dehydratedState?: DehydratedState;
+}) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
-      </ThemeProvider>
-      <Suspense>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </Suspense>
+      <HydrationBoundary state={dehydratedState}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ConfirmDialogProvider>{children}</ConfirmDialogProvider>
+        </ThemeProvider>
+        <Suspense>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </Suspense>
+      </HydrationBoundary>
     </QueryClientProvider>
   );
 }
