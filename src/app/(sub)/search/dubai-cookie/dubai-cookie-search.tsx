@@ -92,7 +92,7 @@ export function DubaiCookieSearch() {
     const params = new URLSearchParams();
     params.set("query", query);
     if (placeId) params.set("place", placeId);
-    router.push(`/map/dubaicookie?${params}`);
+    router.push(`/map/dubai-cookie?${params}`);
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -101,7 +101,7 @@ export function DubaiCookieSearch() {
     if (!trimmed) return;
     addSearch(trimmed);
     if (filtered.length > 0) {
-      router.replace(`/map/dubaicookie?query=${encodeURIComponent(trimmed)}`);
+      router.replace(`/map/dubai-cookie?query=${encodeURIComponent(trimmed)}`);
     }
     // No results → stay on page, inline "검색 결과가 없어요" shown
   }
@@ -119,7 +119,7 @@ export function DubaiCookieSearch() {
       s.name.toLowerCase().includes(q),
     );
     if (results.length > 0) {
-      router.replace(`/map/dubaicookie?query=${encodeURIComponent(term)}`);
+      router.replace(`/map/dubai-cookie?query=${encodeURIComponent(term)}`);
     }
     // No results → stay, input set to term, showNoResults will trigger
   }
