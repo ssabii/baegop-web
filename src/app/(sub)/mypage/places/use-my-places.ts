@@ -20,7 +20,7 @@ interface MyPlacesResponse {
 const LIMIT = 10;
 
 export function useMyPlaces() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, refetch } =
     useInfiniteQuery({
       queryKey: mypageKeys.places,
       queryFn: async ({ pageParam = 0 }) => {
@@ -42,5 +42,7 @@ export function useMyPlaces() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isError,
+    refetch,
   };
 }
