@@ -21,8 +21,8 @@ export interface PlacesResult {
 }
 
 /**
- * "created_at" → DB-level ORDER + RANGE (efficient, supports incremental pagination)
- * "rating" | "review_count" → JS-level sort after full fetch (reviews are computed)
+ * 모든 정렬은 places의 집계 컬럼(avg_rating, review_count)을 사용해
+ * DB 레벨 ORDER + RANGE로 처리한다. (집계 컬럼은 reviews 트리거로 유지 — 020 참조)
  */
 export type PlacesOrderBy = "created_at" | "rating" | "review_count";
 
@@ -31,7 +31,7 @@ export interface PlacesFilter {
   minRating?: number;
   /** 최소 리뷰 수 */
   minReviewCount?: number;
-  /** ISO string — DB 레벨 gte 필터 */
+  /** ISO string — created_at gte 필터 */
   createdAfter?: string;
 }
 
@@ -45,95 +45,16 @@ export interface FetchPlacesOptions {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const KONA_ORDER: Record<string, number> = {
-  available: 0,
-  unavailable: 1,
-  unknown: 2,
-};
-
 const DEFAULT_LIMIT = 10;
 
-function computeReviewAggregates(reviews: { rating: number }[]) {
-  const reviewCount = reviews.length;
-  const avgRating =
-    reviewCount > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
-      : null;
-  return { avg_rating: avgRating, review_count: reviewCount };
-}
-
 function toPlaceRow(raw: Record<string, unknown>): PlaceRow {
-  const { reviews, image_urls, ...rest } = raw;
-  const aggregates = computeReviewAggregates(
-    (reviews as { rating: number }[]) ?? [],
-  );
+  const { image_urls, ...rest } = raw;
   return {
     ...rest,
     image_urls: Array.isArray(image_urls)
       ? optimizeNaverImageUrls(image_urls)
       : image_urls,
-    ...aggregates,
   } as PlaceRow;
-}
-
-function applyFilter(places: PlaceRow[], filter: PlacesFilter): PlaceRow[] {
-  return places.filter((p) => {
-    if (
-      filter.minRating !== undefined &&
-      (p.avg_rating === null || p.avg_rating < filter.minRating)
-    )
-      return false;
-    if (
-      filter.minReviewCount !== undefined &&
-      p.review_count < filter.minReviewCount
-    )
-      return false;
-    return true;
-  });
-}
-
-function sortByRating(places: PlaceRow[], ascending: boolean): PlaceRow[] {
-  return [...places].sort((a, b) => {
-    // Primary: avg_rating
-    let primary = 0;
-    if (a.avg_rating === null && b.avg_rating === null) primary = 0;
-    else if (a.avg_rating === null) primary = ascending ? -1 : 1;
-    else if (b.avg_rating === null) primary = ascending ? 1 : -1;
-    else
-      primary = ascending
-        ? a.avg_rating - b.avg_rating
-        : b.avg_rating - a.avg_rating;
-
-    if (primary !== 0) return primary;
-
-    // Secondary: review_count desc
-    const reviewDiff = b.review_count - a.review_count;
-    if (reviewDiff !== 0) return reviewDiff;
-
-    // Tertiary: kona_card_status, id asc
-    const konaA = KONA_ORDER[String(a.kona_card_status ?? "unknown")] ?? 2;
-    const konaB = KONA_ORDER[String(b.kona_card_status ?? "unknown")] ?? 2;
-    return konaA - konaB || String(a.id).localeCompare(String(b.id));
-  });
-}
-
-function sortByReviewCount(places: PlaceRow[], ascending: boolean): PlaceRow[] {
-  return [...places].sort((a, b) => {
-    const primary = ascending
-      ? a.review_count - b.review_count
-      : b.review_count - a.review_count;
-    if (primary !== 0) return primary;
-
-    const konaA = KONA_ORDER[String(a.kona_card_status ?? "unknown")] ?? 2;
-    const konaB = KONA_ORDER[String(b.kona_card_status ?? "unknown")] ?? 2;
-    return konaA - konaB || String(a.id).localeCompare(String(b.id));
-  });
-}
-
-function paginate(places: PlaceRow[], cursor: number, limit: number) {
-  const items = places.slice(cursor, cursor + limit);
-  const nextCursor = cursor + limit < places.length ? cursor + limit : null;
-  return { items, nextCursor };
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -147,19 +68,35 @@ export async function fetchPlaces({
 }: FetchPlacesOptions = {}): Promise<PlacesResult> {
   const supabase = await createClient();
 
-  let query = supabase.from("places").select("*, reviews(rating)");
+  let query = supabase.from("places").select("*");
 
   if (filter.createdAfter) {
     query = query.gte("created_at", filter.createdAfter);
   }
+  if (filter.minRating !== undefined) {
+    query = query.gte("avg_rating", filter.minRating);
+  }
+  if (filter.minReviewCount !== undefined) {
+    query = query.gte("review_count", filter.minReviewCount);
+  }
 
-  // DB-level ordering + pagination — only possible for actual columns
-  if (orderBy === "created_at") {
+  // DB 레벨 정렬 + 페이지네이션 (집계 컬럼 기반). id를 최종 tie-breaker로 안정 정렬.
+  if (orderBy === "rating") {
+    query = query
+      .order("avg_rating", { ascending, nullsFirst: ascending })
+      .order("review_count", { ascending: false })
+      .order("id", { ascending: true });
+  } else if (orderBy === "review_count") {
+    query = query
+      .order("review_count", { ascending })
+      .order("id", { ascending: true });
+  } else {
     query = query
       .order("created_at", { ascending })
-      .order("id")
-      .range(cursor, cursor + limit - 1);
+      .order("id", { ascending: true });
   }
+
+  query = query.range(cursor, cursor + limit - 1);
 
   const { data: rawPlaces, error } = await query;
   if (error) throw new Error(error.message);
@@ -168,17 +105,6 @@ export async function fetchPlaces({
     toPlaceRow(raw),
   );
 
-  if (orderBy === "created_at") {
-    const nextCursor = places.length === limit ? cursor + limit : null;
-    return { items: places, nextCursor };
-  }
-
-  // JS-level: filter → sort → paginate
-  const filtered = applyFilter(places, filter);
-  const sorted =
-    orderBy === "rating"
-      ? sortByRating(filtered, ascending)
-      : sortByReviewCount(filtered, ascending);
-
-  return paginate(sorted, cursor, limit);
+  const nextCursor = places.length === limit ? cursor + limit : null;
+  return { items: places, nextCursor };
 }

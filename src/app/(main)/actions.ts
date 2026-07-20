@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { PG_UNIQUE_VIOLATION } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
+import { assertValidReviewInput } from "@/lib/validation";
 import type { NaverPlaceDetail } from "@/types";
 
 export async function createPlaceWithReview(
@@ -22,6 +23,8 @@ export async function createPlaceWithReview(
   if (!user) {
     throw new Error("로그인이 필요합니다");
   }
+
+  assertValidReviewInput(review);
 
   // 이미 등록된 장소인지 확인
   const { data: existing } = await supabase

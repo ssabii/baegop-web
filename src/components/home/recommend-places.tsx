@@ -1,6 +1,7 @@
 "use client";
 
 import { MapPinOff, MapPin } from "lucide-react";
+import { ListErrorState } from "@/components/list-error-state";
 import { PlaceCard } from "@/components/places";
 import { PlaceCardSkeleton } from "@/components/places/place-card-skeleton";
 import {
@@ -40,7 +41,10 @@ export function RecommendPlaces() {
   const { coords, loading: geoLoading } = useGeolocation();
 
   const location = coords ?? SEOUL_CITY_HALL_LOCATION;
-  const { places, isLoading } = useRecommendPlaces(location.lat, location.lng);
+  const { places, isLoading, isError, refetch } = useRecommendPlaces(
+    location.lat,
+    location.lng,
+  );
 
   if (geoLoading || isLoading) {
     return (
@@ -50,6 +54,21 @@ export function RecommendPlaces() {
           <h2 className="text-base font-bold">내 주변 추천</h2>
         </div>
         <RecommendPlacesSkeleton />
+      </section>
+    );
+  }
+
+  if (isError) {
+    return (
+      <section>
+        <div className="flex items-center gap-1.5 py-2">
+          <MapPin className="text-primary size-4" />
+          <h2 className="text-base font-bold">내 주변 추천</h2>
+        </div>
+        <ListErrorState
+          onRetry={refetch}
+          title="추천을 불러오지 못했어요"
+        />
       </section>
     );
   }

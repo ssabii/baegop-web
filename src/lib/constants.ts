@@ -247,6 +247,12 @@ export const MAX_FEEDBACK_CONTENT_LENGTH = 3000;
 export const MIN_FEEDBACK_CONTENT_LENGTH = 10;
 export const MAX_FEEDBACK_IMAGES = 5;
 
+// 리뷰
+export const MIN_REVIEW_RATING = 1;
+export const MAX_REVIEW_RATING = 5;
+export const MAX_REVIEW_CONTENT_LENGTH = 300;
+export const MAX_REVIEW_IMAGES = 5;
+
 // 포인트 배분
 export const POINTS = {
   PLACE_REGISTRATION: 2,

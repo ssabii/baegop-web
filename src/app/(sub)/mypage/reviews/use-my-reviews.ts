@@ -23,7 +23,7 @@ interface MyReviewsResponse {
 const LIMIT = 10;
 
 export function useMyReviews(userId: string) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, refetch } =
     useInfiniteQuery({
       queryKey: mypageKeys.reviews(userId),
       queryFn: async ({ pageParam = 0 }) => {
@@ -45,5 +45,7 @@ export function useMyReviews(userId: string) {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isError,
+    refetch,
   };
 }

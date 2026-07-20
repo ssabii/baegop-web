@@ -4,6 +4,7 @@ import { Send } from "lucide-react";
 import Link from "next/link";
 import { useInView } from "react-intersection-observer";
 import { BottomActionBar } from "@/components/bottom-action-bar";
+import { ListErrorState } from "@/components/list-error-state";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -28,6 +29,8 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isError,
+    refetch,
   } = useMyFeedbacks(userId);
 
   const { ref: sentinelRef } = useInView({
@@ -42,6 +45,14 @@ export function MyFeedbackList({ userId }: MyFeedbackListProps) {
     return (
       <div className="flex flex-1 items-center justify-center">
         <Spinner className="text-primary size-8" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <ListErrorState onRetry={refetch} />
       </div>
     );
   }
