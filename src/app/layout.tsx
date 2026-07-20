@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import AnalyticsTracker from "@/components/analytics-tracker";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "@/providers";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,6 +27,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#12151a" },
+  ],
 };
 
 export default function RootLayout({
