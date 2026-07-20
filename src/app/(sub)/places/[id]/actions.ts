@@ -2,6 +2,7 @@
 
 import { toOriginalSupabaseImageUrl } from "@/lib/image";
 import { createClient } from "@/lib/supabase/server";
+import { assertValidReviewInput } from "@/lib/validation";
 import type { KonaCardStatus, KonaVote } from "@/types";
 
 export async function createReview(
@@ -15,6 +16,8 @@ export async function createReview(
   } = await supabase.auth.getUser();
 
   if (!user) throw new Error("로그인이 필요합니다");
+
+  assertValidReviewInput(data, imageUrls?.length ?? 0);
 
   const { error } = await supabase.from("reviews").insert({
     place_id: placeId,
@@ -72,6 +75,11 @@ export async function updateReview(
   } = await supabase.auth.getUser();
 
   if (!user) throw new Error("로그인이 필요합니다");
+
+  assertValidReviewInput(
+    data,
+    keptImageUrls.length + (newImageUrls?.length ?? 0),
+  );
 
   // 기존 이미지 URL 조회
   const { data: existing } = await supabase

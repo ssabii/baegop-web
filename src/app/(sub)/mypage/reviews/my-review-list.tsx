@@ -2,6 +2,7 @@
 
 import { MessageCircle } from "lucide-react";
 import { useInView } from "react-intersection-observer";
+import { ListErrorState } from "@/components/list-error-state";
 import { ReviewCard } from "@/components/reviews";
 import {
   Empty,
@@ -17,8 +18,15 @@ interface MyReviewListProps {
 }
 
 export function MyReviewList({ userId }: MyReviewListProps) {
-  const { reviews, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useMyReviews(userId);
+  const {
+    reviews,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    refetch,
+  } = useMyReviews(userId);
 
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
@@ -32,6 +40,14 @@ export function MyReviewList({ userId }: MyReviewListProps) {
     return (
       <div className="flex flex-1 items-center justify-center">
         <Spinner className="text-primary size-8" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <ListErrorState onRetry={refetch} />
       </div>
     );
   }

@@ -9,6 +9,7 @@ import {
 import { ThemeProvider } from "next-themes";
 import { lazy, Suspense, useState } from "react";
 import { ConfirmDialogProvider } from "@/components/confirm-dialog-provider";
+import { QUERY_STALE_TIME } from "@/lib/constants";
 
 const ReactQueryDevtools =
   process.env.NODE_ENV === "development"
@@ -26,7 +27,16 @@ export default function Providers({
   children: React.ReactNode;
   dehydratedState?: DehydratedState;
 }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: QUERY_STALE_TIME,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

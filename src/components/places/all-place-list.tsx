@@ -1,6 +1,7 @@
 "use client";
 
 import { useInView } from "react-intersection-observer";
+import { ListErrorState } from "@/components/list-error-state";
 import { PlaceCard, EmptyPlace } from "@/components/places";
 import { Spinner } from "@/components/ui/spinner";
 import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
@@ -9,8 +10,15 @@ import { useAllPlaces } from "./use-all-places";
 export function AllPlaceList() {
   useScrollRestoration();
 
-  const { places, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useAllPlaces();
+  const {
+    places,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    refetch,
+  } = useAllPlaces();
 
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
@@ -24,6 +32,14 @@ export function AllPlaceList() {
     return (
       <div className="flex flex-1 items-center justify-center">
         <Spinner className="text-primary size-8" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <ListErrorState onRetry={refetch} />
       </div>
     );
   }

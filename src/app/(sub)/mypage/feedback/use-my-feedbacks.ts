@@ -10,7 +10,7 @@ interface MyFeedbacksResponse {
 const LIMIT = 10;
 
 export function useMyFeedbacks(userId: string) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, refetch } =
     useInfiniteQuery({
       queryKey: mypageKeys.feedbacks(userId),
       queryFn: async ({ pageParam = 0 }) => {
@@ -32,5 +32,7 @@ export function useMyFeedbacks(userId: string) {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isError,
+    refetch,
   };
 }

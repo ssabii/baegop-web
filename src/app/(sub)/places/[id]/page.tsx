@@ -22,6 +22,55 @@ import { PlaceMap } from "./place-map";
 import { PlaceShortcuts } from "./place-shortcuts";
 import { PlaceTabsWithUrl } from "./place-tabs-with-url";
 import type { KonaCardStatus, KonaVote, NaverPlaceDetail } from "@/types";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+
+  const supabase = await createClient();
+  const { data: place } = await supabase
+    .from("places")
+    .select("name, category, address, image_urls")
+    .eq("id", id)
+    .single();
+
+  let name = place?.name ?? null;
+  let category = place?.category ?? null;
+  let address = place?.address ?? null;
+  let imageUrl = place?.image_urls?.[0] ?? null;
+
+  // DB에 없는 장소는 네이버 상세로 폴백 (fetchPlaceDetail은 캐시됨)
+  if (!name) {
+    const detail = await fetchPlaceDetail(id);
+    if (detail) {
+      name = detail.name;
+      category = detail.category;
+      address = detail.roadAddress || detail.address;
+      imageUrl = detail.imageUrls[0] ?? null;
+    }
+  }
+
+  // 정보를 찾지 못하면 루트 레이아웃의 기본 메타데이터를 사용
+  if (!name) return {};
+
+  const title = `${name} | 배곱`;
+  const description =
+    [category, address].filter(Boolean).join(" · ") || "배고플땐 배곱";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(imageUrl ? { images: [{ url: imageUrl }] } : {}),
+    },
+  };
+}
 
 export default async function PlaceDetailPage({
   params,

@@ -14,10 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { useImageForm } from "@/hooks/use-image-form";
+import { MAX_REVIEW_CONTENT_LENGTH, MAX_REVIEW_IMAGES } from "@/lib/constants";
 import { useUpdateReview } from "./use-update-review";
-
-const MAX_IMAGES = 5;
-const MAX_CONTENT_LENGTH = 300;
 
 interface ReviewFormEditProps {
   naverPlaceId: string;
@@ -47,7 +45,7 @@ export function ReviewFormEdit({
 
   const imageForm = useImageForm({
     initialImageUrls: review.image_urls,
-    maxImages: MAX_IMAGES,
+    maxImages: MAX_REVIEW_IMAGES,
   });
 
   const [contentDrawerOpen, setContentDrawerOpen] = useState(false);
@@ -145,7 +143,7 @@ export function ReviewFormEdit({
               )}
             </button>
             <p className="text-muted-foreground mt-1 text-right text-sm">
-              {content.length}/{MAX_CONTENT_LENGTH}
+              {content.length}/{MAX_REVIEW_CONTENT_LENGTH}
             </p>
           </div>
           <ContentDrawerEditor
@@ -155,13 +153,13 @@ export function ReviewFormEdit({
             initialValue={content}
             onConfirm={setContent}
             placeholder="장소에 대한 자세한 리뷰를 남겨주세요"
-            maxLength={MAX_CONTENT_LENGTH}
+            maxLength={MAX_REVIEW_CONTENT_LENGTH}
             rows={5}
           />
 
           <ImageSelector
             label="사진"
-            maxImages={MAX_IMAGES}
+            maxImages={MAX_REVIEW_IMAGES}
             keptImageUrls={imageForm.keptImageUrls}
             previews={imageForm.previews}
             totalImageCount={imageForm.totalImageCount}

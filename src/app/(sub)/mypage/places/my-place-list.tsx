@@ -2,6 +2,7 @@
 
 import { Heart } from "lucide-react";
 import { useInView } from "react-intersection-observer";
+import { ListErrorState } from "@/components/list-error-state";
 import { PlaceCard } from "@/components/places";
 import {
   Empty,
@@ -13,8 +14,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { useMyPlaces } from "./use-my-places";
 
 export function MyPlaceList() {
-  const { places, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useMyPlaces();
+  const {
+    places,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    refetch,
+  } = useMyPlaces();
 
   const { ref: sentinelRef } = useInView({
     onChange: (inView) => {
@@ -28,6 +36,14 @@ export function MyPlaceList() {
     return (
       <div className="flex flex-1 items-center justify-center">
         <Spinner className="text-primary size-8" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <ListErrorState onRetry={refetch} />
       </div>
     );
   }

@@ -76,12 +76,6 @@ export default async function MyPage() {
               newBadge
               inGroup
             />
-            <MypageMenuItem
-              href="/map/dubai-cookie"
-              title="두쫀쿠 지도"
-              newBadge
-              inGroup
-            />
           </ItemGroup>
           <ItemGroup className="bg-background rounded-xl">
             <MypageMenuItem

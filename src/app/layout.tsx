@@ -10,7 +10,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { getServerProfile } from "@/lib/queries/profile";
 import { profileKeys } from "@/lib/query-keys";
 import Providers from "@/providers";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +33,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#12151a" },
+  ],
 };
 
 export default async function RootLayout({
