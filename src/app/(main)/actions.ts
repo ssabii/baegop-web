@@ -80,6 +80,9 @@ export async function createPlaceWithReview(
     image_urls: imageUrls.length > 0 ? imageUrls : null,
   });
 
+  if (reviewError?.code === PG_UNIQUE_VIOLATION) {
+    throw new Error("이미 이 장소에 리뷰를 작성했어요");
+  }
   if (reviewError) {
     throw new Error("리뷰 작성에 실패했습니다");
   }

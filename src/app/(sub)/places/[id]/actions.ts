@@ -1,5 +1,6 @@
 "use server";
 
+import { PG_UNIQUE_VIOLATION } from "@/lib/constants";
 import { toOriginalSupabaseImageUrl } from "@/lib/image";
 import { createClient } from "@/lib/supabase/server";
 import type { KonaCardStatus, KonaVote } from "@/types";
@@ -24,6 +25,9 @@ export async function createReview(
     image_urls: imageUrls?.length ? imageUrls : null,
   });
 
+  if (error?.code === PG_UNIQUE_VIOLATION) {
+    throw new Error("이미 이 장소에 리뷰를 작성했어요");
+  }
   if (error) throw new Error("리뷰 작성에 실패했습니다");
 }
 
