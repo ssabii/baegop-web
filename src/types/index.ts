@@ -1,15 +1,7 @@
 import type { Tables } from "./database";
 
 // DB 테이블 타입 (자동 생성 기반)
-export type Profile = Tables<"profiles">;
-export type Place = Tables<"places">;
-export type Review = Tables<"reviews">;
 export type Feedback = Tables<"feedbacks">;
-
-// 릴레이션 포함 타입 (JOIN 조회용)
-export type PlaceWithProfile = Place & {
-  profile?: Profile;
-};
 
 // 리터럴 타입 (DB에서 text로 저장되지만 앱에서는 좁은 타입으로 사용)
 export type KonaCardStatus = "available" | "unavailable" | "unknown";
