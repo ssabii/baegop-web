@@ -12,10 +12,6 @@ const GRAPHQL_HEADERS = {
   Origin: "https://m.place.naver.com",
 };
 
-export function buildNaverPlaceLink(placeId: string): string {
-  return `https://m.place.naver.com/restaurant/${placeId}/home`;
-}
-
 /** 네이버 플레이스 상세 정보 조회 (이미지 복수, 메뉴 이미지/추천 포함) */
 export async function fetchPlaceDetail(
   placeId: string,
@@ -153,22 +149,6 @@ export async function fetchPlaceBySearch(
   } catch {
     return null;
   }
-}
-
-/** 네이버 플레이스 상세 조회 (Tier 1 → Tier 2 폴백) */
-export async function fetchPlaceDetailWithFallback(
-  placeId: string,
-  placeName?: string,
-): Promise<NaverPlaceDetail | null> {
-  const detail = await fetchPlaceDetail(placeId);
-  if (detail) return detail;
-
-  if (placeName) {
-    const searchResult = await fetchPlaceBySearch(placeId, placeName);
-    if (searchResult) return searchResult;
-  }
-
-  return null;
 }
 
 /** WGS84 좌표를 Web Mercator (EPSG:3857) 좌표로 변환 */

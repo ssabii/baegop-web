@@ -1,19 +1,6 @@
-import type { FeedbackCategory, KonaCardStatus } from "@/types";
-
-export const KONA_CARD_LABELS: Record<KonaCardStatus, string> = {
-  available: "코나카드 가능",
-  unavailable: "코나카드 불가",
-  unknown: "미확인",
-};
+import type { FeedbackCategory } from "@/types";
 
 // 코나카드 투표 임계값은 DB app_config 테이블에서 관리 (key: 'kona_vote_threshold')
-
-// 인기 장소 기준
-export const POPULAR_RATING_THRESHOLD = 4.3;
-export const POPULAR_MIN_REVIEW_COUNT = 3;
-
-// 최근 장소 기준 일수
-export const RECENT_DAYS = 7;
 
 // React Query 기본 staleTime (5분)
 export const QUERY_STALE_TIME = 5 * 60 * 1000;
